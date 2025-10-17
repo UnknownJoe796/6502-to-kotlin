@@ -50,8 +50,8 @@ data class CfgConstruction(
     val functions: List<FunctionCfg>,
 )
 
-private fun basicBlockTerminatorOp(lines: List<AssemblyLine>, bb: BasicBlock): AssemblyOp? {
-    val endInstr = lines[bb.endIndex].instruction ?: return null
+private fun basicBlockTerminatorOp(codeFile: AssemblyCodeFile, bb: BasicBlock): AssemblyOp? {
+    val endInstr = codeFile.lines[bb.endIndex].instruction ?: return null
     return endInstr.op
 }
 
@@ -59,7 +59,7 @@ private fun basicBlockTerminatorOp(lines: List<AssemblyLine>, bb: BasicBlock): A
  * Build a program-level CFG and per-entry (function) CFGs.
  * By design, this pass does NOT create inter-procedural edges for JSR; JSR keeps only a FALL_THROUGH edge.
  */
-fun List<AssemblyLine>.constructCfg(
+fun AssemblyCodeFile.constructCfg(
     resolution: AddressResolution = this.resolveAddresses(),
     reachability: ReachabilityReport = this.analyzeReachability(resolution, this.discoverEntryPoints(resolution)),
     blocks: BasicBlockConstruction = this.constructBasicBlocks(resolution, reachability),

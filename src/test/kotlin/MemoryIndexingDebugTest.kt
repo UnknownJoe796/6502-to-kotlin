@@ -27,12 +27,12 @@ class MemoryIndexingDebugTest {
         
         println("=== Definitions ===")
         mainFunction.definitions.forEach { def ->
-            println("${def.lineIndex}: ${def.variable} (${lines[def.lineIndex].originalLine?.trim()})")
+            println("${def.lineRef.line}: ${def.variable} (${def.lineRef.content.originalLine?.trim()})")
         }
         
         println("=== Uses ===")
         mainFunction.uses.forEach { use ->
-            println("${use.lineIndex}: ${use.variable} (${lines[use.lineIndex].originalLine?.trim()})")
+            println("${use.lineRef.line}: ${use.variable} (${use.lineRef.content.originalLine?.trim()})")
         }
         
         val xUses = mainFunction.uses.filter { it.variable == Variable.RegisterX }
@@ -42,7 +42,7 @@ class MemoryIndexingDebugTest {
         println("Y uses: ${yUses.size}")
         
         // Debug addressing modes
-        lines.forEachIndexed { index, line ->
+        lines.lines.forEachIndexed { index, line ->
             line.instruction?.let { instr ->
                 if (instr.address != null) {
                     println("Line $index: ${instr.op} ${instr.address} (${instr.address!!::class.simpleName})")

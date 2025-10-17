@@ -28,7 +28,7 @@ class DominatorDebugTest {
             println("Function: ${fn.entryLabel} (entry=${fn.entryLeader})")
             println("  Blocks: ${fn.blocks.size}")
             fn.blocks.forEach { block ->
-                println("    Block ${block.leaderIndex}: ${lines[block.leaderIndex].originalLine?.trim()}")
+                println("    Block ${block.leaderIndex}: ${lines[block.leaderIndex].content.originalLine?.trim()}")
             }
             println("  Edges: ${fn.edges.size}")
             fn.edges.forEach { edge ->

@@ -71,7 +71,7 @@ private fun labelOrHexToAddress(label: String, resolution: AddressResolution): I
 /**
  * Construct basic blocks for reachable code lines only.
  */
-fun List<AssemblyLine>.constructBasicBlocks(
+fun AssemblyCodeFile.constructBasicBlocks(
     resolution: AddressResolution = this.resolveAddresses(),
     reachability: ReachabilityReport = this.analyzeReachability(resolution, this.discoverEntryPoints(resolution)),
     entries: EntryPointDiscovery = this.discoverEntryPoints(resolution),
@@ -108,7 +108,7 @@ fun List<AssemblyLine>.constructBasicBlocks(
 
     // Add all labeled instructions as leaders (important for basic block boundaries)
     reachable.forEach { idx ->
-        val line = this[idx]
+        val line = this.lines[idx]
         if (line.label != null) {
             leaders += idx
         }

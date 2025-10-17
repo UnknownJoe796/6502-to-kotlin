@@ -96,7 +96,7 @@ private fun AssemblyInstruction.successorAddresses(
     return out
 }
 
-fun List<AssemblyLine>.analyzeReachability(
+fun AssemblyCodeFile.analyzeReachability(
     resolution: AddressResolution = this.resolveAddresses(),
     entries: EntryPointDiscovery = this.discoverEntryPoints(resolution),
 ): ReachabilityReport {

@@ -116,8 +116,7 @@ class DataFlowAnalysisTest {
         
         // Check use-def chains for the STA instruction
         val staUse = aUses.find { 
-            val line = lines[it.lineIndex]
-            line.instruction?.op == AssemblyOp.STA
+            it.lineRef.content.instruction?.op == AssemblyOp.STA
         }
         assertNotNull(staUse, "Should find STA use of A register")
         

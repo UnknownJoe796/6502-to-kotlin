@@ -58,7 +58,7 @@ class ReachabilityTest {
         // Basic properties
         assertTrue(reach.reachableLineIndexes.isNotEmpty(), "There should be some reachable code lines")
         // Reachable must be subset of instruction lines
-        assertTrue(reach.reachableLineIndexes.all { lines[it].instruction != null }, "Reachable set should contain only instruction lines")
+        assertTrue(reach.reachableLineIndexes.all { lines[it].content.instruction != null }, "Reachable set should contain only instruction lines")
         // Ensure no data lines included
         val anyDataReachable = reach.reachableLineIndexes.any { res.resolved[it].isData }
         assertEquals(false, anyDataReachable, "No data lines should be marked as reachable code")

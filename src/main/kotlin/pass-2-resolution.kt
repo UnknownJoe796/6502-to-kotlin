@@ -19,7 +19,7 @@ data class AddressResolution(
     val labelToAddress: Map<String, Int>
 )
 
-fun List<AssemblyLine>.resolveAddresses(baseAddress: Int = 0): AddressResolution {
+fun AssemblyCodeFile.resolveAddresses(baseAddress: Int = 0): AddressResolution {
     val resolved = mutableListOf<ResolvedLine>()
     val labelToAddress = mutableMapOf<String, Int>()
     var pc = baseAddress
@@ -94,7 +94,7 @@ fun List<AssemblyLine>.resolveAddresses(baseAddress: Int = 0): AddressResolution
         return 3
     }
 
-    this.forEach { line ->
+    this.lines.forEach { line ->
         // If there is a label on this line, map it to the current pc before consuming bytes
         line.label?.let { lbl -> labelToAddress.putIfAbsent(lbl, pc) }
 

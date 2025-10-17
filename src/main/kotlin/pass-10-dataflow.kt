@@ -12,25 +12,33 @@ package com.ivieleague.decompiler6502tokotlin
  * Represents a variable definition in the program
  */
 data class Definition(
-    /** The line index where this definition occurs */
-    val lineIndex: Int,
+    /** The line reference where this definition occurs */
+    val lineRef: AssemblyLineReference,
     /** The variable being defined (register, memory location, etc.) */
     val variable: Variable,
     /** The basic block leader where this definition occurs */
     val blockLeader: Int
-)
+) {
+    /** Legacy property for backward compatibility */
+    @Deprecated("Use lineRef instead", ReplaceWith("lineRef.line"))
+    val lineIndex: Int get() = lineRef.line
+}
 
 /**
  * Represents a variable use in the program
  */
 data class Use(
-    /** The line index where this use occurs */
-    val lineIndex: Int,
+    /** The line reference where this use occurs */
+    val lineRef: AssemblyLineReference,
     /** The variable being used */
     val variable: Variable,
     /** The basic block leader where this use occurs */
     val blockLeader: Int
-)
+) {
+    /** Legacy property for backward compatibility */
+    @Deprecated("Use lineRef instead", ReplaceWith("lineRef.line"))
+    val lineIndex: Int get() = lineRef.line
+}
 
 /**
  * Represents a variable in the 6502 system
@@ -142,7 +150,7 @@ data class DataFlowAnalysis(
 /**
  * Perform data flow analysis on all functions
  */
-fun List<AssemblyLine>.analyzeDataFlow(
+fun AssemblyCodeFile.analyzeDataFlow(
     cfg: CfgConstruction,
     dominators: DominatorConstruction
 ): DataFlowAnalysis {
@@ -155,10 +163,19 @@ fun List<AssemblyLine>.analyzeDataFlow(
 }
 
 /**
+ * Legacy extension for backward compatibility
+ */
+@Deprecated("Use AssemblyCodeFile.analyzeDataFlow instead")
+fun List<AssemblyLine>.analyzeDataFlow(
+    cfg: CfgConstruction,
+    dominators: DominatorConstruction
+): DataFlowAnalysis = this.toCodeFile().analyzeDataFlow(cfg, dominators)
+
+/**
  * Analyze data flow for a single function
  */
 private fun analyzeDataFlowForFunction(
-    lines: List<AssemblyLine>,
+    codeFile: AssemblyCodeFile,
     function: FunctionCfg,
     dominatorAnalysis: DominatorAnalysis
 ): FunctionDataFlow {
@@ -168,10 +185,11 @@ private fun analyzeDataFlowForFunction(
     
     function.blocks.forEach { block ->
         block.lineIndexes.forEach { lineIndex ->
-            val line = lines[lineIndex]
+            val lineRef = codeFile.get(lineIndex)
+            val line = lineRef.content
             line.instruction?.let { instr ->
                 // Extract definitions and uses from this instruction
-                extractDefinitionsAndUses(lineIndex, instr, block.leaderIndex, definitions, uses)
+                extractDefinitionsAndUses(lineRef, instr, block.leaderIndex, definitions, uses)
             }
         }
     }
@@ -227,7 +245,7 @@ private fun analyzeDataFlowForFunction(
  * Extract definitions and uses from a single instruction
  */
 private fun extractDefinitionsAndUses(
-    lineIndex: Int,
+    lineRef: AssemblyLineReference,
     instruction: AssemblyInstruction,
     blockLeader: Int,
     definitions: MutableList<Definition>,
@@ -239,165 +257,165 @@ private fun extractDefinitionsAndUses(
     when (op) {
         // Load instructions - define target register, use source
         AssemblyOp.LDA -> {
-            definitions.add(Definition(lineIndex, Variable.RegisterA, blockLeader))
-            extractUsesFromOperand(lineIndex, instruction, blockLeader, uses)
+            definitions.add(Definition(lineRef, Variable.RegisterA, blockLeader))
+            extractUsesFromOperand(lineRef, instruction, blockLeader, uses)
         }
         AssemblyOp.LDX -> {
-            definitions.add(Definition(lineIndex, Variable.RegisterX, blockLeader))
-            extractUsesFromOperand(lineIndex, instruction, blockLeader, uses)
+            definitions.add(Definition(lineRef, Variable.RegisterX, blockLeader))
+            extractUsesFromOperand(lineRef, instruction, blockLeader, uses)
         }
         AssemblyOp.LDY -> {
-            definitions.add(Definition(lineIndex, Variable.RegisterY, blockLeader))
-            extractUsesFromOperand(lineIndex, instruction, blockLeader, uses)
+            definitions.add(Definition(lineRef, Variable.RegisterY, blockLeader))
+            extractUsesFromOperand(lineRef, instruction, blockLeader, uses)
         }
         
         // Store instructions - use source register, define target memory
         AssemblyOp.STA -> {
-            uses.add(Use(lineIndex, Variable.RegisterA, blockLeader))
-            extractUsesFromOperand(lineIndex, instruction, blockLeader, uses) // For index registers
-            extractDefinitionsFromOperand(lineIndex, instruction, blockLeader, definitions)
+            uses.add(Use(lineRef, Variable.RegisterA, blockLeader))
+            extractUsesFromOperand(lineRef, instruction, blockLeader, uses) // For index registers
+            extractDefinitionsFromOperand(lineRef, instruction, blockLeader, definitions)
         }
         AssemblyOp.STX -> {
-            uses.add(Use(lineIndex, Variable.RegisterX, blockLeader))
-            extractUsesFromOperand(lineIndex, instruction, blockLeader, uses) // For index registers
-            extractDefinitionsFromOperand(lineIndex, instruction, blockLeader, definitions)
+            uses.add(Use(lineRef, Variable.RegisterX, blockLeader))
+            extractUsesFromOperand(lineRef, instruction, blockLeader, uses) // For index registers
+            extractDefinitionsFromOperand(lineRef, instruction, blockLeader, definitions)
         }
         AssemblyOp.STY -> {
-            uses.add(Use(lineIndex, Variable.RegisterY, blockLeader))
-            extractUsesFromOperand(lineIndex, instruction, blockLeader, uses) // For index registers
-            extractDefinitionsFromOperand(lineIndex, instruction, blockLeader, definitions)
+            uses.add(Use(lineRef, Variable.RegisterY, blockLeader))
+            extractUsesFromOperand(lineRef, instruction, blockLeader, uses) // For index registers
+            extractDefinitionsFromOperand(lineRef, instruction, blockLeader, definitions)
         }
         
         // Arithmetic/logic instructions - define A, use A and operand
         AssemblyOp.ADC, AssemblyOp.SBC, AssemblyOp.AND, AssemblyOp.ORA, AssemblyOp.EOR, AssemblyOp.CMP -> {
-            uses.add(Use(lineIndex, Variable.RegisterA, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterA, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
-            extractUsesFromOperand(lineIndex, instruction, blockLeader, uses)
+            uses.add(Use(lineRef, Variable.RegisterA, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterA, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
+            extractUsesFromOperand(lineRef, instruction, blockLeader, uses)
         }
         
         // Register operations
         AssemblyOp.TAX -> {
-            uses.add(Use(lineIndex, Variable.RegisterA, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterX, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            uses.add(Use(lineRef, Variable.RegisterA, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterX, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         AssemblyOp.TAY -> {
-            uses.add(Use(lineIndex, Variable.RegisterA, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterY, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            uses.add(Use(lineRef, Variable.RegisterA, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterY, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         AssemblyOp.TXA -> {
-            uses.add(Use(lineIndex, Variable.RegisterX, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterA, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            uses.add(Use(lineRef, Variable.RegisterX, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterA, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         AssemblyOp.TYA -> {
-            uses.add(Use(lineIndex, Variable.RegisterY, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterA, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            uses.add(Use(lineRef, Variable.RegisterY, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterA, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         AssemblyOp.TXS -> {
-            uses.add(Use(lineIndex, Variable.RegisterX, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StackPointer, blockLeader))
+            uses.add(Use(lineRef, Variable.RegisterX, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StackPointer, blockLeader))
         }
         AssemblyOp.TSX -> {
-            uses.add(Use(lineIndex, Variable.StackPointer, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterX, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            uses.add(Use(lineRef, Variable.StackPointer, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterX, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         
         // Increment/decrement
         AssemblyOp.INX -> {
-            uses.add(Use(lineIndex, Variable.RegisterX, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterX, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            uses.add(Use(lineRef, Variable.RegisterX, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterX, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         AssemblyOp.INY -> {
-            uses.add(Use(lineIndex, Variable.RegisterY, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterY, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            uses.add(Use(lineRef, Variable.RegisterY, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterY, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         AssemblyOp.DEX -> {
-            uses.add(Use(lineIndex, Variable.RegisterX, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterX, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            uses.add(Use(lineRef, Variable.RegisterX, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterX, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         AssemblyOp.DEY -> {
-            uses.add(Use(lineIndex, Variable.RegisterY, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterY, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            uses.add(Use(lineRef, Variable.RegisterY, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterY, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         
         // Memory increment/decrement
         AssemblyOp.INC, AssemblyOp.DEC -> {
-            extractUsesFromOperand(lineIndex, instruction, blockLeader, uses)
-            extractDefinitionsFromOperand(lineIndex, instruction, blockLeader, definitions)
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            extractUsesFromOperand(lineRef, instruction, blockLeader, uses)
+            extractDefinitionsFromOperand(lineRef, instruction, blockLeader, definitions)
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         
         // Shifts and rotates
         AssemblyOp.ASL, AssemblyOp.LSR, AssemblyOp.ROL, AssemblyOp.ROR -> {
             if (instruction.address == null) {
                 // Accumulator mode
-                uses.add(Use(lineIndex, Variable.RegisterA, blockLeader))
-                definitions.add(Definition(lineIndex, Variable.RegisterA, blockLeader))
+                uses.add(Use(lineRef, Variable.RegisterA, blockLeader))
+                definitions.add(Definition(lineRef, Variable.RegisterA, blockLeader))
             } else {
                 // Memory mode
-                extractUsesFromOperand(lineIndex, instruction, blockLeader, uses)
-                extractDefinitionsFromOperand(lineIndex, instruction, blockLeader, definitions)
+                extractUsesFromOperand(lineRef, instruction, blockLeader, uses)
+                extractDefinitionsFromOperand(lineRef, instruction, blockLeader, definitions)
             }
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         
         // Branches - use status flags
         AssemblyOp.BCC, AssemblyOp.BCS, AssemblyOp.BEQ, AssemblyOp.BMI, AssemblyOp.BNE, 
         AssemblyOp.BPL, AssemblyOp.BVC, AssemblyOp.BVS -> {
-            uses.add(Use(lineIndex, Variable.StatusFlags, blockLeader))
+            uses.add(Use(lineRef, Variable.StatusFlags, blockLeader))
         }
         
         // Stack operations
         AssemblyOp.PHA -> {
-            uses.add(Use(lineIndex, Variable.RegisterA, blockLeader))
-            uses.add(Use(lineIndex, Variable.StackPointer, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StackPointer, blockLeader))
+            uses.add(Use(lineRef, Variable.RegisterA, blockLeader))
+            uses.add(Use(lineRef, Variable.StackPointer, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StackPointer, blockLeader))
         }
         AssemblyOp.PLA -> {
-            uses.add(Use(lineIndex, Variable.StackPointer, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterA, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StackPointer, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            uses.add(Use(lineRef, Variable.StackPointer, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterA, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StackPointer, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         AssemblyOp.PHP -> {
-            uses.add(Use(lineIndex, Variable.StatusFlags, blockLeader))
-            uses.add(Use(lineIndex, Variable.StackPointer, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StackPointer, blockLeader))
+            uses.add(Use(lineRef, Variable.StatusFlags, blockLeader))
+            uses.add(Use(lineRef, Variable.StackPointer, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StackPointer, blockLeader))
         }
         AssemblyOp.PLP -> {
-            uses.add(Use(lineIndex, Variable.StackPointer, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StackPointer, blockLeader))
+            uses.add(Use(lineRef, Variable.StackPointer, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StackPointer, blockLeader))
         }
         
         // Flag operations
         AssemblyOp.CLC, AssemblyOp.SEC, AssemblyOp.CLI, AssemblyOp.SEI, 
         AssemblyOp.CLV, AssemblyOp.CLD, AssemblyOp.SED -> {
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         
         // Compare instructions
         AssemblyOp.CPX, AssemblyOp.CPY -> {
             val register = if (op == AssemblyOp.CPX) Variable.RegisterX else Variable.RegisterY
-            uses.add(Use(lineIndex, register, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
-            extractUsesFromOperand(lineIndex, instruction, blockLeader, uses)
+            uses.add(Use(lineRef, register, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
+            extractUsesFromOperand(lineRef, instruction, blockLeader, uses)
         }
         
         // Bit test
         AssemblyOp.BIT -> {
-            extractUsesFromOperand(lineIndex, instruction, blockLeader, uses)
-            uses.add(Use(lineIndex, Variable.RegisterA, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            extractUsesFromOperand(lineRef, instruction, blockLeader, uses)
+            uses.add(Use(lineRef, Variable.RegisterA, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
         
         // Other instructions that don't affect registers directly
@@ -405,17 +423,17 @@ private fun extractDefinitionsAndUses(
             // These may have side effects but don't directly define/use registers
             // JSR/RTS affect stack pointer but we handle that separately
             if (op == AssemblyOp.JSR || op == AssemblyOp.RTS) {
-                uses.add(Use(lineIndex, Variable.StackPointer, blockLeader))
-                definitions.add(Definition(lineIndex, Variable.StackPointer, blockLeader))
+                uses.add(Use(lineRef, Variable.StackPointer, blockLeader))
+                definitions.add(Definition(lineRef, Variable.StackPointer, blockLeader))
             }
         }
         
         else -> {
             // Unknown instruction - be conservative and assume it affects everything
-            definitions.add(Definition(lineIndex, Variable.RegisterA, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterX, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.RegisterY, blockLeader))
-            definitions.add(Definition(lineIndex, Variable.StatusFlags, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterA, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterX, blockLeader))
+            definitions.add(Definition(lineRef, Variable.RegisterY, blockLeader))
+            definitions.add(Definition(lineRef, Variable.StatusFlags, blockLeader))
         }
     }
 }
@@ -424,7 +442,7 @@ private fun extractDefinitionsAndUses(
  * Extract uses from an operand
  */
 private fun extractUsesFromOperand(
-    lineIndex: Int,
+    lineRef: AssemblyLineReference,
     instruction: AssemblyInstruction,
     blockLeader: Int,
     uses: MutableList<Use>
@@ -441,41 +459,41 @@ private fun extractUsesFromOperand(
             
             // Indexed addressing - use index register and base address
             is AssemblyAddressing.DirectX -> {
-                uses.add(Use(lineIndex, Variable.RegisterX, blockLeader))
+                uses.add(Use(lineRef, Variable.RegisterX, blockLeader))
                 val baseAddr = parseAddressFromLabel(addressing.label)
                 if (baseAddr != null) {
                     val variable = if (baseAddr < 256) Variable.ZeroPage(baseAddr) else Variable.Memory(baseAddr)
-                    uses.add(Use(lineIndex, variable, blockLeader))
+                    uses.add(Use(lineRef, variable, blockLeader))
                 }
             }
             is AssemblyAddressing.DirectY -> {
-                uses.add(Use(lineIndex, Variable.RegisterY, blockLeader))
+                uses.add(Use(lineRef, Variable.RegisterY, blockLeader))
                 val baseAddr = parseAddressFromLabel(addressing.label)
                 if (baseAddr != null) {
                     val variable = if (baseAddr < 256) Variable.ZeroPage(baseAddr) else Variable.Memory(baseAddr)
-                    uses.add(Use(lineIndex, variable, blockLeader))
+                    uses.add(Use(lineRef, variable, blockLeader))
                 }
             }
             
             // Indirect addressing
             is AssemblyAddressing.IndirectX -> {
-                uses.add(Use(lineIndex, Variable.RegisterX, blockLeader))
+                uses.add(Use(lineRef, Variable.RegisterX, blockLeader))
                 val baseAddr = parseAddressFromLabel(addressing.label)
                 if (baseAddr != null) {
-                    uses.add(Use(lineIndex, Variable.Indirect(baseAddr), blockLeader))
+                    uses.add(Use(lineRef, Variable.Indirect(baseAddr), blockLeader))
                 }
             }
             is AssemblyAddressing.IndirectY -> {
-                uses.add(Use(lineIndex, Variable.RegisterY, blockLeader))
+                uses.add(Use(lineRef, Variable.RegisterY, blockLeader))
                 val baseAddr = parseAddressFromLabel(addressing.label)
                 if (baseAddr != null) {
-                    uses.add(Use(lineIndex, Variable.Indirect(baseAddr), blockLeader))
+                    uses.add(Use(lineRef, Variable.Indirect(baseAddr), blockLeader))
                 }
             }
             is AssemblyAddressing.IndirectAbsolute -> {
                 val baseAddr = parseAddressFromLabel(addressing.label)
                 if (baseAddr != null) {
-                    uses.add(Use(lineIndex, Variable.Indirect(baseAddr), blockLeader))
+                    uses.add(Use(lineRef, Variable.Indirect(baseAddr), blockLeader))
                 }
             }
             
@@ -484,7 +502,7 @@ private fun extractUsesFromOperand(
                 val addr = parseAddressFromLabel(addressing.label)
                 if (addr != null) {
                     val variable = if (addr < 256) Variable.ZeroPage(addr) else Variable.Memory(addr)
-                    uses.add(Use(lineIndex, variable, blockLeader))
+                    uses.add(Use(lineRef, variable, blockLeader))
                 }
             }
             
@@ -500,7 +518,7 @@ private fun extractUsesFromOperand(
  * Extract definitions from an operand (for store instructions)
  */
 private fun extractDefinitionsFromOperand(
-    lineIndex: Int,
+    lineRef: AssemblyLineReference,
     instruction: AssemblyInstruction,
     blockLeader: Int,
     definitions: MutableList<Definition>
@@ -512,14 +530,14 @@ private fun extractDefinitionsFromOperand(
                 val baseAddr = parseAddressFromLabel(addressing.label)
                 if (baseAddr != null) {
                     val variable = if (baseAddr < 256) Variable.ZeroPage(baseAddr) else Variable.Memory(baseAddr)
-                    definitions.add(Definition(lineIndex, variable, blockLeader))
+                    definitions.add(Definition(lineRef, variable, blockLeader))
                 }
             }
             is AssemblyAddressing.DirectY -> {
                 val baseAddr = parseAddressFromLabel(addressing.label)
                 if (baseAddr != null) {
                     val variable = if (baseAddr < 256) Variable.ZeroPage(baseAddr) else Variable.Memory(baseAddr)
-                    definitions.add(Definition(lineIndex, variable, blockLeader))
+                    definitions.add(Definition(lineRef, variable, blockLeader))
                 }
             }
             
@@ -527,19 +545,19 @@ private fun extractDefinitionsFromOperand(
             is AssemblyAddressing.IndirectX -> {
                 val baseAddr = parseAddressFromLabel(addressing.label)
                 if (baseAddr != null) {
-                    definitions.add(Definition(lineIndex, Variable.Indirect(baseAddr), blockLeader))
+                    definitions.add(Definition(lineRef, Variable.Indirect(baseAddr), blockLeader))
                 }
             }
             is AssemblyAddressing.IndirectY -> {
                 val baseAddr = parseAddressFromLabel(addressing.label)
                 if (baseAddr != null) {
-                    definitions.add(Definition(lineIndex, Variable.Indirect(baseAddr), blockLeader))
+                    definitions.add(Definition(lineRef, Variable.Indirect(baseAddr), blockLeader))
                 }
             }
             is AssemblyAddressing.IndirectAbsolute -> {
                 val baseAddr = parseAddressFromLabel(addressing.label)
                 if (baseAddr != null) {
-                    definitions.add(Definition(lineIndex, Variable.Indirect(baseAddr), blockLeader))
+                    definitions.add(Definition(lineRef, Variable.Indirect(baseAddr), blockLeader))
                 }
             }
             
@@ -548,7 +566,7 @@ private fun extractDefinitionsFromOperand(
                 val addr = parseAddressFromLabel(addressing.label)
                 if (addr != null) {
                     val variable = if (addr < 256) Variable.ZeroPage(addr) else Variable.Memory(addr)
-                    definitions.add(Definition(lineIndex, variable, blockLeader))
+                    definitions.add(Definition(lineRef, variable, blockLeader))
                 }
             }
             
@@ -704,13 +722,13 @@ private fun buildUseDefChains(
         
         // Find definitions within the same block that come before this use
         val defsInBlock = blockFact?.gen?.filter { 
-            it.variable == use.variable && it.lineIndex < use.lineIndex 
+            it.variable == use.variable && it.lineRef.line < use.lineRef.line 
         } ?: emptyList()
         
         val allReachingDefs = if (defsInBlock.isNotEmpty()) {
             // If there are definitions in the same block, use only the most recent one
             // (later definitions kill earlier ones and definitions from block entry)
-            setOf(defsInBlock.maxByOrNull { it.lineIndex }!!)
+            setOf(defsInBlock.maxByOrNull { it.lineRef.line }!!)
         } else {
             // No definitions in block before this use, so use definitions reaching from entry
             blockFact?.reachIn?.filter { it.variable == use.variable }?.toSet() ?: emptySet()
@@ -737,11 +755,11 @@ private fun buildDefUseChains(
             if (definition.blockLeader == use.blockLeader) {
                 // Same block: definition reaches use if it comes before and no other definition
                 // of the same variable comes between them
-                if (definition.lineIndex < use.lineIndex) {
+                if (definition.lineRef.line < use.lineRef.line) {
                     val defsInBetween = blockFact?.gen?.any { otherDef ->
                         otherDef.variable == definition.variable &&
-                        otherDef.lineIndex > definition.lineIndex &&
-                        otherDef.lineIndex < use.lineIndex
+                        otherDef.lineRef.line > definition.lineRef.line &&
+                        otherDef.lineRef.line < use.lineRef.line
                     } ?: false
                     
                     if (!defsInBetween) {
@@ -754,7 +772,7 @@ private fun buildDefUseChains(
                 val reachesFromIn = blockFact?.reachIn?.contains(definition) == true
                 if (reachesFromIn) {
                     val killedInBlock = blockFact?.gen?.any { otherDef ->
-                        otherDef.variable == definition.variable && otherDef.lineIndex < use.lineIndex
+                        otherDef.variable == definition.variable && otherDef.lineRef.line < use.lineRef.line
                     } ?: false
                     
                     if (!killedInBlock) {

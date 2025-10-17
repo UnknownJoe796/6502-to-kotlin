@@ -446,7 +446,7 @@ sealed class AssemblyAddressing {
     }
 }
 
-fun String.parseAssemblyLines(): List<AssemblyLine> {
+fun String.parseAssemblyLines(): AssemblyCodeFile {
     return this.split('\n')
         .map { line ->
             val label = line.substringBefore(':', "").trim().takeIf { it.isNotBlank() }
@@ -476,6 +476,7 @@ fun String.parseAssemblyLines(): List<AssemblyLine> {
                 originalLine = line
             )
         }
+        .let { AssemblyCodeFile(it) }
 }
 
 data class SymbolTable(
@@ -483,10 +484,10 @@ data class SymbolTable(
     val duplicates: Map<String, List<Int>>
 )
 
-fun List<AssemblyLine>.buildSymbolTable(): SymbolTable {
+fun AssemblyCodeFile.buildSymbolTable(): SymbolTable {
     val labelToLineIndex = mutableMapOf<String, Int>()
     val duplicates = mutableMapOf<String, MutableList<Int>>()
-    this.forEachIndexed { index, line ->
+    lines.forEachIndexed { index, line ->
         val lbl = line.label?.trim()
         if (!lbl.isNullOrEmpty()) {
             val existing = labelToLineIndex.putIfAbsent(lbl, index)

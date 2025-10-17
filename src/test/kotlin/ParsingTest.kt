@@ -14,7 +14,7 @@ class ParsingTest {
         val text = Files.readString(path)
         val lines = text.parseAssemblyLines()
         // basic sanity checks
-        assertTrue(lines.isNotEmpty(), "Parsed lines should not be empty")
+        assertTrue(lines.lines.isNotEmpty(), "Parsed lines should not be empty")
         assertEquals(text.lines().size, lines.size, "Line count should match input")
 
         // build symbol table
@@ -38,7 +38,7 @@ class ParsingTest {
         val lines = text.parseAssemblyLines()
 
         // Find a known .db line with numeric bytes
-        val target = lines.firstOrNull { it.originalLine?.contains(".db \$10, \$51, \$88, \$c0", ignoreCase = true) == true }
+        val target = lines.lines.firstOrNull { it.originalLine?.contains(".db \$10, \$51, \$88, \$c0", ignoreCase = true) == true }
         assertTrue(target != null, "Expected to find known .db line in disassembly")
 
         val data = target!!.data

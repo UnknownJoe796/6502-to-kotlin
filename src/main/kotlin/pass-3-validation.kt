@@ -49,14 +49,14 @@ private fun allowedCategories(op: AssemblyOp): Set<AddressCategory> = op.allowed
 /**
  * Enhanced validation that checks addressing modes, opcodes, and data placement
  */
-fun List<AssemblyLine>.validateDisassembly(
+fun AssemblyCodeFile.validateDisassembly(
     resolution: AddressResolution? = null,
     reachability: ReachabilityReport? = null
 ): ValidationReport {
     val issues = mutableListOf<ValidationIssue>()
     val labelReferences = mutableSetOf<String>()
 
-    this.forEachIndexed { idx, line ->
+    this.lines.forEachIndexed { idx, line ->
         // Collect label references for later validation
         line.instruction?.address?.let { addr ->
             when (addr) {
@@ -121,11 +121,11 @@ fun List<AssemblyLine>.validateDisassembly(
 
     // 4. Check for data embedded in code sections (if reachability provided)
     if (resolution != null && reachability != null) {
-        this.forEachIndexed { idx, line ->
+        this.lines.forEachIndexed { idx, line ->
             if (line.data != null) {
                 // Check if this data line is surrounded by reachable instructions
-                val prevInstr = (idx-1 downTo 0).find { i -> this[i].instruction != null }
-                val nextInstr = (idx+1 until this.size).find { i -> this[i].instruction != null }
+                val prevInstr = (idx-1 downTo 0).find { i -> this.lines[i].instruction != null }
+                val nextInstr = (idx+1 until this.lines.size).find { i -> this.lines[i].instruction != null }
                 
                 val prevReachable = prevInstr?.let { it in reachability.reachableLineIndexes } == true
                 val nextReachable = nextInstr?.let { it in reachability.reachableLineIndexes } == true

@@ -49,7 +49,7 @@ data class FunctionBoundaryDetection(
  * Detect function boundaries using the CFG from Pass 7. Tail calls (JMP to another entry leader)
  * are treated as exits and do not traverse into the callee blocks.
  */
-fun List<AssemblyLine>.detectFunctionBoundaries(
+fun AssemblyCodeFile.detectFunctionBoundaries(
     resolution: AddressResolution = this.resolveAddresses(),
     entries: EntryPointDiscovery = this.discoverEntryPoints(resolution),
     reachability: ReachabilityReport = this.analyzeReachability(resolution, entries),

@@ -37,7 +37,7 @@ class Pass6BasicBlocksFixTest {
         // Find any block that should have fall-through
         val blockWithFallThrough = blocks.blocks.find { block ->
             val endLine = lines[block.endIndex]
-            val op = endLine.instruction?.op
+            val op = endLine.content.instruction?.op
             // Should have fall-through if it's not a terminator, unconditional jump, etc.
             op != null && op != AssemblyOp.RTS && op != AssemblyOp.RTI && op != AssemblyOp.BRK && op != AssemblyOp.JMP
         }
@@ -87,7 +87,7 @@ class Pass6BasicBlocksFixTest {
         
         // JMP should not have fall-through
         val jumpBlock = blocks.blocks.find { 
-            lines[it.endIndex].instruction?.op == AssemblyOp.JMP
+            lines[it.endIndex].content.instruction?.op == AssemblyOp.JMP
         }
         assertNotNull(jumpBlock, "Should find JMP block")
         assertEquals(null, jumpBlock.fallThroughLeader, "JMP should not have fall-through")
@@ -113,7 +113,7 @@ class Pass6BasicBlocksFixTest {
         
         // Find the block ending with BEQ
         val branchBlock = blocks.blocks.find { 
-            lines[it.endIndex].instruction?.op == AssemblyOp.BEQ
+            lines[it.endIndex].content.instruction?.op == AssemblyOp.BEQ
         }
         assertNotNull(branchBlock, "Should find branch block")
         

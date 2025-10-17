@@ -76,7 +76,7 @@ class CfgConstructionTest {
 
         // Sanity: no data lines are represented as blocks (ensured by pass 6)
         // Also ensure that blocks ending with JMP have no FALL_THROUGH edges
-        val leaderToOp = cfg.program.blocks.associate { it.leaderIndex to (lines[it.endIndex].instruction?.op) }
+        val leaderToOp = cfg.program.blocks.associate { it.leaderIndex to (lines[it.endIndex].content.instruction?.op) }
         cfg.program.edges.groupBy { it.fromLeader }.forEach { (from, edges) ->
             val op = leaderToOp[from]
             if (op == AssemblyOp.JMP) {

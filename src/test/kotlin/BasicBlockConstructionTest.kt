@@ -59,7 +59,7 @@ class BasicBlockConstructionTest {
         // There should be a block that ends with JMP and has no fall-through
         val jmpBlock = bb.blocks.first { block ->
             val lastIdx = block.endIndex
-            val op = lines[lastIdx].instruction!!.op
+            val op = lines[lastIdx].content.instruction!!.op
             op == AssemblyOp.JMP
         }
         assertTrue(jmpBlock.fallThroughLeader == null, "Block ending with JMP should not have fall-through")
@@ -81,7 +81,7 @@ class BasicBlockConstructionTest {
         bb.blocks.forEach { block ->
             block.lineIndexes.forEach { idx ->
                 val r = res.resolved[idx]
-                assertTrue(!r.isData && lines[idx].instruction != null, "Basic block should not include data lines")
+                assertTrue(!r.isData && lines[idx].content.instruction != null, "Basic block should not include data lines")
             }
         }
     }

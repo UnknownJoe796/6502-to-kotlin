@@ -66,7 +66,7 @@ data class DominatorConstruction(
 /**
  * Build dominator trees for all functions using Lengauer-Tarjan algorithm
  */
-fun List<AssemblyLine>.constructDominatorTrees(
+fun AssemblyCodeFile.constructDominatorTrees(
     cfg: CfgConstruction
 ): DominatorConstruction {
     val functionAnalyses = cfg.functions.map { function ->
@@ -75,6 +75,14 @@ fun List<AssemblyLine>.constructDominatorTrees(
     
     return DominatorConstruction(functions = functionAnalyses)
 }
+
+/**
+ * Legacy extension for backward compatibility
+ */
+@Deprecated("Use AssemblyCodeFile.constructDominatorTrees instead")
+fun List<AssemblyLine>.constructDominatorTrees(
+    cfg: CfgConstruction
+): DominatorConstruction = this.toCodeFile().constructDominatorTrees(cfg)
 
 /**
  * Build dominator analysis for a single function
@@ -149,10 +157,13 @@ private fun buildDominatorAnalysisForFunction(function: FunctionCfg): DominatorA
         }
     }
     
+    // Compute dominance frontiers for SSA construction
+    computeDominanceFrontiers(domNodes, successors, dominators)
+
     // Find back edges and natural loops
     val backEdges = findBackEdges(edges, dominators)
     val naturalLoops = findNaturalLoops(backEdges, successors, predecessors, dominators)
-    
+
     return DominatorAnalysis(
         function = function,
         dominatorTree = rootNode,

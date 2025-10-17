@@ -29,24 +29,24 @@ class DataFlowDebugTest {
         
         println("=== Definitions ===")
         mainFunction.definitions.forEach { def ->
-            println("${def.lineIndex}: ${def.variable} (${lines[def.lineIndex].originalLine?.trim()})")
+            println("${def.lineRef.line}: ${def.variable} (${def.lineRef.content.originalLine?.trim()})")
         }
         
         println("=== Uses ===")
         mainFunction.uses.forEach { use ->
-            println("${use.lineIndex}: ${use.variable} (${lines[use.lineIndex].originalLine?.trim()})")
+            println("${use.lineRef.line}: ${use.variable} (${use.lineRef.content.originalLine?.trim()})")
         }
         
         println("=== Dead Definitions ===")
         mainFunction.deadDefinitions.forEach { def ->
-            println("${def.lineIndex}: ${def.variable} (${lines[def.lineIndex].originalLine?.trim()})")
+            println("${def.lineRef.line}: ${def.variable} (${def.lineRef.content.originalLine?.trim()})")
         }
         
         println("=== Def-Use Chains ===")
         mainFunction.defUseChains.forEach { chain ->
-            println("Def ${chain.definition.lineIndex}: ${chain.definition.variable} -> ${chain.reachedUses.size} uses")
+            println("Def ${chain.definition.lineRef.line}: ${chain.definition.variable} -> ${chain.reachedUses.size} uses")
             chain.reachedUses.forEach { use ->
-                println("  Use ${use.lineIndex}: ${use.variable}")
+                println("  Use ${use.lineRef.line}: ${use.variable}")
             }
         }
     }

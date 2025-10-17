@@ -39,7 +39,7 @@ private fun primaryLabelForAddress(address: Int, labelToAddress: Map<String, Int
  * @param exportedLabels Optional set of label names considered exported/public.
  * @param interruptLabelNames Optional mapping of interrupt kinds to a set of candidate label names to probe in the symbol table.
  */
-fun List<AssemblyLine>.discoverEntryPoints(
+fun AssemblyCodeFile.discoverEntryPoints(
     resolution: AddressResolution = this.resolveAddresses(),
     exportedLabels: Set<String> = emptySet(),
     interruptLabelNames: Map<EntryPointKind, Set<String>> = mapOf(
@@ -54,7 +54,7 @@ fun List<AssemblyLine>.discoverEntryPoints(
     val uniq = linkedSetOf<Triple<EntryPointKind, Int?, String?>>()
 
     // 1) JSR targets from code
-    this.forEach { line ->
+    this.lines.forEach { line ->
         val instr = line.instruction ?: return@forEach
         if (instr.op == AssemblyOp.JSR) {
             when (val a = instr.address) {
@@ -88,7 +88,7 @@ fun List<AssemblyLine>.discoverEntryPoints(
     }
 
     // 4) Jump tables - basic detection of indirect JMP patterns
-    this.forEachIndexed { idx, line ->
+    this.lines.forEachIndexed { idx, line ->
         val instr = line.instruction ?: return@forEachIndexed
         if (instr.op == AssemblyOp.JMP && instr.address is AssemblyAddressing.IndirectAbsolute) {
             val indirectLabel = (instr.address as AssemblyAddressing.IndirectAbsolute).label
@@ -96,7 +96,7 @@ fun List<AssemblyLine>.discoverEntryPoints(
             if (indirectAddr != null) {
                 // Look for data sections that might contain jump table entries
                 // This is a simple heuristic - look for .word/.db directives near the indirect address
-                this.forEachIndexed { dataIdx, dataLine ->
+                this.lines.forEachIndexed { dataIdx, dataLine ->
                     if (dataLine.data is AssemblyData.Db) {
                         val dataResolved = resolution.resolved.getOrNull(dataIdx)
                         val dataAddr = dataResolved?.address
