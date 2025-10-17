@@ -1,0 +1,136 @@
+package com.ivieleague.decompiler6502tokotlin
+
+/**
+ * Pass 4: Entry Point Discovery
+ * - Identify function entry points from code references and conventions
+ * - Sources:
+ *   - JSR targets (direct subroutine calls)
+ *   - Interrupt vectors via well-known label names (NMI, RESET, IRQ) if present
+ *   - Exported/public labels supplied by caller
+ *   - Jump table targets (placeholder for now)
+ */
+
+enum class EntryPointKind {
+    JSR_TARGET,
+    INTERRUPT_NMI,
+    INTERRUPT_RESET,
+    INTERRUPT_IRQ,
+    EXPORTED,
+    JUMP_TABLE,
+}
+
+data class EntryPoint(
+    val label: String?,
+    val address: Int?,
+    val kind: EntryPointKind,
+)
+
+data class EntryPointDiscovery(
+    val entryPoints: List<EntryPoint>
+)
+
+
+private fun primaryLabelForAddress(address: Int, labelToAddress: Map<String, Int>): String? =
+    labelToAddress.entries.firstOrNull { it.value == address }?.key
+
+/**
+ * Discover entry points.
+ * @param resolution Address resolution for the same lines. If not provided by caller, it will be computed with baseAddress=0.
+ * @param exportedLabels Optional set of label names considered exported/public.
+ * @param interruptLabelNames Optional mapping of interrupt kinds to a set of candidate label names to probe in the symbol table.
+ */
+fun List<AssemblyLine>.discoverEntryPoints(
+    resolution: AddressResolution = this.resolveAddresses(),
+    exportedLabels: Set<String> = emptySet(),
+    interruptLabelNames: Map<EntryPointKind, Set<String>> = mapOf(
+        EntryPointKind.INTERRUPT_NMI to setOf("NMI", "NMIHandler", "VEC_NMI"),
+        EntryPointKind.INTERRUPT_RESET to setOf("RESET", "Reset", "RESET_HANDLER", "Init"),
+        EntryPointKind.INTERRUPT_IRQ to setOf("IRQ", "IrqHandler", "VEC_IRQ")
+    ),
+): EntryPointDiscovery {
+    val labelToAddress = resolution.labelToAddress
+
+    // Use a map to deduplicate by (kind, address, label)
+    val uniq = linkedSetOf<Triple<EntryPointKind, Int?, String?>>()
+
+    // 1) JSR targets from code
+    this.forEach { line ->
+        val instr = line.instruction ?: return@forEach
+        if (instr.op == AssemblyOp.JSR) {
+            when (val a = instr.address) {
+                is AssemblyAddressing.Label -> {
+                    val lbl = a.label
+                    val addr = labelToAddress[lbl] ?: parseHexAddr(lbl)
+                    uniq += Triple(EntryPointKind.JSR_TARGET, addr, lbl.takeIf { it in labelToAddress.keys })
+                }
+                // Future: support other forms if parser changes
+                else -> {
+                    // If it's some other addressing that encodes a constant, we don't currently support.
+                }
+            }
+        }
+    }
+
+    // 2) Interrupt vectors via well-known labels present in symbol table
+    interruptLabelNames.forEach { (kind, candidates) ->
+        candidates.forEach { name ->
+            val addr = labelToAddress[name]
+            if (addr != null) {
+                uniq += Triple(kind, addr, name)
+            }
+        }
+    }
+
+    // 3) Exported/public labels provided by caller
+    exportedLabels.forEach { name ->
+        val addr = labelToAddress[name]
+        if (addr != null) uniq += Triple(EntryPointKind.EXPORTED, addr, name)
+    }
+
+    // 4) Jump tables - basic detection of indirect JMP patterns
+    this.forEachIndexed { idx, line ->
+        val instr = line.instruction ?: return@forEachIndexed
+        if (instr.op == AssemblyOp.JMP && instr.address is AssemblyAddressing.IndirectAbsolute) {
+            val indirectLabel = (instr.address as AssemblyAddressing.IndirectAbsolute).label
+            val indirectAddr = labelToAddress[indirectLabel]
+            if (indirectAddr != null) {
+                // Look for data sections that might contain jump table entries
+                // This is a simple heuristic - look for .word/.db directives near the indirect address
+                this.forEachIndexed { dataIdx, dataLine ->
+                    if (dataLine.data is AssemblyData.Db) {
+                        val dataResolved = resolution.resolved.getOrNull(dataIdx)
+                        val dataAddr = dataResolved?.address
+                        if (dataAddr != null && dataAddr >= indirectAddr && dataAddr <= indirectAddr + 32) {
+                            // Found potential jump table data - extract possible targets
+                            val db = dataLine.data as AssemblyData.Db
+                            db.items.forEach { item ->
+                                when (item) {
+                                    is AssemblyData.DbItem.Expr -> {
+                                        // Check if this looks like a label reference
+                                        val targetAddr = labelToAddress[item.expr]
+                                        if (targetAddr != null) {
+                                            val targetLabel = primaryLabelForAddress(targetAddr, labelToAddress)
+                                            uniq += Triple(EntryPointKind.JUMP_TABLE, targetAddr, targetLabel)
+                                        }
+                                    }
+                                    else -> { /* Skip byte values for now */ }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    val entries = uniq
+        .asSequence()
+        .map { (kind, addr, lbl) ->
+            val label = lbl ?: (addr?.let { primaryLabelForAddress(it, labelToAddress) })
+            EntryPoint(label = label, address = addr, kind = kind)
+        }
+        .sortedWith(compareBy<EntryPoint>({ it.address ?: Int.MAX_VALUE }, { it.label ?: "" }, { it.kind.name }))
+        .toList()
+
+    return EntryPointDiscovery(entries)
+}
