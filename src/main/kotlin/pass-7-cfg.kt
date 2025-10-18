@@ -120,6 +120,7 @@ fun AssemblyCodeFile.constructCfg(
 
     entryDescriptors.forEach { (ep, addr, leader) ->
         // BFS over edges, ignoring RETURN edges (toLeader == null)
+        // Also detect recursive calls: edges that branch back to the function entry
         val seen = linkedSetOf<Int>()
         val queue = ArrayDeque<Int>()
         seen += leader
@@ -129,8 +130,15 @@ fun AssemblyCodeFile.constructCfg(
             val cur = queue.removeFirst()
             edgeByFrom[cur].orEmpty().forEach { e ->
                 if (e.toLeader != null) {
-                    collectedEdges += e
-                    if (seen.add(e.toLeader)) queue += e.toLeader
+                    // Check if this edge branches back to the function entry (recursive call)
+                    // If so, treat it like a RETURN edge - include it but don't traverse
+                    if (e.toLeader == leader && cur != leader) {
+                        // This is a recursive call - convert to a RETURN-like edge
+                        collectedEdges += CfgEdge(e.fromLeader, null, CfgEdgeKind.RETURN)
+                    } else {
+                        collectedEdges += e
+                        if (seen.add(e.toLeader)) queue += e.toLeader
+                    }
                 } else {
                     // RETURN edge, include it but do not traverse
                     collectedEdges += e

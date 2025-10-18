@@ -57,17 +57,25 @@ class Phase4AnalysisDemo {
         log()
 
         // Analyze first few interesting functions
-        val interestingFunctions = cfg.functions.take(5)
+        val interestingFunctionNames = setOf(
+            "ProcessAreaData",
+            "DecodeAreaData"
+        )
 
-        interestingFunctions.forEachIndexed { index, function ->
-            analyzeFunctionInDetail(
-                function,
-                dominators.functions[index],
-                loops.functions[index],
-                conditionals.functions[index],
-                regions.functions[index],
-                gotoElim.functions[index]
-            )
+        cfg.functions.forEachIndexed { index, function ->
+            if (function.entryLabel in interestingFunctionNames) {
+                analyzeFunctionInDetail(
+                    lines,
+                    resolution,
+                    blocks,
+                    function,
+                    dominators.functions[index],
+                    loops.functions[index],
+                    conditionals.functions[index],
+                    regions.functions[index],
+                    gotoElim.functions[index]
+                )
+            }
         }
 
         // Summary statistics
@@ -129,6 +137,9 @@ class Phase4AnalysisDemo {
     }
 
     private fun analyzeFunctionInDetail(
+        lines: AssemblyCodeFile,
+        resolution: AddressResolution,
+        blocks: BasicBlockConstruction,
         function: FunctionCfg,
         dominator: DominatorAnalysis,
         loopInfo: FunctionLoopInfo,
@@ -144,6 +155,10 @@ class Phase4AnalysisDemo {
         log("CFG Edges: ${function.edges.size}")
         log()
 
+        // Print annotated assembly code for this function
+        printAnnotatedAssembly(lines, resolution, blocks, function, dominator, loopInfo, conditionalInfo)
+        log()
+
         // Dominator Analysis
         log("📐 Dominator Tree:")
         log("  Back Edges: ${dominator.backEdges.size}")
@@ -155,7 +170,7 @@ class Phase4AnalysisDemo {
                 log("    ... and ${dominator.backEdges.size - 3} more")
             }
         }
-        log()
+
 
         // Loop Detection
         if (loopInfo.loops.isNotEmpty()) {
@@ -221,6 +236,124 @@ class Phase4AnalysisDemo {
             log("    Remaining gotos: ${stats["gotos"]}")
         }
         log()
+        log("-" * 80)
+    }
+
+    private fun printAnnotatedAssembly(
+        lines: AssemblyCodeFile,
+        resolution: AddressResolution,
+        blocks: BasicBlockConstruction,
+        function: FunctionCfg,
+        dominator: DominatorAnalysis,
+        loopInfo: FunctionLoopInfo,
+        conditionalInfo: FunctionConditionalInfo
+    ) {
+        log("📝 ANNOTATED ASSEMBLY CODE:")
+        log("-" * 80)
+
+        // Build address-to-line-index map
+        val addressToLineIndex = resolution.resolved
+            .mapIndexedNotNull { index, resolvedLine ->
+                resolvedLine.address?.let { it to index }
+            }
+            .toMap()
+
+        // Find all line indices for this function
+        val functionLineIndices = function.blocks
+            .flatMap { block -> block.lineIndexes }
+            .toSet()
+
+        // Get all addresses in this function, sorted
+        val functionAddresses = function.blocks.flatMap { block ->
+            block.lineIndexes.mapNotNull { lineIdx ->
+                resolution.resolved.getOrNull(lineIdx)?.address
+            }
+        }.distinct().sorted()
+
+        // Build annotation maps
+        val blockStarts = mutableMapOf<Int, Int>() // address -> block start address
+        val loopHeaderAddrs = mutableSetOf<Int>()
+        val conditionalHeaderAddrs = mutableSetOf<Int>()
+        val backEdgeTargetAddrs = mutableSetOf<Int>()
+
+        // Build leader index to address map
+        val leaderToAddress = function.blocks.associate { block ->
+            block.leaderIndex to block.startAddress
+        }
+
+        function.blocks.forEach { block ->
+            block.lineIndexes.forEach { lineIdx ->
+                resolution.resolved.getOrNull(lineIdx)?.address?.let { addr ->
+                    blockStarts[addr] = block.startAddress
+                }
+            }
+        }
+
+        loopInfo.loops.forEach { loop ->
+            leaderToAddress[loop.header]?.let { loopHeaderAddrs.add(it) }
+        }
+
+        conditionalInfo.conditionals.forEach { cond ->
+            leaderToAddress[cond.header]?.let { conditionalHeaderAddrs.add(it) }
+        }
+
+        dominator.backEdges.forEach { (_, target) ->
+            leaderToAddress[target]?.let { backEdgeTargetAddrs.add(it) }
+        }
+
+        // Print each line with annotations
+        functionAddresses.forEach { addr ->
+            val lineIdx = addressToLineIndex[addr] ?: return@forEach
+            val line = lines.lines.getOrNull(lineIdx) ?: return@forEach
+            val annotations = mutableListOf<String>()
+
+            // Check if this is a block start
+            if (blockStarts[addr] == addr) {
+                annotations.add("BB_START")
+            }
+
+            // Check if this is a loop header
+            if (loopHeaderAddrs.contains(addr)) {
+                val loop = loopInfo.loops.find { leaderToAddress[it.header] == addr }
+                if (loop != null) {
+                    annotations.add("LOOP_${loop.loopType}")
+                }
+            }
+
+            // Check if this is a conditional header
+            if (conditionalHeaderAddrs.contains(addr)) {
+                val cond = conditionalInfo.conditionals.find { leaderToAddress[it.header] == addr }
+                if (cond != null) {
+                    annotations.add("COND_${cond.type}")
+                }
+            }
+
+            // Check if this is a back edge target
+            if (backEdgeTargetAddrs.contains(addr)) {
+                annotations.add("BACK_EDGE_TARGET")
+            }
+
+            // Format the line
+            val addrStr = "0x${addr.toString(16).uppercase().padStart(4, '0')}"
+            val labelStr = (line.label?.let { "$it:" } ?: "").padEnd(24)
+            val instrStr = buildString {
+                append("  ")
+                if (line.instruction != null) {
+                    append(line.instruction.toString())
+                } else if (line.data != null) {
+                    append(line.data.toString())
+                }
+            }.padEnd(32)
+
+            val annotationStr = if (annotations.isNotEmpty()) {
+                "  ; [${annotations.joinToString(", ")}]"
+            } else {
+                line.comment?.let { "  ; $it" } ?: ""
+            }
+
+            log("  $addrStr  $labelStr$instrStr$annotationStr")
+        }
+
         log("-" * 80)
     }
 
