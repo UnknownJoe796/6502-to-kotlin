@@ -10,7 +10,7 @@ import java.io.File
 class Phase4AnalysisDemo {
 
     // Create output file
-    private val outputFile = File("phase4-analysis-output.txt")
+    private val outputFile = File("outputs/phase4-analysis-output.txt")
     private val output = StringBuilder()
 
     private fun log(msg: String = "") {

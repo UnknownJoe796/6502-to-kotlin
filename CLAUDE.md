@@ -59,7 +59,8 @@ This is a 6502 (NES) to Kotlin decompiler implementing a multi-pass compilation 
 ## Architecture
 
 ### Core Data Model
-- **AssemblyLine**: Represents a single line of assembly (label, instruction/data, comment)
+- **AssemblyLine**: Represents a single line of assembly (label, instruction/data/constant, comment)
+- **AssemblyConstant**: Assembly-time constant definitions using `=` directive (e.g., `Player_X = $86`)
 - **AssemblyInstruction**: Operation + addressing mode combination
 - **AssemblyOp**: Enum of all 6502 opcodes with metadata (affected flags, addressing modes)
 - **AssemblyAddressing**: Sealed class hierarchy for different addressing modes
@@ -99,3 +100,8 @@ The parser builds symbol tables tracking:
 - Label-to-line mappings
 - Duplicate label detection
 - Support for forward references
+- **Assembly-time constants**: Constants defined with `=` directive (e.g., `MyVar = $0722`) are:
+  - Parsed in Pass 1 and stored in `AssemblyLine.constant`
+  - Resolved to addresses in Pass 2 using multi-pass resolution (supports forward references)
+  - Added to the symbol table (`labelToAddress`) alongside labels
+  - Support hex values, decimal values, indexed addressing (e.g., `Array = $0200,X`), and constant references

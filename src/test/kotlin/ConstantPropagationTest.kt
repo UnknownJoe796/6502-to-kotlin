@@ -54,7 +54,7 @@ class ConstantPropagationTest {
 
         val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
-        val entries = lines.discoverEntryPoints(resolution)
+        val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("test"))
         val reachability = lines.analyzeReachability(resolution, entries)
         val blocks = lines.constructBasicBlocks(resolution, reachability, entries)
         val cfg = lines.constructCfg(resolution, reachability, blocks, entries)
@@ -82,7 +82,7 @@ class ConstantPropagationTest {
 
         val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
-        val entries = lines.discoverEntryPoints(resolution)
+        val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("test"))
         val reachability = lines.analyzeReachability(resolution, entries)
         val blocks = lines.constructBasicBlocks(resolution, reachability, entries)
         val cfg = lines.constructCfg(resolution, reachability, blocks, entries)
@@ -111,7 +111,7 @@ class ConstantPropagationTest {
 
         val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
-        val entries = lines.discoverEntryPoints(resolution)
+        val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("test"))
         val reachability = lines.analyzeReachability(resolution, entries)
         val blocks = lines.constructBasicBlocks(resolution, reachability, entries)
         val cfg = lines.constructCfg(resolution, reachability, blocks, entries)
@@ -139,7 +139,7 @@ class ConstantPropagationTest {
 
         val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
-        val entries = lines.discoverEntryPoints(resolution)
+        val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("test"))
         val reachability = lines.analyzeReachability(resolution, entries)
         val blocks = lines.constructBasicBlocks(resolution, reachability, entries)
         val cfg = lines.constructCfg(resolution, reachability, blocks, entries)
@@ -177,7 +177,7 @@ class ConstantPropagationTest {
 
         val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
-        val entries = lines.discoverEntryPoints(resolution)
+        val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("test"))
         val reachability = lines.analyzeReachability(resolution, entries)
         val blocks = lines.constructBasicBlocks(resolution, reachability, entries)
         val cfg = lines.constructCfg(resolution, reachability, blocks, entries)
@@ -205,7 +205,7 @@ class ConstantPropagationTest {
 
         val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
-        val entries = lines.discoverEntryPoints(resolution)
+        val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("test"))
         val reachability = lines.analyzeReachability(resolution, entries)
         val blocks = lines.constructBasicBlocks(resolution, reachability, entries)
         val cfg = lines.constructCfg(resolution, reachability, blocks, entries)

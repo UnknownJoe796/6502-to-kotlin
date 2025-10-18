@@ -19,10 +19,92 @@ data class AddressResolution(
     val labelToAddress: Map<String, Int>
 )
 
+/**
+ * Resolve a constant definition to an integer address
+ * Supports: $XXXX (hex), decimal, and references to other constants
+ */
+private fun resolveConstantValue(
+    addressing: AssemblyAddressing,
+    existingConstants: Map<String, Int>
+): Int? {
+    return when (addressing) {
+        is AssemblyAddressing.ValueHex ->
+            addressing.value.toInt() and 0xFF
+
+        is AssemblyAddressing.ValueDecimal ->
+            addressing.value.toInt() and 0xFF
+
+        is AssemblyAddressing.ValueReference ->
+            existingConstants[addressing.name]
+
+        is AssemblyAddressing.Label -> {
+            // Try parsing as hex or decimal first
+            val parsed = parseHexAddr(addressing.label) ?: addressing.label.toIntOrNull()
+            parsed ?: existingConstants[addressing.label]
+        }
+
+        is AssemblyAddressing.DirectX -> {
+            // Handle indexed constants like "Enemy_Y_Speed = $0705,X"
+            // Just resolve base address; indexing info preserved elsewhere
+            val baseAddr = parseHexAddr(addressing.label) ?: existingConstants[addressing.label]
+            baseAddr
+        }
+
+        is AssemblyAddressing.DirectY -> {
+            val baseAddr = parseHexAddr(addressing.label) ?: existingConstants[addressing.label]
+            baseAddr
+        }
+
+        else -> null
+    }
+}
+
+/**
+ * Resolve constants in multiple passes to handle forward references
+ */
+private fun resolveAllConstants(
+    lines: List<AssemblyLine>
+): Map<String, Int> {
+    val constants = mutableMapOf<String, Int>()
+    val unresolved = mutableListOf<AssemblyConstant>()
+
+    // Collect all constant definitions
+    lines.forEach { line ->
+        line.constant?.let { unresolved.add(it) }
+    }
+
+    // Resolve in multiple passes (max 10 to handle chains)
+    var changed = true
+    var passCount = 0
+    while (changed && passCount < 10) {
+        changed = false
+        passCount++
+
+        val stillUnresolved = mutableListOf<AssemblyConstant>()
+        unresolved.forEach { constant ->
+            val value = resolveConstantValue(constant.value, constants)
+            if (value != null) {
+                constants[constant.name] = value
+                changed = true
+            } else {
+                stillUnresolved.add(constant)
+            }
+        }
+        unresolved.clear()
+        unresolved.addAll(stillUnresolved)
+    }
+
+    return constants
+}
+
 fun AssemblyCodeFile.resolveAddresses(baseAddress: Int = 0): AddressResolution {
     val resolved = mutableListOf<ResolvedLine>()
     val labelToAddress = mutableMapOf<String, Int>()
     var pc = baseAddress
+
+    // PHASE 1: Collect all assembly-time constants
+    val constants = resolveAllConstants(this.lines)
+    labelToAddress.putAll(constants)
 
     fun parseDbByteCount(originalLine: String): Int {
         // Remove comment

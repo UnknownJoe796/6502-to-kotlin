@@ -1,0 +1,379 @@
+================================================================================
+SUPER MARIO BROS - MEMORY LAYOUT WITH TYPE INFERENCE
+================================================================================
+
+Running analysis passes...
+✓ Analysis complete!
+
+📊 ANALYSIS STATISTICS
+--------------------------------------------------------------------------------
+Total Functions Analyzed: 296
+Total Variables Typed: 4
+Total Memory Locations Tracked: 1557
+Assembly Constants Parsed: 535
+Named Memory Locations: 2361
+Memory distribution:
+  PPU: 7 locations
+  ROM: 1200 locations
+  NES RAM: 245 locations
+  APU/IO: 8 locations
+  Zero Page: 87 locations
+  Stack: 10 locations
+
+📈 TYPE DISTRIBUTION
+--------------------------------------------------------------------------------
+BitFlags            : 1 variables
+Enum                : 2 variables
+Pointer             : 1 variables
+
+🎮 REGISTER TYPE ANALYSIS
+--------------------------------------------------------------------------------
+A              : BitFlags
+                 Confidence: 44.1%
+                 Usage count: 3007
+                 Constraints: 118
+
+X              : Enum[255, 5]
+                 Confidence: 0.3%
+                 Usage count: 1130
+                 Constraints: 48
+
+Y              : Enum[0, 1, 7, 19, 6, 20]
+                 Confidence: 69.1%
+                 Usage count: 1201
+                 Constraints: 96
+
+🗺️  MEMORY LAYOUT BY REGION
+--------------------------------------------------------------------------------
+ZERO PAGE ($00-$FF): 87 total locations
+Showing top 40 by usage:
+
+  $00 (TitleScreenModeValue): Scalar, R/W, accesses: 145, reads: 65, writes: 80
+  $08 (BulletBill_FrenzyVar): Scalar, R/W, accesses: 73, reads: 61, writes: 12
+  $1E (Enemy_State): Array[X], R/W, accesses: 70, reads: 46, writes: 24
+  $02 (VictoryModeValue): Scalar, R/W, accesses: 65, reads: 27, writes: 38
+  $01 (GameModeValue): Scalar, R/W, accesses: 61, reads: 34, writes: 27
+  $16 (Fireworks): Array[X], R/W, accesses: 55, reads: 45, writes: 10
+  $CF (Enemy_Y_Position): Array[X], R/W, accesses: 43, reads: 27, writes: 16
+  $06 (World7): Scalar, R/W, accesses: 41, reads: 21, writes: 20
+  $07 (World8): Scalar, R/W, accesses: 39, reads: 13, writes: 26
+  $58 (ExplosionGfxCounter): Array[X], R/W, accesses: 34, reads: 9, writes: 25
+  $CE (Player_Y_Position): Scalar, R/W, accesses: 32, reads: 28, writes: 4
+  $05 (World6): Scalar, R/W, accesses: 31, reads: 10, writes: 21
+  $04 (World5): Scalar, R/W, accesses: 30, reads: 15, writes: 15
+  $A0 (ExplosionTimerCounter): Array[X], R/W, accesses: 30, reads: 13, writes: 17
+  $86 (Player_X_Position): Scalar, R/W, accesses: 28, reads: 21, writes: 7
+  $09 (TallEnemy): Scalar, R/W, accesses: 26, reads: 25, writes: 1
+  $9F (Player_Y_Speed): Array[X], R/W, accesses: 26, reads: 10, writes: 16
+  $0E (GreenParatroopaJump): Scalar, R/W, accesses: 25, reads: 16, writes: 9
+  $57 (Player_X_Speed): Scalar, R/W, accesses: 24, reads: 12, writes: 12
+  $03 (GameOverModeValue): Scalar, R/W, accesses: 23, reads: 7, writes: 16
+  $0F (RedParatroopa): Array[X], R/W, accesses: 23, reads: 12, writes: 11
+  $6D (Player_PageLoc): Scalar, R/W, accesses: 23, reads: 16, writes: 7
+  $FF (Square1SoundQueue): Scalar, R/W, accesses: 22, reads: 1, writes: 21
+  $E7 (AreaDataLow): Scalar, R/W, accesses: 21, reads: 19, writes: 2
+  $1D (Player_State): Scalar, R/W, accesses: 19, reads: 13, writes: 6
+  $6E (Enemy_PageLoc): Array[X], R/W, accesses: 19, reads: 11, writes: 8
+  $46 (Enemy_MovingDir): Array[X], R/W, accesses: 19, reads: 8, writes: 11
+  $87 (Enemy_X_Position): Array[X], R/W, accesses: 18, reads: 10, writes: 8
+  $FE (Square2SoundQueue): Scalar, R/W, accesses: 17, reads: 1, writes: 16
+  $EF: Scalar, R/W, accesses: 16, reads: 13, writes: 3
+  $E9 (EnemyDataLow): Scalar, R/W, accesses: 15, reads: 14, writes: 1
+  $B5 (Player_Y_HighPos): Scalar, R/W, accesses: 15, reads: 13, writes: 2
+  $2A (Misc_State): Array[Y], R/W, accesses: 15, reads: 8, writes: 7
+  $24 (Fireball_State): Array[X], R/W, accesses: 12, reads: 5, writes: 7
+  $33 (BulletBill_CannonVar): Scalar, R/W, accesses: 11, reads: 9, writes: 2
+  $ED: Scalar, R/W, accesses: 11, reads: 8, writes: 3
+  $F4 (AreaMusicBuffer): Scalar, R/W, accesses: 11, reads: 8, writes: 3
+  $EB: Scalar, R/W, accesses: 10, reads: 5, writes: 5
+  $FC (EventMusicQueue): Scalar, R/W, accesses: 8, reads: 1, writes: 7
+  $0C (Podoboo): Scalar, R/W, accesses: 8, reads: 5, writes: 3
+
+NES RAM ($0200-$07FF): 245 total locations
+Showing all in usage order:
+
+  $0747 (TimerControl): Scalar, R/W, accesses: 19, reads: 15, writes: 4
+  $074E (AreaType): Scalar, R/W, accesses: 19, reads: 18, writes: 1
+  $0200 (Sprite_Y_Position): Array[Y], R/W, accesses: 19, reads: 1, writes: 18
+  $0202 (Sprite_Attributes): Array[Y], R/W, accesses: 19, reads: 3, writes: 16
+  $06E5 (Enemy_SprDataOffset): Array[X], R/O, accesses: 17, reads: 17, writes: 0
+  $0203 (Sprite_X_Position): Array[Y], R/W, accesses: 17, reads: 1, writes: 16
+  $03AE (Enemy_Rel_XPos): Scalar, R/W, accesses: 16, reads: 15, writes: 1
+  $04AC (BoundingBox_UL_Corner): Array[Y], R/W, accesses: 16, reads: 12, writes: 4
+  $0300 (VRAM_Buffer1_Offset): Scalar, R/W, accesses: 15, reads: 10, writes: 5
+  $0201 (Sprite_Tilenumber): Array[Y], R/W, accesses: 15, reads: 1, writes: 14
+  $04AE (BoundingBox_LR_Corner): Array[Y], R/W, accesses: 15, reads: 11, writes: 4
+  $07BB (Squ1_SfxLenCounter): Scalar, R/W, accesses: 15, reads: 6, writes: 9
+  $0433 (Player_Y_MoveForce): Array[X], R/W, accesses: 14, reads: 5, writes: 9
+  $0754 (PlayerSize): Scalar, R/W, accesses: 13, reads: 12, writes: 1
+  $07BD (Squ2_SfxLenCounter): Scalar, R/W, accesses: 13, reads: 6, writes: 7
+  $06FC (SavedJoypad1Bits): Array[X], R/W, accesses: 12, reads: 6, writes: 6
+  $07B1 (EventMusicBuffer): Scalar, R/W, accesses: 12, reads: 9, writes: 3
+  $0770 (OperMode): Scalar, R/W, accesses: 11, reads: 7, writes: 4
+  $075F (WorldNumber): Scalar, R/W, accesses: 11, reads: 9, writes: 2
+  $071C (ScreenLeft_X_Pos): Scalar, R/W, accesses: 11, reads: 10, writes: 1
+  $071A (ScreenLeft_PageLoc): Scalar, R/W, accesses: 11, reads: 9, writes: 2
+  $0434 (PiranhaPlantDownYPos): Array[X], R/W, accesses: 11, reads: 4, writes: 7
+  $0796 (EnemyIntervalTimer): Array[Y], R/W, accesses: 10, reads: 5, writes: 5
+  $0491 (Enemy_CollisionBits): Array[X], R/W, accesses: 10, reads: 6, writes: 4
+  $0778 (Mirror_PPU_CTRL_REG1): Scalar, R/W, accesses: 9, reads: 6, writes: 3
+  $0301 (VRAM_Buffer1): Array[X], R/W, accesses: 9, reads: 1, writes: 8
+  $0756 (PlayerStatus): Scalar, R/W, accesses: 9, reads: 4, writes: 5
+  $0730 (AreaObjectLength): Array[X], R/W, accesses: 9, reads: 7, writes: 2
+  $071B (ScreenRight_PageLoc): Scalar, R/W, accesses: 9, reads: 7, writes: 2
+  $0714 (CrouchingFlag): Scalar, R/W, accesses: 9, reads: 8, writes: 1
+  $03D1 (Enemy_OffscreenBits): Scalar, R/O, accesses: 9, reads: 9, writes: 0
+  $0739 (EnemyDataOffset): Scalar, R/W, accesses: 9, reads: 3, writes: 6
+  $03EE (SprDataOffset_Ctrl): Scalar, R/W, accesses: 8, reads: 7, writes: 1
+  $0753 (CurrentPlayer): Scalar, R/W, accesses: 8, reads: 7, writes: 1
+  $03C4 (Player_SprAttrib): Scalar, R/W, accesses: 8, reads: 4, writes: 4
+  $0776 (GamePauseStatus): Scalar, R/W, accesses: 7, reads: 6, writes: 1
+  $0772 (OperMode_Task): Scalar, R/W, accesses: 7, reads: 3, writes: 4
+  $072C (AreaDataOffset): Scalar, R/W, accesses: 7, reads: 4, writes: 3
+  $0700 (Player_XSpeedAbsolute): Scalar, R/W, accesses: 7, reads: 6, writes: 1
+  $0704 (SwimmingFlag): Scalar, R/O, accesses: 7, reads: 7, writes: 0
+  $03D8 (EnemyOffscrBitsMasked): Array[X], R/W, accesses: 7, reads: 5, writes: 2
+  $03B9 (Enemy_Rel_YPos): Scalar, R/O, accesses: 7, reads: 7, writes: 0
+  $070D (PlayerAnimCtrl): Scalar, R/W, accesses: 7, reads: 4, writes: 3
+  $07D7 (TopScoreDisplay): Array[X], R/W, accesses: 6, reads: 4, writes: 2
+  $0773 (VRAM_Buffer_AddrCtrl): Scalar, R/W, accesses: 6, reads: 3, writes: 3
+  $06E4 (Player_SprDataOffset): Array[X], R/W, accesses: 6, reads: 5, writes: 1
+  $072B (AreaObjectPageSel): Scalar, R/W, accesses: 6, reads: 2, writes: 4
+  $072A (AreaObjectPageLoc): Scalar, R/W, accesses: 6, reads: 3, writes: 3
+  $079F (StarInvincibleTimer): Scalar, R/W, accesses: 6, reads: 5, writes: 1
+  $0775 (ScrollAmount): Scalar, R/W, accesses: 6, reads: 3, writes: 3
+  $071D (ScreenRight_X_Pos): Scalar, R/W, accesses: 6, reads: 5, writes: 1
+  $070E (JumpspringAnimCtrl): Scalar, R/W, accesses: 6, reads: 5, writes: 1
+  $0490 (Player_CollisionBits): Scalar, R/W, accesses: 6, reads: 4, writes: 2
+  $047D (Whirlpool_Flag): Array[Y], R/W, accesses: 6, reads: 2, writes: 4
+  $0705 (Player_X_MoveForce): Scalar, R/W, accesses: 6, reads: 2, writes: 4
+  $0417 (PiranhaPlantUpYPos): Array[X], R/W, accesses: 6, reads: 3, writes: 3
+  $06CC (SecondaryHardMode): Scalar, R/O, accesses: 6, reads: 6, writes: 0
+  $049A (Enemy_BoundBoxCtrl): Array[X], W/O, accesses: 6, reads: 0, writes: 6
+  $078A (EnemyFrameTimer): Array[X], R/W, accesses: 6, reads: 3, writes: 3
+  $073B (EnemyObjectPageSel): Scalar, R/W, accesses: 6, reads: 2, writes: 4
+  $075A (NumberofLives): Array[X], R/W, accesses: 5, reads: 2, writes: 3
+  $06EC (Alt_SprDataOffset): Array[X], R/O, accesses: 5, reads: 5, writes: 0
+  $03EC (Block_RepFlag): Array[X], R/W, accesses: 5, reads: 1, writes: 4
+  $071F (AreaParserTaskNum): Scalar, R/W, accesses: 5, reads: 3, writes: 2
+  $0725 (CurrentPageLoc): Scalar, R/W, accesses: 5, reads: 4, writes: 1
+  $0728 (BackloadingFlag): Scalar, R/W, accesses: 5, reads: 4, writes: 1
+  $0750 (AreaPointer): Scalar, R/W, accesses: 5, reads: 2, writes: 3
+  $073D (ScrollThirtyTwo): Scalar, R/W, accesses: 5, reads: 3, writes: 2
+  $0711 (FireballThrowingTimer): Scalar, R/W, accesses: 5, reads: 2, writes: 3
+  $046B (Whirlpool_PageLoc): Array[Y], R/O, accesses: 5, reads: 5, writes: 0
+  $036A (BowserGfxFlag): Scalar, R/W, accesses: 5, reads: 4, writes: 1
+  $076A (PrimaryHardMode): Scalar, R/O, accesses: 5, reads: 5, writes: 0
+  $04AD (BoundingBox_UL_YPos): Array[Y], R/W, accesses: 5, reads: 4, writes: 1
+  $07BF (Noise_SfxLenCounter): Scalar, R/W, accesses: 5, reads: 2, writes: 3
+  $0779 (Mirror_PPU_CTRL_REG2): Scalar, R/W, accesses: 4, reads: 3, writes: 1
+  $077A (NumberOfPlayers): Scalar, R/O, accesses: 4, reads: 4, writes: 0
+  $06D4 (ColorRotateOffset): Scalar, R/W, accesses: 4, reads: 2, writes: 2
+  $0752 (AltEntranceControl): Scalar, R/W, accesses: 4, reads: 1, writes: 3
+  $0743 (CloudTypeOverride): Scalar, R/W, accesses: 4, reads: 3, writes: 1
+  $0729 (BehindAreaParserFlag): Scalar, R/W, accesses: 4, reads: 1, writes: 3
+  $06FF (Player_X_Scroll): Scalar, R/W, accesses: 4, reads: 3, writes: 1
+  $070C (PlayerAnimTimerSet): Scalar, R/W, accesses: 4, reads: 2, writes: 2
+  $0702 (FrictionAdderLow): Scalar, R/W, accesses: 4, reads: 2, writes: 2
+  $0701 (FrictionAdderHigh): Scalar, R/W, accesses: 4, reads: 2, writes: 2
+  $0781 (PlayerAnimTimer): Scalar, R/W, accesses: 4, reads: 2, writes: 2
+  $0471 (Whirlpool_LeftExtent): Array[Y], R/O, accesses: 4, reads: 4, writes: 0
+  $073A (EnemyObjectPageLoc): Scalar, R/W, accesses: 4, reads: 1, writes: 3
+  $0401 (RedPTroopaOrigXPos): Array[X], R/W, accesses: 4, reads: 1, writes: 3
+  $079E (InjuryTimer): Scalar, R/W, accesses: 4, reads: 3, writes: 1
+  $03AD (Player_Rel_XPos): Array[Y], R/W, accesses: 4, reads: 3, writes: 1
+  $0484 (StompChainCounter): Scalar, R/W, accesses: 4, reads: 2, writes: 2
+  $0367 (BowserFlameTimerCtrl): Scalar, R/W, accesses: 4, reads: 2, writes: 2
+  $03A2 (HammerThrowingTimer): Array[X], R/W, accesses: 4, reads: 1, writes: 3
+  $04AF (BoundingBox_DR_YPos): Array[Y], R/W, accesses: 4, reads: 3, writes: 1
+  $06D5 (PlayerGfxOffset): Scalar, R/W, accesses: 4, reads: 2, writes: 2
+  $07B2 (PauseSoundBuffer): Scalar, R/W, accesses: 4, reads: 2, writes: 2
+  $07B0 (SoundMemory): Scalar, R/W, accesses: 4, reads: 1, writes: 3
+  $07A7 (PseudoRandomBitReg): Array[X], R/W, accesses: 3, reads: 1, writes: 2
+  $0774 (DisableScreenFlag): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $077F (IntervalTimerControl): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $073F (HorizontalScroll): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $0777 (GamePauseTimer): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $06E0 (SprShuffleAmtOffset): Scalar, R/W, accesses: 3, reads: 2, writes: 1
+  $06F3 (Misc_SprDataOffset): Array[X], R/W, accesses: 3, reads: 2, writes: 1
+  $0760 (AreaNumber): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $0718 (DemoActionTimer): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $0340 (VRAM_Buffer2_Offset): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $0761 (OffScr_NumberofLives): Array[X], R/W, accesses: 3, reads: 2, writes: 1
+  $072D (AreaObjOffsetBuffer): Array[X], R/W, accesses: 3, reads: 2, writes: 1
+  $0745 (LoopCommand): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $0726 (CurrentColumnPos): Scalar, R/O, accesses: 3, reads: 3, writes: 0
+  $06A1 (MetatileBuffer): Array[X], R/W, accesses: 3, reads: 1, writes: 2
+  $074F (AreaAddrsLOffset): Scalar, R/W, accesses: 3, reads: 2, writes: 1
+  $03A1 (Platform_X_Scroll): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $0723 (ScrollLock): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $0755 (Player_Pos_ForScroll): Scalar, R/W, accesses: 3, reads: 2, writes: 1
+  $070B (PlayerChangeSizeFlag): Scalar, R/W, accesses: 3, reads: 2, writes: 1
+  $0450 (MaximumLeftSpeed): Scalar, R/W, accesses: 3, reads: 2, writes: 1
+  $0782 (JumpSwimTimer): Scalar, R/W, accesses: 3, reads: 2, writes: 1
+  $0416 (Player_YMF_Dummy): Array[X], R/W, accesses: 3, reads: 1, writes: 2
+  $0456 (MaximumRightSpeed): Scalar, R/W, accesses: 3, reads: 2, writes: 1
+  $0477 (Whirlpool_Length): Array[Y], R/O, accesses: 3, reads: 3, writes: 0
+  $0398 (VineFlagOffset): Scalar, R/W, accesses: 3, reads: 2, writes: 1
+  $075E (CoinTally): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $03E8 (Block_Metatile): Array[X], R/W, accesses: 3, reads: 2, writes: 1
+  $06CB (EnemyFrenzyBuffer): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $06DA (MultiLoopPassCntr): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $06D9 (MultiLoopCorrectCntr): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $0791 (StompTimer): Scalar, R/W, accesses: 3, reads: 2, writes: 1
+  $06BE (Misc_Collision_Flag): Array[X], R/W, accesses: 3, reads: 1, writes: 2
+  $03D0 (Player_OffscreenBits): Scalar, R/W, accesses: 3, reads: 2, writes: 1
+  $03B8 (Player_Rel_YPos): Array[Y], R/W, accesses: 3, reads: 2, writes: 1
+  $03B3 (Misc_Rel_XPos): Scalar, R/O, accesses: 3, reads: 3, writes: 0
+  $03B1 (Block_Rel_XPos): Scalar, R/O, accesses: 3, reads: 3, writes: 0
+  $03D4 (Block_OffscreenBits): Scalar, R/O, accesses: 3, reads: 3, writes: 0
+  $07C6 (PauseModeFlag): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $07C0 (DAC_Counter): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $07BE (Sfx_SecondaryCounter): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $07B4 (Squ2_NoteLenCounter): Scalar, W/O, accesses: 3, reads: 0, writes: 3
+  $07B9 (Tri_NoteLenCounter): Scalar, W/O, accesses: 3, reads: 0, writes: 3
+  $07B6 (Squ1_NoteLenCounter): Scalar, W/O, accesses: 3, reads: 0, writes: 3
+  $07B5 (Squ2_EnvelopeDataCtrl): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $07BA (Noise_BeatLenCounter): Scalar, W/O, accesses: 3, reads: 0, writes: 3
+  $07CA (AltRegContentFlag): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $07B7 (Squ1_EnvelopeDataCtrl): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $07C4 (NoteLengthTblAdder): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $07C7 (GroundMusicHeaderOfs): Scalar, R/W, accesses: 3, reads: 1, writes: 2
+  $07FF (WarmBootValidation): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0722 (Sprite0HitDetectFlag): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0780 (SelectTimer): Array[X], R/W, accesses: 2, reads: 1, writes: 1
+  $0740 (VerticalScroll): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0717 (DemoAction): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0744 (BackgroundColorCtrl): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $075C (LevelNumber): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $07A0 (ScreenTimer): Scalar, W/O, accesses: 2, reads: 0, writes: 2
+  $0341 (VRAM_Buffer2): Array[Y], W/O, accesses: 2, reads: 0, writes: 2
+  $03F9 (AttributeBuffer): Array[X], R/W, accesses: 2, reads: 1, writes: 1
+  $074A (JoypadBitMask): Array[X], R/W, accesses: 2, reads: 1, writes: 1
+  $07DD (PlayerScoreDisplay): Array[X], R/O, accesses: 2, reads: 2, writes: 0
+  $0710 (PlayerEntranceCtrl): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0757 (FetchNewGameTimerFlag): Scalar, W/O, accesses: 2, reads: 0, writes: 2
+  $0735 (AreaObjectHeight): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0785 (SideCollisionTimer): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0499 (Player_BoundBoxCtrl): Array[X], R/W, accesses: 2, reads: 1, writes: 1
+  $0759 (GameTimerExpiredFlag): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0712 (DeathMusicLoaded): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0703 (RunningSpeed): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0783 (RunningTimer): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0709 (VerticalForce): Scalar, W/O, accesses: 2, reads: 0, writes: 2
+  $06CE (FireballCounter): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $03BA (Fireball_Rel_YPos): Scalar, R/O, accesses: 2, reads: 2, writes: 0
+  $03AF (Fireball_Rel_XPos): Scalar, R/O, accesses: 2, reads: 2, writes: 0
+  $042C (Bubble_YMF_Dummy): Array[X], R/W, accesses: 2, reads: 1, writes: 1
+  $0792 (AirBubbleTimer): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0787 (GameTimerCtrlTimer): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $07F8 (GameTimerDisplay): Scalar, R/O, accesses: 2, reads: 2, writes: 0
+  $039A (VineObjOffset): Array[Y], R/W, accesses: 2, reads: 1, writes: 1
+  $039D (VineStart_Y_Position): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $03C5 (Enemy_SprAttrib): Array[X], R/W, accesses: 2, reads: 1, writes: 1
+  $0363 (BowserBodyControls): Scalar, R/O, accesses: 2, reads: 2, writes: 0
+  $078F (FrenzyEnemyTimer): Scalar, R/O, accesses: 2, reads: 2, writes: 0
+  $06AE (HammerEnemyOffset): Array[Y], R/W, accesses: 2, reads: 1, writes: 1
+  $03EA (Block_PageLoc2): Array[X], R/W, accesses: 2, reads: 1, writes: 1
+  $0748 (CoinTallyFor1Ups): Scalar, W/O, accesses: 2, reads: 0, writes: 2
+  $03E4 (Block_Orig_YPos): Array[X], R/W, accesses: 2, reads: 1, writes: 1
+  $03E6 (Block_BBuf_Low): Array[X], R/W, accesses: 2, reads: 1, writes: 1
+  $0784 (BlockBounceTimer): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $06BC (BrickCoinTimerFlag): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $079D (BrickCoinTimer): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $043C (Block_Y_MoveForce): Array[X], W/O, accesses: 2, reads: 0, writes: 2
+  $03F1 (Block_Orig_XPos): Array[X], R/W, accesses: 2, reads: 1, writes: 1
+  $0400 (SprObject_X_MoveForce): Array[X], R/W, accesses: 2, reads: 1, writes: 1
+  $06CD (EnemyFrenzyQueue): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $0751 (EntrancePage): Scalar, W/O, accesses: 2, reads: 0, writes: 2
+  $06D3 (NumberofGroupEnemies): Scalar, W/O, accesses: 2, reads: 0, writes: 2
+  $06CF (DuplicateObj_Offset): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $03D6 (Misc_OffscreenBits): Scalar, R/O, accesses: 2, reads: 2, writes: 0
+  $070F (FlagpoleCollisionYPos): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $06DE (ChangeAreaTimer): Scalar, W/O, accesses: 2, reads: 0, writes: 2
+  $03BC (Block_Rel_YPos): Scalar, R/O, accesses: 2, reads: 2, writes: 0
+  $07C5 (AreaMusicBuffer_Alt): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $07B3 (Squ2_NoteLenBuffer): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $07C1 (NoiseDataLoopbackOfs): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $07B8 (Tri_NoteLenBuffer): Scalar, R/W, accesses: 2, reads: 1, writes: 1
+  $06E1 (SprShuffleAmt): Array[Y], R/O, accesses: 1, reads: 1, writes: 0
+  $0766 (OffScr_WorldNumber): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0767 (OffScr_AreaNumber): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $073C (ScreenRoutineTask): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0721 (CurrentNTAddr_Low): Scalar, R/O, accesses: 1, reads: 1, writes: 0
+  $0720 (CurrentNTAddr_High): Scalar, R/O, accesses: 1, reads: 1, writes: 0
+  $03F0 (Block_ResidualCounter): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $07FD (ContinueWorld): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $06C9: Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0741 (ForegroundScenery): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0715 (GameTimerSetting): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0727 (TerrainControl): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0742 (BackgroundScenery): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0733 (AreaStyle): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0795 (ScrollIntervalTimer): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0758 (JoypadOverride): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0789 (ClimbSideTimer): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0707 (JumpOrigin_Y_HighPos): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0708 (JumpOrigin_Y_Position): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0706 (DiffToHaltJump): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $070A (VerticalForceDown): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $04A0 (Fireball_BoundBoxCtrl): Array[X], W/O, accesses: 1, reads: 0, writes: 1
+  $03D2 (FBall_OffscreenBits): Scalar, R/O, accesses: 1, reads: 1, writes: 0
+  $06F1 (FBall_SprDataOffset): Array[X], R/O, accesses: 1, reads: 1, writes: 0
+  $04A2 (Misc_BoundBoxCtrl): Array[Y], W/O, accesses: 1, reads: 0, writes: 1
+  $06B7 (JumpCoinMiscOffset): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $06D1 (LakituReappearTimer): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0388 (FirebarSpinSpeed): Array[X], R/O, accesses: 1, reads: 1, writes: 0
+  $0483 (BowserHitPoints): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0716 (DisableCollisionDet): Scalar, R/O, accesses: 1, reads: 1, writes: 0
+  $0713 (FlagpoleSoundQueue): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $06DB (JumpspringForce): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $0786 (JumpspringTimer): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $06D6 (WarpZoneControl): Scalar, R/O, accesses: 1, reads: 1, writes: 0
+  $075D (Hidden1UpFlag): Scalar, W/O, accesses: 1, reads: 0, writes: 1
+  $04B0 (EnemyBoundingBoxCoord): Array[Y], W/O, accesses: 1, reads: 0, writes: 1
+  $03BE (Misc_Rel_YPos): Scalar, R/O, accesses: 1, reads: 1, writes: 0
+  $03D3 (Bubble_OffscreenBits): Scalar, R/O, accesses: 1, reads: 1, writes: 0
+  $06EE (Bubble_SprDataOffset): Array[X], R/O, accesses: 1, reads: 1, writes: 0
+  $03B0 (Bubble_Rel_XPos): Scalar, R/O, accesses: 1, reads: 1, writes: 0
+  $03BB (Bubble_Rel_YPos): Scalar, R/O, accesses: 1, reads: 1, writes: 0
+
+🔍 FUNCTION-SPECIFIC TYPE ANALYSIS
+--------------------------------------------------------------------------------
+Function: PlayerMovementSubs
+  Address: $B339
+  Variables typed: 2
+  Interesting locals (1):
+    A: Boolean (confidence: 62.5%)
+
+Function: RunGameTimer
+  Address: $B7BA
+  Variables typed: 3
+  Interesting locals (3):
+    A: Enum[164, 0, 32, 34] (confidence: 0.0%)
+    Y: Index (confidence: 50.0%)
+    X: Index (confidence: 60.0%)
+
+📈 TYPE INFERENCE QUALITY
+--------------------------------------------------------------------------------
+High confidence (≥70%): 1 variables (25.0%)
+Medium confidence (40-69%): 1 variables (25.0%)
+Low confidence (<40%): 1 variables (25.0%)
+
+Specific types inferred: 4 / 4 (100.0%)
+
+TYPE BREAKDOWN:
+  Enum                : 2 (50.0%)
+  BitFlags            : 1 (25.0%)
+  Pointer             : 1 (25.0%)
+
+🔥 MOST FREQUENTLY USED VARIABLES
+--------------------------------------------------------------------------------
+A                        : 3007 uses, type: BitFlags, confidence: 44.1%
+Y                        : 1201 uses, type: Enum[0, 1, 7, 19, 6, 20], confidence: 69.1%
+X                        : 1130 uses, type: Enum[255, 5], confidence: 0.3%
+ZP[$6]                   :    1 uses, type: Pointer, confidence: 100.0%
+
+================================================================================
+✅ Memory layout analysis complete!
+================================================================================

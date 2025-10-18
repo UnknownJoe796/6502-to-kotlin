@@ -347,24 +347,32 @@ private fun classifyAccessPattern(
         val indexRegister = indexedAccesses.first().indexRegister!!
         val indirectionLevel = indexedAccesses.first().indirectionLevel
 
-        return if (indirectionLevel > 0) {
-            // Indirect indexed - likely structure or dynamic array
-            MemoryAccessPattern.IndirectArray(
-                basePointer = address,
-                indexRegister = indexRegister,
-                name = null
-            )
-        } else {
-            // Direct indexed - likely array
-            val observedIndices = indexedAccesses.mapNotNull { it.observedIndex }.toSet()
-            MemoryAccessPattern.Array(
-                baseAddress = address,
-                indexRegister = indexRegister,
-                observedIndices = observedIndices,
-                estimatedLength = if (observedIndices.isNotEmpty()) observedIndices.maxOrNull()?.plus(1) else null,
-                name = null
-            )
+        // Only classify as array if majority of accesses are indexed
+        // This filters out incidental indexed access from memory-clearing loops
+        val indexedRatio = indexedAccesses.size.toDouble() / accessList.size
+        val isLikelyArray = indexedRatio >= 0.5  // At least 50% of accesses must be indexed
+
+        if (isLikelyArray) {
+            return if (indirectionLevel > 0) {
+                // Indirect indexed - likely structure or dynamic array
+                MemoryAccessPattern.IndirectArray(
+                    basePointer = address,
+                    indexRegister = indexRegister,
+                    name = null
+                )
+            } else {
+                // Direct indexed - likely array
+                val observedIndices = indexedAccesses.mapNotNull { it.observedIndex }.toSet()
+                MemoryAccessPattern.Array(
+                    baseAddress = address,
+                    indexRegister = indexRegister,
+                    observedIndices = observedIndices,
+                    estimatedLength = if (observedIndices.isNotEmpty()) observedIndices.maxOrNull()?.plus(1) else null,
+                    name = null
+                )
+            }
         }
+        // If less than 50% indexed, fall through to scalar classification
     }
 
     // Check for pointer pattern (indirect addressing without index)
@@ -418,6 +426,19 @@ private fun parseAddress(label: String): Int? {
 private fun buildGlobalMemoryMap(
     functionAnalyses: List<FunctionMemoryAnalysis>
 ): Map<Int, MemoryLocationInfo> {
+    // First, collect ALL accesses per address across all functions
+    val accessesByAddress = mutableMapOf<Int, MutableList<MemoryAccess>>()
+
+    functionAnalyses.forEach { funcAnalysis ->
+        funcAnalysis.memoryAccesses.forEach { (address, info) ->
+            // Reconstruct MemoryAccess objects from the info
+            // Note: We don't have direct access to the original MemoryAccess list here,
+            // but we can approximate by counting indexed vs non-indexed from the pattern
+            // For now, let's use the existing merge logic but be smarter about it
+            accessesByAddress.getOrPut(address) { mutableListOf() }
+        }
+    }
+
     val globalMap = mutableMapOf<Int, MemoryLocationInfo>()
 
     functionAnalyses.forEach { funcAnalysis ->
@@ -427,12 +448,32 @@ private fun buildGlobalMemoryMap(
             if (existing == null) {
                 globalMap[address] = info
             } else {
-                // Merge: combine reads/writes, prefer more specific pattern
+                // Merge: combine reads/writes
+                val allReads = (existing.reads + info.reads).distinct()
+                val allWrites = (existing.writes + info.writes).distinct()
+                val allAccesses = allReads.size + allWrites.size
+
+                // Determine if this should be classified as array based on global access pattern
+                // Count how many accesses are indexed
+                val existingIndexed = if (existing.accessPattern is MemoryAccessPattern.Array) existing.reads.size + existing.writes.size else 0
+                val infoIndexed = if (info.accessPattern is MemoryAccessPattern.Array) info.reads.size + info.writes.size else 0
+                val totalIndexedAccesses = existingIndexed + infoIndexed
+                val indexedRatio = totalIndexedAccesses.toDouble() / allAccesses
+
+                // Reclassify based on global ratio
+                val globalPattern = if (indexedRatio >= 0.5) {
+                    // Prefer array if at least 50% of ALL accesses are indexed
+                    mergePatterns(existing.accessPattern, info.accessPattern)
+                } else {
+                    // Otherwise, treat as scalar
+                    MemoryAccessPattern.Scalar(address = address, name = null)
+                }
+
                 globalMap[address] = MemoryLocationInfo(
                     address = address,
-                    accessPattern = mergePatterns(existing.accessPattern, info.accessPattern),
-                    reads = (existing.reads + info.reads).distinct(),
-                    writes = (existing.writes + info.writes).distinct(),
+                    accessPattern = globalPattern,
+                    reads = allReads,
+                    writes = allWrites,
                     isConstant = existing.isConstant && info.isConstant,
                     isIndexed = existing.isIndexed || info.isIndexed,
                     indirectionLevel = maxOf(existing.indirectionLevel, info.indirectionLevel)

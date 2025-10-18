@@ -7,7 +7,7 @@ package com.ivieleague.decompiler6502tokotlin
  *   - JSR targets (direct subroutine calls)
  *   - Interrupt vectors via well-known label names (NMI, RESET, IRQ) if present
  *   - Exported/public labels supplied by caller
- *   - Jump table targets (placeholder for now)
+ *   - Jump table targets (JSR JumpEngine pattern with .dw directives)
  */
 
 enum class EntryPointKind {
@@ -43,8 +43,8 @@ fun AssemblyCodeFile.discoverEntryPoints(
     resolution: AddressResolution = this.resolveAddresses(),
     exportedLabels: Set<String> = emptySet(),
     interruptLabelNames: Map<EntryPointKind, Set<String>> = mapOf(
-        EntryPointKind.INTERRUPT_NMI to setOf("NMI", "NMIHandler", "VEC_NMI"),
-        EntryPointKind.INTERRUPT_RESET to setOf("RESET", "Reset", "RESET_HANDLER", "Init"),
+        EntryPointKind.INTERRUPT_NMI to setOf("NMI", "NMIHandler", "VEC_NMI", "NonMaskableInterrupt"),
+        EntryPointKind.INTERRUPT_RESET to setOf("RESET", "Reset", "RESET_HANDLER", "Init", "Start"),
         EntryPointKind.INTERRUPT_IRQ to setOf("IRQ", "IrqHandler", "VEC_IRQ")
     ),
 ): EntryPointDiscovery {
@@ -87,36 +87,43 @@ fun AssemblyCodeFile.discoverEntryPoints(
         if (addr != null) uniq += Triple(EntryPointKind.EXPORTED, addr, name)
     }
 
-    // 4) Jump tables - basic detection of indirect JMP patterns
+    // 4) Jump tables - detect JSR JumpEngine pattern
+    // Pattern: JSR JumpEngine followed immediately by .dw directives containing function addresses
     this.lines.forEachIndexed { idx, line ->
         val instr = line.instruction ?: return@forEachIndexed
-        if (instr.op == AssemblyOp.JMP && instr.address is AssemblyAddressing.IndirectAbsolute) {
-            val indirectLabel = (instr.address as AssemblyAddressing.IndirectAbsolute).label
-            val indirectAddr = labelToAddress[indirectLabel]
-            if (indirectAddr != null) {
-                // Look for data sections that might contain jump table entries
-                // This is a simple heuristic - look for .word/.db directives near the indirect address
-                this.lines.forEachIndexed { dataIdx, dataLine ->
-                    if (dataLine.data is AssemblyData.Db) {
-                        val dataResolved = resolution.resolved.getOrNull(dataIdx)
-                        val dataAddr = dataResolved?.address
-                        if (dataAddr != null && dataAddr >= indirectAddr && dataAddr <= indirectAddr + 32) {
-                            // Found potential jump table data - extract possible targets
-                            val db = dataLine.data as AssemblyData.Db
-                            db.items.forEach { item ->
-                                when (item) {
-                                    is AssemblyData.DbItem.Expr -> {
-                                        // Check if this looks like a label reference
-                                        val targetAddr = labelToAddress[item.expr]
-                                        if (targetAddr != null) {
-                                            val targetLabel = primaryLabelForAddress(targetAddr, labelToAddress)
-                                            uniq += Triple(EntryPointKind.JUMP_TABLE, targetAddr, targetLabel)
-                                        }
+
+        // Check for JSR JumpEngine
+        if (instr.op == AssemblyOp.JSR) {
+            val target = (instr.address as? AssemblyAddressing.Label)?.label
+            if (target == "JumpEngine") {
+                // Scan forward to find consecutive .dw directives
+                var scanIdx = idx + 1
+                while (scanIdx < this.lines.size) {
+                    val scanLine = this.lines[scanIdx]
+
+                    // Check if this is a .dw directive
+                    val data = scanLine.data
+                    if (data is AssemblyData.Db) {
+                        // Extract label references from this .dw
+                        data.items.forEach { item ->
+                            when (item) {
+                                is AssemblyData.DbItem.Expr -> {
+                                    val targetLabel = item.expr
+                                    val targetAddr = labelToAddress[targetLabel]
+                                    if (targetAddr != null) {
+                                        uniq += Triple(EntryPointKind.JUMP_TABLE, targetAddr, targetLabel)
                                     }
-                                    else -> { /* Skip byte values for now */ }
                                 }
+                                else -> { /* Skip byte values */ }
                             }
                         }
+                        scanIdx++
+                    } else if (scanLine.instruction != null || scanLine.label != null) {
+                        // Stop when we hit an instruction or a new label (end of jump table)
+                        break
+                    } else {
+                        // Empty line or comment, keep scanning
+                        scanIdx++
                     }
                 }
             }

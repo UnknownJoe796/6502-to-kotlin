@@ -328,10 +328,19 @@ enum class AssemblyOp(
     }
 }
 
+/**
+ * Assembly-time constant definition (using = directive)
+ */
+data class AssemblyConstant(
+    val name: String,
+    val value: AssemblyAddressing  // Can be hex, decimal, or expression
+)
+
 data class AssemblyLine(
     val label: String? = null,
     val instruction: AssemblyInstruction? = null,
     val data: AssemblyData? = null,
+    val constant: AssemblyConstant? = null,
     val comment: String? = null,
     val originalLine: String? = null,
 ) {
@@ -344,6 +353,10 @@ data class AssemblyLine(
             append(instruction)
         } else if (data != null) {
             append(data)
+        } else if (constant != null) {
+            append(constant.name)
+            append(" = ")
+            append(constant.value)
         }
         if (comment != null) {
             while (length < 32) append(' ')
@@ -447,8 +460,31 @@ sealed class AssemblyAddressing {
 }
 
 fun String.parseToAssemblyCodeFile(): AssemblyCodeFile {
+    // Regex to detect constant definitions: Name = Value
+    val constantPattern = Regex("""^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+?)(?:\s*;.*)?$""")
+
     return this.split('\n')
         .map { line ->
+            // Check for constant definition first (before label parsing)
+            // But skip directives that start with '.'
+            val trimmedLine = line.substringBefore(';').trim()
+            if (!trimmedLine.startsWith('.')) {
+                val constantMatch = constantPattern.matchEntire(trimmedLine)
+                if (constantMatch != null) {
+                    val (name, valueStr) = constantMatch.destructured
+                    val value = AssemblyAddressing.parse(valueStr.trim())
+                    return@map AssemblyLine(
+                        label = null,
+                        instruction = null,
+                        data = null,
+                        constant = AssemblyConstant(name, value),
+                        comment = line.substringAfter(';', "").trim().takeIf { it.isNotBlank() },
+                        originalLine = line
+                    )
+                }
+            }
+
+            // Normal parsing (labels, instructions, data)
             val label = line.substringBefore(':', "").trim().takeIf { it.isNotBlank() }
             val instrOrDirText = line.substringAfter(":").substringBefore(";").trim()
             var instruction: AssemblyInstruction? = null
@@ -457,7 +493,7 @@ fun String.parseToAssemblyCodeFile(): AssemblyCodeFile {
                 val firstToken = instrOrDirText.substringBefore(' ').trim()
                 val rest = instrOrDirText.substringAfter(firstToken, missingDelimiterValue = "").trim()
                 val firstLower = firstToken.lowercase()
-                if (firstLower == ".db" || firstLower == ".byte") {
+                if (firstLower == ".db" || firstLower == ".byte" || firstLower == ".dw" || firstLower == ".word") {
                     data = AssemblyData.Db(parseDbItems(rest))
                 } else {
                     instruction = runCatching {
@@ -472,6 +508,7 @@ fun String.parseToAssemblyCodeFile(): AssemblyCodeFile {
                 label = label,
                 instruction = instruction,
                 data = data,
+                constant = null,
                 comment = line.substringAfter(';', "").trim().takeIf { it.isNotBlank() },
                 originalLine = line
             )
