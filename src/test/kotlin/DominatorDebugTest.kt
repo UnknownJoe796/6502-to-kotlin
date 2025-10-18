@@ -15,7 +15,7 @@ class DominatorDebugTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("main"))
         val reachability = lines.analyzeReachability(resolution, entries)
@@ -42,15 +42,11 @@ class DominatorDebugTest {
         dominators.functions.forEach { fnAnalysis ->
             println("Function: ${fnAnalysis.function.entryLabel}")
             println("  Back edges: ${fnAnalysis.backEdges}")
-            println("  Natural loops: ${fnAnalysis.naturalLoops.size}")
-            fnAnalysis.naturalLoops.forEach { loop ->
-                println("    Loop: header=${loop.header}, source=${loop.backEdgeSource}, blocks=${loop.blocks}")
-            }
         }
-        
-        // Debug complete - check if we detected loops  
+
+        // Debug complete - check if we detected back edges
         val mainFunction = dominators.functions[0]
         println("Back edges found: ${mainFunction.backEdges.size}")
-        println("Natural loops found: ${mainFunction.naturalLoops.size}")
+        println("Note: Natural loop detection is now in Pass 14")
     }
 }

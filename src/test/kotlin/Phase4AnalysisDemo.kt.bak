@@ -1,0 +1,223 @@
+package com.ivieleague.decompiler6502tokotlin
+
+import kotlin.test.Test
+import java.io.File
+
+/**
+ * Demonstration of Phase 4 structural analysis on real Super Mario Bros assembly code
+ * This test shows what we can analyze through Pass 17 (Goto Elimination)
+ */
+class Phase4AnalysisDemo {
+
+    @Test
+    fun analyzeSuperMarioBrosCode() {
+        // Read the actual Super Mario Bros disassembly
+        val smbFile = File("smbdism.asm")
+        if (!smbFile.exists()) {
+            println("Warning: smbdism.asm not found, skipping demo")
+            return
+        }
+
+        val assembly = smbFile.readText()
+
+        // Create output file
+        val outputFile = File("phase4-analysis-output.txt")
+        val output = StringBuilder()
+
+        fun log(msg: String) {
+            output.appendLine(msg)
+            println(msg)
+        }
+
+        log("=" * 80)
+        log("PHASE 4 STRUCTURAL ANALYSIS DEMO")
+        log("Analyzing Super Mario Bros Disassembly")
+        log("=" * 80)
+        log("")
+
+        // Parse and run all passes through Phase 4
+        val lines = assembly.parseToAssemblyCodeFile()
+        val resolution = lines.resolveAddresses(0x8000)
+        val entries = lines.discoverEntryPoints(resolution)
+        val reachability = lines.analyzeReachability(resolution, entries)
+        val blocks = lines.constructBasicBlocks(resolution, reachability, entries)
+        val cfg = lines.constructCfg(resolution, reachability, blocks, entries)
+        val dominators = lines.constructDominatorTrees(cfg)
+        val loops = lines.detectLoops(resolution, entries, reachability, blocks, cfg, dominators)
+        val conditionals = lines.detectConditionals(resolution, entries, reachability, blocks, cfg, dominators, loops)
+        val regions = lines.formRegions(resolution, entries, reachability, blocks, cfg, dominators, loops, conditionals)
+        val gotoElim = lines.eliminateGotos(resolution, entries, reachability, blocks, cfg, dominators, loops, conditionals, regions)
+
+        println("📊 OVERALL STATISTICS")
+        println("-" * 80)
+        println("Total Assembly Lines: ${lines.lines.size}")
+        println("Total Functions: ${cfg.functions.size}")
+        println("Total Basic Blocks: ${blocks.blocks.size}")
+        println("Total CFG Edges: ${cfg.functions.sumOf { it.edges.size }}")
+        println()
+
+        // Analyze first few interesting functions
+        val interestingFunctions = cfg.functions.take(5)
+
+        interestingFunctions.forEachIndexed { index, function ->
+            analyzeFunctionInDetail(
+                function,
+                dominators.functions[index],
+                loops.functions[index],
+                conditionals.functions[index],
+                regions.functions[index],
+                gotoElim.functions[index]
+            )
+        }
+
+        // Summary statistics
+        println()
+        println("🎯 PHASE 4 SUMMARY STATISTICS")
+        println("=" * 80)
+
+        val totalLoops = loops.functions.sumOf { it.loops.size }
+        val totalConditionals = conditionals.functions.sumOf { it.conditionals.size }
+        val totalRegions = regions.functions.sumOf { it.allRegions.size }
+        val fullyStructured = gotoElim.functions.count { it.isFullyStructured }
+
+        println("Total Loops Detected: $totalLoops")
+        println("  - While loops: ${loops.functions.sumOf { f -> f.loops.count { it.loopType == LoopType.WHILE } }}")
+        println("  - Do-while loops: ${loops.functions.sumOf { f -> f.loops.count { it.loopType == LoopType.DO_WHILE } }}")
+        println("  - Infinite loops: ${loops.functions.sumOf { f -> f.loops.count { it.loopType == LoopType.INFINITE } }}")
+        println("  - Multi-exit loops: ${loops.functions.sumOf { f -> f.loops.count { it.loopType == LoopType.MULTI_EXIT } }}")
+        println()
+
+        println("Total Conditionals Detected: $totalConditionals")
+        println("  - Simple IF: ${conditionals.functions.sumOf { f -> f.conditionals.count { it.type == ConditionalType.IF } }}")
+        println("  - IF-ELSE: ${conditionals.functions.sumOf { f -> f.conditionals.count { it.type == ConditionalType.IF_ELSE } }}")
+        println("  - IF-ELSE-IF: ${conditionals.functions.sumOf { f -> f.conditionals.count { it.type == ConditionalType.IF_ELSE_IF } }}")
+        println()
+
+        println("Total Regions Formed: $totalRegions")
+        println("  - Block regions: ${regions.functions.sumOf { it.allRegions.count { r -> r is Region.Block } }}")
+        println("  - Loop regions: ${regions.functions.sumOf { it.allRegions.count { r -> r is Region.Loop } }}")
+        println("  - Conditional regions: ${regions.functions.sumOf { it.allRegions.count { r -> r is Region.IfThenElse } }}")
+        println("  - Sequence regions: ${regions.functions.sumOf { it.allRegions.count { r -> r is Region.Sequence } }}")
+        println()
+
+        println("Goto Elimination:")
+        println("  - Fully structured functions: $fullyStructured / ${gotoElim.functions.size}")
+        println("  - Functions with remaining gotos: ${gotoElim.functionsWithGotos.size}")
+
+        val totalStats = gotoElim.functions.map { it.getStatistics() }
+            .fold(mutableMapOf<String, Int>()) { acc, map ->
+                map.forEach { (k, v) -> acc[k] = (acc[k] ?: 0) + v }
+                acc
+            }
+
+        println()
+        println("Structured Control Flow Statistics:")
+        println("  - If statements: ${totalStats["ifs"]}")
+        println("  - Loop statements: ${totalStats["loops"]}")
+        println("  - Break statements: ${totalStats["breaks"]}")
+        println("  - Continue statements: ${totalStats["continues"]}")
+        println("  - Return statements: ${totalStats["returns"]}")
+        println("  - Block statements: ${totalStats["blocks"]}")
+        println("  - Remaining gotos: ${totalStats["gotos"]}")
+        println()
+        println("=" * 80)
+    }
+
+    private fun analyzeFunctionInDetail(
+        function: FunctionCfg,
+        dominator: DominatorAnalysis,
+        loopInfo: FunctionLoopInfo,
+        conditionalInfo: FunctionConditionalInfo,
+        regionInfo: FunctionRegionInfo,
+        gotoElimInfo: FunctionStructuredCode
+    ) {
+        println()
+        println("🔍 FUNCTION ANALYSIS: ${function.entryLabel ?: "UNNAMED"}")
+        println("=" * 80)
+        println("Entry Address: 0x${function.entryLeader.toString(16).uppercase().padStart(4, '0')}")
+        println("Basic Blocks: ${function.blocks.size}")
+        println("CFG Edges: ${function.edges.size}")
+        println()
+
+        // Dominator Analysis
+        println("📐 Dominator Tree:")
+        println("  Back Edges: ${dominator.backEdges.size}")
+        if (dominator.backEdges.isNotEmpty()) {
+            dominator.backEdges.take(3).forEach { (from, to) ->
+                println("    0x${from.toString(16).uppercase()} -> 0x${to.toString(16).uppercase()}")
+            }
+            if (dominator.backEdges.size > 3) {
+                println("    ... and ${dominator.backEdges.size - 3} more")
+            }
+        }
+        println()
+
+        // Loop Detection
+        if (loopInfo.loops.isNotEmpty()) {
+            println("🔄 Loops Detected: ${loopInfo.loops.size}")
+            loopInfo.loops.take(3).forEach { loop ->
+                println("  Loop at 0x${loop.header.toString(16).uppercase()}:")
+                println("    Type: ${loop.loopType}")
+                println("    Body size: ${loop.body.size} blocks")
+                println("    Exits: ${loop.exits.size}")
+                println("    Nesting depth: ${loop.nestingDepth}")
+                if (loop.parentLoop != null) {
+                    println("    Parent loop: 0x${loop.parentLoop.header.toString(16).uppercase()}")
+                }
+            }
+            if (loopInfo.loops.size > 3) {
+                println("  ... and ${loopInfo.loops.size - 3} more loops")
+            }
+            println()
+        }
+
+        // Conditional Detection
+        if (conditionalInfo.conditionals.isNotEmpty()) {
+            println("🔀 Conditionals Detected: ${conditionalInfo.conditionals.size}")
+            conditionalInfo.conditionals.take(3).forEach { cond ->
+                println("  Conditional at 0x${cond.header.toString(16).uppercase()}:")
+                println("    Type: ${cond.type}")
+                println("    Then branch: ${cond.thenBranch.size} blocks")
+                println("    Else branch: ${cond.elseBranch.size} blocks")
+                println("    Merge point: ${cond.mergePoint?.let { "0x${it.toString(16).uppercase()}" } ?: "none"}")
+                println("    Nesting depth: ${cond.nestingDepth}")
+            }
+            if (conditionalInfo.conditionals.size > 3) {
+                println("  ... and ${conditionalInfo.conditionals.size - 3} more conditionals")
+            }
+            println()
+        }
+
+        // Region Formation
+        println("🏗️  Region Structure:")
+        println("  Total regions: ${regionInfo.allRegions.size}")
+        println("  Root region depth: ${regionInfo.rootRegion.getDepth()}")
+        println()
+        println("  Region tree (first 20 lines):")
+        val regionTree = regionInfo.rootRegion.toPrettyString("    ")
+        regionTree.lines().take(20).forEach { println(it) }
+        if (regionTree.lines().size > 20) {
+            println("    ... (${regionTree.lines().size - 20} more lines)")
+        }
+        println()
+
+        // Goto Elimination
+        println("✨ Structured Code:")
+        val stats = gotoElimInfo.getStatistics()
+        println("  Fully structured: ${if (gotoElimInfo.isFullyStructured) "YES ✓" else "NO (${gotoElimInfo.remainingGotos.size} gotos)"}")
+        println("  Control flow breakdown:")
+        println("    If statements: ${stats["ifs"]}")
+        println("    Loops: ${stats["loops"]}")
+        println("    Breaks: ${stats["breaks"]}")
+        println("    Continues: ${stats["continues"]}")
+        println("    Returns: ${stats["returns"]}")
+        println("    Block statements: ${stats["blocks"]}")
+        if (stats["gotos"]!! > 0) {
+            println("    Remaining gotos: ${stats["gotos"]}")
+        }
+        println()
+        println("-" * 80)
+    }
+
+    private operator fun String.times(count: Int): String = this.repeat(count)
+}

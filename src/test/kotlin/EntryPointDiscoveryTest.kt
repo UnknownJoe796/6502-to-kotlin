@@ -2,7 +2,6 @@ package com.ivieleague.decompiler6502tokotlin
 
 import kotlin.test.Test
 import kotlin.test.assertTrue
-import kotlin.test.assertEquals
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -17,7 +16,7 @@ class EntryPointDiscoveryTest {
             Foo:
                 RTS
         """.trimIndent()
-        val lines = snippet.parseAssemblyLines()
+        val lines = snippet.parseToAssemblyCodeFile()
         val res = lines.resolveAddresses(baseAddress = 0x8000)
         val discovered = lines.discoverEntryPoints(resolution = res, exportedLabels = setOf("Start"))
 
@@ -38,7 +37,7 @@ class EntryPointDiscoveryTest {
         val path = Paths.get("smbdism.asm")
         assertTrue(Files.exists(path), "smbdism.asm should exist at project root for this test")
         val text = Files.readString(path)
-        val lines = text.parseAssemblyLines()
+        val lines = text.parseToAssemblyCodeFile()
         val res = lines.resolveAddresses(baseAddress = 0x8000)
         val discovered = lines.discoverEntryPoints(resolution = res)
 

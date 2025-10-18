@@ -1,0 +1,299 @@
+================================================================================
+PHASE 4 STRUCTURAL ANALYSIS DEMO
+Analyzing Super Mario Bros Disassembly
+================================================================================
+
+📊 OVERALL STATISTICS
+--------------------------------------------------------------------------------
+Total Assembly Lines: 16352
+Total Functions: 294
+Total Basic Blocks: 2445
+Total CFG Edges: 5294
+
+
+🔍 FUNCTION ANALYSIS: PauseRoutine
+================================================================================
+Entry Address: 0x0353
+Basic Blocks: 11
+CFG Edges: 18
+
+📐 Dominator Tree:
+  Back Edges: 0
+
+🔀 Conditionals Detected: 7
+  Conditional at 0x353:
+    Type: IF_ELSE_IF
+    Then branch: 1 blocks
+    Else branch: 3 blocks
+    Merge point: 0x35B
+    Nesting depth: 0
+  Conditional at 0x35B:
+    Type: IF_ELSE
+    Then branch: 6 blocks
+    Else branch: 1 blocks
+    Merge point: none
+    Nesting depth: 1
+  Conditional at 0x356:
+    Type: IF_ELSE_IF
+    Then branch: 1 blocks
+    Else branch: 2 blocks
+    Merge point: 0x371
+    Nesting depth: 1
+  ... and 4 more conditionals
+
+🏗️  Region Structure:
+  Total regions: 13
+  Root region depth: 4
+
+  Region tree (first 20 lines):
+    Function(entry=851)
+      Sequence(entry=851)
+        If(header=851, type=IF_ELSE_IF)
+        Then:
+          Block(859)
+        Else:
+          Sequence(entry=854)
+            Block(854)
+            Block(856)
+            Block(859)
+        Block(851)
+        Block(854)
+        Block(856)
+        Block(859)
+        Block(861)
+        Block(863)
+        Block(866)
+        Block(869)
+        Block(878)
+        Block(880)
+    ... (1 more lines)
+
+✨ Structured Code:
+  Fully structured: YES ✓
+  Control flow breakdown:
+    If statements: 1
+    Loops: 0
+    Breaks: 0
+    Continues: 0
+    Returns: 0
+    Block statements: 15
+
+--------------------------------------------------------------------------------
+
+🔍 FUNCTION ANALYSIS: SpriteShuffler
+================================================================================
+Entry Address: 0x0377
+Basic Blocks: 11
+CFG Edges: 16
+
+📐 Dominator Tree:
+  Back Edges: 2
+    0x385 -> 0x37B
+    0x38F -> 0x38F
+
+🔄 Loops Detected: 2
+  Loop at 0x37B:
+    Type: DO_WHILE
+    Body size: 5 blocks
+    Exits: 1
+    Nesting depth: 0
+  Loop at 0x38F:
+    Type: DO_WHILE
+    Body size: 1 blocks
+    Exits: 1
+    Nesting depth: 0
+
+🔀 Conditionals Detected: 3
+  Conditional at 0x37B:
+    Type: IF_ELSE_IF
+    Then branch: 1 blocks
+    Else branch: 3 blocks
+    Merge point: 0x385
+    Nesting depth: 0
+  Conditional at 0x37E:
+    Type: IF_ELSE
+    Then branch: 1 blocks
+    Else branch: 2 blocks
+    Merge point: 0x384
+    Nesting depth: 1
+  Conditional at 0x387:
+    Type: IF_ELSE
+    Then branch: 1 blocks
+    Else branch: 2 blocks
+    Merge point: 0x38C
+    Nesting depth: 0
+
+🏗️  Region Structure:
+  Total regions: 15
+  Root region depth: 6
+
+  Region tree (first 20 lines):
+    Function(entry=887)
+      Sequence(entry=887)
+        Block(887)
+        Loop(header=891, type=DO_WHILE)
+          Sequence(entry=891)
+            If(header=891, type=IF_ELSE_IF)
+            Then:
+              Block(901)
+            Else:
+              Sequence(entry=894)
+                Block(894)
+                Block(900)
+                Block(901)
+            Block(898)
+        Block(891)
+        Block(894)
+        Block(898)
+        Block(900)
+        Block(901)
+        If(header=903, type=IF_ELSE)
+    ... (13 more lines)
+
+✨ Structured Code:
+  Fully structured: YES ✓
+  Control flow breakdown:
+    If statements: 2
+    Loops: 2
+    Breaks: 0
+    Continues: 0
+    Returns: 0
+    Block statements: 20
+
+--------------------------------------------------------------------------------
+
+🔍 FUNCTION ANALYSIS: OperModeExecutionTree
+================================================================================
+Entry Address: 0x03A1
+Basic Blocks: 2
+CFG Edges: 1
+
+📐 Dominator Tree:
+  Back Edges: 0
+
+🏗️  Region Structure:
+  Total regions: 3
+  Root region depth: 2
+
+  Region tree (first 20 lines):
+    Function(entry=929)
+      Sequence(entry=929)
+        Block(929)
+        Block(940)
+
+✨ Structured Code:
+  Fully structured: YES ✓
+  Control flow breakdown:
+    If statements: 0
+    Loops: 0
+    Breaks: 0
+    Continues: 0
+    Returns: 0
+    Block statements: 2
+
+--------------------------------------------------------------------------------
+
+🔍 FUNCTION ANALYSIS: MoveAllSpritesOffscreen
+================================================================================
+Entry Address: 0x03AC
+Basic Blocks: 1
+CFG Edges: 0
+
+📐 Dominator Tree:
+  Back Edges: 0
+
+🏗️  Region Structure:
+  Total regions: 2
+  Root region depth: 1
+
+  Region tree (first 20 lines):
+    Function(entry=940)
+      Block(940)
+
+✨ Structured Code:
+  Fully structured: YES ✓
+  Control flow breakdown:
+    If statements: 0
+    Loops: 0
+    Breaks: 0
+    Continues: 0
+    Returns: 0
+    Block statements: 1
+
+--------------------------------------------------------------------------------
+
+🔍 FUNCTION ANALYSIS: MoveSpritesOffscreen
+================================================================================
+Entry Address: 0x03B0
+Basic Blocks: 3
+CFG Edges: 4
+
+📐 Dominator Tree:
+  Back Edges: 1
+    0x3B2 -> 0x3B2
+
+🔄 Loops Detected: 1
+  Loop at 0x3B2:
+    Type: DO_WHILE
+    Body size: 1 blocks
+    Exits: 1
+    Nesting depth: 0
+
+🏗️  Region Structure:
+  Total regions: 5
+  Root region depth: 3
+
+  Region tree (first 20 lines):
+    Function(entry=944)
+      Sequence(entry=944)
+        Block(944)
+        Loop(header=946, type=DO_WHILE)
+          Block(946)
+        Block(946)
+        Block(952)
+
+✨ Structured Code:
+  Fully structured: YES ✓
+  Control flow breakdown:
+    If statements: 0
+    Loops: 1
+    Breaks: 0
+    Continues: 0
+    Returns: 0
+    Block statements: 4
+
+--------------------------------------------------------------------------------
+
+🎯 PHASE 4 SUMMARY STATISTICS
+================================================================================
+Total Loops Detected: 86
+  - While loops: 1
+  - Do-while loops: 57
+  - Infinite loops: 0
+  - Multi-exit loops: 28
+
+Total Conditionals Detected: 1607
+  - Simple IF: 18
+  - IF-ELSE: 363
+  - IF-ELSE-IF: 1226
+
+Total Regions Formed: 4174
+  - Block regions: 3610
+  - Loop regions: 80
+  - Conditional regions: 190
+  - Sequence regions: 0
+
+Goto Elimination:
+  - Fully structured functions: 294 / 294
+  - Functions with remaining gotos: 0
+
+Structured Control Flow Statistics:
+  - If statements: 219
+  - Loop statements: 86
+  - Break statements: 0
+  - Continue statements: 0
+  - Return statements: 0
+  - Block statements: 5069
+  - Remaining gotos: 0
+
+================================================================================

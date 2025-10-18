@@ -12,7 +12,7 @@ class ParsingTest {
         val path = Paths.get("smbdism.asm")
         assertTrue(Files.exists(path), "smbdism.asm should exist at project root for this test")
         val text = Files.readString(path)
-        val lines = text.parseAssemblyLines()
+        val lines = text.parseToAssemblyCodeFile()
         // basic sanity checks
         assertTrue(lines.lines.isNotEmpty(), "Parsed lines should not be empty")
         assertEquals(text.lines().size, lines.size, "Line count should match input")
@@ -35,7 +35,7 @@ class ParsingTest {
         val path = Paths.get("smbdism.asm")
         assertTrue(Files.exists(path), "smbdism.asm should exist at project root for this test")
         val text = Files.readString(path)
-        val lines = text.parseAssemblyLines()
+        val lines = text.parseToAssemblyCodeFile()
 
         // Find a known .db line with numeric bytes
         val target = lines.lines.firstOrNull { it.originalLine?.contains(".db \$10, \$51, \$88, \$c0", ignoreCase = true) == true }

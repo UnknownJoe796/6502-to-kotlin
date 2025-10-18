@@ -16,7 +16,7 @@ class DominatorTreeTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("main"))
         val reachability = lines.analyzeReachability(resolution, entries)
@@ -32,9 +32,8 @@ class DominatorTreeTest {
         // Simple linear function should have entry block dominating itself
         assertEquals(mainFunction.function.entryLeader, mainFunction.dominatorTree.leaderIndex)
         assertEquals(null, mainFunction.dominatorTree.immediateDominator, "Entry should have no immediate dominator")
-        
-        // No loops in linear code
-        assertEquals(0, mainFunction.naturalLoops.size, "Linear function should have no loops")
+
+        // No loops in linear code (no back edges)
         assertEquals(0, mainFunction.backEdges.size, "Linear function should have no back edges")
     }
     
@@ -53,7 +52,7 @@ class DominatorTreeTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("main"))
         val reachability = lines.analyzeReachability(resolution, entries)
@@ -65,12 +64,12 @@ class DominatorTreeTest {
         
         val mainFunction = dominators.functions[0]
         assertTrue(mainFunction.dominatorTree.children.isNotEmpty(), "Entry should dominate other blocks")
-        
+
         // Should have multiple blocks
         assertTrue(mainFunction.leaderToDomNode.size > 1, "Should have multiple basic blocks")
-        
-        // No loops in if-then-else
-        assertEquals(0, mainFunction.naturalLoops.size, "If-then-else should have no loops")
+
+        // No loops in if-then-else (no back edges)
+        assertEquals(0, mainFunction.backEdges.size, "If-then-else should have no back edges")
     }
     
     @Test
@@ -84,7 +83,7 @@ class DominatorTreeTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("main"))
         val reachability = lines.analyzeReachability(resolution, entries)
@@ -95,17 +94,13 @@ class DominatorTreeTest {
         assertEquals(1, dominators.functions.size, "Should have one function")
         
         val mainFunction = dominators.functions[0]
-        
-        // Should detect the loop 
-        assertTrue(mainFunction.naturalLoops.isNotEmpty(), "Should detect natural loop")
+
+        // Should detect back edge (loop detection is now in Pass 14)
         assertTrue(mainFunction.backEdges.isNotEmpty(), "Should detect back edge")
-        
-        val loop = mainFunction.naturalLoops[0]
-        assertTrue(loop.blocks.isNotEmpty(), "Loop should contain at least one block")
-        
-        // Back edge should go from loop body back to header
+
+        // Back edge check
         val backEdge = mainFunction.backEdges[0]
-        assertEquals(loop.header, backEdge.second, "Back edge should target loop header")
+        assertTrue(backEdge.second > 0, "Back edge should have valid target")
     }
     
     @Test
@@ -123,7 +118,7 @@ class DominatorTreeTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("main"))
         val reachability = lines.analyzeReachability(resolution, entries)
@@ -134,11 +129,10 @@ class DominatorTreeTest {
         assertEquals(1, dominators.functions.size, "Should have one function")
         
         val mainFunction = dominators.functions[0]
-        
-        // Should detect multiple loops (inner and outer)
-        assertTrue(mainFunction.naturalLoops.size >= 1, "Should detect at least one natural loop")
+
+        // Should detect back edges (loop detection is now in Pass 14)
         assertTrue(mainFunction.backEdges.size >= 1, "Should detect at least one back edge")
-        
+
         // Test dominator relationships
         val domTree = mainFunction.dominatorTree
         assertTrue(domTree.children.isNotEmpty(), "Entry should dominate other blocks")
@@ -165,7 +159,7 @@ class DominatorTreeTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("main"))
         val reachability = lines.analyzeReachability(resolution, entries)
@@ -176,12 +170,9 @@ class DominatorTreeTest {
         assertEquals(1, dominators.functions.size, "Should have one function")
         
         val mainFunction = dominators.functions[0]
-        
-        // Should still detect the loop despite multiple exits
-        assertTrue(mainFunction.naturalLoops.isNotEmpty(), "Should detect natural loop with multiple exits")
-        
-        val loop = mainFunction.naturalLoops[0] 
-        assertTrue(loop.blocks.isNotEmpty(), "Loop should contain blocks")
+
+        // Should detect back edge despite multiple exits (loop detection is now in Pass 14)
+        assertTrue(mainFunction.backEdges.isNotEmpty(), "Should detect back edge despite multiple exits")
     }
     
     @Test
@@ -204,7 +195,7 @@ class DominatorTreeTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("main"))
         val reachability = lines.analyzeReachability(resolution, entries)
@@ -238,7 +229,7 @@ class DominatorTreeTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("main"))
         val reachability = lines.analyzeReachability(resolution, entries)

@@ -2,7 +2,6 @@ package com.ivieleague.decompiler6502tokotlin
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class Pass2AddressResolutionFixTest {
     
@@ -16,7 +15,7 @@ class Pass2AddressResolutionFixTest {
                 STA ${'$'}200    ; Absolute addressing - should be 3 bytes
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         
         // Check instruction sizes
@@ -46,7 +45,7 @@ class Pass2AddressResolutionFixTest {
                 STA ${'$'}2000,Y ; Absolute indexed - should be 3 bytes
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         
         val instructions = resolution.resolved.filter { it.line.instruction != null }
@@ -67,7 +66,7 @@ class Pass2AddressResolutionFixTest {
                 .db ${'$'}40, "world", ${'$'}50   ; 1 + 5 + 1 = 7 bytes
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x2000)
         
         val dataLines = resolution.resolved.filter { it.isData }
@@ -90,7 +89,7 @@ class Pass2AddressResolutionFixTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         
         assertEquals(0x8000, resolution.labelToAddress["start"])

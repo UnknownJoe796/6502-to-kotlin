@@ -25,7 +25,7 @@ class Pass6BasicBlocksFixTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("start"))
         val reachability = lines.analyzeReachability(resolution, entries)
@@ -72,7 +72,7 @@ class Pass6BasicBlocksFixTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("start"))
         val reachability = lines.analyzeReachability(resolution, entries)
@@ -105,7 +105,7 @@ class Pass6BasicBlocksFixTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("start"))
         val reachability = lines.analyzeReachability(resolution, entries)
@@ -134,7 +134,7 @@ class Pass6BasicBlocksFixTest {
                 RTS         ; 1 byte
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("start"))
         val reachability = lines.analyzeReachability(resolution, entries)

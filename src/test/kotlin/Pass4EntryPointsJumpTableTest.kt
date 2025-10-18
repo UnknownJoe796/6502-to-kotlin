@@ -27,7 +27,7 @@ class Pass4EntryPointsJumpTableTest {
                 .db state_0, state_1
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("start"))
         
@@ -56,7 +56,7 @@ class Pass4EntryPointsJumpTableTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("start"))
         
@@ -82,7 +82,7 @@ class Pass4EntryPointsJumpTableTest {
                 RTI
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution)
         
@@ -108,7 +108,7 @@ class Pass4EntryPointsJumpTableTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(
             resolution, 
@@ -128,7 +128,7 @@ class Pass4EntryPointsJumpTableTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(
             resolution, 

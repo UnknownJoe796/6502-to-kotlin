@@ -12,7 +12,7 @@ class ValidationTest {
         val path = Paths.get("smbdism.asm")
         assertTrue(Files.exists(path), "smbdism.asm should exist at project root for this test")
         val text = Files.readString(path)
-        val lines = text.parseAssemblyLines()
+        val lines = text.parseToAssemblyCodeFile()
         val report = lines.validateDisassembly()
         // We expect the real SMB disassembly to use only legal 6502 addressing modes
         assertTrue(report.issues.isEmpty(), "Expected no addressing mode issues, found: ${report.issues.take(5)}")
@@ -26,7 +26,7 @@ class ValidationTest {
             JMP ($1234)
             LDX $10,X
         """.trimIndent()
-        val lines = snippet.parseAssemblyLines()
+        val lines = snippet.parseToAssemblyCodeFile()
         val report = lines.validateDisassembly()
         // Expect 2 issues: STA immediate, LDX with ,X
         assertEquals(2, report.issues.size, "Expected two invalid addressing issues")

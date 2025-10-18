@@ -14,7 +14,7 @@ class MemoryIndexingDebugTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses(0x8000)
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("main"))
         val reachability = lines.analyzeReachability(resolution, entries)

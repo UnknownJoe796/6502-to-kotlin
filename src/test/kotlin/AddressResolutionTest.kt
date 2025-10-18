@@ -12,7 +12,7 @@ class AddressResolutionTest {
         val path = Paths.get("smbdism.asm")
         assertTrue(Files.exists(path), "smbdism.asm should exist at project root for this test")
         val text = Files.readString(path)
-        val lines = text.parseAssemblyLines()
+        val lines = text.parseToAssemblyCodeFile()
         val res = lines.resolveAddresses(baseAddress = 0x8000)
 
         // basic shape

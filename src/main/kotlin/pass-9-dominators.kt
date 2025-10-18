@@ -26,20 +26,6 @@ class DominatorNode(
 }
 
 /**
- * Represents a natural loop in the CFG
- */
-data class NaturalLoop(
-    /** The header block of the loop (dominates all blocks in the loop) */
-    val header: Int,
-    /** The back edge source that creates this loop */
-    val backEdgeSource: Int,
-    /** All blocks that are part of this loop */
-    val blocks: Set<Int>,
-    /** Nested loops contained within this loop */
-    val nestedLoops: Set<NaturalLoop> = emptySet()
-)
-
-/**
  * Result of dominator analysis for a single function
  */
 data class DominatorAnalysis(
@@ -49,8 +35,6 @@ data class DominatorAnalysis(
     val dominatorTree: DominatorNode,
     /** Map from block leader to its dominator node */
     val leaderToDomNode: Map<Int, DominatorNode>,
-    /** Natural loops discovered in this function */
-    val naturalLoops: List<NaturalLoop>,
     /** Back edges that create loops (source -> target) */
     val backEdges: List<Pair<Int, Int>>
 )
@@ -98,7 +82,6 @@ private fun buildDominatorAnalysisForFunction(function: FunctionCfg): DominatorA
             function = function,
             dominatorTree = dummyRoot,
             leaderToDomNode = mapOf(function.entryLeader to dummyRoot),
-            naturalLoops = emptyList(),
             backEdges = emptyList()
         )
     }
@@ -160,15 +143,13 @@ private fun buildDominatorAnalysisForFunction(function: FunctionCfg): DominatorA
     // Compute dominance frontiers for SSA construction
     computeDominanceFrontiers(domNodes, successors, dominators)
 
-    // Find back edges and natural loops
+    // Find back edges (natural loops are now detected in Pass 14)
     val backEdges = findBackEdges(edges, dominators)
-    val naturalLoops = findNaturalLoops(backEdges, successors, predecessors, dominators)
 
     return DominatorAnalysis(
         function = function,
         dominatorTree = rootNode,
         leaderToDomNode = domNodes,
-        naturalLoops = naturalLoops,
         backEdges = backEdges
     )
 }
@@ -272,68 +253,4 @@ private fun findBackEdges(
     }
     
     return backEdges
-}
-
-/**
- * Find natural loops from back edges
- */
-private fun findNaturalLoops(
-    backEdges: List<Pair<Int, Int>>,
-    successors: Map<Int, List<Int>>,
-    predecessors: Map<Int, List<Int>>,
-    dominators: Map<Int, Set<Int>>
-): List<NaturalLoop> {
-    val loops = mutableListOf<NaturalLoop>()
-    
-    backEdges.forEach { (source, header) ->
-        // Find all blocks in the natural loop defined by this back edge
-        val loopBlocks = findLoopBlocks(source, header, predecessors)
-        
-        val loop = NaturalLoop(
-            header = header,
-            backEdgeSource = source,
-            blocks = loopBlocks
-        )
-        
-        loops.add(loop)
-    }
-    
-    return loops
-}
-
-/**
- * Find all blocks in a natural loop using the back edge
- */
-private fun findLoopBlocks(
-    backEdgeSource: Int,
-    header: Int,
-    predecessors: Map<Int, List<Int>>
-): Set<Int> {
-    val loopBlocks = mutableSetOf<Int>()
-    val worklist = mutableListOf<Int>()
-    
-    // Header is always in the loop
-    loopBlocks.add(header)
-    
-    // If back edge source is not the header, add it and trace backwards
-    if (backEdgeSource != header) {
-        loopBlocks.add(backEdgeSource)
-        worklist.add(backEdgeSource)
-        
-        // Trace backwards from back edge source to find all loop blocks
-        while (worklist.isNotEmpty()) {
-            val current = worklist.removeAt(worklist.size - 1)
-            
-            predecessors[current]?.forEach { pred ->
-                // Only add predecessors that are not already in the loop
-                // and that are not the header (to avoid infinite loops)
-                if (pred !in loopBlocks && pred != header) {
-                    loopBlocks.add(pred)
-                    worklist.add(pred)
-                }
-            }
-        }
-    }
-    
-    return loopBlocks
 }

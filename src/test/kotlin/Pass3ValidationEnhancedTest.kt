@@ -15,7 +15,7 @@ class Pass3ValidationEnhancedTest {
                 STA #${'$'}20    ; Invalid - store with immediate
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val report = lines.validateDisassembly()
         
         assertTrue(report.issues.isNotEmpty(), "Should detect addressing mode issues")
@@ -39,7 +39,7 @@ class Pass3ValidationEnhancedTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val report = lines.validateDisassembly()
         
         assertEquals(0, report.issues.size, "Valid assembly should pass validation")
@@ -54,7 +54,7 @@ class Pass3ValidationEnhancedTest {
                 STA ${'$'}2000
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses()
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("start"))
         val reachability = lines.analyzeReachability(resolution, entries)
@@ -76,7 +76,7 @@ class Pass3ValidationEnhancedTest {
                 RTS
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val report = lines.validateDisassembly()
         
         val branchIssues = report.addressingModeIssues.filter { it.message.contains("Branch") }
@@ -94,7 +94,7 @@ class Pass3ValidationEnhancedTest {
                 .db ${'$'}30     ; Will be data in code if reachable
         """.trimIndent()
         
-        val lines = assembly.parseAssemblyLines()
+        val lines = assembly.parseToAssemblyCodeFile()
         val resolution = lines.resolveAddresses()
         val entries = lines.discoverEntryPoints(resolution, exportedLabels = setOf("start"))
         val reachability = lines.analyzeReachability(resolution, entries)

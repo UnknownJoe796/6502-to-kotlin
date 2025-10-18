@@ -15,7 +15,7 @@ class FunctionBoundaryDetectionTest {
             Callee:
                 RTS
         """.trimIndent()
-        val lines = snippet.parseAssemblyLines()
+        val lines = snippet.parseToAssemblyCodeFile()
         val res = lines.resolveAddresses(baseAddress = 0x8000)
         val entries = lines.discoverEntryPoints(resolution = res, exportedLabels = setOf("Start", "Callee"))
         val reach = lines.analyzeReachability(resolution = res, entries = entries)
@@ -56,7 +56,7 @@ class FunctionBoundaryDetectionTest {
             Bar:
                 JMP Shared
         """.trimIndent()
-        val lines = snippet.parseAssemblyLines()
+        val lines = snippet.parseToAssemblyCodeFile()
         val res = lines.resolveAddresses(baseAddress = 0x8000)
         val entries = lines.discoverEntryPoints(resolution = res, exportedLabels = setOf("Foo", "Bar"))
         val reach = lines.analyzeReachability(resolution = res, entries = entries)
@@ -82,7 +82,7 @@ class FunctionBoundaryDetectionTest {
         val path = Paths.get("smbdism.asm")
         assertTrue(Files.exists(path), "smbdism.asm should exist at project root for this test")
         val text = Files.readString(path)
-        val lines = text.parseAssemblyLines()
+        val lines = text.parseToAssemblyCodeFile()
         val res = lines.resolveAddresses(baseAddress = 0x8000)
         val entries = lines.discoverEntryPoints(resolution = res)
         val reach = lines.analyzeReachability(resolution = res, entries = entries)

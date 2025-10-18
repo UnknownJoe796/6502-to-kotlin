@@ -23,7 +23,7 @@ class ReachabilityTest {
             Unreached:
                 NOP
         """.trimIndent()
-        val lines = snippet.parseAssemblyLines()
+        val lines = snippet.parseToAssemblyCodeFile()
         val res = lines.resolveAddresses(baseAddress = 0x8000)
         val eps = lines.discoverEntryPoints(resolution = res, exportedLabels = setOf("Start"))
         val reach = lines.analyzeReachability(resolution = res, entries = eps)
@@ -50,7 +50,7 @@ class ReachabilityTest {
         val path = Paths.get("smbdism.asm")
         assertTrue(Files.exists(path), "smbdism.asm should exist at project root for this test")
         val text = Files.readString(path)
-        val lines = text.parseAssemblyLines()
+        val lines = text.parseToAssemblyCodeFile()
         val res = lines.resolveAddresses(baseAddress = 0x8000)
         val eps = lines.discoverEntryPoints(resolution = res)
         val reach = lines.analyzeReachability(resolution = res, entries = eps)

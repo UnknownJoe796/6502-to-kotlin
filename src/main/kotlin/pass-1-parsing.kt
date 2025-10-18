@@ -446,7 +446,7 @@ sealed class AssemblyAddressing {
     }
 }
 
-fun String.parseAssemblyLines(): AssemblyCodeFile {
+fun String.parseToAssemblyCodeFile(): AssemblyCodeFile {
     return this.split('\n')
         .map { line ->
             val label = line.substringBefore(':', "").trim().takeIf { it.isNotBlank() }
