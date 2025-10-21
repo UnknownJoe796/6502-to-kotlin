@@ -3,7 +3,6 @@ package com.ivieleague.decompiler6502tokotlin
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlin.test.assertNotNull
 
 class GotoEliminationTest {
 
