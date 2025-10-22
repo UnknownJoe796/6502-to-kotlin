@@ -37,35 +37,46 @@ class AssemblyBlock(
     val dominates = ArrayList<AssemblyBlock>()
 
     var function: AssemblyFunction? = null
+
+    val dominationDepth: Int get() = generateSequence(this.immediateDominator) { it.immediateDominator }.count()
 }
 
 sealed interface ExpressionifiedState {
-    object A : ExpressionifiedState
-    object X : ExpressionifiedState
-    object Y : ExpressionifiedState
-    object ZeroFlag : ExpressionifiedState
-    object NegativeFlag : ExpressionifiedState
-    object OverflowFlag : ExpressionifiedState
-    object CarryFlag : ExpressionifiedState
+    object A : ExpressionifiedState {
+        override fun toString() = "A"
+    }
+    object X : ExpressionifiedState {
+        override fun toString() = "X"
+    }
+    object Y : ExpressionifiedState {
+        override fun toString() = "Y"
+    }
+    object ZeroFlag : ExpressionifiedState {
+        override fun toString() = "ZeroFlag"
+    }
+    object NegativeFlag : ExpressionifiedState {
+        override fun toString() = "NegativeFlag"
+    }
+    object OverflowFlag : ExpressionifiedState {
+        override fun toString() = "OverflowFlag"
+    }
+    object CarryFlag : ExpressionifiedState {
+        override fun toString() = "CarryFlag"
+    }
 
     /**
      * An address in zero-page that is treated like a temporary register to move data between subroutines.
      */
-    data class VirtualRegister(val label: String): ExpressionifiedState
+    data class VirtualRegister(val label: String): ExpressionifiedState {
+        override fun toString(): String = label
+    }
 }
 
 class AssemblyFunction(
     val startingBlock: AssemblyBlock,
     val callers: List<AssemblyLine>
 ) {
-    init {
-        fun set(block: AssemblyBlock) {
-            block.function = this
-            block.branchExit?.let { set(it) }
-            block.fallThroughExit?.let { set(it) }
-        }
-        set(startingBlock)
-    }
+    override fun toString(): String = "fun ${startingBlock.label}(${inputs?.joinToString("")}): ${outputs?.joinToString("")}"
     /**
      * States that are consumed before being set by the function, indicating that they are inputs.
      */
@@ -147,7 +158,12 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
                 currentBlock = ArrayList()
             }
 
-            else -> currentBlock.add(line)
+            line.instruction != null || line.data != null -> {
+                currentBlock.add(line)
+            }
+            else -> {
+                // We don't assemble lines that aren't instructions or labels into blocks.
+            }
         }
     }
     if (currentBlock.isNotEmpty()) {
@@ -171,9 +187,14 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
             }
 
             op == AssemblyOp.JMP -> {
-                val otherBlock = blocksByLabel[lastInstruction.addressAsLabel.label]!!
-                block.branchExit = otherBlock
-                otherBlock.enteredFrom.add(block)
+                val addr = lastInstruction.address
+                if (addr is AssemblyAddressing.Direct) {
+                    val otherBlock = blocksByLabel[addr.label]
+                    if (otherBlock != null) {
+                        block.branchExit = otherBlock
+                        otherBlock.enteredFrom.add(block)
+                    }
+                }
             }
         }
     }
@@ -186,94 +207,119 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
 fun List<AssemblyBlock>.dominators() {
     if (this.isEmpty()) return
 
-    // Step 1: Build predecessor map for iterative algorithm
-    val predecessors = mutableMapOf<AssemblyBlock, MutableSet<AssemblyBlock>>()
-    for (block in this) {
-        predecessors[block] = mutableSetOf()
+    val indexOf = HashMap<AssemblyBlock, Int>(this.size)
+    for ((i, b) in this.withIndex()) indexOf[b] = i
+
+    val n = this.size
+    val preds = Array(n) { mutableListOf<Int>() }
+    val succs = Array(n) { mutableListOf<Int>() }
+
+    // Build preds from enteredFrom (or keep your existing successor-based fill)
+    for (i in 0 until n) {
+        val b = this[i]
+        for (p in b.enteredFrom) {
+            val pi = indexOf[p] ?: continue
+            preds[i].add(pi)
+        }
+        b.fallThroughExit?.let { t -> indexOf[t]?.let { succs[i].add(it) } }
+        b.branchExit?.let { t -> indexOf[t]?.let { succs[i].add(it) } }
     }
-    for (block in this) {
-        block.fallThroughExit?.let { predecessors[it]?.add(block) }
-        block.branchExit?.let { predecessors[it]?.add(block) }
+
+    // Identify all real roots (no predecessors)
+    val roots = (0 until n).filter { preds[it].isEmpty() }
+
+    // If there’s only one root, we can use it directly; otherwise add a synthetic super-root
+    val hasSuperRoot = roots.size > 1
+    val total = if (hasSuperRoot) n + 1 else n
+    val entry = if (hasSuperRoot) n else roots.firstOrNull() ?: 0
+
+    val P = Array(total) { mutableListOf<Int>() }
+    val S = Array(total) { mutableListOf<Int>() }
+
+    // Copy original graph
+    for (i in 0 until n) {
+        P[i].addAll(preds[i])
+        S[i].addAll(succs[i])
     }
 
-    // Step 2: Compute dominators using iterative dataflow algorithm
-    // dom(entry) = {entry}
-    // dom(n) = {n} ∪ (∩ dom(p) for all predecessors p)
-
-    val entryBlock = this[0]
-    val dominators = mutableMapOf<AssemblyBlock, MutableSet<AssemblyBlock>>()
-
-    // Initialize: entry dominates only itself, all others dominate everything
-    for (block in this) {
-        dominators[block] = if (block == entryBlock) {
-            mutableSetOf(block)
-        } else {
-            this.toMutableSet()
+    // Super-root edges
+    if (hasSuperRoot) {
+        for (r in roots) {
+            P[r].add(entry)
+            S[entry].add(r)
         }
     }
 
-    // Iterate until fixed point
+    // RPO from entry over extended graph
+    val visited = BooleanArray(total)
+    val rpoList = ArrayList<Int>(total)
+    fun dfs(u: Int) {
+        if (visited[u]) return
+        visited[u] = true
+        for (v in S[u]) dfs(v)
+        rpoList.add(u)
+    }
+    dfs(entry)
+    rpoList.reverse()
+
+    val rpoIndex = IntArray(total) { Int.MAX_VALUE }
+    for (i in rpoList.indices) rpoIndex[rpoList[i]] = i
+
+    val idom = IntArray(total) { -1 }
+    idom[entry] = entry
+
+    fun intersect(a0: Int, b0: Int): Int {
+        var a = a0
+        var b = b0
+        while (a != b) {
+            while (rpoIndex[a] < rpoIndex[b]) b = idom[b]
+            while (rpoIndex[b] < rpoIndex[a]) a = idom[a]
+        }
+        return a
+    }
+
     var changed = true
-    var iterations = 0
-    while (changed && iterations < 100) {
+    while (changed) {
         changed = false
-        iterations++
-
-        for (block in this) {
-            if (block == entryBlock) continue
-
-            val preds = predecessors[block] ?: emptySet()
-            if (preds.isEmpty()) continue
-
-            // Compute intersection of all predecessor dominators
-            val newDoms = preds
-                .map { dominators[it]!! }
-                .reduce { acc, predDoms -> acc.intersect(predDoms).toMutableSet() }
-                .toMutableSet()
-
-            // Add the block itself
-            newDoms.add(block)
-
-            if (newDoms != dominators[block]) {
-                dominators[block] = newDoms
-                changed = true
+        for (b in rpoList) {
+            if (b == entry) continue
+            var newIdom = -1
+            for (p in P[b]) {
+                if (!visited[p]) continue
+                if (idom[p] != -1) { newIdom = p; break }
             }
+            if (newIdom == -1) continue
+            for (p in P[b]) {
+                if (!visited[p]) continue
+                if (p == newIdom) continue
+                if (idom[p] != -1) newIdom = intersect(newIdom, p)
+            }
+            if (idom[b] != newIdom) { idom[b] = newIdom; changed = true }
         }
     }
 
-    // Step 3: Compute immediate dominators
-    // idom(n) is the dominator of n that is dominated by all other dominators of n
-    for (block in this) {
-        if (block == entryBlock) {
+    // Clear existing dominance info
+    for (block in this) block.dominates.clear()
+
+    // Write results back to blocks, skipping the synthetic node
+    for (i in 0 until n) {
+        val block = this[i]
+        if (!visited[i]) {
             block.immediateDominator = null
             continue
         }
 
-        val doms = dominators[block]!!
-        val strictDoms = doms.filter { it != block }
+        val isRealRoot = preds[i].isEmpty()
+        val parent = idom[i]
 
-        if (strictDoms.isEmpty()) {
-            block.immediateDominator = null
-            continue
+        block.immediateDominator = when {
+            isRealRoot -> null
+            parent == -1 -> null
+            hasSuperRoot && parent == entry -> null // dominated only by super-root => real root
+            parent == i -> null
+            else -> this[parent]
         }
 
-        // Find the dominator that is dominated by all other dominators
-        // (i.e., the one that no other dominator dominates)
-        val idom = strictDoms.find { candidate ->
-            strictDoms.all { other ->
-                other == candidate || dominators[candidate]!!.contains(other)
-            }
-        }
-
-        block.immediateDominator = idom
-    }
-
-    // Step 4: Build dominates lists (inverse of immediateDominator)
-    for (block in this) {
-        block.dominates.clear()
-    }
-
-    for (block in this) {
         block.immediateDominator?.dominates?.add(block)
     }
 }
@@ -283,7 +329,7 @@ fun List<AssemblyBlock>.dominators() {
  * Populates `inputs` and `outputs` on the functions.
  */
 fun List<AssemblyBlock>.functionify(
-    includeLabel: (String) -> Boolean = {
+    labelIsVirtualRegister: (String) -> Boolean = {
         it.startsWith('$') && it.substring(1).toUShortOrNull(16)?.let { it <= 0x7u } == true
     }
 ): List<AssemblyFunction> {
@@ -300,13 +346,9 @@ fun List<AssemblyBlock>.functionify(
     for (block in this) {
         for (line in block.lines) {
             if (line.instruction?.op == AssemblyOp.JSR) {
-                val targetLabel = (line.instruction.address as? AssemblyAddressing.Direct)?.label
-                if (targetLabel != null) {
-                    val targetBlock = this.find { it.label == targetLabel }
-                    if (targetBlock != null) {
-                        functionEntryBlocks.getOrPut(targetBlock) { ArrayList() }.add(line)
-                    }
-                }
+                val targetLabel = (line.instruction.address as AssemblyAddressing.Direct).label
+                val targetBlock = this.find { it.label == targetLabel } ?: throw IllegalArgumentException("Could not find block with label $targetLabel")
+                functionEntryBlocks.getOrPut(targetBlock) { ArrayList() }.add(line)
             }
         }
     }
@@ -334,6 +376,7 @@ fun List<AssemblyBlock>.functionify(
             }
 
             functionBlocks.add(current)
+            current.function = function
 
             // Add successors
             current.fallThroughExit?.let { if (it !in visited) toVisit.add(it) }
@@ -391,7 +434,7 @@ fun List<AssemblyBlock>.functionify(
                 // Check if instruction reads from memory (virtual registers)
                 when (val addr = instruction.address) {
                     is AssemblyAddressing.Direct -> {
-                        if(includeLabel(addr.label)) {
+                        if(labelIsVirtualRegister(addr.label)) {
                             // Reading from memory location
                             if (op == AssemblyOp.LDA || op == AssemblyOp.LDX || op == AssemblyOp.LDY ||
                                 op == AssemblyOp.CMP || op == AssemblyOp.CPX || op == AssemblyOp.CPY ||
