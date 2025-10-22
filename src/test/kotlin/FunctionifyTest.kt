@@ -65,7 +65,7 @@ class FunctionifyTest {
 
         // STA consumes A register without setting it first
         Assertions.assertEquals(1, functions.size)
-        Assertions.assertTrue(functions[0].inputs?.contains(ExpressionifiedState.A) == true)
+        Assertions.assertTrue(functions[0].inputs?.contains(TrackedAsIo.A) == true)
     }
 
     @Test
@@ -85,7 +85,7 @@ class FunctionifyTest {
 
         // BEQ consumes zero flag without setting it
         Assertions.assertEquals(1, functions.size)
-        Assertions.assertTrue(functions[0].inputs?.contains(ExpressionifiedState.ZeroFlag) == true)
+        Assertions.assertTrue(functions[0].inputs?.contains(TrackedAsIo.ZeroFlag) == true)
     }
 
     @Test
@@ -104,7 +104,7 @@ class FunctionifyTest {
 
         // Loading from 'temp' makes it an input
         Assertions.assertEquals(1, functions.size)
-        val tempInput = functions[0].inputs?.filterIsInstance<ExpressionifiedState.VirtualRegister>()
+        val tempInput = functions[0].inputs?.filterIsInstance<TrackedAsIo.VirtualRegister>()
             ?.find { it.label == "$02" }
         Assertions.assertNotNull(tempInput)
     }

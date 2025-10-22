@@ -1,6 +1,5 @@
 package com.ivieleague.decompiler6502tokotlin.hand
 
-import java.lang.Exception
 
 
 private fun parseDbItems(payload: String): List<AssemblyData.DbItem> {
@@ -48,22 +47,31 @@ private fun splitCsvRespectingQuotes(s: String): List<String> {
     val tokens = mutableListOf<String>()
     val current = StringBuilder()
     var inString = false
+    var escaped = false
     for (ch in s) {
-        when (ch) {
-            '"' -> {
+        when {
+            inString && !escaped && ch == '\\' -> {
+                // Start escape sequence inside string; keep the backslash
+                escaped = true
+                current.append(ch)
+            }
+            ch == '"' && !escaped -> {
+                // Toggle quote only if not escaped
                 inString = !inString
                 current.append(ch)
             }
-            ',' -> {
-                if (inString) current.append(ch) else {
-                    tokens += current.toString()
-                    current.clear()
-                }
+            ch == ',' && !inString -> {
+                tokens += current.toString()
+                current.clear()
             }
-            else -> current.append(ch)
+            else -> {
+                current.append(ch)
+            }
         }
+        // Any character other than the first after a backslash clears escape
+        if (escaped && ch != '\\') escaped = false
     }
-    tokens += current.toString()  // Always add the last token, even if empty
+    tokens += current.toString() // Always add the last token, even if empty
     return tokens
 }
 
@@ -88,15 +96,21 @@ fun String.parseToAssemblyCodeFile(): AssemblyCodeFile {
                             name = cName,
                             value = AssemblyAddressing.parse("#" + cValue) as AssemblyAddressing.Value
                         )
-                    } else if (firstLower == ".db" || firstLower == ".byte" || firstLower == ".dw" || firstLower == ".word") {
-                        data = AssemblyData.Db(parseDbItems(rest))
-                    } else {
-                        instruction = runCatching {
-                            AssemblyInstruction(
-                                op = AssemblyOp.parse(firstToken),
-                                address = rest.takeUnless { it.isBlank() }?.let { AssemblyAddressing.parse(it) }
-                            )
-                        }.getOrNull()
+                                        } else when (firstLower) {
+                        ".db", ".byte" -> {
+                            data = AssemblyData.Db(parseDbItems(rest))
+                        }
+                        ".dw", ".word" -> {
+                            data = AssemblyData.Db(parseWordItems(rest))
+                        }
+                        else -> {
+                            instruction = runCatching {
+                                AssemblyInstruction(
+                                    op = AssemblyOp.parse(firstToken),
+                                    address = rest.takeUnless { it.isBlank() }?.let { AssemblyAddressing.parse(it) }
+                                )
+                            }.getOrNull()
+                        }
                     }
                 }
                 AssemblyLine(
@@ -113,4 +127,45 @@ fun String.parseToAssemblyCodeFile(): AssemblyCodeFile {
             }
         }
         .let { AssemblyCodeFile(it) }
+}
+
+private fun parseWordItems(payload: String): List<AssemblyData.DbItem> {
+    val items = mutableListOf<AssemblyData.DbItem>()
+    val tokens = splitCsvRespectingQuotes(payload)
+    for (raw in tokens) {
+        val tok = raw.trim()
+        if (tok.isEmpty()) continue
+        try {
+            when {
+                tok.startsWith("$") -> {
+                    val v = tok.drop(1).trim().ifEmpty { "0" }.toInt(16)
+                    val lo = v and 0xFF
+                    val hi = (v ushr 8) and 0xFF
+                    items += AssemblyData.DbItem.ByteValue(lo)
+                    items += AssemblyData.DbItem.ByteValue(hi)
+                }
+                tok.startsWith("%") -> {
+                    val v = tok.drop(1).trim().ifEmpty { "0" }.toInt(2)
+                    val lo = v and 0xFF
+                    val hi = (v ushr 8) and 0xFF
+                    items += AssemblyData.DbItem.ByteValue(lo)
+                    items += AssemblyData.DbItem.ByteValue(hi)
+                }
+                tok.all { it.isDigit() } -> {
+                    val v = tok.toInt()
+                    val lo = v and 0xFF
+                    val hi = (v ushr 8) and 0xFF
+                    items += AssemblyData.DbItem.ByteValue(lo)
+                    items += AssemblyData.DbItem.ByteValue(hi)
+                }
+                else -> {
+                    // Unknown expression/label: keep as expression and assume 2 bytes for sizing (handled by Db as 1 each)
+                    items += AssemblyData.DbItem.Expr(tok)
+                }
+            }
+        } catch (_: Throwable) {
+            items += AssemblyData.DbItem.Expr(tok)
+        }
+    }
+    return items
 }

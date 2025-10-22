@@ -1,5 +1,7 @@
 package com.ivieleague.decompiler6502tokotlin.hand
 
+import javax.sound.midi.Track
+
 class AssemblyBlock(
     val lines: List<AssemblyLine>
 ) {
@@ -21,7 +23,7 @@ class AssemblyBlock(
     var fallThroughExit: AssemblyBlock? = null
 
     /**
-     * The alternate exit from a conditional branch.
+     * The alternate exit from a conditional branch, or the target of an unconditional JMP.
      * Note that the code we're analyzing does not use any indirect jumps.
      */
     var branchExit: AssemblyBlock? = null  // Always comes from last assembly line
@@ -41,35 +43,55 @@ class AssemblyBlock(
     val dominationDepth: Int get() = generateSequence(this.immediateDominator) { it.immediateDominator }.count()
 }
 
-sealed interface ExpressionifiedState {
-    object A : ExpressionifiedState {
+sealed interface TrackedAsIo {
+    object A : TrackedAsIo {
         override fun toString() = "A"
     }
-    object X : ExpressionifiedState {
+    object X : TrackedAsIo {
         override fun toString() = "X"
     }
-    object Y : ExpressionifiedState {
+    object Y : TrackedAsIo {
         override fun toString() = "Y"
     }
-    object ZeroFlag : ExpressionifiedState {
+    object ZeroFlag : TrackedAsIo {
         override fun toString() = "ZeroFlag"
     }
-    object NegativeFlag : ExpressionifiedState {
+    object NegativeFlag : TrackedAsIo {
         override fun toString() = "NegativeFlag"
     }
-    object OverflowFlag : ExpressionifiedState {
+    object OverflowFlag : TrackedAsIo {
         override fun toString() = "OverflowFlag"
     }
-    object CarryFlag : ExpressionifiedState {
+    object CarryFlag : TrackedAsIo {
         override fun toString() = "CarryFlag"
     }
 
     /**
      * An address in zero-page that is treated like a temporary register to move data between subroutines.
      */
-    data class VirtualRegister(val label: String): ExpressionifiedState {
+    data class VirtualRegister(val label: String): TrackedAsIo {
         override fun toString(): String = label
     }
+}
+fun AssemblyAffectable.toTrackedAsIo(
+    addressing: AssemblyAddressing?,
+    labelIsVirtualRegister: (String) -> Boolean = {
+        it.startsWith('$') && it.substring(1).toUShortOrNull(16)?.let { it <= 0x7u } == true
+    }
+): TrackedAsIo? = when (this) {
+    AssemblyAffectable.A -> TrackedAsIo.A
+    AssemblyAffectable.X -> TrackedAsIo.X
+    AssemblyAffectable.Y -> TrackedAsIo.Y
+    AssemblyAffectable.Stack -> null
+    AssemblyAffectable.DisableInterrupt -> null
+    AssemblyAffectable.StackPointer -> null
+    AssemblyAffectable.Negative -> TrackedAsIo.NegativeFlag
+    AssemblyAffectable.Overflow -> TrackedAsIo.OverflowFlag
+    AssemblyAffectable.Zero -> TrackedAsIo.ZeroFlag
+    AssemblyAffectable.Carry -> TrackedAsIo.CarryFlag
+    AssemblyAffectable.Memory -> (addressing as? AssemblyAddressing.Direct)?.takeIf {
+        labelIsVirtualRegister(it.label)
+    }?.let { TrackedAsIo.VirtualRegister(it.label) }
 }
 
 class AssemblyFunction(
@@ -80,18 +102,26 @@ class AssemblyFunction(
     /**
      * States that are consumed before being set by the function, indicating that they are inputs.
      */
-    var inputs: Set<ExpressionifiedState>? = null
+    var inputs: Set<TrackedAsIo>? = null
+
+    /**
+     * States that may be modified (written/clobbered) within the function body.
+     * This is a superset of outputs, used to gate which states can be considered outputs.
+     */
+    var clobbers: Set<TrackedAsIo>? = null
 
     /**
      * States that calling functions read from that are affected by this function.
      */
-    var outputs: Set<ExpressionifiedState>? = null
+    var outputs: Set<TrackedAsIo>? = null
 
     /**
      * The number of stack elements pushed by the function.
      * Negative indicates stack elements popped off the stack.
      */
     var stackSizeChange: Int? = null
+
+    var asControls: List<ControlNode>? = null
 }
 
 /**
@@ -384,9 +414,9 @@ fun List<AssemblyBlock>.functionify(
         }
 
         // Step 3: Analyze data flow to determine inputs and outputs
-        val inputs = mutableSetOf<ExpressionifiedState>()
-        val outputs = mutableSetOf<ExpressionifiedState>()
-        val defined = mutableSetOf<ExpressionifiedState>() // States that have been written
+        val inputs = mutableSetOf<TrackedAsIo>()
+        val outputs = mutableSetOf<TrackedAsIo>()
+        val defined = mutableSetOf<TrackedAsIo>() // States that have been written
 
         // Track which states are defined before being used
         for (block in functionBlocks) {
@@ -394,108 +424,65 @@ fun List<AssemblyBlock>.functionify(
                 val instruction = line.instruction ?: continue
                 val op = instruction.op
 
-                // Check if instruction consumes a flag
-                op.consumedFlag?.let { flag ->
-                    val state = when (flag) {
-                        AssemblyFlag.N -> ExpressionifiedState.NegativeFlag
-                        AssemblyFlag.V -> ExpressionifiedState.OverflowFlag
-                        AssemblyFlag.Z -> ExpressionifiedState.ZeroFlag
-                        AssemblyFlag.C -> ExpressionifiedState.CarryFlag
+                // Check if instruction consumes data
+                op.reads(instruction.address?.let {it::class })
+                    .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
+                    .forEach { state ->
+                        if(state !in defined) inputs.add(state)
                     }
-                    if (state !in defined) {
-                        inputs.add(state)
+                op.modifies(instruction.address?.let {it::class })
+                    .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
+                    .forEach { state ->
+                        defined.add(state)
                     }
-                }
-
-                // Check if instruction reads from registers
-                when (op) {
-                    AssemblyOp.STA, AssemblyOp.CMP, AssemblyOp.ADC, AssemblyOp.SBC,
-                    AssemblyOp.AND, AssemblyOp.EOR, AssemblyOp.ORA, AssemblyOp.PHA,
-                    AssemblyOp.TAX, AssemblyOp.TAY -> {
-                        if (ExpressionifiedState.A !in defined) {
-                            inputs.add(ExpressionifiedState.A)
-                        }
-                    }
-                    AssemblyOp.STX, AssemblyOp.CPX, AssemblyOp.TXA, AssemblyOp.TXS,
-                    AssemblyOp.INX, AssemblyOp.DEX -> {
-                        if (ExpressionifiedState.X !in defined) {
-                            inputs.add(ExpressionifiedState.X)
-                        }
-                    }
-                    AssemblyOp.STY, AssemblyOp.CPY, AssemblyOp.TYA,
-                    AssemblyOp.INY, AssemblyOp.DEY -> {
-                        if (ExpressionifiedState.Y !in defined) {
-                            inputs.add(ExpressionifiedState.Y)
-                        }
-                    }
-                    else -> {}
-                }
-
-                // Check if instruction reads from memory (virtual registers)
-                when (val addr = instruction.address) {
-                    is AssemblyAddressing.Direct -> {
-                        if(labelIsVirtualRegister(addr.label)) {
-                            // Reading from memory location
-                            if (op == AssemblyOp.LDA || op == AssemblyOp.LDX || op == AssemblyOp.LDY ||
-                                op == AssemblyOp.CMP || op == AssemblyOp.CPX || op == AssemblyOp.CPY ||
-                                op == AssemblyOp.ADC || op == AssemblyOp.SBC ||
-                                op == AssemblyOp.AND || op == AssemblyOp.EOR || op == AssemblyOp.ORA
-                            ) {
-                                val virtualReg =
-                                    ExpressionifiedState.VirtualRegister(addr.label) as ExpressionifiedState
-                                if (!defined.contains(virtualReg)) {
-                                    inputs.add(virtualReg)
-                                }
-                            }
-                        }
-                    }
-                    else -> {}
-                }
-
-                // Track what this instruction defines
-                when (op) {
-                    AssemblyOp.LDA, AssemblyOp.TXA, AssemblyOp.TYA, AssemblyOp.PLA,
-                    AssemblyOp.ADC, AssemblyOp.SBC, AssemblyOp.AND, AssemblyOp.EOR, AssemblyOp.ORA,
-                    AssemblyOp.ASL, AssemblyOp.LSR, AssemblyOp.ROL, AssemblyOp.ROR -> {
-                        defined.add(ExpressionifiedState.A)
-                    }
-                    AssemblyOp.LDX, AssemblyOp.TAX, AssemblyOp.TSX,
-                    AssemblyOp.INX, AssemblyOp.DEX -> {
-                        defined.add(ExpressionifiedState.X)
-                    }
-                    AssemblyOp.LDY, AssemblyOp.TAY,
-                    AssemblyOp.INY, AssemblyOp.DEY -> {
-                        defined.add(ExpressionifiedState.Y)
-                    }
-                    else -> {}
-                }
-
-                // Track flag definitions
-                op.affectedFlags.forEach { flag ->
-                    val state = when (flag) {
-                        AssemblyFlag.N -> ExpressionifiedState.NegativeFlag
-                        AssemblyFlag.V -> ExpressionifiedState.OverflowFlag
-                        AssemblyFlag.Z -> ExpressionifiedState.ZeroFlag
-                        AssemblyFlag.C -> ExpressionifiedState.CarryFlag
-                    }
-                    defined.add(state)
-                }
-
-                // Track memory writes (virtual registers)
-                when (val addr = instruction.address) {
-                    is AssemblyAddressing.Direct -> {
-                        if (op == AssemblyOp.STA || op == AssemblyOp.STX || op == AssemblyOp.STY) {
-                            defined.add(ExpressionifiedState.VirtualRegister(addr.label))
-                        }
-                    }
-                    else -> {}
-                }
             }
         }
-
-        // TODO: Analyze function outputs by looping through callers
-
         function.inputs = inputs
+        function.clobbers = defined.toSet()
+        
+        // Analyze function outputs by looping through callers. A state is an output if:
+        // - This function can define it, AND
+        // - At least one caller reads that state immediately after the call before redefining it.
+        run {
+            val candidateDefs = function.clobbers ?: emptySet()
+            val detectedOutputs = mutableSetOf<TrackedAsIo>()
+
+            fun trackUse(state: TrackedAsIo, killed: Set<TrackedAsIo>) {
+                if (state in candidateDefs && state !in killed) detectedOutputs.add(state)
+            }
+
+            for (caller in callers) {
+                val block = caller.block ?: continue
+                val idx = block.lines.indexOf(caller)
+                if (idx == -1) continue
+
+                val killed = mutableSetOf<TrackedAsIo>()
+                // Scan forward within the same block after the JSR to see what the caller uses
+                for (i in (idx + 1) until block.lines.size) {
+                    val line = block.lines[i]
+                    val instruction = line.instruction ?: continue
+                    val op = instruction.op
+
+                    // Uses: consumed flag
+                    op.reads(instruction.address?.let {it::class })
+                        .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
+                        .forEach { state ->
+                            trackUse(state, killed)
+                        }
+                    op.modifies(instruction.address?.let {it::class })
+                        .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
+                        .forEach { state ->
+                            killed.add(state)
+                        }
+                }
+            }
+
+            function.outputs = detectedOutputs
+        }
+
+        // Build a simple control list for this function
+        function.analyzeControls()
+
         functions.add(function)
     }
 

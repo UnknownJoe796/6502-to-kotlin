@@ -4,9 +4,12 @@ import kotlin.reflect.KClass
 
 // All right, let's show you how it's done.
 
-enum class AssemblyFlag {
-    N, V, Z, C
+enum class AssemblyAffectable {
+    A, X, Y, Stack, DisableInterrupt, StackPointer,
+    Negative, Overflow, Zero, Carry,
+    Memory
 }
+
 
 object AddressCategory {
     val IMPLIED = null
@@ -22,15 +25,16 @@ object AddressCategory {
 
 enum class AssemblyOp(
     val description: String,
-    val affectedFlags: Set<AssemblyFlag> = setOf(),
-    val consumedFlag: AssemblyFlag? = null,
+    val modifies: (KClass<out AssemblyAddressing>?) -> Set<AssemblyAffectable> = { setOf() },
+    val reads: (KClass<out AssemblyAddressing>?) -> Set<AssemblyAffectable> = { setOf() },
     val isBranch: Boolean = false,
     val flagPositive: Boolean = false,
     val allowedCategories: Set<KClass<out AssemblyAddressing>?> = emptySet()
 ) {
     LDA(
         description = "Load Accumulator",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.A, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.Memory) },
         allowedCategories = setOf(
             AddressCategory.IMMEDIATE, AddressCategory.MEM, AddressCategory.MEM_X, AddressCategory.MEM_Y,
             AddressCategory.INDIRECT_X, AddressCategory.INDIRECT_Y
@@ -38,16 +42,20 @@ enum class AssemblyOp(
     ),
     LDX(
         description = "Load X Register",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.X, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.Memory) },
         allowedCategories = setOf(AddressCategory.IMMEDIATE, AddressCategory.MEM, AddressCategory.MEM_Y)
     ),
     LDY(
         description = "Load Y Register",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.Y, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.Memory) },
         allowedCategories = setOf(AddressCategory.IMMEDIATE, AddressCategory.MEM, AddressCategory.MEM_X)
     ),
     STA(
         description = "Store Accumulator",
+        reads = { setOf(AssemblyAffectable.A) },
+        modifies = { setOf(AssemblyAffectable.Memory) },
         allowedCategories = setOf(
             AddressCategory.MEM, AddressCategory.MEM_X, AddressCategory.MEM_Y,
             AddressCategory.INDIRECT_X, AddressCategory.INDIRECT_Y
@@ -55,61 +63,79 @@ enum class AssemblyOp(
     ),
     STX(
         description = "Store X Register",
+        reads = { setOf(AssemblyAffectable.X) },
+        modifies = { setOf(AssemblyAffectable.Memory) },
         allowedCategories = setOf(AddressCategory.MEM, AddressCategory.MEM_Y)
     ),
     STY(
         description = "Store Y Register",
+        reads = { setOf(AssemblyAffectable.Y) },
+        modifies = { setOf(AssemblyAffectable.Memory) },
         allowedCategories = setOf(AddressCategory.MEM, AddressCategory.MEM_X)
     ),
     TAX(
         description = "Transfer accumulator to X",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        reads = { setOf(AssemblyAffectable.A) },
+        modifies = { setOf(AssemblyAffectable.X, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     TAY(
         description = "Transfer accumulator to Y",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        reads = { setOf(AssemblyAffectable.A) },
+        modifies = { setOf(AssemblyAffectable.Y, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     TXA(
         description = "Transfer X to accumulator",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        reads = { setOf(AssemblyAffectable.X) },
+        modifies = { setOf(AssemblyAffectable.A, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     TYA(
         description = "Transfer Y to accumulator",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        reads = { setOf(AssemblyAffectable.Y) },
+        modifies = { setOf(AssemblyAffectable.A, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     TSX(
         description = "Transfer stack pointer to X",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        reads = { setOf(AssemblyAffectable.StackPointer) },
+        modifies = { setOf(AssemblyAffectable.X, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     TXS(
         description = "Transfer X to stack pointer",
+        reads = { setOf(AssemblyAffectable.X) },
+        modifies = { setOf(AssemblyAffectable.StackPointer) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     PHA(
         description = "Push accumulator on stack",
+        reads = { setOf(AssemblyAffectable.A) },
+        modifies = { setOf(AssemblyAffectable.Stack) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     PHP(
         description = "Push processor status on stack",
+        modifies = { setOf(AssemblyAffectable.Stack) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     PLA(
         description = "Pull accumulator from stack",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.A, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.Stack) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     PLP(
         description = "Pull processor status from stack",
+        modifies = { setOf(AssemblyAffectable.Negative, AssemblyAffectable.Overflow, AssemblyAffectable.Zero, AssemblyAffectable.Carry, AssemblyAffectable.DisableInterrupt) },
+        reads = { setOf(AssemblyAffectable.Stack) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     AND(
         description = "Logical AND",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.A, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.A, AssemblyAffectable.Memory) },
         allowedCategories = setOf(
             AddressCategory.IMMEDIATE, AddressCategory.MEM, AddressCategory.MEM_X, AddressCategory.MEM_Y,
             AddressCategory.INDIRECT_X, AddressCategory.INDIRECT_Y
@@ -117,7 +143,8 @@ enum class AssemblyOp(
     ),
     EOR(
         description = "Exclusive OR",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.A, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.A, AssemblyAffectable.Memory) },
         allowedCategories = setOf(
             AddressCategory.IMMEDIATE, AddressCategory.MEM, AddressCategory.MEM_X, AddressCategory.MEM_Y,
             AddressCategory.INDIRECT_X, AddressCategory.INDIRECT_Y
@@ -125,7 +152,8 @@ enum class AssemblyOp(
     ),
     ORA(
         description = "Logical Inclusive OR",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.A, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.A, AssemblyAffectable.Memory) },
         allowedCategories = setOf(
             AddressCategory.IMMEDIATE, AddressCategory.MEM, AddressCategory.MEM_X, AddressCategory.MEM_Y,
             AddressCategory.INDIRECT_X, AddressCategory.INDIRECT_Y
@@ -133,13 +161,14 @@ enum class AssemblyOp(
     ),
     BIT(
         description = "Bit Test",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.V, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.Negative, AssemblyAffectable.Overflow, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.A, AssemblyAffectable.Memory) },
         allowedCategories = setOf(AddressCategory.MEM)
     ),
     ADC(
         description = "Add with Carry",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.V, AssemblyFlag.Z, AssemblyFlag.C),
-        consumedFlag = AssemblyFlag.C,
+        modifies = { setOf(AssemblyAffectable.A, AssemblyAffectable.Negative, AssemblyAffectable.Overflow, AssemblyAffectable.Zero, AssemblyAffectable.Carry) },
+        reads = { setOf(AssemblyAffectable.A, AssemblyAffectable.Carry, AssemblyAffectable.Memory) },
         allowedCategories = setOf(
             AddressCategory.IMMEDIATE, AddressCategory.MEM, AddressCategory.MEM_X, AddressCategory.MEM_Y,
             AddressCategory.INDIRECT_X, AddressCategory.INDIRECT_Y
@@ -147,8 +176,8 @@ enum class AssemblyOp(
     ),
     SBC(
         description = "Subtract with Carry",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.V, AssemblyFlag.Z, AssemblyFlag.C),
-        consumedFlag = AssemblyFlag.C,
+        modifies = { setOf(AssemblyAffectable.A, AssemblyAffectable.Negative, AssemblyAffectable.Overflow, AssemblyAffectable.Zero, AssemblyAffectable.Carry) },
+        reads = { setOf(AssemblyAffectable.A, AssemblyAffectable.Carry, AssemblyAffectable.Memory) },
         allowedCategories = setOf(
             AddressCategory.IMMEDIATE, AddressCategory.MEM, AddressCategory.MEM_X, AddressCategory.MEM_Y,
             AddressCategory.INDIRECT_X, AddressCategory.INDIRECT_Y
@@ -156,7 +185,8 @@ enum class AssemblyOp(
     ),
     CMP(
         description = "Compare accumulator",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z, AssemblyFlag.C),
+        modifies = { setOf(AssemblyAffectable.Negative, AssemblyAffectable.Zero, AssemblyAffectable.Carry) },
+        reads = { setOf(AssemblyAffectable.A, AssemblyAffectable.Memory) },
         allowedCategories = setOf(
             AddressCategory.IMMEDIATE, AddressCategory.MEM, AddressCategory.MEM_X, AddressCategory.MEM_Y,
             AddressCategory.INDIRECT_X, AddressCategory.INDIRECT_Y
@@ -164,62 +194,74 @@ enum class AssemblyOp(
     ),
     CPX(
         description = "Compare X register",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z, AssemblyFlag.C),
+        modifies = { setOf(AssemblyAffectable.Negative, AssemblyAffectable.Zero, AssemblyAffectable.Carry) },
+        reads = { setOf(AssemblyAffectable.X) },
         allowedCategories = setOf(AddressCategory.IMMEDIATE, AddressCategory.MEM)
     ),
     CPY(
         description = "Compare Y register",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z, AssemblyFlag.C),
+        modifies = { setOf(AssemblyAffectable.Negative, AssemblyAffectable.Zero, AssemblyAffectable.Carry) },
+        reads = { setOf(AssemblyAffectable.Y) },
         allowedCategories = setOf(AddressCategory.IMMEDIATE, AddressCategory.MEM)
     ),
     INC(
         description = "Increment a memory location",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.Memory, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.Memory) },
         allowedCategories = setOf(AddressCategory.MEM, AddressCategory.MEM_X)
     ),
     INX(
         description = "Increment the X register",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.X, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.X) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     INY(
         description = "Increment the Y register",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.Y, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.Y) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     DEC(
         description = "Decrement a memory location",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.Memory, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.Memory) },
         allowedCategories = setOf(AddressCategory.MEM, AddressCategory.MEM_X)
     ),
     DEX(
         description = "Decrement the X register",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.X, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.X) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     DEY(
         description = "Decrement the Y register",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z),
+        modifies = { setOf(AssemblyAffectable.Y, AssemblyAffectable.Negative, AssemblyAffectable.Zero) },
+        reads = { setOf(AssemblyAffectable.Y) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     ASL(
         description = "Arithmetic Shift Left",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z, AssemblyFlag.C),
+        reads = { if(it == null) setOf(AssemblyAffectable.A) else setOf(AssemblyAffectable.Memory) },
+        modifies = { (if(it == null) setOf(AssemblyAffectable.A) else setOf(AssemblyAffectable.Memory)) + setOf(AssemblyAffectable.Negative, AssemblyAffectable.Zero, AssemblyAffectable.Carry) },
         allowedCategories = setOf(AddressCategory.ACCUMULATOR, AddressCategory.MEM, AddressCategory.MEM_X)
     ),
     LSR(
         description = "Logical Shift Right",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z, AssemblyFlag.C),
+        reads = { if(it == null) setOf(AssemblyAffectable.A) else setOf(AssemblyAffectable.Memory) },
+        modifies = { (if(it == null) setOf(AssemblyAffectable.A) else setOf(AssemblyAffectable.Memory)) + setOf(AssemblyAffectable.Negative, AssemblyAffectable.Zero, AssemblyAffectable.Carry) },
         allowedCategories = setOf(AddressCategory.ACCUMULATOR, AddressCategory.MEM, AddressCategory.MEM_X)
     ),
     ROL(
         description = "Rotate Left",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z, AssemblyFlag.C),
+        reads = { (if(it == null) setOf(AssemblyAffectable.A) else setOf(AssemblyAffectable.Memory)) + setOf(AssemblyAffectable.Carry) },
+        modifies = { (if(it == null) setOf(AssemblyAffectable.A) else setOf(AssemblyAffectable.Memory)) + setOf(AssemblyAffectable.Negative, AssemblyAffectable.Zero, AssemblyAffectable.Carry) },
         allowedCategories = setOf(AddressCategory.ACCUMULATOR, AddressCategory.MEM, AddressCategory.MEM_X)
     ),
     ROR(
         description = "Rotate Right",
-        affectedFlags = setOf(AssemblyFlag.N, AssemblyFlag.Z, AssemblyFlag.C),
+        reads = { (if(it == null) setOf(AssemblyAffectable.A) else setOf(AssemblyAffectable.Memory)) + setOf(AssemblyAffectable.Carry) },
+        modifies = { (if(it == null) setOf(AssemblyAffectable.A) else setOf(AssemblyAffectable.Memory)) + setOf(AssemblyAffectable.Negative, AssemblyAffectable.Zero, AssemblyAffectable.Carry) },
         allowedCategories = setOf(AddressCategory.ACCUMULATOR, AddressCategory.MEM, AddressCategory.MEM_X)
     ),
     JMP(
@@ -236,55 +278,55 @@ enum class AssemblyOp(
     ),
     BCC(
         description = "Branch if carry flag clear",
-        consumedFlag = AssemblyFlag.C,
+        reads = { setOf(AssemblyAffectable.Carry) },
         isBranch = true,
         flagPositive = false
     ),
     BCS(
         description = "Branch if carry flag set",
-        consumedFlag = AssemblyFlag.C,
+        reads = { setOf(AssemblyAffectable.Carry) },
         isBranch = true,
         flagPositive = true
     ),
     BEQ(
         description = "Branch if zero flag set",
-        consumedFlag = AssemblyFlag.Z,
+        reads = { setOf(AssemblyAffectable.Zero) },
         isBranch = true,
         flagPositive = true
     ),
     BMI(
         description = "Branch if negative flag set",
-        consumedFlag = AssemblyFlag.N,
+        reads = { setOf(AssemblyAffectable.Negative) },
         isBranch = true,
         flagPositive = true
     ),
     BNE(
         description = "Branch if zero flag clear",
-        consumedFlag = AssemblyFlag.Z,
+        reads = { setOf(AssemblyAffectable.Zero) },
         isBranch = true,
         flagPositive = false
     ),
     BPL(
         description = "Branch if negative flag clear",
-        consumedFlag = AssemblyFlag.N,
+        reads = { setOf(AssemblyAffectable.Negative) },
         isBranch = true,
         flagPositive = false
     ),
     BVC(
         description = "Branch if overflow flag clear",
-        consumedFlag = AssemblyFlag.V,
+        reads = { setOf(AssemblyAffectable.Overflow) },
         isBranch = true,
         flagPositive = false
     ),
     BVS(
         description = "Branch if overflow flag set",
-        consumedFlag = AssemblyFlag.V,
+        reads = { setOf(AssemblyAffectable.Overflow) },
         isBranch = true,
         flagPositive = true
     ),
     CLC(
         description = "Clear carry flag",
-        affectedFlags = setOf(AssemblyFlag.C),
+        modifies = { setOf(AssemblyAffectable.Carry) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     CLD(
@@ -293,16 +335,17 @@ enum class AssemblyOp(
     ),
     CLI(
         description = "Clear interrupt disable flag",
+        modifies = { setOf(AssemblyAffectable.DisableInterrupt) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     CLV(
         description = "Clear overflow flag",
-        affectedFlags = setOf(AssemblyFlag.V),
+        modifies = { setOf(AssemblyAffectable.Overflow) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     SEC(
         description = "Set carry flag",
-        affectedFlags = setOf(AssemblyFlag.C),
+        modifies = { setOf(AssemblyAffectable.Carry) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     SED(
@@ -311,6 +354,7 @@ enum class AssemblyOp(
     ),
     SEI(
         description = "Set interrupt disable flag",
+        modifies = { setOf(AssemblyAffectable.DisableInterrupt) },
         allowedCategories = setOf(AddressCategory.IMPLIED)
     ),
     BRK(
@@ -384,13 +428,13 @@ sealed interface AssemblyAddressing {
         Decimal(10, "", null),
         Hex(16, "$", 2)
     }
-    data class ByteValue(val byte: UByte, val radix: Radix) : Value {
-        override fun toString(): String = "#${radix.prefix}${byte.toString(radix.base).let {
+    data class ByteValue(val value: UByte, val radix: Radix) : Value {
+        override fun toString(): String = "#${radix.prefix}${value.toString(radix.base).let {
             if (radix.perByte != null) it.padStart(radix.perByte, '0') else it 
         }}"
     }
-    data class ShortValue(val byte: UShort, val radix: Radix) : Value {
-        override fun toString(): String = "#${radix.prefix}${byte.toString(radix.base).let {
+    data class ShortValue(val value: UShort, val radix: Radix) : Value {
+        override fun toString(): String = "#${radix.prefix}${value.toString(radix.base).let {
             if (radix.perByte != null) it.padStart(radix.perByte, '0') else it 
         }}"
     }
@@ -456,7 +500,7 @@ sealed interface AssemblyAddressing {
                         val radix = Radix.entries.find { it.prefix == nextLetter.toString() } ?: throw IllegalStateException("What am I supposed to do with '$trimmed'?")
                         val digits = trimmed.substring(2)
                         val directValue = digits.toUInt(radix.base)
-                        return if (digits <= radix.prefix) ByteValue(directValue.toUByte(), radix)
+                        return if (directValue <= 0xFFu) ByteValue(directValue.toUByte(), radix)
                         else ShortValue(directValue.toUShort(), radix)
                     }
                 }
@@ -486,7 +530,7 @@ sealed interface AssemblyAddressing {
                 val parsed = trimmed.substringBefore(',').trim().parseLabelWithOffset()
                 return DirectY(parsed.first, parsed.second)
             }
-            if (trimmed.startsWith("(") && trimmed.equals(")")) {
+            if (trimmed.startsWith("(") && trimmed.endsWith(")")) {
                 val parsed = trimmed.substringAfter('(').substringBeforeLast(')').trim().parseLabelWithOffset()
                 return IndirectAbsolute(parsed.first, parsed.second)
             }
