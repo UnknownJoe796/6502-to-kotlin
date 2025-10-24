@@ -1,0 +1,3292 @@
+Function RunGameTimer
+  Inputs: []
+  Outputs: []
+        Line 6435: RunGameTimer: 
+          Branch exit: Line 6471: ExGTimer: RTS                   ; leave
+          Line 6438: LDA GameEngineSubroutine
+            Branch exit: Line 6471: ExGTimer: RTS                   ; leave
+            Line 6441: CMP #$0b                        ; if running death routine,
+              Branch exit: Line 6471: ExGTimer: RTS                   ; leave
+              Line 6443: LDA Player_Y_HighPos
+                Branch exit: Line 6471: ExGTimer: RTS                   ; leave
+                Line 6446: LDA GameTimerCtrlTimer          ; if game timer control not yet expired,
+                  Branch exit: Line 6471: ExGTimer: RTS                   ; leave
+                  Line 6448: LDA GameTimerDisplay
+                    Branch exit: Line 6468: TimeUpOn: STA PlayerStatus      ; init player status (note A will always be zero here)
+                    Line 6452: LDY GameTimerDisplay            ; otherwise check first digit
+                      Branch exit: Line 6460: ResGTCtrl: LDA #$18             ; reset game timer control
+                      Line 6455: LDA GameTimerDisplay+1          ; otherwise check second and third digits
+                        Branch exit: Line 6460: ResGTCtrl: LDA #$18             ; reset game timer control
+                        Line 6458: LDA #TimeRunningOutMusic
+                      Line 6460: ResGTCtrl: LDA #$18             ; reset game timer control
+                        Branch exit: Line 2529: PrintStatusBarNumbers: 
+                    Line 6468: TimeUpOn: STA PlayerStatus      ; init player status (note A will always be zero here)
+
+Function MoveFallingPlatform
+  Inputs: []
+  Outputs: []
+      Line 7604: MoveFallingPlatform: 
+
+Function InitScroll
+  Inputs: [A]
+  Outputs: [A]
+  Line 2501: InitScroll: STA PPU_SCROLL_REG  ; store contents of A into scroll registers
+
+Function RemoveCoin_Axe
+  Inputs: []
+  Outputs: []
+  Line 2015: RemoveCoin_Axe: 
+    Branch exit: Line 2021: WriteBlankMT: JSR PutBlockMetatile; do a sub to write blank metatile to vram buffer
+    Line 2020: LDA #$04                        ; otherwise load offset for blank metatile used in water
+    Line 2021: WriteBlankMT: JSR PutBlockMetatile; do a sub to write blank metatile to vram buffer
+
+Function ReadJoypads
+  Inputs: []
+  Outputs: []
+    Line 2420: ReadJoypads: 
+      Line 2428: ReadPortBits: LDY #$08 (as a call, not in function)
+
+Function ReadPortBits
+  Inputs: [A]
+  Outputs: [A]
+      Line 2428: ReadPortBits: LDY #$08
+        Line 2429: PortLoop: PHA                   ; push previous bit onto stack
+          Branch exit: Line 2429: PortLoop: PHA                   ; push previous bit onto stack
+          Line 2439: STA SavedJoypadBits,X           ; save controller status here always
+            Branch exit: Line 2448: Save8Bits: PLA 
+            Line 2444: PLA 
+            Line 2448: Save8Bits: PLA 
+
+Function OffscreenBoundsCheck
+  Inputs: []
+  Outputs: []
+  Line 11005: OffscreenBoundsCheck: 
+    Branch exit: Line 11049: ExScrnBd: RTS                   ; leave
+    Line 11009: LDA ScreenLeft_X_Pos            ; get horizontal coordinate for left side of screen
+      Branch exit: Line 11015: LimitB: ADC #$38                ; add 56 pixels to coordinate if hammer bro or piranha plant
+      Line 11013: CPY #PiranhaPlant               ; check for piranha plant object
+        Branch exit: Line 11016: ExtendLB: SBC #$48              ; subtract 72 pixels regardless of enemy object
+      Line 11015: LimitB: ADC #$38                ; add 56 pixels to coordinate if hammer bro or piranha plant
+      Line 11016: ExtendLB: SBC #$48              ; subtract 72 pixels regardless of enemy object
+        Branch exit: Line 11048: TooFar: JSR EraseEnemyObject    ; erase object if necessary
+        Line 11032: LDA Enemy_X_Position,X          ; compare horizontal coordinate of the enemy object
+          Branch exit: Line 11049: ExScrnBd: RTS                   ; leave
+          Line 11037: LDA Enemy_State,X               ; if at this point, enemy is offscreen to the right, so check
+            Branch exit: Line 11049: ExScrnBd: RTS                   ; leave
+            Line 11040: CPY #PiranhaPlant               ; if piranha plant, do not erase
+              Branch exit: Line 11049: ExScrnBd: RTS                   ; leave
+              Line 11042: CPY #FlagpoleFlagObject         ; if flagpole flag, do not erase
+                Branch exit: Line 11049: ExScrnBd: RTS                   ; leave
+                Line 11044: CPY #StarFlagObject             ; if star flag, do not erase
+                  Branch exit: Line 11049: ExScrnBd: RTS                   ; leave
+                  Line 11046: CPY #JumpspringObject           ; if jumpspring, do not erase
+                    Branch exit: Line 11049: ExScrnBd: RTS                   ; leave
+        Line 11048: TooFar: JSR EraseEnemyObject    ; erase object if necessary
+    Line 11049: ExScrnBd: RTS                   ; leave
+
+Function RelativeMiscPosition
+  Inputs: []
+  Outputs: []
+    Line 14779: RelativeMiscPosition: 
+      Branch exit: Line 14775: RelWOfs: JSR GetObjRelativePosition; get the coordinates
+
+Function DrawHammer
+  Inputs: []
+  Outputs: []
+                  Line 13198: DrawHammer: 
+                    Branch exit: Line 13206: ForceHPose: LDX #$00            ; reset offset here
+                    Line 13202: LDA Misc_State,X                ; otherwise get hammer's state
+                      Branch exit: Line 13208: GetHPose: LDA FrameCounter      ; get frame counter
+                    Line 13206: ForceHPose: LDX #$00            ; reset offset here
+                      Branch exit: Line 13213: RenderH: LDA Misc_Rel_YPos      ; get relative vertical coordinate
+                    Line 13208: GetHPose: LDA FrameCounter      ; get frame counter
+                    Line 13213: RenderH: LDA Misc_Rel_YPos      ; get relative vertical coordinate
+                      Branch exit: Line 13242: NoHOffscr: RTS                  ; leave
+                      Line 13238: LDA #$00
+                      Line 13242: NoHOffscr: RTS                  ; leave
+
+Function InitPodoboo
+  Inputs: []
+  Outputs: []
+    Line 8143: InitPodoboo: 
+      Branch exit: Line 8208: SmallBBox: LDA #$09             ; set specific bounding box size control
+
+Function ProcBowserFlame
+  Inputs: []
+  Outputs: []
+    Line 10323: ProcBowserFlame: 
+      Branch exit: Line 10348: SetGfxF: JSR RelativeEnemyPosition; get new relative coordinates
+      Line 10326: LDA #$40                        ; load default movement force
+        Branch exit: Line 10330: SFlmX: STA $00                  ; store value here
+        Line 10329: LDA #$60                        ; otherwise load alternate movement force to go faster
+        Line 10330: SFlmX: STA $00                  ; store value here
+          Branch exit: Line 10348: SetGfxF: JSR RelativeEnemyPosition; get new relative coordinates
+          Line 10345: CLC 
+      Line 10348: SetGfxF: JSR RelativeEnemyPosition; get new relative coordinates
+        Branch exit: Line 10321: ExFl: RTS 
+        Line 10351: LDA #$51                        ; otherwise, continue
+          Branch exit: Line 10358: FlmeAt: STY $01                 ; set bowser's flame sprite attributes here
+          Line 10357: LDY #$82                        ; otherwise write value with vertical flip bit set
+          Line 10358: FlmeAt: STY $01                 ; set bowser's flame sprite attributes here
+            Line 10362: DrawFlameLoop: 
+              Branch exit: Line 10362: DrawFlameLoop: 
+              Line 10382: LDX ObjectOffset                ; reload original enemy offset
+                Branch exit: Line 10391: M3FOfs: PLA                     ; get bits from stack
+                Line 10389: LDA #$f8                        ; otherwise move sprite offscreen, this part likely
+                Line 10391: M3FOfs: PLA                     ; get bits from stack
+                  Branch exit: Line 10397: M2FOfs: PLA                     ; get bits from stack again
+                  Line 10395: LDA #$f8                        ; otherwise move third sprite offscreen
+                  Line 10397: M2FOfs: PLA                     ; get bits from stack again
+                    Branch exit: Line 10403: M1FOfs: PLA                     ; get bits from stack one last time
+                    Line 10401: LDA #$f8                        ; otherwise move second sprite offscreen
+                    Line 10403: M1FOfs: PLA                     ; get bits from stack one last time
+                      Branch exit: Line 10408: ExFlmeD: RTS                    ; leave
+                      Line 10406: LDA #$f8
+                      Line 10408: ExFlmeD: RTS                    ; leave
+
+Function InitEnemyObject
+  Inputs: []
+  Outputs: []
+  Line 8011: InitEnemyObject: 
+
+Function ShellOrBlockDefeat
+  Inputs: []
+  Outputs: []
+  Line 11171: ShellOrBlockDefeat: 
+    Branch exit: Line 11178: StnE: JSR ChkToStunEnemies      ; do yet another sub
+    Line 11175: LDA Enemy_Y_Position,X
+    Line 11178: StnE: JSR ChkToStunEnemies      ; do yet another sub
+      Branch exit: Line 11189: GoombaPoints: 
+      Line 11187: LDA #$06                        ; award 1000 points for hammer bro
+      Line 11189: GoombaPoints: 
+        Branch exit: Line 11194: EnemySmackScore: 
+        Line 11192: LDA #$01                        ; award 100 points for goomba
+
+Function GetPlayerOffscreenBits
+  Inputs: [$00]
+  Outputs: [$00]
+    Line 14820: GetPlayerOffscreenBits: 
+      Branch exit: Line 14868: GetOffScreenBitsSet: 
+
+Function ResetPalStar
+  Inputs: []
+  Outputs: []
+    Line 5798: ResetPalStar: 
+
+Function MoveObjectHorizontally
+  Inputs: []
+  Outputs: []
+        Line 7540: MoveObjectHorizontally: 
+          Branch exit: Line 7555: SaveXSpd: STA $00               ; save result here
+          Line 7554: ORA #%11110000                  ; otherwise alter high nybble
+          Line 7555: SaveXSpd: STA $00               ; save result here
+            Branch exit: Line 7560: UseAdder: STY $02               ; save Y here
+            Line 7559: DEY                             ; otherwise decrement Y
+            Line 7560: UseAdder: STY $02               ; save Y here
+
+Function MoveLiftPlatforms
+  Inputs: []
+  Outputs: []
+    Line 10981: MoveLiftPlatforms: 
+      Branch exit: Line 10997: ExLiftP: RTS                    ; then leave
+      Line 10984: LDA Enemy_YMF_Dummy,X
+
+Function BulletBillHandler
+  Inputs: [$00]
+  Outputs: [$00]
+      Line 6823: BulletBillHandler: 
+        Branch exit: Line 6855: RunBBSubs: JSR GetEnemyOffscreenBits; get offscreen information
+        Line 6826: LDA Enemy_State,X
+          Branch exit: Line 6850: ChkDSte: LDA Enemy_State,X      ; check enemy state for d5 set
+          Line 6828: LDA Enemy_OffscreenBits         ; otherwise load offscreen bits
+            Branch exit: Line 6860: KillBB: JSR EraseEnemyObject    ; kill bullet bill and leave
+            Line 6832: LDY #$01                        ; set to move right by default
+              Branch exit: Line 6836: SetupBB: STY Enemy_MovingDir,X  ; set bullet bill's moving direction
+              Line 6835: INY                             ; otherwise increment to move left
+              Line 6836: SetupBB: STY Enemy_MovingDir,X  ; set bullet bill's moving direction
+                Branch exit: Line 6860: KillBB: JSR EraseEnemyObject    ; kill bullet bill and leave
+                Line 6844: LDA #$01
+            Line 6860: KillBB: JSR EraseEnemyObject    ; kill bullet bill and leave
+          Line 6850: ChkDSte: LDA Enemy_State,X      ; check enemy state for d5 set
+            Branch exit: Line 6854: BBFly: JSR MoveEnemyHorizontally; do sub to move bullet bill horizontally
+            Line 6853: JSR MoveD_EnemyVertically       ; otherwise do sub to move bullet bill vertically
+            Line 6854: BBFly: JSR MoveEnemyHorizontally; do sub to move bullet bill horizontally
+        Line 6855: RunBBSubs: JSR GetEnemyOffscreenBits; get offscreen information
+          Branch exit: Line 13613: EnemyGfxHandler: 
+
+Function RenderAttributeTables
+  Inputs: []
+  Outputs: []
+    Line 1894: RenderAttributeTables: 
+      Branch exit: Line 1904: SetATHigh: AND #%00000100       ; mask out all other bits
+      Line 1903: EOR #%00000100                  ; otherwise invert d2
+      Line 1904: SetATHigh: AND #%00000100       ; mask out all other bits
+        Line 1914: AttribLoop: LDA $00
+          Branch exit: Line 1914: AttribLoop: LDA $00
+          Line 1934: STA VRAM_Buffer2,Y              ; put null terminator at the end
+
+Function MoveNormalEnemy
+  Inputs: []
+  Outputs: []
+        Line 9292: MoveNormalEnemy: 
+          Branch exit: Line 9310: FallE: JSR MoveD_EnemyVertically; do a sub here to move enemy downwards
+          Line 9297: LDA Enemy_State,X
+            Branch exit: Line 9324: SteadM: LDA Enemy_X_Speed,X     ; get current horizontal speed
+            Line 9300: LDA Enemy_State,X
+              Branch exit: Line 9355: MoveDefeatedEnemy: 
+              Line 9303: LDA Enemy_State,X
+                Branch exit: Line 9324: SteadM: LDA Enemy_X_Speed,X     ; get current horizontal speed
+                Line 9306: CMP #$05
+                  Branch exit: Line 9310: FallE: JSR MoveD_EnemyVertically; do a sub here to move enemy downwards
+                  Line 9308: CMP #$03
+                    Branch exit: Line 9337: ReviveStunned: 
+          Line 9310: FallE: JSR MoveD_EnemyVertically; do a sub here to move enemy downwards
+            Branch exit: Line 9321: MEHor: JMP MoveEnemyHorizontally; jump here to move enemy horizontally for <> $2e and d6 set
+            Line 9315: AND #%01000000                  ; check for d6 set
+              Branch exit: Line 9324: SteadM: LDA Enemy_X_Speed,X     ; get current horizontal speed
+              Line 9317: LDA Enemy_ID,X
+                Branch exit: Line 9324: SteadM: LDA Enemy_X_Speed,X     ; get current horizontal speed
+                Line 9320: BNE SlowM                       ; if any other object where d6 set, jump to set Y
+                  Branch exit: Line 9323: SlowM: LDY #$01                 ; if branched here, increment Y to slow horizontal movement
+            Line 9321: MEHor: JMP MoveEnemyHorizontally; jump here to move enemy horizontally for <> $2e and d6 set
+              Branch exit: Line 7529: MoveEnemyHorizontally: 
+
+Function ReplaceBlockMetatile
+  Inputs: []
+  Outputs: []
+    Line 2026: ReplaceBlockMetatile: 
+
+Function DrawExplosion_Fireworks
+  Inputs: [A, Y]
+  Outputs: [A, Y]
+      Line 14266: DrawExplosion_Fireworks: 
+
+Function SetupPlatformRope
+  Inputs: [A]
+  Outputs: [A]
+    Line 10805: SetupPlatformRope: 
+      Branch exit: Line 10814: GetLRp: PHA                     ; save modified horizontal coordinate to stack
+      Line 10812: CLC 
+      Line 10814: GetLRp: PHA                     ; save modified horizontal coordinate to stack
+        Branch exit: Line 10831: GetHRp: TXA                     ; move vertical coordinate to A
+        Line 10827: TXA 
+        Line 10831: GetHRp: TXA                     ; move vertical coordinate to A
+          Branch exit: Line 10857: ExPRp: RTS                      ; leave!
+          Line 10854: LDA $00
+          Line 10857: ExPRp: RTS                      ; leave!
+
+Function GetMTileAttrib
+  Inputs: [A]
+  Outputs: [A]
+    Line 12381: GetMTileAttrib: 
+
+Function DrawBubble
+  Inputs: []
+  Outputs: []
+    Line 14371: DrawBubble: 
+      Branch exit: Line 14387: ExDBub: RTS                     ; leave
+      Line 14375: LDA Bubble_OffscreenBits        ; check air bubble's offscreen bits
+        Branch exit: Line 14387: ExDBub: RTS                     ; leave
+        Line 14378: LDY Bubble_SprDataOffset,X      ; get air bubble's OAM data offset
+      Line 14387: ExDBub: RTS                     ; leave
+
+Function ProcessLengthData
+  Inputs: [A]
+  Outputs: [A]
+      Line 15916: ProcessLengthData: 
+
+Function SpawnBrickChunks
+  Inputs: []
+  Outputs: []
+    Line 7415: SpawnBrickChunks: 
+
+Function SmallBBox
+  Inputs: [CarryFlag]
+  Outputs: [CarryFlag]
+  Line 8208: SmallBBox: LDA #$09             ; set specific bounding box size control
+    Branch exit: Line 8223: SetBBox: STA Enemy_BoundBoxCtrl,X; set bounding box control here
+    Line 8210: 
+      Line 8213: InitRedPTroopa: 
+        Branch exit: Line 8219: GetCent: TYA                    ; send central position adder to A
+        Line 8218: LDY #$e0                        ; if => $80, load position adder for 32 pixels up
+        Line 8219: GetCent: TYA                    ; send central position adder to A
+
+Function VictoryModeSubroutines
+  Inputs: []
+  Outputs: []
+    Line 1121: VictoryModeSubroutines: 
+      Line 1133: SetupVictoryMode: 
+        Branch exit: Line 1630: IncModeTask_B: INC OperMode_Task; move onto next mode
+
+Function PlayerGfxHandler
+  Inputs: []
+  Outputs: []
+  Line 14434: PlayerGfxHandler: 
+    Branch exit: Line 14440: CntPl: LDA GameEngineSubroutine ; if executing specific game engine routine,
+    Line 14437: LDA FrameCounter
+      Branch exit: Line 14471: ExPGH: RTS                      ; then leave
+    Line 14440: CntPl: LDA GameEngineSubroutine ; if executing specific game engine routine,
+      Branch exit: Line 14481: PlayerKilled: 
+      Line 14443: LDA PlayerChangeSizeFlag        ; if grow/shrink flag set
+        Branch exit: Line 14477: DoChangeSize: 
+        Line 14445: LDY SwimmingFlag                ; if swimming flag set, branch to
+          Branch exit: Line 14473: FindPlayerAction: 
+          Line 14447: LDA Player_State
+            Branch exit: Line 14473: FindPlayerAction: 
+            Line 14450: JSR FindPlayerAction            ; otherwise jump and return
+              Branch exit: Line 14471: ExPGH: RTS                      ; then leave
+              Line 14454: TAX                             ; initialize X to zero
+                Branch exit: Line 14463: SwimKT: LDA PlayerSize          ; check player's size
+                Line 14459: INY 
+                Line 14463: SwimKT: LDA PlayerSize          ; check player's size
+                  Branch exit: Line 14469: BigKTS: LDA SwimKickTileNum,X   ; overwrite tile number in sprite 7/8
+                  Line 14465: LDA Sprite_Tilenumber+24,Y      ; check tile number of seventh/eighth sprite
+                    Branch exit: Line 14471: ExPGH: RTS                      ; then leave
+                    Line 14468: INX                             ; otherwise increment X for second tile
+                  Line 14469: BigKTS: LDA SwimKickTileNum,X   ; overwrite tile number in sprite 7/8
+    Line 14471: ExPGH: RTS                      ; then leave
+
+Function HandleEnemyFBallCol
+  Inputs: [$01]
+  Outputs: [$01]
+      Line 11122: HandleEnemyFBallCol: 
+        Branch exit: Line 11134: ChkBuzzyBeetle: 
+        Line 11127: AND #%00001111                  ; otherwise mask out high nybble and
+          Branch exit: Line 11141: HurtBowser: 
+          Line 11132: LDX $01                         ; otherwise retrieve current enemy offset
+        Line 11134: ChkBuzzyBeetle: 
+          Branch exit: Line 11198: ExHCF: RTS                      ; and now let's leave
+          Line 11138: CMP #Bowser                     ; check for bowser one more time (necessary if d7 of flag was clear)
+            Branch exit: Line 11163: ChkOtherEnemies: 
+            Line 11140: 
+        Line 11141: HurtBowser: 
+          Branch exit: Line 11198: ExHCF: RTS                      ; and now let's leave
+          Line 11144: JSR InitVStf                    ; otherwise do sub to init vertical speed and movement force
+            Branch exit: Line 11156: SetDBSte: STA Enemy_State,X     ; set defeated enemy state
+            Line 11155: ORA #$03                        ; otherwise add 3 to enemy state
+            Line 11156: SetDBSte: STA Enemy_State,X     ; set defeated enemy state
+              Branch exit: Line 11194: EnemySmackScore: 
+              Line 11162: 
+        Line 11163: ChkOtherEnemies: 
+          Branch exit: Line 11198: ExHCF: RTS                      ; and now let's leave
+          Line 11166: CMP #Podoboo
+            Branch exit: Line 11198: ExHCF: RTS                      ; and now let's leave
+            Line 11168: CMP #$15
+              Branch exit: Line 11198: ExHCF: RTS                      ; and now let's leave
+              Line 11170: 
+
+Function DrawFirebar
+  Inputs: []
+  Outputs: []
+    Line 14235: DrawFirebar: 
+      Branch exit: Line 14249: FireA: STA Sprite_Attributes,Y  ; store attribute byte and leave
+      Line 14248: ORA #%11000000                  ; otherwise flip both ways every eight frames
+      Line 14249: FireA: STA Sprite_Attributes,Y  ; store attribute byte and leave
+
+Function ProcSwimmingB
+  Inputs: []
+  Outputs: []
+    Line 9519: ProcSwimmingB: 
+      Branch exit: Line 9555: ChkForFloatdown: 
+      Line 9523: LDA FrameCounter
+        Branch exit: Line 9541: SlowSwim: 
+        Line 9529: PLA                             ; pull 3 LSB of frame counter from the stack
+          Branch exit: Line 9539: BSwimE: RTS 
+          Line 9531: LDA Enemy_Y_MoveForce,X
+            Branch exit: Line 9539: BSwimE: RTS 
+            Line 9538: INC BlooperMoveCounter,X        ; otherwise increment movement counter
+          Line 9539: BSwimE: RTS 
+
+Function Square1SfxHandler
+  Inputs: []
+  Outputs: []
+                      Line 15230: Square1SfxHandler: 
+                        Branch exit: Line 15250: CheckSfx1Buffer: 
+                        Line 15233: STY Square1SoundBuffer          ; if found, put in buffer
+                          Branch exit: Line 15180: PlaySmallJump: 
+                          Line 15235: LSR Square1SoundQueue
+                            Branch exit: Line 15184: PlayBigJump: 
+                            Line 15237: LSR Square1SoundQueue
+                              Branch exit: Line 15213: PlayBump: 
+                              Line 15239: LSR Square1SoundQueue
+                                Branch exit: Line 15270: PlaySwimStomp: 
+                                Line 15241: LSR Square1SoundQueue
+                                  Branch exit: Line 15290: PlaySmackEnemy: 
+                                  Line 15243: LSR Square1SoundQueue
+                                    Branch exit: Line 15323: PlayPipeDownInj: 
+                                    Line 15245: LSR Square1SoundQueue
+                                      Branch exit: Line 15208: PlayFireballThrow: 
+                                      Line 15247: LSR Square1SoundQueue
+                                        Branch exit: Line 15172: PlayFlagpoleSlide: 
+                                        Line 15249: 
+                        Line 15250: CheckSfx1Buffer: 
+                          Branch exit: Line 15268: ExS1H: RTS 
+                          Line 15253: BMI ContinueSndJump             ; small mario jump
+                            Branch exit: Line 15194: ContinueSndJump: 
+                            Line 15254: LSR 
+                              Branch exit: Line 15194: ContinueSndJump: 
+                              Line 15256: LSR 
+                                Branch exit: Line 15221: ContinueBumpThrow: 
+                                Line 15258: LSR 
+                                  Branch exit: Line 15278: ContinueSwimStomp: 
+                                  Line 15260: LSR 
+                                    Branch exit: Line 15299: ContinueSmackEnemy: 
+                                    Line 15262: LSR 
+                                      Branch exit: Line 15327: ContinuePipeDownInj: 
+                                      Line 15264: LSR 
+                                        Branch exit: Line 15221: ContinueBumpThrow: 
+                                        Line 15266: LSR 
+                                          Branch exit: Line 15310: DecrementSfx1Length: 
+                          Line 15268: ExS1H: RTS 
+
+Function CheckpointEnemyID
+  Inputs: []
+  Outputs: []
+  Line 8054: CheckpointEnemyID: 
+    Branch exit: Line 8066: InitEnemyRoutines: 
+    Line 8058: TAY                             ; save identifier in Y register for now
+    Line 8066: InitEnemyRoutines: 
+      Line 8132: NoInitCode: 
+
+Function GetBlockBufferAddr
+  Inputs: [A]
+  Outputs: [A]
+      Line 4327: GetBlockBufferAddr: 
+
+Function DrawOneSpriteRow
+  Inputs: [A, $03, $00, $04, $02, $05, Y, X]
+  Outputs: [A, $03, $00, $04, $02, $05, Y, X]
+      Line 14067: DrawOneSpriteRow: 
+        Branch exit: Line 14999: DrawSpriteObject: 
+
+Function FindAreaPointer
+  Inputs: []
+  Outputs: []
+    Line 4366: FindAreaPointer: 
+
+Function FindEmptyMiscSlot
+  Inputs: []
+  Outputs: []
+    Line 6999: FindEmptyMiscSlot: 
+      Line 7001: FMiscLoop: LDA Misc_State,Y     ; get misc object state
+        Branch exit: Line 7007: UseMiscS: STY JumpCoinMiscOffset; store offset of misc object buffer here (residual)
+        Line 7003: DEY                             ; decrement offset
+          Branch exit: Line 7001: FMiscLoop: LDA Misc_State,Y     ; get misc object state
+          Line 7006: LDY #$08                        ; if no empty slots found, use last slot
+        Line 7007: UseMiscS: STY JumpCoinMiscOffset; store offset of misc object buffer here (residual)
+
+Function EnemyJump
+  Inputs: [CarryFlag]
+  Outputs: [CarryFlag]
+  Line 12660: EnemyJump: 
+    Branch exit: Line 12675: DoSide: JMP DoEnemySideCheck    ; check for horizontal blockage, then leave
+    Line 12663: LDA Enemy_Y_Speed,X
+      Branch exit: Line 12675: DoSide: JMP DoEnemySideCheck    ; check for horizontal blockage, then leave
+      Line 12668: JSR ChkUnderEnemy               ; otherwise, check to see if green paratroopa is
+        Branch exit: Line 12675: DoSide: JMP DoEnemySideCheck    ; check for horizontal blockage, then leave
+        Line 12670: JSR ChkForNonSolids             ; check for non-solid blocks
+          Branch exit: Line 12675: DoSide: JMP DoEnemySideCheck    ; check for horizontal blockage, then leave
+          Line 12672: JSR EnemyLanding                ; change vertical coordinate and speed
+    Line 12675: DoSide: JMP DoEnemySideCheck    ; check for horizontal blockage, then leave
+      Branch exit: Line 12591: DoEnemySideCheck: 
+
+Function RelativePlayerPosition
+  Inputs: []
+  Outputs: []
+    Line 14760: RelativePlayerPosition: 
+      Branch exit: Line 14775: RelWOfs: JSR GetObjRelativePosition; get the coordinates
+
+Function FlagpoleRoutine
+  Inputs: []
+  Outputs: []
+        Line 6578: FlagpoleRoutine: 
+          Branch exit: Line 6620: ExitFlagP: RTS 
+          Line 6584: LDA GameEngineSubroutine
+            Branch exit: Line 6609: SkipScore: JMP FPGfx            ; jump to skip ahead and draw flag and floatey number
+            Line 6587: LDA Player_State
+              Branch exit: Line 6609: SkipScore: JMP FPGfx            ; jump to skip ahead and draw flag and floatey number
+              Line 6590: LDA Enemy_Y_Position,X          ; check flagpole flag's vertical coordinate
+                Branch exit: Line 6610: GiveFPScr: LDY FlagpoleScore    ; get score offset from earlier (when player touched flagpole)
+                Line 6593: LDA Player_Y_Position           ; check player's vertical coordinate
+                  Branch exit: Line 6610: GiveFPScr: LDY FlagpoleScore    ; get score offset from earlier (when player touched flagpole)
+                  Line 6596: LDA Enemy_YMF_Dummy,X
+                Line 6610: GiveFPScr: LDY FlagpoleScore    ; get score offset from earlier (when player touched flagpole)
+            Line 6609: SkipScore: JMP FPGfx            ; jump to skip ahead and draw flag and floatey number
+              Branch exit: Line 6617: FPGfx: JSR GetEnemyOffscreenBits; get offscreen information
+            Line 6617: FPGfx: JSR GetEnemyOffscreenBits; get offscreen information
+          Line 6620: ExitFlagP: RTS 
+
+Function SetStun
+  Inputs: []
+  Outputs: []
+          Line 12465: SetStun: LDA Enemy_State,X      ; load enemy state
+            Branch exit: Line 12477: SetWYSpd: LDA #$ff              ; change the vertical speed
+            Line 12474: LDA #$fd                        ; set default vertical speed
+              Branch exit: Line 12478: SetNotW: STA Enemy_Y_Speed,X    ; set vertical speed now
+            Line 12477: SetWYSpd: LDA #$ff              ; change the vertical speed
+            Line 12478: SetNotW: STA Enemy_Y_Speed,X    ; set vertical speed now
+              Branch exit: Line 12483: ChkBBill: LDA Enemy_ID,X
+              Line 12482: INY                             ; increment Y if not
+              Line 12483: ChkBBill: LDA Enemy_ID,X
+                Branch exit: Line 12489: NoCDirF: DEY                    ; decrement and use as offset
+                Line 12486: CMP #BulletBill_FrenzyVar       ; check for bullet bill (frenzy variant)
+                  Branch exit: Line 12489: NoCDirF: DEY                    ; decrement and use as offset
+                  Line 12488: STY Enemy_MovingDir,X           ; store as moving direction
+                Line 12489: NoCDirF: DEY                    ; decrement and use as offset
+
+Function GetAreaObjXPosition
+  Inputs: []
+  Outputs: []
+    Line 4300: GetAreaObjXPosition: 
+
+Function PlatLiftDown
+  Inputs: []
+  Outputs: []
+    Line 8964: PlatLiftDown: 
+
+Function KillEnemyAboveBlock
+  Inputs: []
+  Outputs: []
+        Line 12685: KillEnemyAboveBlock: 
+
+Function FirebarCollision
+  Inputs: [Y, $07, $00]
+  Outputs: [Y, $07, $00]
+            Line 9796: FirebarCollision: 
+              Branch exit: Line 9863: NoColFB: PLA                    ; get OAM data offset
+              Line 9803: STA $05                         ; otherwise initialize counter
+                Branch exit: Line 9863: NoColFB: PLA                    ; get OAM data offset
+                Line 9807: LDY Player_Y_Position           ; get player's vertical position
+                  Branch exit: Line 9812: AdjSm: INC $05                  ; if small or big but crouching, execute this part
+                  Line 9810: LDA CrouchingFlag
+                    Branch exit: Line 9818: BigJp: TYA                      ; get vertical coordinate, altered or otherwise, from Y
+                  Line 9812: AdjSm: INC $05                  ; if small or big but crouching, execute this part
+                  Line 9818: BigJp: TYA                      ; get vertical coordinate, altered or otherwise, from Y
+                    Line 9819: FBCLoop: SEC                    ; subtract vertical position of firebar
+                      Branch exit: Line 9825: ChkVFBD: CMP #$08               ; if difference => 8 pixels, skip ahead of this part
+                      Line 9822: EOR #$ff                        ; skip two's compliment part
+                      Line 9825: ChkVFBD: CMP #$08               ; if difference => 8 pixels, skip ahead of this part
+                        Branch exit: Line 9842: Chk2Ofs: LDA $05                ; if value of $02 was set earlier for whatever reason,
+                        Line 9827: LDA $06                         ; if firebar on far right on the screen, skip this,
+                          Branch exit: Line 9842: Chk2Ofs: LDA $05                ; if value of $02 was set earlier for whatever reason,
+                          Line 9830: LDA Sprite_X_Position+4         ; get OAM X coordinate for sprite #1
+                            Branch exit: Line 9840: ChkFBCl: CMP #$08               ; if difference < 8 pixels, collision, thus branch
+                            Line 9837: EOR #$ff                        ; skip two's compliment part
+                            Line 9840: ChkFBCl: CMP #$08               ; if difference < 8 pixels, collision, thus branch
+                              Branch exit: Line 9851: ChgSDir: LDX #$01               ; set movement direction by default
+                              Line 9851: ChgSDir: LDX #$01               ; set movement direction by default
+                                Branch exit: Line 9856: SetSDir: STX Enemy_MovingDir    ; store movement direction here
+                                Line 9855: INX                             ; otherwise increment it
+                                Line 9856: SetSDir: STX Enemy_MovingDir    ; store movement direction here
+                        Line 9842: Chk2Ofs: LDA $05                ; if value of $02 was set earlier for whatever reason,
+                          Branch exit: Line 9863: NoColFB: PLA                    ; get OAM data offset
+                          Line 9845: LDY $05                         ; otherwise get temp here and use as offset
+                            Branch exit: Line 9819: FBCLoop: SEC                    ; subtract vertical position of firebar
+              Line 9863: NoColFB: PLA                    ; get OAM data offset
+
+Function TerminateGame
+  Inputs: [CarryFlag]
+  Outputs: [CarryFlag]
+      Line 2975: TerminateGame: 
+        Branch exit: Line 2989: ContinueGame: 
+        Line 2980: LDA WorldNumber                 ; otherwise put world number of current
+
+Function MoveAllSpritesOffscreen
+  Inputs: []
+  Outputs: []
+      Line 939: MoveAllSpritesOffscreen: 
+        Line 943: MoveSpritesOffscreen:  (as a call, not in function)
+
+Function BrickShatter
+  Inputs: []
+  Outputs: []
+    Line 7378: BrickShatter: 
+
+Function GetXOffscreenBits
+  Inputs: [X]
+  Outputs: [X]
+        Line 14908: GetXOffscreenBits: 
+          Line 14911: XOfsLoop: LDA ScreenEdge_X_Pos,Y; get pixel coordinate of edge
+            Branch exit: Line 14927: XLdBData: LDA XOffscreenBitsData,X; get bits here
+            Line 14920: LDX DefaultXOnscreenOfs+1,Y     ; if not, load alternate offset value here
+              Branch exit: Line 14927: XLdBData: LDA XOffscreenBitsData,X; get bits here
+              Line 14923: LDA #$38                        ; if no branching, load value here and store
+            Line 14927: XLdBData: LDA XOffscreenBitsData,X; get bits here
+              Branch exit: Line 14933: ExXOfsBS: RTS 
+              Line 14931: DEY                             ; otherwise, do left side of screen now
+                Branch exit: Line 14911: XOfsLoop: LDA ScreenEdge_X_Pos,Y; get pixel coordinate of edge
+              Line 14933: ExXOfsBS: RTS 
+
+Function PrintStatusBarNumbers
+  Inputs: [A]
+  Outputs: [A]
+  Line 2529: PrintStatusBarNumbers: 
+    Line 2538: OutputNumbers:  (as a call, not in function)
+
+Function MoveESprColOffscreen
+  Inputs: [A]
+  Outputs: [A]
+    Line 14078: MoveESprColOffscreen: 
+
+Function Dump_Sq2_Regs
+  Inputs: [X, Y]
+  Outputs: [X, Y]
+    Line 15150: Dump_Sq2_Regs: 
+
+Function KillAllEnemies
+  Inputs: [A]
+  Outputs: [A]
+  Line 10141: KillAllEnemies: 
+    Line 10143: KillLoop: JSR EraseEnemyObject  ; branch to kill enemy objects
+      Branch exit: Line 10143: KillLoop: JSR EraseEnemyObject  ; branch to kill enemy objects
+      Line 10146: STA EnemyFrenzyBuffer           ; empty frenzy buffer
+
+Function PlayerLakituDiff
+  Inputs: [$00]
+  Outputs: [$00]
+    Line 10001: PlayerLakituDiff: 
+      Branch exit: Line 10011: ChkLakDif: LDA $00              ; get low byte of horizontal difference
+      Line 10005: INY                             ; increment Y for left of player
+      Line 10011: ChkLakDif: LDA $00              ; get low byte of horizontal difference
+        Branch exit: Line 10029: ChkPSpeed: LDA $00
+        Line 10014: LDA #$3c                        ; otherwise set maximum distance
+          Branch exit: Line 10029: ChkPSpeed: LDA $00
+          Line 10019: TYA                             ; compare contents of Y, now in A
+            Branch exit: Line 10029: ChkPSpeed: LDA $00
+            Line 10022: LDA LakituMoveDirection,X       ; if moving to the left beyond maximum distance,
+              Branch exit: Line 10027: SetLMovD: TYA                   ; set horizontal direction depending on horizontal
+              Line 10024: DEC LakituMoveSpeed,X           ; decrement horizontal speed
+                Branch exit: Line 10061: ExMoveLak: RTS                  ; leave!!!
+              Line 10027: SetLMovD: TYA                   ; set horizontal direction depending on horizontal
+        Line 10029: ChkPSpeed: LDA $00
+          Branch exit: Line 10055: SubDifAdj: LDA $0001,Y          ; get one of three saved values from earlier
+          Line 10037: LDA ScrollAmount
+            Branch exit: Line 10055: SubDifAdj: LDA $0001,Y          ; get one of three saved values from earlier
+            Line 10039: INY                             ; otherwise increment offset
+              Branch exit: Line 10047: ChkSpinyO: LDA Enemy_ID,X       ; check for spiny object
+              Line 10043: LDA ScrollAmount
+                Branch exit: Line 10047: ChkSpinyO: LDA Enemy_ID,X       ; check for spiny object
+                Line 10046: INY                             ; otherwise increment once more
+              Line 10047: ChkSpinyO: LDA Enemy_ID,X       ; check for spiny object
+                Branch exit: Line 10052: ChkEmySpd: LDA Enemy_Y_Speed,X  ; check vertical speed
+                Line 10050: LDA Player_X_Speed              ; if player not moving, skip this part
+                  Branch exit: Line 10055: SubDifAdj: LDA $0001,Y          ; get one of three saved values from earlier
+                Line 10052: ChkEmySpd: LDA Enemy_Y_Speed,X  ; check vertical speed
+                  Branch exit: Line 10055: SubDifAdj: LDA $0001,Y          ; get one of three saved values from earlier
+                  Line 10054: LDY #$00                        ; otherwise reinit offset
+          Line 10055: SubDifAdj: LDA $0001,Y          ; get one of three saved values from earlier
+            Line 10057: SPixelLak: SEC                  ; subtract one for each pixel of horizontal difference
+              Branch exit: Line 10057: SPixelLak: SEC                  ; subtract one for each pixel of horizontal difference
+        Line 10061: ExMoveLak: RTS                  ; leave!!!
+
+Function MovePlayerHorizontally
+  Inputs: []
+  Outputs: []
+    Line 7535: MovePlayerHorizontally: 
+      Branch exit: Line 7578: ExXMove: RTS                    ; and leave
+      Line 7538: TAX                             ; otherwise set zero for offset to use player's stuff
+        Line 7540: MoveObjectHorizontally:  (as a call, not in function)
+
+Function DemoEngine
+  Inputs: []
+  Outputs: []
+        Line 1093: DemoEngine: 
+          Branch exit: Line 1103: DoAction: LDA DemoActionData-1,X; get and perform action (current or next)
+          Line 1097: INX 
+            Branch exit: Line 1107: DemoOver: RTS 
+          Line 1103: DoAction: LDA DemoActionData-1,X; get and perform action (current or next)
+          Line 1107: DemoOver: RTS 
+
+Function BlockObjMT_Updater
+  Inputs: []
+  Outputs: []
+    Line 7501: BlockObjMT_Updater: 
+      Line 7503: UpdateLoop: STX ObjectOffset    ; set offset here
+        Branch exit: Line 7520: NextBUpd: DEX                   ; decrement block object offset
+        Line 7506: LDA Block_RepFlag,X             ; if flag for block object already clear,
+          Branch exit: Line 7520: NextBUpd: DEX                   ; decrement block object offset
+          Line 7508: LDA Block_BBuf_Low,X            ; get low byte of block buffer
+        Line 7520: NextBUpd: DEX                   ; decrement block object offset
+          Branch exit: Line 7503: UpdateLoop: STX ObjectOffset    ; set offset here
+          Line 7522: RTS                             ; then leave
+
+Function DonePlayerTask
+  Inputs: []
+  Outputs: []
+  Line 5771: DonePlayerTask: 
+
+Function GetEnemyBoundBoxOfsArg
+  Inputs: [A]
+  Outputs: [A]
+      Line 11882: GetEnemyBoundBoxOfsArg: 
+
+Function DoNothing1
+  Inputs: []
+  Outputs: []
+    Line 3026: DoNothing1: 
+      Line 3029: DoNothing2:  (as a call, not in function)
+
+Function SetupFloateyNumber
+  Inputs: [A]
+  Outputs: [A]
+    Line 11532: SetupFloateyNumber: 
+
+Function InitNormalEnemy
+  Inputs: []
+  Outputs: []
+      Line 8165: InitNormalEnemy: 
+        Branch exit: Line 8170: GetESpd: LDA NormalXSpdData,Y   ; get appropriate horizontal speed
+        Line 8169: DEY                             ; if not set, decrement offset
+        Line 8170: GetESpd: LDA NormalXSpdData,Y   ; get appropriate horizontal speed
+
+Function GetAreaDataAddrs
+  Inputs: []
+  Outputs: []
+    Line 4376: GetAreaDataAddrs: 
+      Branch exit: Line 4408: StoreFore: STA ForegroundScenery; if less, save value here as foreground scenery
+      Line 4406: STA BackgroundColorCtrl         ; if 4 or greater, save value here as bg color control
+      Line 4408: StoreFore: STA ForegroundScenery; if less, save value here as foreground scenery
+        Branch exit: Line 4446: StoreStyle: STA AreaStyle
+        Line 4444: STA CloudTypeOverride           ; otherwise store value in other place
+        Line 4446: StoreStyle: STA AreaStyle
+
+Function StopPlatforms
+  Inputs: [A]
+  Outputs: [A]
+  Line 10872: StopPlatforms: 
+
+Function RemBridge
+  Inputs: [$04, $05, $00]
+  Outputs: [$04, $05, $00]
+        Line 2092: RemBridge: LDA BlockGfxData,X   ; write top left and top right
+
+Function CheckForClimbMTiles
+  Inputs: [A]
+  Outputs: [A]
+      Line 12365: CheckForClimbMTiles: 
+
+Function RenderSidewaysPipe
+  Inputs: [Y]
+  Outputs: [Y]
+            Line 3814: RenderSidewaysPipe: 
+              Branch exit: Line 3829: DrawSidePart: LDY $06           ; render side pipe part at the bottom
+              Line 3825: LDX #$00
+              Line 3829: DrawSidePart: LDY $06           ; render side pipe part at the bottom
+
+Function ProcessWhirlpools
+  Inputs: []
+  Outputs: []
+    Line 6493: ProcessWhirlpools: 
+      Branch exit: Line 6522: ExitWh: RTS                     ; leave
+      Line 6496: STA Whirlpool_Flag              ; otherwise initialize whirlpool flag
+        Branch exit: Line 6522: ExitWh: RTS                     ; leave
+        Line 6499: LDY #$04                        ; otherwise start with last whirlpool data
+          Line 6500: WhLoop: LDA Whirlpool_LeftExtent,Y; get left extent of whirlpool
+            Branch exit: Line 6520: NextWh: DEY                     ; move onto next whirlpool data
+            Line 6506: ADC #$00                        ; add carry
+              Branch exit: Line 6520: NextWh: DEY                     ; move onto next whirlpool data
+              Line 6514: LDA $02                         ; otherwise get right extent
+                Branch exit: Line 6524: WhirlpoolActivate: 
+            Line 6520: NextWh: DEY                     ; move onto next whirlpool data
+              Branch exit: Line 6500: WhLoop: LDA Whirlpool_LeftExtent,Y; get left extent of whirlpool
+      Line 6522: ExitWh: RTS                     ; leave
+
+Function GetCurrentAnimOffset
+  Inputs: []
+  Outputs: []
+  Line 14650: GetCurrentAnimOffset: 
+    Branch exit: Line 14708: GetOffsetFromAnimCtrl: 
+
+Function RunOffscrBitsSubs
+  Inputs: [A, X]
+  Outputs: [A, X]
+    Line 14885: RunOffscrBitsSubs: 
+      Branch exit: Line 14948: GetYOffscreenBits: 
+
+Function SprObjectCollisionCore
+  Inputs: [Y, X]
+  Outputs: [Y, X]
+      Line 12933: SprObjectCollisionCore: 
+
+Function WriteGameText
+  Inputs: [A]
+  Outputs: [A]
+                          Line 1693: WriteGameText: 
+                            Branch exit: Line 1705: LdGameText: LDX GameTextOffsets,Y; get offset to message we want to print
+                            Line 1699: CPY #$08                        ; if set to do time-up or game over,
+                              Branch exit: Line 1702: Chk2Players: LDA NumberOfPlayers; check for number of players
+                              Line 1701: LDY #$08                        ; otherwise warp zone, therefore set offset
+                              Line 1702: Chk2Players: LDA NumberOfPlayers; check for number of players
+                                Branch exit: Line 1705: LdGameText: LDX GameTextOffsets,Y; get offset to message we want to print
+                                Line 1704: INY                             ; otherwise increment offset by one to not print name
+                            Line 1705: LdGameText: LDX GameTextOffsets,Y; get offset to message we want to print
+                              Line 1707: GameTextLoop: LDA GameText,X    ; load message data
+                                Branch exit: Line 1714: EndGameText: LDA #$00           ; put null terminator at end
+                                Line 1710: STA VRAM_Buffer1,Y              ; otherwise write data to buffer
+                                  Branch exit: Line 1707: GameTextLoop: LDA GameText,X    ; load message data
+                                Line 1714: EndGameText: LDA #$00           ; put null terminator at end
+                                  Branch exit: Line 1758: PrintWarpZoneNumbers: 
+                                  Line 1720: DEX                             ; are we printing the world/lives display?
+                                    Branch exit: Line 1739: CheckPlayerName: 
+                                    Line 1722: LDA NumberofLives               ; otherwise, check number of lives
+                                      Branch exit: Line 1730: PutLives: STA VRAM_Buffer1+8
+                                      Line 1727: SBC #10                         ; if so, subtract 10 and put a crown tile
+                                      Line 1730: PutLives: STA VRAM_Buffer1+8
+
+Function DoNothing2
+  Inputs: []
+  Outputs: []
+      Line 3029: DoNothing2: 
+
+Function ChkLeftCo
+  Inputs: [A]
+  Outputs: [A]
+                  Line 14149: ChkLeftCo: AND #%00001000       ; check to see if d3 in offscreen bits are set
+                    Branch exit: Line 14156: ExDBlk: RTS 
+                    Line 14151: 
+                      Line 14152: MoveColOffscreen:  (as a call, not in function)
+                    Line 14156: ExDBlk: RTS  (as a call, not in function)
+
+Function TransposePlayers
+  Inputs: []
+  Outputs: []
+    Line 3003: TransposePlayers: 
+      Branch exit: Line 3022: ExTrans: RTS 
+      Line 3007: LDA OffScr_NumberofLives        ; does offscreen player have any lives left?
+        Branch exit: Line 3022: ExTrans: RTS 
+        Line 3009: LDA CurrentPlayer               ; invert bit to update
+          Line 3013: TransLoop: LDA OnscreenPlayerInfo,X; transpose the information
+            Branch exit: Line 3013: TransLoop: LDA OnscreenPlayerInfo,X; transpose the information
+            Line 3021: CLC                             ; clear carry flag to get game going
+      Line 3022: ExTrans: RTS 
+
+Function SetupLakitu
+  Inputs: []
+  Outputs: []
+        Line 8257: SetupLakitu: 
+          Branch exit: Line 8872: TallBBox2: LDA #$03             ; set specific value for bounding box control
+
+Function AlternateLengthHandler
+  Inputs: [A, CarryFlag]
+  Outputs: [A, CarryFlag]
+    Line 15908: AlternateLengthHandler: 
+      Line 15916: ProcessLengthData:  (as a call, not in function)
+
+Function SetPRout
+  Inputs: [A, Y]
+  Outputs: [A, Y]
+    Line 11415: SetPRout: STA GameEngineSubroutine; load new value to run subroutine on next frame
+
+Function BlockBufferChk_FBall
+  Inputs: [X]
+  Outputs: [X]
+    Line 13014: BlockBufferChk_FBall: 
+
+Function OutputNumbers
+  Inputs: [A]
+  Outputs: [A]
+    Line 2538: OutputNumbers: 
+      Branch exit: Line 2578: ExitOutputN: RTS 
+      Line 2544: PHA                             ; save incremented value to stack for now and
+        Branch exit: Line 2552: SetupNums: STA VRAM_Buffer1,X
+        Line 2551: LDA #$22                        ; if so, put further down on the screen
+        Line 2552: SetupNums: STA VRAM_Buffer1,X
+          Line 2566: DigitPLoop: LDA DisplayDigits,Y ; write digits to the buffer
+            Branch exit: Line 2566: DigitPLoop: LDA DisplayDigits,Y ; write digits to the buffer
+            Line 2572: LDA #$00                        ; put null terminator at end
+      Line 2578: ExitOutputN: RTS 
+
+Function DigitsMathRoutine
+  Inputs: [Y]
+  Outputs: [Y]
+    Line 2582: DigitsMathRoutine: 
+      Branch exit: Line 2597: EraseDMods: LDA #$00            ; store zero here
+      Line 2586: LDX #$05
+        Line 2587: AddModLoop: LDA DigitModifier,X ; load digit amount to increment
+          Branch exit: Line 2603: BorrowOne: DEC DigitModifier-1,X; decrement the previous digit, then put $09 in
+          Line 2591: CMP #10
+            Branch exit: Line 2606: CarryOne: SEC                   ; subtract ten from our digit to make it a
+          Line 2593: StoreNewD: STA DisplayDigits,Y  ; store as new score or game timer digit
+            Branch exit: Line 2587: AddModLoop: LDA DigitModifier,X ; load digit amount to increment
+          Line 2603: BorrowOne: DEC DigitModifier-1,X; decrement the previous digit, then put $09 in
+            Branch exit: Line 2593: StoreNewD: STA DisplayDigits,Y  ; store as new score or game timer digit
+          Line 2606: CarryOne: SEC                   ; subtract ten from our digit to make it a
+            Branch exit: Line 2593: StoreNewD: STA DisplayDigits,Y  ; store as new score or game timer digit
+      Line 2597: EraseDMods: LDA #$00            ; store zero here
+        Line 2599: EraseMLoop: STA DigitModifier-1,X; initialize the digit amounts to increment
+          Branch exit: Line 2599: EraseMLoop: STA DigitModifier-1,X; initialize the digit amounts to increment
+          Line 2602: RTS 
+
+Function SoundEngine
+  Inputs: []
+  Outputs: []
+    Line 15044: SoundEngine: 
+      Branch exit: Line 15049: SndOn: LDA #$ff
+      Line 15047: STA SND_MASTERCTRL_REG          ; if so, disable sound and leave
+      Line 15049: SndOn: LDA #$ff
+        Branch exit: Line 15058: InPause: LDA PauseSoundBuffer   ; check pause sfx buffer
+        Line 15055: LDA PauseSoundQueue             ; if not, check pause sfx queue
+          Branch exit: Line 15099: RunSoundSubroutines: 
+        Line 15058: InPause: LDA PauseSoundBuffer   ; check pause sfx buffer
+          Branch exit: Line 15075: ContPau: LDA Squ1_SfxLenCounter ; check pause length left
+          Line 15060: LDA PauseSoundQueue             ; check pause queue
+            Branch exit: Line 15108: SkipSoundSubroutines: 
+            Line 15062: STA PauseSoundBuffer            ; if queue full, store in buffer and activate
+          Line 15073: PTone1F: LDA #$44               ; play first tone
+            Branch exit: Line 15083: PTRegC: LDX #$84
+          Line 15075: ContPau: LDA Squ1_SfxLenCounter ; check pause length left
+            Branch exit: Line 15082: PTone2F: LDA #$64               ; store reg contents and play the pause sfx
+            Line 15078: CMP #$1e                        ; time to play first again?
+              Branch exit: Line 15073: PTone1F: LDA #$44               ; play first tone
+              Line 15080: CMP #$18                        ; time to play second again?
+                Branch exit: Line 15086: DecPauC: DEC Squ1_SfxLenCounter ; decrement pause sfx counter
+            Line 15082: PTone2F: LDA #$64               ; store reg contents and play the pause sfx
+          Line 15083: PTRegC: LDX #$84
+          Line 15086: DecPauC: DEC Squ1_SfxLenCounter ; decrement pause sfx counter
+            Branch exit: Line 15108: SkipSoundSubroutines: 
+            Line 15088: LDA #$00                        ; disable sound if in pause mode and
+              Branch exit: Line 15095: SkipPIn: LDA #$00               ; clear pause sfx buffer
+              Line 15093: LDA #$00                        ; clear pause mode to allow game sounds again
+              Line 15095: SkipPIn: LDA #$00               ; clear pause sfx buffer
+                Branch exit: Line 15108: SkipSoundSubroutines: 
+                Line 15098: 
+        Line 15099: RunSoundSubroutines: 
+        Line 15108: SkipSoundSubroutines: 
+          Branch exit: Line 15121: NoIncDAC: TYA 
+          Line 15118: INC DAC_Counter                 ; increment and check counter
+            Branch exit: Line 15124: StrWave: STY SND_DELTA_REG+1    ; store into DMC load register (??)
+          Line 15121: NoIncDAC: TYA 
+            Branch exit: Line 15124: StrWave: STY SND_DELTA_REG+1    ; store into DMC load register (??)
+            Line 15123: DEC DAC_Counter                 ; decrement counter
+          Line 15124: StrWave: STY SND_DELTA_REG+1    ; store into DMC load register (??)
+
+Function GetAreaObjectID
+  Inputs: [$00]
+  Outputs: [$00]
+    Line 4202: GetAreaObjectID: 
+
+Function ChkForBump_HammerBroJ
+  Inputs: [X]
+  Outputs: [X]
+  Line 12612: ChkForBump_HammerBroJ: 
+    Branch exit: Line 12620: NoBump: LDA Enemy_ID,X          ; check for hammer bro
+    Line 12615: LDA Enemy_State,X               ; if enemy state d7 not set, branch
+      Branch exit: Line 12620: NoBump: LDA Enemy_ID,X          ; check for hammer bro
+      Line 12618: LDA #Sfx_Bump                   ; otherwise, play bump sound
+    Line 12620: NoBump: LDA Enemy_ID,X          ; check for hammer bro
+      Branch exit: Line 12628: InvEnemyDir: 
+      Line 12623: LDA #$00
+        Branch exit: Line 9259: SetHJ: STY Enemy_Y_Speed,X      ; set vertical speed for jumping
+
+Function WriteBlockMetatile
+  Inputs: [A]
+  Outputs: [A]
+      Line 2035: WriteBlockMetatile: 
+        Branch exit: Line 2050: UseBOffset: TYA                 ; put Y in A
+        Line 2039: LDY #$00                        ; load offset for brick metatile w/ line
+          Branch exit: Line 2050: UseBOffset: TYA                 ; put Y in A
+          Line 2042: CMP #$51
+            Branch exit: Line 2050: UseBOffset: TYA                 ; put Y in A
+            Line 2044: INY                             ; increment offset for brick metatile w/o line
+              Branch exit: Line 2050: UseBOffset: TYA                 ; put Y in A
+              Line 2047: CMP #$52
+                Branch exit: Line 2050: UseBOffset: TYA                 ; put Y in A
+                Line 2049: INY                             ; if any other metatile, increment offset for empty block
+        Line 2050: UseBOffset: TYA                 ; put Y in A
+          Line 2054: MoveVOffset: DEY                ; decrement vram buffer offset (as a call, not in function)
+
+Function ColorRotation
+  Inputs: []
+  Outputs: []
+          Line 1957: ColorRotation: 
+            Branch exit: Line 1998: ExitColorRot: RTS               ; leave
+            Line 1961: LDX VRAM_Buffer1_Offset         ; check vram buffer offset
+              Branch exit: Line 1998: ExitColorRot: RTS               ; leave
+              Line 1964: TAY                             ; otherwise use frame counter's 3 LSB as offset here
+                Line 1965: GetBlankPal: LDA BlankPalette,Y ; get blank palette for palette 3
+                  Branch exit: Line 1965: GetBlankPal: LDA BlankPalette,Y ; get blank palette for palette 3
+                  Line 1971: LDX VRAM_Buffer1_Offset         ; get current vram buffer offset
+                    Line 1978: GetAreaPal: LDA Palette3Data,Y  ; fetch palette to be written based on area type
+                      Branch exit: Line 1978: GetAreaPal: LDA Palette3Data,Y  ; fetch palette to be written based on area type
+                      Line 1984: LDX VRAM_Buffer1_Offset         ; get current vram buffer offset
+                        Branch exit: Line 1998: ExitColorRot: RTS               ; leave
+                        Line 1996: LDA #$00
+            Line 1998: ExitColorRot: RTS               ; leave
+
+Function DrawStarFlag
+  Inputs: []
+  Outputs: []
+      Line 10529: DrawStarFlag: 
+        Line 10533: DSFLoop: LDA Enemy_Rel_YPos     ; get relative vertical coordinate
+          Branch exit: Line 10533: DSFLoop: LDA Enemy_Rel_YPos     ; get relative vertical coordinate
+          Line 10551: LDX ObjectOffset                ; get enemy object offset and leave
+
+Function ChkForLandJumpSpring
+  Inputs: [CarryFlag]
+  Outputs: [CarryFlag]
+    Line 12247: ChkForLandJumpSpring: 
+      Branch exit: Line 12258: ExCJSp: RTS                     ; and leave
+      Line 12250: LDA #$70
+      Line 12258: ExCJSp: RTS                     ; and leave
+
+Function UpdateScreen
+  Inputs: [$00, $01]
+  Outputs: [$00, $01]
+                Line 2497: UpdateScreen: LDX PPU_STATUS    ; reset flip-flop
+                  Branch exit: Line 2456: WriteBufferToScreen: 
+
+Function ChkJumpspringMetatiles
+  Inputs: [A]
+  Outputs: [A]
+    Line 12260: ChkJumpspringMetatiles: 
+      Branch exit: Line 12266: JSFnd: SEC                      ; set carry if found
+      Line 12263: CMP #$68                        ; check for bottom jumpspring metatile
+        Branch exit: Line 12267: NoJSFnd: RTS                    ; leave
+      Line 12266: JSFnd: SEC                      ; set carry if found
+      Line 12267: NoJSFnd: RTS                    ; leave
+
+Function HandlePipeEntry
+  Inputs: [$00, $01]
+  Outputs: [$00, $01]
+    Line 12269: HandlePipeEntry: 
+      Branch exit: Line 12315: ExPipeE: RTS                    ; leave!!!
+      Line 12273: LDA $00
+        Branch exit: Line 12315: ExPipeE: RTS                    ; leave!!!
+        Line 12276: LDA $01
+          Branch exit: Line 12315: ExPipeE: RTS                    ; leave!!!
+          Line 12279: LDA #$30
+            Branch exit: Line 12315: ExPipeE: RTS                    ; leave!!!
+            Line 12289: AND #%00000011                  ; mask out all but 2 LSB
+              Branch exit: Line 12300: GetWNum: LDY WarpZoneNumbers,X  ; get warp zone numbers
+              Line 12296: INX                             ; otherwise increment for middle pipe
+                Branch exit: Line 12300: GetWNum: LDY WarpZoneNumbers,X  ; get warp zone numbers
+                Line 12299: INX                             ; otherwise increment for last pipe
+              Line 12300: GetWNum: LDY WarpZoneNumbers,X  ; get warp zone numbers
+      Line 12315: ExPipeE: RTS                    ; leave!!!
+
+Function LargePlatformCollision
+  Inputs: []
+  Outputs: []
+    Line 11708: LargePlatformCollision: 
+      Branch exit: Line 11736: ExLPC: LDX ObjectOffset         ; get enemy object buffer offset and leave
+      Line 11713: LDA Enemy_State,X               ; if d7 set in object state,
+        Branch exit: Line 11736: ExLPC: LDX ObjectOffset         ; get enemy object buffer offset and leave
+        Line 11715: LDA Enemy_ID,X
+          Branch exit: Line 11722: ChkForPlayerC_LargeP: 
+          Line 11718: LDA Enemy_State,X
+          Line 11722: ChkForPlayerC_LargeP:  (as a call, not in function)
+      Line 11736: ExLPC: LDX ObjectOffset         ; get enemy object buffer offset and leave (as a call, not in function)
+
+Function EnemyLanding
+  Inputs: []
+  Outputs: []
+    Line 12645: EnemyLanding: 
+
+Function PosPlatform
+  Inputs: []
+  Outputs: []
+        Line 8987: PosPlatform: 
+
+Function GetProperObjOffset
+  Inputs: [X]
+  Outputs: [X]
+      Line 14846: GetProperObjOffset: 
+
+Function CheckForCoinMTiles
+  Inputs: [A]
+  Outputs: [A]
+    Line 12370: CheckForCoinMTiles: 
+      Branch exit: Line 12377: CoinSd: LDA #Sfx_CoinGrab
+      Line 12373: CMP #$c3                        ; check for underwater coin
+        Branch exit: Line 12377: CoinSd: LDA #Sfx_CoinGrab
+        Line 12375: CLC                             ; otherwise clear carry and leave
+      Line 12377: CoinSd: LDA #Sfx_CoinGrab
+
+Function GetFireballBoundBox
+  Inputs: [X]
+  Outputs: [X]
+      Line 12779: GetFireballBoundBox: 
+        Branch exit: Line 12793: FBallB: JSR BoundingBoxCore     ; get bounding box coordinates
+        Line 12786: 
+          Line 12787: GetMiscBoundBox:  (as a call, not in function)
+        Line 12793: FBallB: JSR BoundingBoxCore     ; get bounding box coordinates (as a call, not in function)
+
+Function GetMiscBoundBox
+  Inputs: [X]
+  Outputs: [X]
+          Line 12787: GetMiscBoundBox: 
+
+Function GameCoreRoutine
+  Inputs: []
+  Outputs: []
+                                                                                                                                                                              Line 5300: GameCoreRoutine: 
+                                                                                                                                                                                Branch exit: Line 5310: GameEngine: 
+                                                                                                                                                                                Line 5308: RTS 
+
+Function DrawPlayer_Intermediate
+  Inputs: []
+  Outputs: []
+      Line 14538: DrawPlayer_Intermediate: 
+        Line 14540: PIntLoop: LDA IntermediatePlayerData,X; load data to display player as he always
+          Branch exit: Line 14540: PIntLoop: LDA IntermediatePlayerData,X; load data to display player as he always
+          Line 14544: LDX #$b8                        ; load offset for small standing
+
+Function FlagpoleGfxHandler
+  Inputs: []
+  Outputs: []
+      Line 13258: FlagpoleGfxHandler: 
+        Branch exit: Line 13300: ChkFlagOffscreen: 
+        Line 13288: TYA 
+        Line 13300: ChkFlagOffscreen: 
+          Branch exit: Line 13326: ExitDumpSpr: 
+          Line 13306: 
+            Line 13309: MoveSixSpritesOffscreen:  (as a call, not in function)
+
+Function EnemyGfxHandler
+  Inputs: []
+  Outputs: []
+  Line 13613: EnemyGfxHandler: 
+    Branch exit: Line 13635: CheckForRetainerObj: 
+    Line 13629: LDY PiranhaPlant_Y_Speed,X
+      Branch exit: Line 13635: CheckForRetainerObj: 
+      Line 13631: LDY EnemyFrameTimer,X
+        Branch exit: Line 13635: CheckForRetainerObj: 
+        Line 13633: RTS                             ; if all conditions fail, leave
+
+Function RelativeFireballPosition
+  Inputs: []
+  Outputs: []
+    Line 14771: RelativeFireballPosition: 
+
+Function UpdScrollVar
+  Inputs: []
+  Outputs: []
+          Line 5359: UpdScrollVar: LDA VRAM_Buffer_AddrCtrl
+            Branch exit: Line 5373: ExitEng: RTS                    ; and after all that, we're finally done!
+            Line 5362: LDA AreaParserTaskNum           ; otherwise check number of tasks
+              Branch exit: Line 5372: RunParser: JSR AreaParserTaskHandler; update the name table with more level graphics
+              Line 5364: LDA ScrollThirtyTwo             ; get horizontal scroll in 0-31 or $00-$20 range
+                Branch exit: Line 5373: ExitEng: RTS                    ; and after all that, we're finally done!
+                Line 5367: LDA ScrollThirtyTwo
+              Line 5372: RunParser: JSR AreaParserTaskHandler; update the name table with more level graphics
+            Line 5373: ExitEng: RTS                    ; and after all that, we're finally done!
+
+Function BlockObjectsCore
+  Inputs: [X]
+  Outputs: [X]
+    Line 7442: BlockObjectsCore: 
+      Branch exit: Line 7494: UpdSte: STA Block_State,X       ; store contents of A in block object state
+      Line 7445: AND #$0f                        ; mask out high nybble
+        Branch exit: Line 7480: BouncingBlockHandler: 
+        Line 7454: JSR ImposeGravityBlock          ; do sub to impose gravity on one block object object
+          Branch exit: Line 7494: UpdSte: STA Block_State,X       ; store contents of A in block object state
+          Line 7469: PHA                             ; otherwise save state back into stack
+            Branch exit: Line 7474: ChkTop: LDA Block_Y_Position,X  ; get top block object's vertical coordinate
+            Line 7473: STA Block_Y_Position+2,X        ; otherwise set offscreen coordinate
+            Line 7474: ChkTop: LDA Block_Y_Position,X  ; get top block object's vertical coordinate
+              Branch exit: Line 7494: UpdSte: STA Block_State,X       ; store contents of A in block object state
+              Line 7478: BCS KillBlock                   ; otherwise do unconditional branch to kill it
+                Branch exit: Line 7493: KillBlock: LDA #$00             ; if branched here, nullify object state
+                Line 7479: 
+        Line 7480: BouncingBlockHandler: 
+          Branch exit: Line 7494: UpdSte: STA Block_State,X       ; store contents of A in block object state
+          Line 7491: LDA #$01
+        Line 7493: KillBlock: LDA #$00             ; if branched here, nullify object state
+      Line 7494: UpdSte: STA Block_State,X       ; store contents of A in block object state
+
+Function PauseRoutine
+  Inputs: []
+  Outputs: []
+    Line 850: PauseRoutine: 
+      Branch exit: Line 859: ChkPauseTimer: LDA GamePauseTimer; check if pause timer is still counting down
+      Line 854: CMP #GameModeValue              ; are we in game mode?
+        Branch exit: Line 881: ExitPause: RTS 
+        Line 856: LDA OperMode_Task               ; if we are in game mode, are we running game engine?
+          Branch exit: Line 881: ExitPause: RTS 
+      Line 859: ChkPauseTimer: LDA GamePauseTimer; check if pause timer is still counting down
+        Branch exit: Line 863: ChkStart: LDA SavedJoypad1Bits  ; check to see if start is pressed
+        Line 861: DEC GamePauseTimer              ; if so, decrement and leave
+        Line 863: ChkStart: LDA SavedJoypad1Bits  ; check to see if start is pressed
+          Branch exit: Line 878: ClrPauseTimer: LDA GamePauseStatus; clear timer flag if timer is at zero and start button
+          Line 866: LDA GamePauseStatus             ; check to see if timer flag is set
+            Branch exit: Line 881: ExitPause: RTS 
+            Line 869: LDA #$2b                        ; set pause timer
+              Branch exit: Line 880: SetPause: STA GamePauseStatus
+          Line 878: ClrPauseTimer: LDA GamePauseStatus; clear timer flag if timer is at zero and start button
+          Line 880: SetPause: STA GamePauseStatus
+      Line 881: ExitPause: RTS 
+
+Function DrawPowerUp
+  Inputs: []
+  Outputs: []
+        Line 13483: DrawPowerUp: 
+          Line 13504: PUpDrawLoop: 
+            Branch exit: Line 13504: PUpDrawLoop: 
+            Line 13511: LDY Enemy_SprDataOffset+5       ; get sprite data offset again
+              Branch exit: Line 13536: PUpOfs: JMP SprObjectOffscrChk  ; jump to check to see if power-up is offscreen at all, then leave
+              Line 13514: CMP #$03
+                Branch exit: Line 13536: PUpOfs: JMP SprObjectOffscrChk  ; jump to check to see if power-up is offscreen at all, then leave
+                Line 13516: STA $00                         ; store power-up type here now
+                  Branch exit: Line 13529: FlipPUpRightSide: 
+                  Line 13526: STA Sprite_Attributes+8,Y       ; otherwise set new palette bits  for bottom left
+                  Line 13529: FlipPUpRightSide: 
+              Line 13536: PUpOfs: JMP SprObjectOffscrChk  ; jump to check to see if power-up is offscreen at all, then leave
+                Branch exit: Line 14018: SprObjectOffscrChk: 
+
+Function DrawLargePlatform
+  Inputs: []
+  Outputs: []
+    Line 13331: DrawLargePlatform: 
+      Branch exit: Line 13348: ShrinkPlatform: 
+      Line 13345: LDY SecondaryHardMode           ; check for secondary hard mode flag set
+        Branch exit: Line 13351: SetLast2Platform: 
+        Line 13347: 
+      Line 13348: ShrinkPlatform: 
+      Line 13351: SetLast2Platform: 
+        Branch exit: Line 13360: SetPlatformTilenum: 
+        Line 13358: LDA #$75                        ; otherwise load other tile for platform (puff)
+        Line 13360: SetPlatformTilenum: 
+          Branch exit: Line 13376: SChk2: PLA                      ; get bits from stack
+          Line 13374: LDA #$f8                        ; if d7 was set, move first sprite offscreen
+          Line 13376: SChk2: PLA                      ; get bits from stack
+            Branch exit: Line 13382: SChk3: PLA                      ; get bits from stack
+            Line 13380: LDA #$f8                        ; if d6 was set, move second sprite offscreen
+            Line 13382: SChk3: PLA                      ; get bits from stack
+              Branch exit: Line 13388: SChk4: PLA                      ; get bits from stack
+              Line 13386: LDA #$f8                        ; if d5 was set, move third sprite offscreen
+              Line 13388: SChk4: PLA                      ; get bits from stack
+                Branch exit: Line 13394: SChk5: PLA                      ; get bits from stack
+                Line 13392: LDA #$f8                        ; if d4 was set, move fourth sprite offscreen
+                Line 13394: SChk5: PLA                      ; get bits from stack
+                  Branch exit: Line 13400: SChk6: PLA                      ; get bits from stack
+                  Line 13398: LDA #$f8                        ; if d3 was set, move fifth sprite offscreen
+                  Line 13400: SChk6: PLA                      ; get bits from stack
+                    Branch exit: Line 13405: SLChk: LDA Enemy_OffscreenBits  ; check d7 of offscreen bits
+                    Line 13403: LDA #$f8
+                    Line 13405: SLChk: LDA Enemy_OffscreenBits  ; check d7 of offscreen bits
+                      Branch exit: Line 13409: ExDLPl: RTS 
+                      Line 13408: JSR MoveSixSpritesOffscreen     ; otherwise branch to move all sprites offscreen
+                      Line 13409: ExDLPl: RTS 
+
+Function ChgAreaMode
+  Inputs: []
+  Outputs: []
+  Line 5710: ChgAreaMode: INC DisableScreenFlag; set flag to disable screen output
+
+Function DestroyBlockMetatile
+  Inputs: []
+  Outputs: []
+    Line 2032: DestroyBlockMetatile: 
+      Line 2035: WriteBlockMetatile:  (as a call, not in function)
+
+Function PlayerCollisionCore
+  Inputs: []
+  Outputs: []
+    Line 12930: PlayerCollisionCore: 
+      Line 12933: SprObjectCollisionCore:  (as a call, not in function)
+
+Function DumpThreeSpr
+  Inputs: [A]
+  Outputs: [A]
+                  Line 13319: DumpThreeSpr: 
+
+Function InjurePlayer
+  Inputs: []
+  Outputs: []
+  Line 11400: InjurePlayer: 
+    Branch exit: Line 11422: ExInjColRoutines: 
+    Line 11403: 
+      Line 11404: ForceInjury:  (as a call, not in function)
+
+Function PlaySqu1Sfx
+  Inputs: []
+  Outputs: []
+    Line 15134: PlaySqu1Sfx: 
+      Line 15137: SetFreq_Squ1:  (as a call, not in function)
+
+Function LargePlatformSubroutines
+  Inputs: []
+  Outputs: []
+    Line 9156: LargePlatformSubroutines: 
+
+Function ScrollHandler
+  Inputs: []
+  Outputs: []
+    Line 5377: ScrollHandler: 
+      Branch exit: Line 5425: InitScrlAmt: LDA #$00
+      Line 5384: LDA Player_Pos_ForScroll
+        Branch exit: Line 5425: InitScrlAmt: LDA #$00
+        Line 5387: LDA SideCollisionTimer          ; if timer related to player's side collision
+          Branch exit: Line 5425: InitScrlAmt: LDA #$00
+          Line 5389: LDY Player_X_Scroll             ; get value and decrement by one
+            Branch exit: Line 5425: InitScrlAmt: LDA #$00
+            Line 5392: INY 
+              Branch exit: Line 5396: ChkNearMid: LDA Player_Pos_ForScroll
+              Line 5395: DEY                             ; otherwise decrement by one
+              Line 5396: ChkNearMid: LDA Player_Pos_ForScroll
+                Branch exit: Line 5401: ScrollScreen: 
+                Line 5399: LDY Player_X_Scroll             ; otherwise get original value undecremented
+                Line 5401: ScrollScreen:  (as a call, not in function)
+      Line 5425: InitScrlAmt: LDA #$00
+      Line 5427: ChkPOffscr: LDX #$00            ; set X for player offset (as a call, not in function)
+
+Function EraseEnemyObject
+  Inputs: []
+  Outputs: []
+  Line 9172: EraseEnemyObject: 
+
+Function PlayerPhysicsSub
+  Inputs: []
+  Outputs: []
+                      Line 6041: PlayerPhysicsSub: 
+                        Branch exit: Line 6063: CheckForJumping: 
+                        Line 6045: LDY #$00
+                          Branch exit: Line 6053: ProcClimb: LDX Climb_Y_MForceData,Y; load value here
+                          Line 6049: INY 
+                            Branch exit: Line 6053: ProcClimb: LDX Climb_Y_MForceData,Y; load value here
+                            Line 6052: INY 
+                          Line 6053: ProcClimb: LDX Climb_Y_MForceData,Y; load value here
+                            Branch exit: Line 6060: SetCAnim: STA PlayerAnimTimerSet; store animation timer setting and leave
+                            Line 6059: LSR                             ; otherwise divide timer setting by 2
+                            Line 6060: SetCAnim: STA PlayerAnimTimerSet; store animation timer setting and leave
+
+Function PlatLiftUp
+  Inputs: []
+  Outputs: []
+    Line 8955: PlatLiftUp: 
+      Branch exit: Line 8972: CommonSmallLift: 
+
+Function IncAreaObjOffset
+  Inputs: []
+  Outputs: []
+    Line 3360: IncAreaObjOffset: 
+
+Function MoveSixSpritesOffscreen
+  Inputs: []
+  Outputs: []
+            Line 13309: MoveSixSpritesOffscreen: 
+              Line 13312: DumpSixSpr:  (as a call, not in function)
+
+Function GetEnemyOffscreenBits
+  Inputs: [X]
+  Outputs: [X]
+    Line 14853: GetEnemyOffscreenBits: 
+      Branch exit: Line 14862: SetOffscrBitsOffset: 
+
+Function EnemyFacePlayer
+  Inputs: []
+  Outputs: []
+    Line 11523: EnemyFacePlayer: 
+      Branch exit: Line 11528: SFcRt: STY Enemy_MovingDir,X    ; set moving direction here
+      Line 11527: INY                             ; otherwise, increment to set to move to the left
+      Line 11528: SFcRt: STY Enemy_MovingDir,X    ; set moving direction here
+
+Function PutAtRightExtent
+  Inputs: [A]
+  Outputs: [A]
+                Line 8578: PutAtRightExtent: 
+                  Branch exit: Line 8614: FinishFlame: 
+
+Function ImposeGravityBlock
+  Inputs: []
+  Outputs: []
+        Line 7659: ImposeGravityBlock: 
+
+Function GetSBNybbles
+  Inputs: []
+  Outputs: []
+        Line 7108: GetSBNybbles: 
+
+Function JCoinGfxHandler
+  Inputs: []
+  Outputs: []
+      Line 13437: JCoinGfxHandler: 
+        Branch exit: Line 13413: DrawFloateyNumber_Coin: 
+        Line 13442: LDA Misc_Y_Position,X           ; store vertical coordinate as
+
+Function SetFreq_Squ1
+  Inputs: [A]
+  Outputs: [A]
+      Line 15137: SetFreq_Squ1: 
+
+Function FireballBGCollision
+  Inputs: []
+  Outputs: []
+    Line 12725: FireballBGCollision: 
+      Branch exit: Line 12746: ClearBounceFlag: 
+      Line 12729: JSR BlockBufferChk_FBall        ; do fireball to background collision detection on bottom of it
+        Branch exit: Line 12746: ClearBounceFlag: 
+        Line 12731: JSR ChkForNonSolids             ; check for non-solid metatiles
+          Branch exit: Line 12746: ClearBounceFlag: 
+          Line 12733: LDA Fireball_Y_Speed,X          ; if fireball's vertical speed set to move upwards,
+            Branch exit: Line 12751: InitFireballExplode: 
+            Line 12735: LDA FireballBouncingFlag,X      ; if bouncing flag already set,
+              Branch exit: Line 12751: InitFireballExplode: 
+              Line 12737: LDA #$fd
+
+Function BlockBufferChk_Enemy
+  Inputs: [A, X]
+  Outputs: [A, X]
+  Line 12997: BlockBufferChk_Enemy: 
+    Branch exit: Line 13021: BBChk_E: JSR BlockBufferCollision; do collision detection subroutine for sprite object
+
+Function TopScoreCheck
+  Inputs: [X]
+  Outputs: [X]
+      Line 2618: TopScoreCheck: 
+        Line 2621: GetScoreDiff: LDA PlayerScoreDisplay,X; subtract each player digit from each high score digit
+          Branch exit: Line 2621: GetScoreDiff: LDA PlayerScoreDisplay,X; subtract each player digit from each high score digit
+          Line 2626: BCC NoTopSc                     ; check to see if borrow is still set, if so, no new high score
+            Branch exit: Line 2635: NoTopSc: RTS 
+            Line 2627: INX                             ; increment X and Y once to the start of the score
+              Line 2629: CopyScore: LDA PlayerScoreDisplay,X; store player's score digits into high score memory area
+                Branch exit: Line 2629: CopyScore: LDA PlayerScoreDisplay,X; store player's score digits into high score memory area
+            Line 2635: NoTopSc: RTS 
+
+Function MoveWithXMCntrs
+  Inputs: []
+  Outputs: []
+    Line 9442: MoveWithXMCntrs: 
+      Branch exit: Line 9455: XMRight: STY Enemy_MovingDir,X  ; store as moving direction
+      Line 9449: LDA XMoveSecondaryCounter,X
+      Line 9455: XMRight: STY Enemy_MovingDir,X  ; store as moving direction
+
+Function KillEnemies
+  Inputs: [A]
+  Outputs: [A]
+    Line 3589: KillEnemies: 
+      Line 3593: KillELoop: LDY Enemy_ID,X
+        Branch exit: Line 3597: NoKillE: DEX                    ; do this until all slots are checked
+        Line 3596: STA Enemy_Flag,X                ; if found, deactivate enemy object flag
+        Line 3597: NoKillE: DEX                    ; do this until all slots are checked
+          Branch exit: Line 3593: KillELoop: LDY Enemy_ID,X
+          Line 3599: RTS 
+
+Function GetPlayerAnimSpeed
+  Inputs: []
+  Outputs: []
+      Line 6194: GetPlayerAnimSpeed: 
+        Branch exit: Line 6210: SetRunSpd: STA RunningSpeed     ; store zero or running speed here
+        Line 6199: INY                             ; otherwise increment Y
+          Branch exit: Line 6203: ChkSkid: LDA SavedJoypadBits    ; get controller bits
+          Line 6202: INY                             ; otherwise increment Y again
+          Line 6203: ChkSkid: LDA SavedJoypadBits    ; get controller bits
+            Branch exit: Line 6220: SetAnimSpd: LDA PlayerAnimTmrData,Y; get animation timer setting using Y as offset
+            Line 6206: AND #$03                        ; mask out all others except left and right
+              Branch exit: Line 6212: ProcSkid: LDA Player_XSpeedAbsolute; check player's walking/running speed
+              Line 6209: LDA #$00                        ; otherwise set zero value here
+              Line 6212: ProcSkid: LDA Player_XSpeedAbsolute; check player's walking/running speed
+                Branch exit: Line 6220: SetAnimSpd: LDA PlayerAnimTmrData,Y; get animation timer setting using Y as offset
+                Line 6215: LDA PlayerFacingDir
+        Line 6210: SetRunSpd: STA RunningSpeed     ; store zero or running speed here
+          Branch exit: Line 6220: SetAnimSpd: LDA PlayerAnimTmrData,Y; get animation timer setting using Y as offset
+        Line 6220: SetAnimSpd: LDA PlayerAnimTmrData,Y; get animation timer setting using Y as offset
+
+Function GetMiscOffscreenBits
+  Inputs: [$00]
+  Outputs: [$00]
+    Line 14837: GetMiscOffscreenBits: 
+      Branch exit: Line 14868: GetOffScreenBitsSet: 
+
+Function PlayerEnemyCollision
+  Inputs: []
+  Outputs: []
+  Line 11292: PlayerEnemyCollision: 
+    Branch exit: Line 11279: NoPUp: RTS 
+    Line 11296: JSR CheckPlayerVertical         ; if player object is completely offscreen or
+      Branch exit: Line 11313: NoPECol: RTS 
+      Line 11298: LDA EnemyOffscrBitsMasked,X     ; if current enemy is offscreen by any amount,
+        Branch exit: Line 11313: NoPECol: RTS 
+        Line 11300: LDA GameEngineSubroutine
+          Branch exit: Line 11313: NoPECol: RTS 
+          Line 11303: LDA Enemy_State,X
+            Branch exit: Line 11313: NoPECol: RTS 
+            Line 11306: JSR GetEnemyBoundBoxOfs         ; get bounding box offset for current enemy object
+              Branch exit: Line 11315: CheckForPUpCollision: 
+              Line 11310: LDA Enemy_CollisionBits,X
+      Line 11313: NoPECol: RTS 
+
+Function GetScreenPosition
+  Inputs: []
+  Outputs: []
+        Line 5461: GetScreenPosition: 
+
+Function ImposeGravitySprObj
+  Inputs: [A]
+  Outputs: [A]
+  Line 7665: ImposeGravitySprObj: 
+    Branch exit: Line 7703: ImposeGravity: 
+
+Function MusicHandler
+  Inputs: []
+  Outputs: []
+    Line 15609: MusicHandler: 
+      Branch exit: Line 15619: LoadEventMusic: 
+      Line 15612: LDA AreaMusicQueue              ; check area music queue
+        Branch exit: Line 15636: LoadAreaMusic: 
+        Line 15614: LDA EventMusicBuffer            ; check both buffers
+          Branch exit: Line 15606: ContinueMusic: 
+          Line 15617: RTS                             ; no music, then leave
+
+Function CheckPlayerVertical
+  Inputs: []
+  Outputs: []
+    Line 11866: CheckPlayerVertical: 
+      Branch exit: Line 11875: ExCPV: RTS 
+      Line 11870: LDY Player_Y_HighPos            ; if player high vertical byte is not
+        Branch exit: Line 11875: ExCPV: RTS 
+        Line 11873: LDA Player_Y_Position           ; if on the screen, check to see how far down
+      Line 11875: ExCPV: RTS 
+
+Function PositionPlayerOnHPlat
+  Inputs: [$00]
+  Outputs: [$00]
+        Line 10933: PositionPlayerOnHPlat: 
+          Branch exit: Line 10943: PPHSubt: SBC #$00               ; subtract borrow from page location
+          Line 10941: ADC #$00                        ; otherwise add carry to page location
+            Branch exit: Line 10944: SetPVar: STA Player_PageLoc     ; save result to player's page location
+          Line 10943: PPHSubt: SBC #$00               ; subtract borrow from page location
+          Line 10944: SetPVar: STA Player_PageLoc     ; save result to player's page location
+
+Function LoadAreaPointer
+  Inputs: [A]
+  Outputs: [A]
+      Line 4355: LoadAreaPointer: 
+        Line 4358: GetAreaType: AND #%01100000     ; mask out all but d6 and d5 (as a call, not in function)
+
+Function XMoveCntr_GreenPTroopa
+  Inputs: []
+  Outputs: []
+    Line 9419: XMoveCntr_GreenPTroopa: 
+      Line 9422: XMoveCntr_Platform:  (as a call, not in function)
+
+Function ErACM
+  Inputs: [$02]
+  Outputs: [$02]
+    Line 12133: ErACM: LDY $02                  ; load vertical high nybble offset for block buffer
+      Branch exit: Line 2015: RemoveCoin_Axe: 
+
+Function DumpFourSpr
+  Inputs: [A]
+  Outputs: [A]
+                Line 13316: DumpFourSpr: 
+                  Line 13319: DumpThreeSpr:  (as a call, not in function)
+
+Function ProcessPlayerAction
+  Inputs: []
+  Outputs: []
+    Line 14584: ProcessPlayerAction: 
+      Branch exit: Line 14633: ActionClimbing: 
+      Line 14588: CMP #$02
+        Branch exit: Line 14623: ActionFalling: 
+        Line 14590: CMP #$01
+          Branch exit: Line 14600: ProcOnGroundActs: 
+          Line 14592: LDA SwimmingFlag
+            Branch exit: Line 14640: ActionSwimming: 
+            Line 14594: LDY #$06                        ; load offset for crouching
+              Branch exit: Line 14616: NonAnimatedActs: 
+              Line 14597: LDY #$00                        ; otherwise load offset for jumping
+                Branch exit: Line 14616: NonAnimatedActs: 
+
+Function InitializeMemory
+  Inputs: [Y]
+  Outputs: [Y]
+    Line 2769: InitializeMemory: 
+      Line 2773: InitPageLoop: STX $07
+        Line 2774: InitByteLoop: CPX #$01          ; check to see if we're on the stack ($0100-$01ff)
+          Branch exit: Line 2778: InitByte: STA ($06),Y           ; otherwise, initialize byte with current low byte in Y
+          Line 2776: CPY #$60                        ; otherwise, check to see if we're at $0160-$01ff
+            Branch exit: Line 2779: SkipByte: DEY 
+          Line 2778: InitByte: STA ($06),Y           ; otherwise, initialize byte with current low byte in Y
+          Line 2779: SkipByte: DEY 
+            Branch exit: Line 2774: InitByteLoop: CPX #$01          ; check to see if we're on the stack ($0100-$01ff)
+            Line 2782: DEX                             ; go onto the next page
+              Branch exit: Line 2773: InitPageLoop: STX $07
+              Line 2784: RTS 
+
+Function SixSpriteStacker
+  Inputs: [A, Y, $02]
+  Outputs: [A, Y, $02]
+    Line 13161: SixSpriteStacker: 
+      Line 13163: StkLp: STA Sprite_Data,Y        ; store X or Y coordinate into OAM data
+        Branch exit: Line 13163: StkLp: STA Sprite_Data,Y        ; store X or Y coordinate into OAM data
+        Line 13172: LDY $02                         ; get saved OAM data offset and leave
+
+Function UpdateTopScore
+  Inputs: []
+  Outputs: []
+    Line 2613: UpdateTopScore: 
+      Line 2618: TopScoreCheck:  (as a call, not in function)
+
+Function VariableObjOfsRelPos
+  Inputs: [X, A]
+  Outputs: [X, A]
+  Line 14799: VariableObjOfsRelPos: 
+
+Function DividePDiff
+  Inputs: [A, $07, $06, Y]
+  Outputs: [A, $07, $06, Y]
+    Line 14977: DividePDiff: 
+      Branch exit: Line 14990: ExDivPD: RTS                    ; leave
+      Line 14982: LSR                             ; divide by eight
+        Branch exit: Line 14989: SetOscrO: TAX                   ; use as offset
+        Line 14988: ADC $05                         ; if not, add value to difference / 8
+        Line 14989: SetOscrO: TAX                   ; use as offset
+      Line 14990: ExDivPD: RTS                    ; leave
+
+Function RunRetainerObj
+  Inputs: []
+  Outputs: []
+    Line 9059: RunRetainerObj: 
+      Branch exit: Line 13613: EnemyGfxHandler: 
+
+Function SetFreq_Squ2
+  Inputs: [A]
+  Outputs: [A]
+      Line 15158: SetFreq_Squ2: 
+        Branch exit: Line 15140: Dump_Freq_Regs: 
+        Line 15161: 
+          Line 15162: SetFreq_Tri:  (as a call, not in function)
+
+Function LoadControlRegs
+  Inputs: []
+  Outputs: []
+    Line 15925: LoadControlRegs: 
+      Branch exit: Line 15931: NotECstlM: LDA AreaMusicBuffer
+      Line 15929: LDA #$04                        ; this value is only used for win castle music
+        Branch exit: Line 15937: AllMus: LDX #$82                ; load contents of other sound regs for square 2
+      Line 15931: NotECstlM: LDA AreaMusicBuffer
+        Branch exit: Line 15936: WaterMus: LDA #$28              ; this value is used for water music and all other event music
+        Line 15934: LDA #$08                        ; this is the default value for all other music
+          Branch exit: Line 15937: AllMus: LDX #$82                ; load contents of other sound regs for square 2
+        Line 15936: WaterMus: LDA #$28              ; this value is used for water music and all other event music
+      Line 15937: AllMus: LDX #$82                ; load contents of other sound regs for square 2
+
+Function PutBlockMetatile
+  Inputs: [X, Y, A, $06, $02]
+  Outputs: [X, Y, A, $06, $02]
+    Line 2060: PutBlockMetatile: 
+      Branch exit: Line 2071: SaveHAdder: STY $03             ; save high byte here
+      Line 2070: LDY #$24                        ; otherwise load high byte for name table 1
+      Line 2071: SaveHAdder: STY $03             ; save high byte here
+        Line 2092: RemBridge: LDA BlockGfxData,X   ; write top left and top right (as a call, not in function)
+
+Function ExecGameLoopback
+  Inputs: []
+  Outputs: []
+          Line 7795: ExecGameLoopback: 
+
+Function EnemyTurnAround
+  Inputs: []
+  Outputs: []
+    Line 11681: EnemyTurnAround: 
+      Branch exit: Line 11703: ExTA: RTS                       ; leave!!!
+      Line 11685: CMP #Lakitu
+        Branch exit: Line 11703: ExTA: RTS                       ; leave!!!
+        Line 11687: CMP #HammerBro
+          Branch exit: Line 11703: ExTA: RTS                       ; leave!!!
+          Line 11689: CMP #Spiny
+            Branch exit: Line 11695: RXSpd: LDA Enemy_X_Speed,X      ; load horizontal speed
+            Line 11691: CMP #GreenParatroopaJump
+              Branch exit: Line 11695: RXSpd: LDA Enemy_X_Speed,X      ; load horizontal speed
+              Line 11693: CMP #$07
+                Branch exit: Line 11703: ExTA: RTS                       ; leave!!!
+
+Function ProcessBowserHalf
+  Inputs: []
+  Outputs: []
+    Line 10297: ProcessBowserHalf: 
+      Branch exit: Line 10295: ExBGfxH: RTS                    ; leave!
+      Line 10302: LDA #$0a
+        Branch exit: Line 11292: PlayerEnemyCollision: 
+
+Function ImposeGravity
+  Inputs: [A, $00, $02, $01]
+  Outputs: [A, $00, $02, $01]
+  Line 7703: ImposeGravity: 
+    Branch exit: Line 7713: AlterYP: STY $07                ; store Y here
+    Line 7712: DEY                             ; otherwise decrement Y
+    Line 7713: AlterYP: STY $07                ; store Y here
+      Branch exit: Line 7735: ChkUpM: PLA                     ; get value from stack
+      Line 7728: LDA SprObject_Y_MoveForce,X
+        Branch exit: Line 7735: ChkUpM: PLA                     ; get value from stack
+        Line 7731: LDA $02
+      Line 7735: ChkUpM: PLA                     ; get value from stack
+        Branch exit: Line 7758: ExVMove: RTS                    ; leave!
+        Line 7737: LDA $02
+          Branch exit: Line 7758: ExVMove: RTS                    ; leave!
+          Line 7751: LDA SprObject_Y_MoveForce,X
+            Branch exit: Line 7758: ExVMove: RTS                    ; leave!
+            Line 7754: LDA $07
+        Line 7758: ExVMove: RTS                    ; leave!
+
+Function EnemiesAndLoopsCore
+  Inputs: []
+  Outputs: []
+    Line 7762: EnemiesAndLoopsCore: 
+      Branch exit: Line 7775: ChkBowserF: PLA                 ; get data from stack
+      Line 7767: PLA                             ; get from stack
+        Branch exit: Line 7770: ChkAreaTsk: LDA AreaParserTaskNum; check number of tasks to perform
+        Line 7769: JMP RunEnemyObjectsCore         ; otherwise, jump to run enemy subroutines
+          Branch exit: Line 9004: RunEnemyObjectsCore: 
+        Line 7770: ChkAreaTsk: LDA AreaParserTaskNum; check number of tasks to perform
+          Branch exit: Line 7781: ExitELCore: RTS 
+          Line 7774: JMP ProcLoopCommand             ; otherwise, jump to process loop command/load enemies
+            Branch exit: Line 7825: ProcLoopCommand: 
+      Line 7775: ChkBowserF: PLA                 ; get data from stack
+        Branch exit: Line 7781: ExitELCore: RTS 
+        Line 7780: STA Enemy_Flag,X                ; if second enemy flag not set, also clear first one
+      Line 7781: ExitELCore: RTS 
+
+Function ProcessCannons
+  Inputs: []
+  Outputs: []
+      Line 6762: ProcessCannons: 
+        Branch exit: Line 6816: ExCannon: RTS                   ; then leave
+        Line 6765: LDX #$02
+
+Function BlockBufferColli_Side
+  Inputs: []
+  Outputs: []
+              Line 13048: BlockBufferColli_Side: 
+                Line 13052: BlockBufferCollision:  (as a call, not in function)
+
+Function GetBubbleOffscreenBits
+  Inputs: [$00]
+  Outputs: [$00]
+    Line 14831: GetBubbleOffscreenBits: 
+      Branch exit: Line 14868: GetOffScreenBitsSet: 
+
+Function HandleChangeSize
+  Inputs: []
+  Outputs: []
+      Line 14692: HandleChangeSize: 
+        Branch exit: Line 14703: GorSLog: LDA PlayerSize         ; get player's size
+        Line 14697: INY                             ; increment frame control
+          Branch exit: Line 14702: CSzNext: STY PlayerAnimCtrl     ; store proper frame control
+          Line 14700: LDY #$00                        ; otherwise initialize both grow/shrink flag
+          Line 14702: CSzNext: STY PlayerAnimCtrl     ; store proper frame control
+        Line 14703: GorSLog: LDA PlayerSize         ; get player's size
+          Branch exit: Line 14715: ShrinkPlayer: 
+          Line 14705: LDA ChangeSizeOffsetAdder,Y     ; get offset adder based on frame control as offset
+
+Function MoveVOffset
+  Inputs: [Y]
+  Outputs: [Y]
+          Line 2054: MoveVOffset: DEY                ; decrement vram buffer offset
+            Branch exit: Line 1476: SetVRAMOffset: STA VRAM_Buffer1_Offset; store as new vram buffer offset
+
+Function GetFirebarPosition
+  Inputs: [A, $00]
+  Outputs: [A, $00]
+    Line 9870: GetFirebarPosition: 
+      Branch exit: Line 9878: GetHAdder: STA $01              ; store result, modified or not, here
+      Line 9875: EOR #%00001111                  ; otherwise get two's compliment to oscillate
+      Line 9878: GetHAdder: STA $01              ; store result, modified or not, here
+        Branch exit: Line 9896: GetVAdder: STA $02              ; store result here
+        Line 9893: EOR #%00001111                  ; otherwise get two's compliment
+        Line 9896: GetVAdder: STA $02              ; store result here
+
+Function CheckTopOfBlock
+  Inputs: [$02]
+  Outputs: [$02]
+    Line 7394: CheckTopOfBlock: 
+      Branch exit: Line 7411: TopEx: RTS                      ; leave!
+      Line 7398: TYA                             ; otherwise set to A
+        Branch exit: Line 7411: TopEx: RTS                      ; leave!
+        Line 7406: LDA #$00
+      Line 7411: TopEx: RTS                      ; leave!
+
+Function MoveEnemySlowVert
+  Inputs: []
+  Outputs: []
+  Line 7634: MoveEnemySlowVert: 
+
+Function ChkLrgObjLength
+  Inputs: []
+  Outputs: []
+    Line 4274: ChkLrgObjLength: 
+      Line 4277: ChkLrgObjFixedLength:  (as a call, not in function)
+
+Function FloateyNumbersRoutine
+  Inputs: []
+  Outputs: []
+        Line 1282: FloateyNumbersRoutine: 
+          Branch exit: Line 1245: EndExitOne: RTS                 ; and leave
+          Line 1285: CMP #$0b                        ; if less than $0b, branch
+            Branch exit: Line 1289: ChkNumTimer: TAY                ; use as Y
+            Line 1287: LDA #$0b                        ; otherwise set to $0b, thus keeping
+            Line 1289: ChkNumTimer: TAY                ; use as Y
+              Branch exit: Line 1294: DecNumTimer: DEC FloateyNum_Timer,X; decrement value here
+              Line 1292: STA FloateyNum_Control,X        ; initialize floatey number control and leave
+              Line 1294: DecNumTimer: DEC FloateyNum_Timer,X; decrement value here
+                Branch exit: Line 1312: ChkTallEnemy: LDY Enemy_SprDataOffset,X; get OAM data offset for enemy object
+                Line 1297: CPY #$0b                        ; check offset for $0b
+                  Branch exit: Line 1302: LoadNumTiles: LDA ScoreUpdateData,Y; load point value here
+                  Line 1299: INC NumberofLives               ; give player one extra life (1-up)
+                  Line 1302: LoadNumTiles: LDA ScoreUpdateData,Y; load point value here
+                Line 1312: ChkTallEnemy: LDY Enemy_SprDataOffset,X; get OAM data offset for enemy object
+                  Branch exit: Line 1332: FloateyPart: LDA FloateyNum_Y_Pos,X; get vertical coordinate for
+                  Line 1316: CMP #PiranhaPlant
+                    Branch exit: Line 1332: FloateyPart: LDA FloateyNum_Y_Pos,X; get vertical coordinate for
+                    Line 1318: CMP #HammerBro
+                      Branch exit: Line 1329: GetAltOffset: LDX SprDataOffset_Ctrl; load some kind of control bit
+                      Line 1320: CMP #GreyCheepCheep
+                        Branch exit: Line 1332: FloateyPart: LDA FloateyNum_Y_Pos,X; get vertical coordinate for
+                        Line 1322: CMP #RedCheepCheep
+                          Branch exit: Line 1332: FloateyPart: LDA FloateyNum_Y_Pos,X; get vertical coordinate for
+                          Line 1324: CMP #TallEnemy
+                            Branch exit: Line 1329: GetAltOffset: LDX SprDataOffset_Ctrl; load some kind of control bit
+                            Line 1326: LDA Enemy_State,X
+                              Branch exit: Line 1332: FloateyPart: LDA FloateyNum_Y_Pos,X; get vertical coordinate for
+                      Line 1329: GetAltOffset: LDX SprDataOffset_Ctrl; load some kind of control bit
+                  Line 1332: FloateyPart: LDA FloateyNum_Y_Pos,X; get vertical coordinate for
+                    Branch exit: Line 1337: SetupNumSpr: LDA FloateyNum_Y_Pos,X; get vertical coordinate
+                    Line 1335: SBC #$01
+                    Line 1337: SetupNumSpr: LDA FloateyNum_Y_Pos,X; get vertical coordinate
+
+Function GetEnemyBoundBoxOfs
+  Inputs: []
+  Outputs: []
+    Line 11879: GetEnemyBoundBoxOfs: 
+      Line 11882: GetEnemyBoundBoxOfsArg:  (as a call, not in function)
+
+Function SetupJumpCoin
+  Inputs: [$06, $02, X]
+  Outputs: [$06, $02, X]
+    Line 6974: SetupJumpCoin: 
+
+Function ProcEnemyCollisions
+  Inputs: [Y, $01]
+  Outputs: [Y, $01]
+    Line 11622: ProcEnemyCollisions: 
+      Branch exit: Line 11654: ExitProcessEColl: 
+      Line 11627: LDA Enemy_State,X
+        Branch exit: Line 11657: ProcSecondEnemyColl: 
+        Line 11630: LDA Enemy_ID,X                  ; check second enemy identifier for hammer bro
+          Branch exit: Line 11654: ExitProcessEColl: 
+          Line 11633: LDA Enemy_State,Y               ; check first enemy state for d7 set
+            Branch exit: Line 11641: ShellCollisions: 
+            Line 11636: LDA #$06
+            Line 11641: ShellCollisions: 
+
+Function ForceInjury
+  Inputs: [A]
+  Outputs: [A]
+      Line 11404: ForceInjury: 
+        Branch exit: Line 11426: KillPlayer: 
+        Line 11407: STA PlayerStatus                ; otherwise set player's status to small
+
+Function MoveDropPlatform
+  Inputs: []
+  Outputs: []
+    Line 7630: MoveDropPlatform: 
+      Branch exit: Line 7636: SetMdMax: LDA #$02              ; set maximum speed in A
+      Line 7633: 
+
+Function GetLrgObjAttrib
+  Inputs: []
+  Outputs: []
+    Line 4287: GetLrgObjAttrib: 
+
+Function MoveESprRowOffscreen
+  Inputs: [A]
+  Outputs: [A]
+    Line 14071: MoveESprRowOffscreen: 
+      Branch exit: Line 13322: DumpTwoSpr: 
+
+Function CheckForSolidMTiles
+  Inputs: [A]
+  Outputs: [A]
+      Line 12357: CheckForSolidMTiles: 
+
+Function ChkForPlayerAttrib
+  Inputs: []
+  Outputs: []
+    Line 14727: ChkForPlayerAttrib: 
+      Branch exit: Line 14741: KilledAtt: LDA Sprite_Attributes+16,Y
+      Line 14732: LDA PlayerGfxOffset             ; get graphics table offset
+        Branch exit: Line 14748: C_S_IGAtt: LDA Sprite_Attributes+24,Y
+        Line 14735: CMP #$b8                        ; or intermediate growing offset,
+          Branch exit: Line 14748: C_S_IGAtt: LDA Sprite_Attributes+24,Y
+          Line 14737: CMP #$c0                        ; fourth row OAM attributes only
+            Branch exit: Line 14748: C_S_IGAtt: LDA Sprite_Attributes+24,Y
+            Line 14739: CMP #$c8
+              Branch exit: Line 14755: ExPlyrAt: RTS                   ; leave
+      Line 14741: KilledAtt: LDA Sprite_Attributes+16,Y
+      Line 14748: C_S_IGAtt: LDA Sprite_Attributes+24,Y
+      Line 14755: ExPlyrAt: RTS                   ; leave
+
+Function ChkLrgObjFixedLength
+  Inputs: [Y]
+  Outputs: [Y]
+      Line 4277: ChkLrgObjFixedLength: 
+        Branch exit: Line 4284: LenSet: RTS 
+        Line 4281: TYA                             ; save length into length counter
+        Line 4284: LenSet: RTS 
+
+Function PlayerHammerCollision
+  Inputs: [X]
+  Outputs: [X]
+    Line 11202: PlayerHammerCollision: 
+      Branch exit: Line 11232: ExPHC: RTS 
+      Line 11206: LDA TimerControl                ; if either master timer control
+        Branch exit: Line 11232: ExPHC: RTS 
+        Line 11209: TXA 
+          Branch exit: Line 11230: ClHCol: LDA #$00                ; clear collision flag
+          Line 11218: LDA Misc_Collision_Flag,X       ; otherwise read collision flag
+            Branch exit: Line 11232: ExPHC: RTS 
+            Line 11220: LDA #$01
+              Branch exit: Line 11232: ExPHC: RTS 
+              Line 11229: JMP InjurePlayer                ; otherwise jump to hurt player, do not return
+                Branch exit: Line 11400: InjurePlayer: 
+          Line 11230: ClHCol: LDA #$00                ; clear collision flag
+      Line 11232: ExPHC: RTS 
+
+Function Dump_Squ1_Regs
+  Inputs: [Y, X]
+  Outputs: [Y, X]
+    Line 15129: Dump_Squ1_Regs: 
+
+Function SmallPlatformBoundBox
+  Inputs: [X]
+  Outputs: [X]
+    Line 12802: SmallPlatformBoundBox: 
+
+Function GameRoutines
+  Inputs: []
+  Outputs: []
+    Line 5473: GameRoutines: 
+      Line 5493: PlayerEntrance: 
+        Branch exit: Line 5515: EntrMode2: LDA JoypadOverride   ; if controller override bits set here,
+        Line 5497: LDA #$00
+          Branch exit: Line 5554: AutoControlPlayer: 
+          Line 5501: LDA PlayerEntranceCtrl          ; check player entry bits from header
+            Branch exit: Line 5506: ChkBehPipe: LDA Player_SprAttrib; check for sprite attributes
+            Line 5504: CMP #$07                        ; otherwise branch to normal entry
+              Branch exit: Line 5541: PlayerRdy: LDA #$08             ; set routine to be executed by game engine next frame
+            Line 5506: ChkBehPipe: LDA Player_SprAttrib; check for sprite attributes
+              Branch exit: Line 5510: IntroEntr: JSR EnterSidePipe    ; execute sub to move player to the right
+              Line 5508: LDA #$01
+                Branch exit: Line 5554: AutoControlPlayer: 
+              Line 5510: IntroEntr: JSR EnterSidePipe    ; execute sub to move player to the right
+                Branch exit: Line 5549: ExitEntr: RTS                   ; leave!
+                Line 5513: INC DisableIntermediate         ; set flag to skip world and lives display
+                  Branch exit: Line 5862: NextArea: INC AreaNumber        ; increment area number used for address loader
+        Line 5515: EntrMode2: LDA JoypadOverride   ; if controller override bits set here,
+          Branch exit: Line 5523: VineEntr: LDA VineHeight
+          Line 5517: LDA #$ff                        ; otherwise, set value here then execute sub
+            Branch exit: Line 5541: PlayerRdy: LDA #$08             ; set routine to be executed by game engine next frame
+            Line 5522: RTS                             ; to the last part, otherwise leave
+          Line 5523: VineEntr: LDA VineHeight
+            Branch exit: Line 5549: ExitEntr: RTS                   ; leave!
+            Line 5526: LDA Player_Y_Position           ; get player's vertical coordinate
+              Branch exit: Line 5536: OffVine: STY DisableCollisionDet; set collision detection disable flag
+              Line 5531: LDA #$03
+              Line 5536: OffVine: STY DisableCollisionDet; set collision detection disable flag
+                Branch exit: Line 5549: ExitEntr: RTS                   ; leave!
+        Line 5541: PlayerRdy: LDA #$08             ; set routine to be executed by game engine next frame
+        Line 5549: ExitEntr: RTS                   ; leave!
+
+Function BumpBlock
+  Inputs: [$05, CarryFlag, Y]
+  Outputs: [$05, CarryFlag, Y]
+    Line 7306: BumpBlock: 
+      Branch exit: Line 7355: ExitBlockChk: 
+      Line 7319: TYA                             ; move block number to A
+        Branch exit: Line 7323: BlockCode: JSR JumpEngine       ; run appropriate subroutine depending on block number
+        Line 7322: SBC #$05                        ; otherwise subtract 5 for second set to get proper number
+        Line 7323: BlockCode: JSR JumpEngine       ; run appropriate subroutine depending on block number
+          Line 7337: MushFlowerBlock: 
+            Line 7341: StarBlock: 
+              Line 7345: ExtraLifeMushBlock: 
+                Branch exit: Line 7124: SetupPowerUp: 
+
+Function SpriteShuffler
+  Inputs: []
+  Outputs: []
+    Line 886: SpriteShuffler: 
+      Line 891: ShuffleLoop: LDA SprDataOffset,X; check for offset value against
+        Branch exit: Line 901: NextSprOffset: DEX              ; move backwards to next one
+        Line 894: LDY SprShuffleAmtOffset         ; get current offset to preset value we want to add
+          Branch exit: Line 900: StrSprOffset: STA SprDataOffset,X; store new offset here or old one if branched to here
+          Line 898: CLC 
+          Line 900: StrSprOffset: STA SprDataOffset,X; store new offset here or old one if branched to here
+        Line 901: NextSprOffset: DEX              ; move backwards to next one
+          Branch exit: Line 891: ShuffleLoop: LDA SprDataOffset,X; check for offset value against
+          Line 903: LDX SprShuffleAmtOffset         ; load offset
+            Branch exit: Line 908: SetAmtOffset: STX SprShuffleAmtOffset
+            Line 907: LDX #$00                        ; otherwise, init to 0
+            Line 908: SetAmtOffset: STX SprShuffleAmtOffset
+              Line 911: SetMiscOffset: LDA SprDataOffset+5,Y; load one of three OAM data offsets
+                Branch exit: Line 911: SetMiscOffset: LDA SprDataOffset+5,Y; load one of three OAM data offsets
+                Line 924: RTS 
+
+Function Setup_Vine
+  Inputs: [X]
+  Outputs: [X]
+    Line 6676: Setup_Vine: 
+      Branch exit: Line 6690: NextVO: TXA                     ; store object offset to next available vine slot
+      Line 6689: STA VineStart_Y_Position        ; otherwise store vertical coordinate here
+      Line 6690: NextVO: TXA                     ; store object offset to next available vine slot
+
+Function ChkInvisibleMTiles
+  Inputs: [A]
+  Outputs: [A]
+    Line 12237: ChkInvisibleMTiles: 
+      Branch exit: Line 12241: ExCInvT: RTS                    ; leave with zero flag set if either found
+      Line 12240: CMP #$60                        ; check for hidden 1-up block
+      Line 12241: ExCInvT: RTS                    ; leave with zero flag set if either found
+
+Function FindPlayerAction
+  Inputs: [A]
+  Outputs: [A]
+  Line 14473: FindPlayerAction: 
+    Branch exit: Line 14485: PlayerGfxProcessing: 
+
+Function ProcFirebar
+  Inputs: []
+  Outputs: []
+            Line 9700: ProcFirebar: 
+              Branch exit: Line 9756: SkipFBar: RTS 
+              Line 9705: LDA TimerControl                ; if master timer control set, branch
+                Branch exit: Line 9711: SusFbar: LDA FirebarSpinState_High,X; get high byte of spinstate
+                Line 9707: LDA FirebarSpinSpeed,X          ; load spinning speed of firebar
+                Line 9711: SusFbar: LDA FirebarSpinState_High,X; get high byte of spinstate
+                  Branch exit: Line 9722: SetupGFB: STA $ef               ; save high byte of spinning thing, modified or otherwise
+                  Line 9715: CMP #$08                        ; check high byte of spinstate
+                    Branch exit: Line 9719: SkpFSte: CLC 
+                    Line 9717: CMP #$18
+                      Branch exit: Line 9722: SetupGFB: STA $ef               ; save high byte of spinning thing, modified or otherwise
+                    Line 9719: SkpFSte: CLC 
+                  Line 9722: SetupGFB: STA $ef               ; save high byte of spinning thing, modified or otherwise
+                    Branch exit: Line 9740: SetMFbar: STY $ed               ; store maximum value for length of firebars
+                    Line 9739: LDY #$0b                        ; otherwise load value for long firebars
+                    Line 9740: SetMFbar: STY $ed               ; store maximum value for length of firebars
+                      Line 9743: DrawFbar: LDA $ef               ; load high byte of spinstate
+                        Branch exit: Line 9752: NextFbar: INC $00               ; move onto the next firebar part
+                        Line 9749: LDY DuplicateObj_Offset         ; if we arrive at fifth firebar part,
+                        Line 9752: NextFbar: INC $00               ; move onto the next firebar part
+                          Branch exit: Line 9743: DrawFbar: LDA $ef               ; load high byte of spinstate
+              Line 9756: SkipFBar: RTS 
+
+Function PositionPlayerOnVPlat
+  Inputs: []
+  Outputs: []
+        Line 11845: PositionPlayerOnVPlat: 
+          Branch exit: Line 11862: ExPlPos: RTS 
+          Line 11850: LDY Enemy_Y_HighPos,X
+            Branch exit: Line 11862: ExPlPos: RTS 
+            Line 11853: SEC                             ; subtract 32 pixels from vertical coordinate
+          Line 11862: ExPlPos: RTS 
+
+Function SetXMoveAmt
+  Inputs: [Y, X]
+  Outputs: [Y, X]
+  Line 7644: SetXMoveAmt: STY $00            ; set movement amount here
+
+Function BubbleCheck
+  Inputs: []
+  Outputs: []
+    Line 6383: BubbleCheck: 
+      Branch exit: Line 6414: MoveBubl: LDY $07               ; get pseudorandom bit again, use as offset
+      Line 6390: LDA AirBubbleTimer              ; if air bubble timer not expired,
+        Branch exit: Line 6425: ExitBubl: RTS                   ; leave
+        Line 6392: 
+          Line 6393: SetupBubble:  (as a call, not in function)
+      Line 6414: MoveBubl: LDY $07               ; get pseudorandom bit again, use as offset (as a call, not in function)
+      Line 6425: ExitBubl: RTS                   ; leave (as a call, not in function)
+
+Function PlayerMovementSubs
+  Inputs: []
+  Outputs: []
+    Line 5873: PlayerMovementSubs: 
+      Branch exit: Line 5881: SetCrouch: STA CrouchingFlag    ; store value in crouch flag
+      Line 5877: LDA Player_State                ; check state of player
+        Branch exit: Line 5882: ProcMove: JSR PlayerPhysicsSub  ; run sub related to jumping and swimming
+        Line 5879: LDA Up_Down_Buttons             ; load controller bits for up and down
+      Line 5881: SetCrouch: STA CrouchingFlag    ; store value in crouch flag
+      Line 5882: ProcMove: JSR PlayerPhysicsSub  ; run sub related to jumping and swimming
+        Branch exit: Line 5897: NoMoveSub: RTS 
+        Line 5885: LDA Player_State
+          Branch exit: Line 5890: MoveSubs: JSR JumpEngine
+          Line 5888: LDY #$18
+          Line 5890: MoveSubs: JSR JumpEngine
+        Line 5897: NoMoveSub: RTS 
+
+Function GetAreaType
+  Inputs: [A]
+  Outputs: [A]
+        Line 4358: GetAreaType: AND #%01100000     ; mask out all but d6 and d5
+
+Function DrawBrickChunks
+  Inputs: []
+  Outputs: []
+    Line 14161: DrawBrickChunks: 
+      Branch exit: Line 14171: DChunks: LDY Block_SprDataOffset,X; get OAM data offset
+      Line 14168: LDA #$03                        ; otherwise set different palette bits
+      Line 14171: DChunks: LDY Block_SprDataOffset,X; get OAM data offset
+        Branch exit: Line 14216: ChnkOfs: LDA $00                ; if relative position on left side of screen,
+        Line 14214: LDA #$f8
+        Line 14216: ChnkOfs: LDA $00                ; if relative position on left side of screen,
+          Branch exit: Line 14224: ExBCDr: RTS                     ; leave
+          Line 14218: LDA Sprite_X_Position,Y         ; otherwise compare left-side X coordinate
+            Branch exit: Line 14224: ExBCDr: RTS                     ; leave
+            Line 14221: LDA #$f8                        ; otherwise move right half of sprites offscreen
+          Line 14224: ExBCDr: RTS                     ; leave
+
+Function MoveJ_EnemyVertically
+  Inputs: []
+  Outputs: []
+  Line 7641: MoveJ_EnemyVertically: 
+
+Function RenderPlayerSub
+  Inputs: [A]
+  Outputs: [A]
+    Line 14561: RenderPlayerSub: 
+      Line 14575: DrawPlayerLoop:  (as a call, not in function)
+
+Function SpawnHammerObj
+  Inputs: []
+  Outputs: []
+        Line 6872: SpawnHammerObj: 
+          Branch exit: Line 6878: SetMOfs: TAY                    ; use either d3 or d2-d0 for offset here
+          Line 6876: LDA PseudoRandomBitReg+1
+          Line 6878: SetMOfs: TAY                    ; use either d3 or d2-d0 for offset here
+            Branch exit: Line 6893: NoHammer: LDX ObjectOffset      ; get original enemy object offset
+            Line 6881: LDX HammerEnemyOfsData,Y        ; get offset of enemy slot to check using Y as offset
+              Branch exit: Line 6893: NoHammer: LDX ObjectOffset      ; get original enemy object offset
+              Line 6884: LDX ObjectOffset                ; get original enemy object offset
+            Line 6893: NoHammer: LDX ObjectOffset      ; get original enemy object offset
+
+Function MoveJumpingEnemy
+  Inputs: []
+  Outputs: []
+    Line 9370: MoveJumpingEnemy: 
+      Branch exit: Line 7529: MoveEnemyHorizontally: 
+
+Function ImposeFriction
+  Inputs: [A]
+  Outputs: [A]
+    Line 6226: ImposeFriction: 
+      Branch exit: Line 6234: JoypFrict: LSR                  ; put right controller bit into carry
+      Line 6230: LDA Player_X_Speed
+        Branch exit: Line 6264: SetAbsSpd: STA Player_XSpeedAbsolute; store walking/running speed here and leave
+        Line 6232: BPL RghtFrict                   ; if player moving to the right, branch to slow
+          Branch exit: Line 6248: RghtFrict: LDA Player_X_MoveForce; load value set here
+          Line 6233: BMI LeftFrict                   ; otherwise logic dictates player moving left, branch to slow
+            Branch exit: Line 6236: LeftFrict: LDA Player_X_MoveForce; load value set here
+      Line 6234: JoypFrict: LSR                  ; put right controller bit into carry
+        Branch exit: Line 6248: RghtFrict: LDA Player_X_MoveForce; load value set here
+      Line 6236: LeftFrict: LDA Player_X_MoveForce; load value set here
+        Branch exit: Line 6259: XSpdSign: CMP #$00              ; if player not moving or moving to the right,
+        Line 6245: LDA MaximumRightSpeed           ; otherwise set preset value as horizontal speed
+          Branch exit: Line 6264: SetAbsSpd: STA Player_XSpeedAbsolute; store walking/running speed here and leave
+      Line 6248: RghtFrict: LDA Player_X_MoveForce; load value set here
+        Branch exit: Line 6259: XSpdSign: CMP #$00              ; if player not moving or moving to the right,
+        Line 6257: LDA MaximumLeftSpeed            ; otherwise set preset value as horizontal speed
+      Line 6259: XSpdSign: CMP #$00              ; if player not moving or moving to the right,
+        Branch exit: Line 6264: SetAbsSpd: STA Player_XSpeedAbsolute; store walking/running speed here and leave
+        Line 6261: EOR #$ff
+      Line 6264: SetAbsSpd: STA Player_XSpeedAbsolute; store walking/running speed here and leave
+
+Function BlockBufferColli_Feet
+  Inputs: [Y]
+  Outputs: [Y]
+          Line 13041: BlockBufferColli_Feet: 
+            Line 13044: BlockBufferColli_Head:  (as a call, not in function)
+
+Function BoundingBoxCore
+  Inputs: [X]
+  Outputs: [X]
+    Line 12852: BoundingBoxCore: 
+
+Function DrawSmallPlatform
+  Inputs: []
+  Outputs: []
+    Line 14308: DrawSmallPlatform: 
+      Branch exit: Line 14335: TopSP: JSR DumpThreeSpr         ; dump vertical coordinate into Y coordinates
+      Line 14334: LDA #$f8                        ; otherwise move first three sprites offscreen
+      Line 14335: TopSP: JSR DumpThreeSpr         ; dump vertical coordinate into Y coordinates
+        Branch exit: Line 14343: BotSP: STA Sprite_Y_Position+12,Y; dump vertical coordinate + 128 pixels
+        Line 14342: LDA #$f8                        ; otherwise move last three sprites offscreen
+        Line 14343: BotSP: STA Sprite_Y_Position+12,Y; dump vertical coordinate + 128 pixels
+          Branch exit: Line 14353: SOfs: PLA                       ; move out and back into stack
+          Line 14350: LDA #$f8                        ; if d3 was set, move first and
+          Line 14353: SOfs: PLA                       ; move out and back into stack
+            Branch exit: Line 14360: SOfs2: PLA                      ; get from stack
+            Line 14357: LDA #$f8                        ; if d2 was set, move second and
+            Line 14360: SOfs2: PLA                      ; get from stack
+              Branch exit: Line 14366: ExSPl: LDX ObjectOffset         ; get enemy object offset and leave
+              Line 14363: LDA #$f8                        ; if d1 was set, move third and
+              Line 14366: ExSPl: LDX ObjectOffset         ; get enemy object offset and leave
+
+Function StopSquare2Sfx
+  Inputs: []
+  Outputs: []
+    Line 15422: StopSquare2Sfx: 
+
+Function AreaParserTaskHandler
+  Inputs: []
+  Outputs: []
+    Line 3034: AreaParserTaskHandler: 
+      Branch exit: Line 3039: DoAPTasks: DEY 
+      Line 3037: LDY #$08
+      Line 3039: DoAPTasks: DEY 
+        Branch exit: Line 3045: SkipATRender: RTS 
+        Line 3044: JSR RenderAttributeTables
+        Line 3045: SkipATRender: RTS 
+
+Function MoveSmallPlatform
+  Inputs: []
+  Outputs: []
+    Line 10977: MoveSmallPlatform: 
+      Branch exit: Line 10993: ChkSmallPlatCollision: 
+
+Function CyclePlayerPalette
+  Inputs: [A]
+  Outputs: [A]
+        Line 5786: CyclePlayerPalette: 
+
+Function ScrollScreen
+  Inputs: [Y]
+  Outputs: [Y]
+                Line 5401: ScrollScreen: 
+                  Branch exit: Line 5427: ChkPOffscr: LDX #$00            ; set X for player offset
+
+Function RelativeEnemyPosition
+  Inputs: []
+  Outputs: []
+    Line 14785: RelativeEnemyPosition: 
+      Branch exit: Line 14799: VariableObjOfsRelPos: 
+
+Function BlockBufferColli_Head
+  Inputs: []
+  Outputs: []
+            Line 13044: BlockBufferColli_Head: 
+              Line 13048: BlockBufferColli_Side:  (as a call, not in function)
+
+Function LoadEnvelopeData
+  Inputs: []
+  Outputs: []
+    Line 15941: LoadEnvelopeData: 
+      Branch exit: Line 15948: LoadUsualEnvData: 
+      Line 15945: LDA EndOfCastleMusicEnvData,Y   ; load data from offset for win castle music
+
+Function AddToScore
+  Inputs: []
+  Outputs: []
+      Line 7103: AddToScore: 
+        Line 7108: GetSBNybbles:  (as a call, not in function)
+
+Function GetGfxOffsetAdder
+  Inputs: [Y]
+  Outputs: [Y]
+    Line 14679: GetGfxOffsetAdder: 
+      Branch exit: Line 14686: SzOfs: RTS                      ; go back
+      Line 14682: TYA                             ; for big player
+      Line 14686: SzOfs: RTS                      ; go back
+
+Function SetFlameTimer
+  Inputs: []
+  Outputs: []
+      Line 10314: SetFlameTimer: 
+
+Function ChkForPlayerC_LargeP
+  Inputs: [CarryFlag, X]
+  Outputs: [CarryFlag, X]
+          Line 11722: ChkForPlayerC_LargeP: 
+            Branch exit: Line 11736: ExLPC: LDX ObjectOffset         ; get enemy object buffer offset and leave
+            Line 11725: TXA 
+              Branch exit: Line 11736: ExLPC: LDX ObjectOffset         ; get enemy object buffer offset and leave
+              Line 11735: JSR ProcLPlatCollisions         ; otherwise collision, perform sub
+
+Function GiveOneCoin
+  Inputs: []
+  Outputs: []
+  Line 7083: GiveOneCoin: 
+    Branch exit: Line 7099: CoinPoints: 
+    Line 7093: LDA #$00
+    Line 7099: CoinPoints: 
+      Line 7103: AddToScore:  (as a call, not in function)
+
+Function PlayerHeadCollision
+  Inputs: [A, $02, $06, CarryFlag]
+  Outputs: [A, $02, $06, CarryFlag]
+      Line 7218: PlayerHeadCollision: 
+        Branch exit: Line 7225: DBlockSte: STA Block_State,X    ; store into block object buffer
+        Line 7224: LDA #$12                        ; otherwise load breakable block object state
+        Line 7225: DBlockSte: STA Block_State,X    ; store into block object buffer
+          Branch exit: Line 7239: ChkBrick: BCC PutMTileB         ; if no match was found in previous sub, skip ahead
+          Line 7238: TYA                             ; otherwise init A (note: big = 0)
+          Line 7239: ChkBrick: BCC PutMTileB         ; if no match was found in previous sub, skip ahead
+            Branch exit: Line 7257: PutMTileB: STA Block_Metatile,X ; store whatever metatile be appropriate here
+            Line 7240: LDY #$11                        ; otherwise load unbreakable state into block object buffer
+              Branch exit: Line 7248: StartBTmr: LDA BrickCoinTimerFlag; check brick coin timer flag
+              Line 7246: CPY #$5d                        ; is it brick with coins (without line)?
+                Branch exit: Line 7257: PutMTileB: STA Block_Metatile,X ; store whatever metatile be appropriate here
+              Line 7248: StartBTmr: LDA BrickCoinTimerFlag; check brick coin timer flag
+                Branch exit: Line 7253: ContBTmr: LDA BrickCoinTimer    ; check brick coin timer
+                Line 7250: LDA #$0b
+                Line 7253: ContBTmr: LDA BrickCoinTimer    ; check brick coin timer
+                  Branch exit: Line 7256: PutOldMT: TYA                   ; put metatile into A
+                  Line 7255: LDY #$c4                        ; otherwise use empty block metatile
+                  Line 7256: PutOldMT: TYA                   ; put metatile into A
+            Line 7257: PutMTileB: STA Block_Metatile,X ; store whatever metatile be appropriate here
+              Branch exit: Line 7271: SmallBP: INY                    ; increment for small or big and crouching
+              Line 7269: LDA PlayerSize                  ; is player big?
+                Branch exit: Line 7272: BigBP: LDA Player_Y_Position    ; get player's vertical coordinate
+              Line 7271: SmallBP: INY                    ; increment for small or big and crouching
+              Line 7272: BigBP: LDA Player_Y_Position    ; get player's vertical coordinate
+                Branch exit: Line 7282: Unbreak: JSR BumpBlock          ; execute code for unbreakable brick or question block
+                Line 7280: JSR BrickShatter                ; execute code for breakable brick
+                  Branch exit: Line 7283: InvOBit: LDA SprDataOffset_Ctrl ; invert control bit used by block objects
+                Line 7282: Unbreak: JSR BumpBlock          ; execute code for unbreakable brick or question block
+                Line 7283: InvOBit: LDA SprDataOffset_Ctrl ; invert control bit used by block objects
+
+Function DuplicateEnemyObj
+  Inputs: [X]
+  Outputs: [X]
+    Line 8525: DuplicateEnemyObj: 
+      Line 8527: FSLoop: INY                     ; increment one slot
+        Branch exit: Line 8527: FSLoop: INY                     ; increment one slot
+        Line 8530: STY DuplicateObj_Offset         ; otherwise set offset here
+
+Function SubtEnemyYPos
+  Inputs: []
+  Outputs: []
+    Line 12653: SubtEnemyYPos: 
+
+Function WriteNTAddr
+  Inputs: [A]
+  Outputs: [A]
+      Line 2395: WriteNTAddr: STA PPU_ADDRESS
+        Line 2401: InitNTLoop: STA PPU_DATA        ; count out exactly 768 tiles
+          Branch exit: Line 2401: InitNTLoop: STA PPU_DATA        ; count out exactly 768 tiles
+          Line 2404: DEX 
+            Branch exit: Line 2401: InitNTLoop: STA PPU_DATA        ; count out exactly 768 tiles
+            Line 2406: LDY #64                         ; now to clear the attribute table (with zero this time)
+              Line 2410: InitATLoop: STA PPU_DATA
+                Branch exit: Line 2410: InitATLoop: STA PPU_DATA
+                Line 2413: STA HorizontalScroll            ; reset scroll variables
+                  Branch exit: Line 2501: InitScroll: STA PPU_SCROLL_REG  ; store contents of A into scroll registers
+
+Function EnemyMovementSubs
+  Inputs: []
+  Outputs: []
+    Line 9081: EnemyMovementSubs: 
+      Line 9109: NoMoveCode: 
+
+Function EnemiesCollision
+  Inputs: [Y]
+  Outputs: [Y]
+        Line 11551: EnemiesCollision: 
+          Branch exit: Line 11540: ExSFN: RTS 
+          Line 11555: LDA AreaType
+            Branch exit: Line 11540: ExSFN: RTS 
+            Line 11557: LDA Enemy_ID,X
+              Branch exit: Line 11618: ExitECRoutine: 
+              Line 11560: CMP #Lakitu                     ; if lakitu, branch to leave
+                Branch exit: Line 11618: ExitECRoutine: 
+                Line 11562: CMP #PiranhaPlant               ; if piranha plant, branch to leave
+                  Branch exit: Line 11618: ExitECRoutine: 
+                  Line 11564: LDA EnemyOffscrBitsMasked,X     ; if masked offscreen bits nonzero, branch to leave
+                    Branch exit: Line 11618: ExitECRoutine: 
+                    Line 11566: JSR GetEnemyBoundBoxOfs         ; otherwise, do sub, get appropriate bounding box offset for
+                      Branch exit: Line 11618: ExitECRoutine: 
+
+Function MovePlatformUp
+  Inputs: [X]
+  Outputs: [X]
+      Line 7676: MovePlatformUp: 
+        Branch exit: Line 7685: SetDplSpd: STA $00              ; save downward movement amount here
+        Line 7684: LDA #$09                        ; residual code
+        Line 7685: SetDplSpd: STA $00              ; save downward movement amount here
+
+Function JumpEngine
+  Inputs: [A]
+  Outputs: [A]
+                                              Line 2369: JumpEngine: 
+
+Function BlockBumpedChk
+  Inputs: [A]
+  Outputs: [A]
+      Line 7367: BlockBumpedChk: 
+        Line 7369: BumpChkLoop: CMP BrickQBlockMetatiles,Y; check to see if current metatile matches
+          Branch exit: Line 7374: MatchBump: RTS                  ; note carry is set if found match
+          Line 7371: DEY                             ; otherwise move onto next metatile
+            Branch exit: Line 7369: BumpChkLoop: CMP BrickQBlockMetatiles,Y; check to see if current metatile matches
+            Line 7373: CLC                             ; if none match, return with carry clear
+          Line 7374: MatchBump: RTS                  ; note carry is set if found match
+
+Function MovePlatformDown
+  Inputs: []
+  Outputs: []
+    Line 7672: MovePlatformDown: 
+      Line 7676: MovePlatformUp:  (as a call, not in function)
+
+Function MiscObjectsCore
+  Inputs: []
+  Outputs: []
+    Line 7012: MiscObjectsCore: 
+
+Function InitHorizFlySwimEnemy
+  Inputs: []
+  Outputs: []
+    Line 8199: InitHorizFlySwimEnemy: 
+      Branch exit: Line 8171: SetESpd: STA Enemy_X_Speed,X    ; store as speed for enemy object
+
+Function RenderUnderPart
+  Inputs: [Y, A, X]
+  Outputs: [Y, A, X]
+  Line 4247: RenderUnderPart: 
+    Branch exit: Line 4263: DrawThisRow: STA MetatileBuffer,X; render contents of A from routine that called this
+    Line 4251: CPY #$17
+      Branch exit: Line 4264: WaitOneRow: INX 
+      Line 4253: CPY #$1a
+        Branch exit: Line 4264: WaitOneRow: INX 
+        Line 4255: CPY #$c0
+          Branch exit: Line 4263: DrawThisRow: STA MetatileBuffer,X; render contents of A from routine that called this
+          Line 4257: CPY #$c0
+            Branch exit: Line 4264: WaitOneRow: INX 
+            Line 4259: CPY #$54
+              Branch exit: Line 4263: DrawThisRow: STA MetatileBuffer,X; render contents of A from routine that called this
+              Line 4261: CMP #$50
+                Branch exit: Line 4264: WaitOneRow: INX 
+    Line 4263: DrawThisRow: STA MetatileBuffer,X; render contents of A from routine that called this
+    Line 4264: WaitOneRow: INX 
+      Branch exit: Line 4270: ExitUPartR: RTS 
+      Line 4267: LDY AreaObjectHeight            ; decrement, and stop rendering if there is no more length
+        Branch exit: Line 4247: RenderUnderPart: 
+      Line 4270: ExitUPartR: RTS 
+
+Function ChkUnderEnemy
+  Inputs: []
+  Outputs: []
+    Line 12706: ChkUnderEnemy: 
+      Branch exit: Line 12997: BlockBufferChk_Enemy: 
+
+Function ResetScreenTimer
+  Inputs: []
+  Outputs: []
+        Line 1783: ResetScreenTimer: 
+
+Function AreaParserTasks
+  Inputs: []
+  Outputs: []
+    Line 3047: AreaParserTasks: 
+      Line 3061: IncrementColumnPos: 
+        Branch exit: Line 3068: NoColWrap: INC BlockBufferColumnPos; increment column offset where we're at
+        Line 3066: STA CurrentColumnPos            ; if no bits left set, wrap back to zero (0-f)
+        Line 3068: NoColWrap: INC BlockBufferColumnPos; increment column offset where we're at
+
+Function DrawFirebar_Collision
+  Inputs: [$03, $06, $01, $02]
+  Outputs: [$03, $06, $01, $02]
+    Line 9758: DrawFirebar_Collision: 
+      Branch exit: Line 9767: AddHA: CLC                      ; add horizontal coordinate relative to screen to
+      Line 9765: EOR #$ff
+      Line 9767: AddHA: CLC                      ; add horizontal coordinate relative to screen to
+        Branch exit: Line 9777: SubtR1: SEC                     ; subtract original X from the
+        Line 9773: LDA Enemy_Rel_XPos
+          Branch exit: Line 9779: ChkFOfs: CMP #$59               ; if difference of coordinates within a certain range,
+        Line 9777: SubtR1: SEC                     ; subtract original X from the
+        Line 9779: ChkFOfs: CMP #$59               ; if difference of coordinates within a certain range,
+          Branch exit: Line 9783: VAHandl: LDA Enemy_Rel_YPos     ; if vertical relative coordinate offscreen,
+          Line 9781: LDA #$f8                        ; otherwise, load offscreen Y coordinate
+            Branch exit: Line 9793: SetVFbr: STA Sprite_Y_Position,Y; store as Y coordinate here
+          Line 9783: VAHandl: LDA Enemy_Rel_YPos     ; if vertical relative coordinate offscreen,
+            Branch exit: Line 9793: SetVFbr: STA Sprite_Y_Position,Y; store as Y coordinate here
+            Line 9786: LDA $02                         ; load vertical adder we got from position loader
+              Branch exit: Line 9791: AddVA: CLC                      ; add vertical coordinate relative to screen to
+              Line 9789: EOR #$ff
+              Line 9791: AddVA: CLC                      ; add vertical coordinate relative to screen to
+          Line 9793: SetVFbr: STA Sprite_Y_Position,Y; store as Y coordinate here
+            Line 9796: FirebarCollision:  (as a call, not in function)
+
+Function SmallPlatformCollision
+  Inputs: [CarryFlag]
+  Outputs: [CarryFlag]
+    Line 11742: SmallPlatformCollision: 
+      Branch exit: Line 11773: ExSPC: LDX ObjectOffset         ; get enemy object buffer offset, then leave
+      Line 11745: STA PlatformCollisionFlag,X     ; otherwise initialize collision flag
+        Branch exit: Line 11773: ExSPC: LDX ObjectOffset         ; get enemy object buffer offset, then leave
+        Line 11748: LDA #$02
+          Line 11751: ChkSmallPlatLoop: 
+            Branch exit: Line 11773: ExSPC: LDX ObjectOffset         ; get enemy object buffer offset, then leave
+            Line 11756: LDA BoundingBox_UL_YPos,Y       ; check top of platform's bounding box for being
+              Branch exit: Line 11762: MoveBoundBox: 
+              Line 11759: JSR PlayerCollisionCore         ; otherwise, perform player-to-platform collision detection
+                Branch exit: Line 11778: ProcSPlatCollisions: 
+                Line 11761: 
+              Line 11762: MoveBoundBox: 
+                Branch exit: Line 11751: ChkSmallPlatLoop: 
+      Line 11773: ExSPC: LDX ObjectOffset         ; get enemy object buffer offset, then leave
+
+Function InitBlock_XY_Pos
+  Inputs: []
+  Outputs: []
+    Line 7290: InitBlock_XY_Pos: 
+
+Function GetPipeHeight
+  Inputs: []
+  Outputs: []
+    Line 3885: GetPipeHeight: 
+
+Function GetEnemyBoundBox
+  Inputs: [X]
+  Outputs: [X]
+    Line 12796: GetEnemyBoundBox: 
+      Branch exit: Line 12807: GetMaskedOffScrBits: 
+
+Function EnemyToBGCollisionDet
+  Inputs: [CarryFlag, $02, $04]
+  Outputs: [CarryFlag, $02, $04]
+        Line 12400: EnemyToBGCollisionDet: 
+          Branch exit: Line 12389: ExEBG: RTS                      ; leave
+          Line 12404: JSR SubtEnemyYPos               ; otherwise, do a subroutine here
+            Branch exit: Line 12389: ExEBG: RTS                      ; leave
+            Line 12406: LDY Enemy_ID,X
+              Branch exit: Line 12413: DoIDCheckBGColl: 
+              Line 12409: LDA Enemy_Y_Position,X
+                Branch exit: Line 12389: ExEBG: RTS                      ; leave
+                Line 12412: 
+              Line 12413: DoIDCheckBGColl: 
+                Branch exit: Line 12417: HBChk: CPY #HammerBro           ; check for hammer bro
+                Line 12416: JMP EnemyJump                   ; otherwise jump elsewhere
+                  Branch exit: Line 12660: EnemyJump: 
+                Line 12417: HBChk: CPY #HammerBro           ; check for hammer bro
+                  Branch exit: Line 12420: CInvu: CPY #Spiny               ; if enemy object is spiny, branch
+                  Line 12419: JMP HammerBroBGColl             ; otherwise jump elsewhere
+                    Branch exit: Line 12679: HammerBroBGColl: 
+                  Line 12420: CInvu: CPY #Spiny               ; if enemy object is spiny, branch
+                    Branch exit: Line 12426: YesIn: JSR ChkUnderEnemy        ; if enemy object < $07, or = $12 or $2e, do this sub
+                    Line 12422: CPY #PowerUpObject              ; if special power-up object, branch
+                      Branch exit: Line 12426: YesIn: JSR ChkUnderEnemy        ; if enemy object < $07, or = $12 or $2e, do this sub
+                      Line 12424: CPY #$07                        ; if enemy object =>$07, branch to leave
+                        Branch exit: Line 12492: ExEBGChk: RTS 
+                    Line 12426: YesIn: JSR ChkUnderEnemy        ; if enemy object < $07, or = $12 or $2e, do this sub
+                      Branch exit: Line 12435: HandleEToBGCollision: 
+                      Line 12428: 
+
+Function DumpTwoSpr
+  Inputs: [A]
+  Outputs: [A]
+  Line 13322: DumpTwoSpr: 
+
+Function null
+  Inputs: []
+  Outputs: []
+  Line 0:                                 ; SMBDIS.ASM - A COMPREHENSIVE SUPER MARIO BROS. DISASSEMBLY
+    Line 673: Start: 
+      Line 680: VBlank1: LDA PPU_STATUS         ; wait two frames
+        Branch exit: Line 680: VBlank1: LDA PPU_STATUS         ; wait two frames
+        Line 682: VBlank2: LDA PPU_STATUS
+          Branch exit: Line 682: VBlank2: LDA PPU_STATUS
+          Line 684: LDY #ColdBootOffset             ; load default cold boot pointer
+            Line 686: WBootCheck: LDA TopScoreDisplay,X; check each score digit in the top score
+              Branch exit: Line 695: ColdBoot: JSR InitializeMemory  ; clear memory using pointer in Y
+              Line 689: DEX 
+                Branch exit: Line 686: WBootCheck: LDA TopScoreDisplay,X; check each score digit in the top score
+                Line 691: LDA WarmBootValidation          ; second checkpoint, check to see if
+                  Branch exit: Line 695: ColdBoot: JSR InitializeMemory  ; clear memory using pointer in Y
+                  Line 694: LDY #WarmBootOffset             ; if passed both, load warm boot pointer
+              Line 695: ColdBoot: JSR InitializeMemory  ; clear memory using pointer in Y
+                Line 711: EndlessLoop: JMP EndlessLoop    ; endless loop, need I say more?
+                  Branch exit: Line 711: EndlessLoop: JMP EndlessLoop    ; endless loop, need I say more?
+
+Function FirebarSpin
+  Inputs: [A]
+  Outputs: [A]
+    Line 10638: FirebarSpin: 
+      Branch exit: Line 10651: SpinCounterClockwise: 
+      Line 10642: LDY #$18                        ; possibly residual ldy
+
+Function DrawEnemyObjRow
+  Inputs: []
+  Outputs: []
+    Line 14062: DrawEnemyObjRow: 
+      Line 14067: DrawOneSpriteRow:  (as a call, not in function)
+
+Function AutoControlPlayer
+  Inputs: [A]
+  Outputs: [A]
+  Line 5554: AutoControlPlayer: 
+
+Function StopSquare1Sfx
+  Inputs: []
+  Outputs: []
+      Line 15314: StopSquare1Sfx: 
+
+Function FindEmptyEnemySlot
+  Inputs: []
+  Outputs: []
+    Line 3895: FindEmptyEnemySlot: 
+      Line 3897: EmptyChkLoop: CLC               ; clear carry flag by default
+        Branch exit: Line 3903: ExitEmptyChk: RTS               ; if all values nonzero, carry flag is set
+        Line 3900: INX 
+          Branch exit: Line 3897: EmptyChkLoop: CLC               ; clear carry flag by default
+        Line 3903: ExitEmptyChk: RTS               ; if all values nonzero, carry flag is set
+
+Function WritePPUReg1
+  Inputs: [A]
+  Outputs: [A]
+    Line 2507: WritePPUReg1: 
+
+Function ChkToStunEnemies
+  Inputs: [A]
+  Outputs: [A]
+        Line 12454: ChkToStunEnemies: 
+          Branch exit: Line 12465: SetStun: LDA Enemy_State,X      ; load enemy state
+          Line 12457: CMP #$11                        ; if the enemy object identifier is equal to the values
+            Branch exit: Line 12465: SetStun: LDA Enemy_State,X      ; load enemy state
+            Line 12459: CMP #$0a                        ; modified if not any of those values, note that piranha plant will
+              Branch exit: Line 12463: Demote: AND #%00000001          ; erase all but LSB, essentially turning enemy object
+              Line 12461: CMP #PiranhaPlant               ; coordinate from previous addition, also these comparisons
+                Branch exit: Line 12465: SetStun: LDA Enemy_State,X      ; load enemy state
+              Line 12463: Demote: AND #%00000001          ; erase all but LSB, essentially turning enemy object
+          Line 12465: SetStun: LDA Enemy_State,X      ; load enemy state (as a call, not in function)
+
+Function LargePlatformBoundBox
+  Inputs: [X, A]
+  Outputs: [X, A]
+    Line 12824: LargePlatformBoundBox: 
+      Branch exit: Line 12840: MoveBoundBoxOffscreen: 
+      Line 12830: 
+
+Function MoveSpritesOffscreen
+  Inputs: []
+  Outputs: []
+        Line 943: MoveSpritesOffscreen: 
+          Line 946: SprInitLoop: STA Sprite_Y_Position,Y; write 248 into OAM data's Y coordinate
+            Branch exit: Line 946: SprInitLoop: STA Sprite_Y_Position,Y; write 248 into OAM data's Y coordinate
+            Line 952: RTS 
+
+Function GetAreaObjYPosition
+  Inputs: [$07]
+  Outputs: [$07]
+    Line 4310: GetAreaObjYPosition: 
+
+Function SetEntr
+  Inputs: []
+  Outputs: []
+        Line 5676: SetEntr: LDA #$02               ; set starting position to override
+          Branch exit: Line 5710: ChgAreaMode: INC DisableScreenFlag; set flag to disable screen output
+
+Function OperModeExecutionTree
+  Inputs: []
+  Outputs: []
+    Line 928: OperModeExecutionTree: 
+      Line 939: MoveAllSpritesOffscreen:  (as a call, not in function)
+
+Function MoveEnemyHorizontally
+  Inputs: [X]
+  Outputs: [X]
+  Line 7529: MoveEnemyHorizontally: 
+
+Function XMoveCntr_Platform
+  Inputs: [A]
+  Outputs: [A]
+      Line 9422: XMoveCntr_Platform: 
+        Branch exit: Line 9434: NoIncXM: RTS 
+        Line 9427: LDY XMoveSecondaryCounter,X     ; get secondary counter
+          Branch exit: Line 9437: DecSeXM: TYA                    ; put secondary counter in A
+          Line 9431: CPY $01                         ; compare secondary counter to preset maximum value
+            Branch exit: Line 9435: IncPXM: INC XMovePrimaryCounter,X; increment primary counter and leave
+            Line 9433: INC XMoveSecondaryCounter,X     ; increment secondary counter and leave
+          Line 9435: IncPXM: INC XMovePrimaryCounter,X; increment primary counter and leave
+          Line 9437: DecSeXM: TYA                    ; put secondary counter in A
+            Branch exit: Line 9435: IncPXM: INC XMovePrimaryCounter,X; increment primary counter and leave
+            Line 9439: DEC XMoveSecondaryCounter,X     ; otherwise decrement secondary counter and leave
+        Line 9434: NoIncXM: RTS 
+
+Function DrawMushroomIcon
+  Inputs: []
+  Outputs: []
+      Line 1067: DrawMushroomIcon: 
+        Line 1069: IconDataRead: LDA MushroomIconData,Y; note that the default position is set for a
+          Branch exit: Line 1069: IconDataRead: LDA MushroomIconData,Y; note that the default position is set for a
+          Line 1073: LDA NumberOfPlayers             ; check number of players
+            Branch exit: Line 1079: ExitIcon: RTS 
+            Line 1075: LDA #$24                        ; otherwise, load blank tile in 1-player position
+            Line 1079: ExitIcon: RTS 
+
+Function InitPiranhaPlant
+  Inputs: []
+  Outputs: []
+    Line 8813: InitPiranhaPlant: 
+      Branch exit: Line 8873: SetBBox2: STA Enemy_BoundBoxCtrl,X; set bounding box control then leave
+
+Function PlayerEnemyDiff
+  Inputs: []
+  Outputs: []
+    Line 12634: PlayerEnemyDiff: 
+
+Function MoveD_EnemyVertically
+  Inputs: []
+  Outputs: []
+  Line 7598: MoveD_EnemyVertically: 
+    Branch exit: Line 7606: ContVMove: JMP SetHiMax         ; jump to skip the rest of this
+    Line 7603: 
+      Line 7604: MoveFallingPlatform:  (as a call, not in function)
+    Line 7606: ContVMove: JMP SetHiMax         ; jump to skip the rest of this
+      Branch exit: Line 7643: SetHiMax: LDA #$03              ; set maximum speed in A
+
+Function FireballObjCore
+  Inputs: [X]
+  Outputs: [X]
+      Line 6326: FireballObjCore: 
+        Branch exit: Line 6379: FireballExplosion: 
+        Line 6331: LDY Fireball_State,X            ; if fireball inactive, branch to leave
+          Branch exit: Line 6377: NoFBall: RTS                    ; leave
+          Line 6333: DEY                             ; if fireball state set to 1, skip this part and just run it
+            Branch exit: Line 6354: RunFB: TXA                      ; add 7 to offset to use
+            Line 6335: LDA Player_X_Position           ; get player's horizontal position
+            Line 6354: RunFB: TXA                      ; add 7 to offset to use
+              Branch exit: Line 6375: EraseFB: LDA #$00               ; erase fireball state
+              Line 6373: JSR FireballEnemyCollision      ; do fireball to enemy collision detection and deal with collisions
+                Branch exit: Line 14228: DrawFireball: 
+              Line 6375: EraseFB: LDA #$00               ; erase fireball state
+          Line 6377: NoFBall: RTS                    ; leave
+
+Function ProcFireball_Bubble
+  Inputs: []
+  Outputs: []
+    Line 6272: ProcFireball_Bubble: 
+      Branch exit: Line 6310: ProcAirBubbles: 
+      Line 6276: LDA A_B_Buttons
+        Branch exit: Line 6304: ProcFireballs: 
+        Line 6279: AND PreviousA_B_Buttons
+          Branch exit: Line 6304: ProcFireballs: 
+          Line 6281: LDA FireballCounter             ; load fireball counter
+            Branch exit: Line 6304: ProcFireballs: 
+            Line 6286: LDY Player_Y_HighPos            ; if player too high or too low, branch
+              Branch exit: Line 6304: ProcFireballs: 
+              Line 6289: LDA CrouchingFlag               ; if player crouching, branch
+                Branch exit: Line 6304: ProcFireballs: 
+                Line 6291: LDA Player_State                ; if player's state = climbing, branch
+                  Branch exit: Line 6304: ProcFireballs: 
+                  Line 6294: LDA #Sfx_Fireball               ; play fireball sound effect
+        Line 6304: ProcFireballs: 
+      Line 6310: ProcAirBubbles: 
+        Branch exit: Line 6321: BublExit: RTS                   ; then leave
+        Line 6313: LDX #$02                        ; otherwise load counter and use as offset
+          Line 6314: BublLoop: STX ObjectOffset      ; store offset
+            Branch exit: Line 6314: BublLoop: STX ObjectOffset      ; store offset
+        Line 6321: BublExit: RTS                   ; then leave
+
+Function InitializeNameTables
+  Inputs: []
+  Outputs: []
+    Line 2386: InitializeNameTables: 
+      Line 2395: WriteNTAddr: STA PPU_ADDRESS (as a call, not in function)
+
+Function ProcHammerObj
+  Inputs: []
+  Outputs: []
+    Line 6902: ProcHammerObj: 
+      Branch exit: Line 6952: RunHSubs: JSR GetMiscOffscreenBits; get offscreen information
+      Line 6905: LDA Misc_State,X                ; otherwise get hammer's state
+        Branch exit: Line 6926: SetHSpd: LDA #$fe
+        Line 6910: BCS SetHPos                     ; if greater than 2, branch elsewhere
+          Branch exit: Line 6936: SetHPos: DEC Misc_State,X       ; decrement hammer's state
+          Line 6911: TXA 
+            Branch exit: Line 6951: RunAllH: JSR PlayerHammerCollision; handle collisions
+        Line 6926: SetHSpd: LDA #$fe
+        Line 6936: SetHPos: DEC Misc_State,X       ; decrement hammer's state
+          Branch exit: Line 6952: RunHSubs: JSR GetMiscOffscreenBits; get offscreen information
+        Line 6951: RunAllH: JSR PlayerHammerCollision; handle collisions
+      Line 6952: RunHSubs: JSR GetMiscOffscreenBits; get offscreen information
+
+Function PositionPlayerOnS_Plat
+  Inputs: [A]
+  Outputs: [A]
+      Line 11838: PositionPlayerOnS_Plat: 
+        Line 11845: PositionPlayerOnVPlat:  (as a call, not in function)
+
+Function MoveColOffscreen
+  Inputs: []
+  Outputs: []
+                      Line 14152: MoveColOffscreen: 
+
+Function BlockBufferCollision
+  Inputs: [A, Y]
+  Outputs: [A, Y]
+                Line 13052: BlockBufferCollision: 
+                  Branch exit: Line 13085: RetXC: LDA SprObject_X_Position,X; otherwise load horizontal coordinate
+                  Line 13083: LDA SprObject_Y_Position,X      ; if A = 0, load vertical coordinate
+                    Branch exit: Line 13086: RetYC: AND #%00001111           ; and mask out high nybble
+                  Line 13085: RetXC: LDA SprObject_X_Position,X; otherwise load horizontal coordinate
+                  Line 13086: RetYC: AND #%00001111           ; and mask out high nybble
+
+Function EnterSidePipe
+  Inputs: []
+  Outputs: []
+    Line 5716: EnterSidePipe: 
+      Branch exit: Line 5725: RightPipe: TYA                  ; use contents of Y to
+      Line 5723: STA Player_X_Speed              ; if lower nybble = 0, set as horizontal speed
+      Line 5725: RightPipe: TYA                  ; use contents of Y to
+
+Function UpdateNumber
+  Inputs: []
+  Outputs: []
+  Line 7112: UpdateNumber: 
+    Branch exit: Line 7119: NoZSup: LDX ObjectOffset        ; get enemy object buffer offset
+    Line 7117: LDA #$24
+    Line 7119: NoZSup: LDX ObjectOffset        ; get enemy object buffer offset
+
+Function RelativeBlockPosition
+  Inputs: [X]
+  Outputs: [X]
+    Line 14790: RelativeBlockPosition: 
+
+Function GetBlockOffscreenBits
+  Inputs: [X]
+  Outputs: [X]
+    Line 14858: GetBlockOffscreenBits: 
+
+Function DrawBlock
+  Inputs: []
+  Outputs: []
+      Line 14096: DrawBlock: 
+        Line 14107: DBlkLoop: LDA DefaultBlockObjTiles,X; get left tile number
+          Branch exit: Line 14107: DBlkLoop: LDA DefaultBlockObjTiles,X; get left tile number
+          Line 14113: LDX ObjectOffset                ; get block object offset
+            Branch exit: Line 14121: ChkRep: LDA Block_Metatile,X    ; check replacement metatile
+            Line 14118: LDA #$86
+            Line 14121: ChkRep: LDA Block_Metatile,X    ; check replacement metatile
+              Branch exit: Line 14141: BlkOffscr: LDA Block_OffscreenBits; get offscreen bits for block object
+              Line 14124: LDA #$87                        ; set A for used block tile
+                Branch exit: Line 14133: SetBFlip: LDX ObjectOffset      ; put block object offset back in X
+                Line 14132: LSR                             ; otherwise set to $01
+                Line 14133: SetBFlip: LDX ObjectOffset      ; put block object offset back in X
+              Line 14141: BlkOffscr: LDA Block_OffscreenBits; get offscreen bits for block object
+                Branch exit: Line 14148: PullOfsB: PLA                   ; pull offscreen bits from stack
+                Line 14145: LDA #$f8                        ; move offscreen two OAMs
+                Line 14148: PullOfsB: PLA                   ; pull offscreen bits from stack
+                  Line 14149: ChkLeftCo: AND #%00001000       ; check to see if d3 in offscreen bits are set (as a call, not in function)
+
+Function GetAreaMusic
+  Inputs: []
+  Outputs: []
+      Line 2792: GetAreaMusic: 
+        Branch exit: Line 2810: ExitGetM: RTS 
+        Line 2795: LDA AltEntranceControl          ; check for specific alternate mode of entry
+          Branch exit: Line 2804: ChkAreaType: LDY AreaType       ; load area type as offset for music bit
+          Line 2798: LDY #$05                        ; select music for pipe intro scene by default
+            Branch exit: Line 2808: StoreMusic: LDA MusicSelectData,Y; otherwise select appropriate music for level type
+            Line 2802: CMP #$07                        ; start position either value $06 or $07
+              Branch exit: Line 2808: StoreMusic: LDA MusicSelectData,Y; otherwise select appropriate music for level type
+          Line 2804: ChkAreaType: LDY AreaType       ; load area type as offset for music bit
+            Branch exit: Line 2808: StoreMusic: LDA MusicSelectData,Y; otherwise select appropriate music for level type
+            Line 2807: LDY #$04                        ; select music for cloud type level if found
+          Line 2808: StoreMusic: LDA MusicSelectData,Y; otherwise select appropriate music for level type
+        Line 2810: ExitGetM: RTS 
+
+Function MovePlayerYAxis
+  Inputs: [A]
+  Outputs: [A]
+    Line 5696: MovePlayerYAxis: 
+
+Function Square2SfxHandler
+  Inputs: []
+  Outputs: []
+    Line 15429: Square2SfxHandler: 
+      Branch exit: Line 15498: ContinueExtraLife: 
+      Line 15433: LDY Square2SoundQueue           ; check for sfx in queue
+        Branch exit: Line 15452: CheckSfx2Buffer: 
+        Line 15435: STY Square2SoundBuffer          ; if found, put in buffer and check for the following
+          Branch exit: Line 15478: PlayBowserFall: 
+          Line 15437: LSR Square2SoundQueue
+            Branch exit: Line 15360: PlayCoinGrab: 
+            Line 15439: LSR Square2SoundQueue
+              Branch exit: Line 15511: PlayGrowPowerUp: 
+              Line 15441: LSR Square2SoundQueue
+                Branch exit: Line 15515: PlayGrowVine: 
+                Line 15443: LSR Square2SoundQueue
+                  Branch exit: Line 15383: PlayBlast: 
+                  Line 15445: LSR Square2SoundQueue
+                    Branch exit: Line 15365: PlayTimerTick: 
+                    Line 15447: LSR Square2SoundQueue
+                      Branch exit: Line 15398: PlayPowerUpGrab: 
+                      Line 15449: LSR Square2SoundQueue
+                        Branch exit: Line 15494: PlayExtraLife: 
+                        Line 15451: 
+        Line 15452: CheckSfx2Buffer: 
+          Branch exit: Line 15470: ExS2H: RTS 
+          Line 15455: BMI ContinueBowserFall          ; bowser fall
+            Branch exit: Line 15485: ContinueBowserFall: 
+            Line 15456: LSR 
+              Branch exit: Line 15472: Cont_CGrab_TTick: 
+              Line 15458: LSR 
+                Branch exit: Line 15525: ContinueGrowItems: 
+                Line 15460: LSR 
+                  Branch exit: Line 15525: ContinueGrowItems: 
+                  Line 15462: LSR 
+                    Branch exit: Line 15390: ContinueBlast: 
+                    Line 15464: LSR 
+                      Branch exit: Line 15472: Cont_CGrab_TTick: 
+                      Line 15466: LSR 
+                        Branch exit: Line 15402: ContinuePowerUpGrab: 
+                        Line 15468: LSR 
+                          Branch exit: Line 15498: ContinueExtraLife: 
+          Line 15470: ExS2H: RTS 
+
+Function GetPlayerColors
+  Inputs: []
+  Outputs: []
+              Line 1441: GetPlayerColors: 
+                Branch exit: Line 1447: ChkFiery: LDA PlayerStatus      ; check player status
+                Line 1446: LDY #$04                        ; load offset for luigi
+                Line 1447: ChkFiery: LDA PlayerStatus      ; check player status
+                  Branch exit: Line 1451: StartClrGet: LDA #$03           ; do four colors
+                  Line 1450: LDY #$08
+                  Line 1451: StartClrGet: LDA #$03           ; do four colors
+                    Line 1453: ClrGetLoop: LDA PlayerColors,Y  ; fetch player colors and store them
+                      Branch exit: Line 1453: ClrGetLoop: LDA PlayerColors,Y  ; fetch player colors and store them
+                      Line 1459: LDX VRAM_Buffer1_Offset         ; load original offset from before
+                        Branch exit: Line 1463: SetBGColor: LDA BackgroundColors,Y; to background color instead
+                        Line 1462: LDY AreaType                    ; otherwise use area type bits from area offset as offset
+                        Line 1463: SetBGColor: LDA BackgroundColors,Y; to background color instead
+
+Function ProcessAreaData
+  Inputs: []
+  Outputs: []
+      Line 3300: ProcessAreaData: 
+        Line 3302: ProcADLoop: STX ObjectOffset
+          Branch exit: Line 3344: RdyDecode: JSR DecodeAreaData   ; do sub and do not turn on flag
+          Line 3309: LDA AreaObjectLength,X          ; check area object buffer flag
+            Branch exit: Line 3344: RdyDecode: JSR DecodeAreaData   ; do sub and do not turn on flag
+            Line 3311: INY 
+              Branch exit: Line 3319: Chk1Row13: DEY 
+              Line 3315: LDA AreaObjectPageSel           ; check page select
+                Branch exit: Line 3319: Chk1Row13: DEY 
+                Line 3317: INC AreaObjectPageSel           ; if not already set, set it now
+              Line 3319: Chk1Row13: DEY 
+                Branch exit: Line 3337: Chk1Row14: CMP #$0e             ; row 14?
+                Line 3324: INY                             ; if so, reread second byte of level object
+                  Branch exit: Line 3341: CheckRear: LDA AreaObjectPageLoc; check to see if current page of level object is
+                  Line 3329: LDA AreaObjectPageSel           ; if page select is set, do not reread
+                    Branch exit: Line 3341: CheckRear: LDA AreaObjectPageLoc; check to see if current page of level object is
+                    Line 3331: INY                             ; if d6 not set, reread second byte
+                      Branch exit: Line 3347: NextAObj: JSR IncAreaObjOffset  ; increment buffer offset and move on
+                Line 3337: Chk1Row14: CMP #$0e             ; row 14?
+                  Branch exit: Line 3341: CheckRear: LDA AreaObjectPageLoc; check to see if current page of level object is
+                  Line 3339: LDA BackloadingFlag             ; check flag for saved page number and branch if set
+                    Branch exit: Line 3344: RdyDecode: JSR DecodeAreaData   ; do sub and do not turn on flag
+                Line 3341: CheckRear: LDA AreaObjectPageLoc; check to see if current page of level object is
+                  Branch exit: Line 3346: SetBehind: INC BehindAreaParserFlag; turn on flag if object is behind renderer
+                  Line 3346: SetBehind: INC BehindAreaParserFlag; turn on flag if object is behind renderer
+                Line 3347: NextAObj: JSR IncAreaObjOffset  ; increment buffer offset and move on
+          Line 3344: RdyDecode: JSR DecodeAreaData   ; do sub and do not turn on flag
+            Branch exit: Line 3348: ChkLength: LDX ObjectOffset     ; get buffer offset
+          Line 3348: ChkLength: LDX ObjectOffset     ; get buffer offset
+            Branch exit: Line 3352: ProcLoopb: DEX                  ; decrement buffer offset
+            Line 3351: DEC AreaObjectLength,X          ; otherwise decrement length or get rid of it
+            Line 3352: ProcLoopb: DEX                  ; decrement buffer offset
+              Branch exit: Line 3302: ProcADLoop: STX ObjectOffset
+              Line 3354: LDA BehindAreaParserFlag        ; check for flag set if objects were behind renderer
+                Branch exit: Line 3300: ProcessAreaData: 
+                Line 3356: LDA BackloadingFlag             ; check for flag set if starting right of page $00
+                  Branch exit: Line 3300: ProcessAreaData: 
+
+Function ChkForNonSolids
+  Inputs: [A]
+  Outputs: [A]
+    Line 12711: ChkForNonSolids: 
+      Branch exit: Line 12721: NSFnd: RTS 
+      Line 12714: CMP #$c2                        ; regular coin?
+        Branch exit: Line 12721: NSFnd: RTS 
+        Line 12716: CMP #$c3                        ; underwater coin?
+          Branch exit: Line 12721: NSFnd: RTS 
+          Line 12718: CMP #$5f                        ; hidden coin block?
+            Branch exit: Line 12721: NSFnd: RTS 
+            Line 12720: CMP #$60                        ; hidden 1-up block?
+      Line 12721: NSFnd: RTS 
+
+Function DumpSixSpr
+  Inputs: [A]
+  Outputs: [A]
+              Line 13312: DumpSixSpr: 
+                Line 13316: DumpFourSpr:  (as a call, not in function)
+
+Function PlaySqu2Sfx
+  Inputs: []
+  Outputs: []
+    Line 15155: PlaySqu2Sfx: 
+      Line 15158: SetFreq_Squ2:  (as a call, not in function)
+
+Function NoiseSfxHandler
+  Inputs: []
+  Outputs: []
+    Line 15574: NoiseSfxHandler: 
+      Branch exit: Line 15583: CheckNoiseBuffer: 
+      Line 15577: STY NoiseSoundBuffer            ; if found, put in buffer
+        Branch exit: Line 15547: PlayBrickShatter: 
+        Line 15580: LSR NoiseSoundQueue
+          Branch exit: Line 15592: PlayBowserFlame: 
+          Line 15582: 
+      Line 15583: CheckNoiseBuffer: 
+        Branch exit: Line 15590: ExNH: RTS 
+        Line 15586: LSR 
+          Branch exit: Line 15551: ContinueBrickShatter: 
+          Line 15588: LSR 
+            Branch exit: Line 15596: ContinueBowserFlame: 
+        Line 15590: ExNH: RTS 
+
+Function GetFireballOffscreenBits
+  Inputs: [$00]
+  Outputs: [$00]
+    Line 14825: GetFireballOffscreenBits: 
+      Branch exit: Line 14868: GetOffScreenBitsSet: 
+
+Function RelativeBubblePosition
+  Inputs: []
+  Outputs: []
+    Line 14765: RelativeBubblePosition: 
+      Branch exit: Line 14775: RelWOfs: JSR GetObjRelativePosition; get the coordinates
+
+Function DrawVine
+  Inputs: [Y]
+  Outputs: [Y]
+      Line 13103: DrawVine: 
+        Line 13130: VineTL: LDA #$e1                ; set tile number for sprite
+          Branch exit: Line 13130: VineTL: LDA #$e1                ; set tile number for sprite
+          Line 13138: LDY $02                         ; get original offset
+            Branch exit: Line 13143: SkpVTop: LDX #$00               ; start with the first sprite again
+            Line 13141: LDA #$e0
+            Line 13143: SkpVTop: LDX #$00               ; start with the first sprite again
+              Line 13144: ChkFTop: LDA VineStart_Y_Position; get original starting vertical coordinate
+                Branch exit: Line 13151: NextVSp: INY                    ; move offset to next OAM data
+                Line 13149: LDA #$f8
+                Line 13151: NextVSp: INY                    ; move offset to next OAM data
+                  Branch exit: Line 13144: ChkFTop: LDA VineStart_Y_Position; get original starting vertical coordinate
+                  Line 13158: LDY $00                         ; return offset set earlier
+
+Function InitVStf
+  Inputs: []
+  Outputs: []
+    Line 8226: InitVStf: LDA #$00              ; initialize vertical speed
+
+Function SetupBubble
+  Inputs: [$07]
+  Outputs: [$07]
+          Line 6393: SetupBubble: 
+            Branch exit: Line 6399: PosBubl: TYA                    ; use value loaded as adder
+            Line 6398: LDY #$08                        ; otherwise load alternate value here
+            Line 6399: PosBubl: TYA                    ; use value loaded as adder
+
+Function DrawPlayerLoop
+  Inputs: [$07]
+  Outputs: [$07]
+      Line 14575: DrawPlayerLoop: 
+        Branch exit: Line 14575: DrawPlayerLoop: 
+        Line 14582: RTS 
+
+Function GetObjRelativePosition
+  Inputs: []
+  Outputs: []
+    Line 14808: GetObjRelativePosition: 
+
+Function SetFreq_Tri
+  Inputs: [A]
+  Outputs: [A]
+          Line 15162: SetFreq_Tri: 
+            Branch exit: Line 15140: Dump_Freq_Regs: 
+            Line 15165: 
+              Line 15168: SwimStompEnvelopeData: 
+                Line 15172: PlayFlagpoleSlide: 
+                  Branch exit: Line 15204: FPS2nd: LDY #$bc                ; the flagpole slide sound shares part of third part
+                  Line 15179: 
+                  Line 15180: PlaySmallJump: 
+                    Branch exit: Line 15187: JumpRegContents: 
+                    Line 15183: 
+                  Line 15184: PlayBigJump: 
+                  Line 15187: JumpRegContents: 
+                  Line 15194: ContinueSndJump: 
+                    Branch exit: Line 15201: N2Prt: CMP #$20                 ; check for third part
+                    Line 15198: LDX #$5f                        ; load second part
+                      Branch exit: Line 15205: DmpJpFPS: JSR Dump_Squ1_Regs
+                    Line 15201: N2Prt: CMP #$20                 ; check for third part
+                      Branch exit: Line 15227: DecJpFPS: BNE BranchToDecLength1; unconditional branch
+                      Line 15203: LDX #$48                        ; load third part
+                  Line 15204: FPS2nd: LDY #$bc                ; the flagpole slide sound shares part of third part
+                  Line 15205: DmpJpFPS: JSR Dump_Squ1_Regs
+                    Branch exit: Line 15227: DecJpFPS: BNE BranchToDecLength1; unconditional branch
+                    Line 15207: 
+                  Line 15208: PlayFireballThrow: 
+                    Branch exit: Line 15216: Fthrow: LDX #$9e                ; the fireball sound shares reg contents with the bump sound
+                    Line 15212: 
+                  Line 15213: PlayBump: 
+                  Line 15216: Fthrow: LDX #$9e                ; the fireball sound shares reg contents with the bump sound
+                  Line 15221: ContinueBumpThrow: 
+                    Branch exit: Line 15227: DecJpFPS: BNE BranchToDecLength1; unconditional branch
+                    Line 15225: LDA #$bb                        ; load second part directly
+                  Line 15227: DecJpFPS: BNE BranchToDecLength1; unconditional branch
+                    Branch exit: Line 15287: BranchToDecLength1: 
+                    Line 15228: 
+                      Line 15230: Square1SfxHandler:  (as a call, not in function)
+
+Function ProcLPlatCollisions
+  Inputs: []
+  Outputs: []
+    Line 11781: ProcLPlatCollisions: 
+      Branch exit: Line 11792: ChkForTopCollision: 
+      Line 11787: LDA Player_Y_Speed              ; check to see if player's vertical speed is moving down
+        Branch exit: Line 11792: ChkForTopCollision: 
+        Line 11789: LDA #$01                        ; otherwise, set vertical
+      Line 11792: ChkForTopCollision: 
+        Branch exit: Line 11815: PlatformSideCollisions: 
+        Line 11798: LDA Player_Y_Speed
+          Branch exit: Line 11815: PlatformSideCollisions: 
+          Line 11800: LDA $00                         ; get saved bounding box counter from earlier
+            Branch exit: Line 11808: SetCollisionFlag: 
+            Line 11804: CPY #$2c                        ; as contents of collision flag
+              Branch exit: Line 11808: SetCollisionFlag: 
+              Line 11806: TXA                             ; otherwise use enemy object buffer offset
+            Line 11808: SetCollisionFlag: 
+
+Function FireballEnemyCollision
+  Inputs: []
+  Outputs: []
+    Line 11059: FireballEnemyCollision: 
+      Branch exit: Line 11115: ExitFBallEnemy: 
+      Line 11062: ASL 
+        Branch exit: Line 11115: ExitFBallEnemy: 
+        Line 11064: LDA FrameCounter
+          Branch exit: Line 11115: ExitFBallEnemy: 
+          Line 11067: TXA 
+            Line 11075: FireballEnemyCDLoop: 
+              Branch exit: Line 11109: NoFToECol: PLA                  ; pull fireball offset from stack
+              Line 11082: LDA Enemy_Flag,X                ; check to see if buffer flag is set
+                Branch exit: Line 11109: NoFToECol: PLA                  ; pull fireball offset from stack
+                Line 11084: LDA Enemy_ID,X                  ; check enemy identifier
+                  Branch exit: Line 11089: GoombaDie: CMP #Goomba          ; check for goomba identifier
+                  Line 11087: CMP #$2b
+                    Branch exit: Line 11109: NoFToECol: PLA                  ; pull fireball offset from stack
+                  Line 11089: GoombaDie: CMP #Goomba          ; check for goomba identifier
+                    Branch exit: Line 11094: NotGoomba: LDA EnemyOffscrBitsMasked,X; if any masked offscreen bits set,
+                    Line 11091: LDA Enemy_State,X               ; otherwise check for defeated state
+                      Branch exit: Line 11109: NoFToECol: PLA                  ; pull fireball offset from stack
+                    Line 11094: NotGoomba: LDA EnemyOffscrBitsMasked,X; if any masked offscreen bits set,
+                      Branch exit: Line 11109: NoFToECol: PLA                  ; pull fireball offset from stack
+                      Line 11096: TXA 
+                        Branch exit: Line 11109: NoFToECol: PLA                  ; pull fireball offset from stack
+                        Line 11105: LDA #%10000000
+              Line 11109: NoFToECol: PLA                  ; pull fireball offset from stack
+                Branch exit: Line 11075: FireballEnemyCDLoop: 
+                Line 11114: 
+      Line 11115: ExitFBallEnemy: 
+
+Function ImpedePlayerMove
+  Inputs: [$00]
+  Outputs: [$00]
+  Line 12317: ImpedePlayerMove: 
+    Branch exit: Line 12328: RImpd: LDX #$02                 ; return $02 to X
+    Line 12323: INX                             ; return value to X
+      Branch exit: Line 12346: ExIPM: TXA                      ; invert contents of X
+      Line 12326: LDA #$ff                        ; otherwise load A with value to be used later
+        Branch exit: Line 12332: NXSpd: LDY #$10
+    Line 12328: RImpd: LDX #$02                 ; return $02 to X
+      Branch exit: Line 12346: ExIPM: TXA                      ; invert contents of X
+      Line 12331: LDA #$01                        ; otherwise load A with value to be used here
+    Line 12332: NXSpd: LDY #$10
+      Branch exit: Line 12339: PlatF: STY $00                  ; store Y as high bits of horizontal adder
+      Line 12338: DEY                             ; otherwise decrement Y now
+      Line 12339: PlatF: STY $00                  ; store Y as high bits of horizontal adder
+    Line 12346: ExIPM: TXA                      ; invert contents of X
+
+Function GoContinue
+  Inputs: [A]
+  Outputs: [A]
+  Line 1055: GoContinue: STA WorldNumber     ; start both players at the first area
+
+Function DecodeAreaData
+  Inputs: []
+  Outputs: []
+    Line 3367: DecodeAreaData: 
+      Branch exit: Line 3371: Chk1stB: LDX #$10               ; load offset of 16 for special row 15
+      Line 3370: LDY AreaObjOffsetBuffer,X       ; if not, get offset from buffer
+      Line 3371: Chk1stB: LDX #$10               ; load offset of 16 for special row 15
+        Branch exit: Line 3358: EndAParse: RTS 
+        Line 3375: AND #$0f                        ; otherwise, mask out low nybble
+          Branch exit: Line 3382: ChkRow14: STX $07               ; store whatever value we just loaded here
+          Line 3378: LDX #$08                        ; otherwise load offset of 8 for special row 12
+            Branch exit: Line 3382: ChkRow14: STX $07               ; store whatever value we just loaded here
+            Line 3381: LDX #$00                        ; otherwise nullify value by default
+          Line 3382: ChkRow14: STX $07               ; store whatever value we just loaded here
+            Branch exit: Line 3390: ChkRow13: CMP #$0d              ; row 13?
+            Line 3386: LDA #$00                        ; if so, load offset with $00
+              Branch exit: Line 3433: NormObj: STA $00                ; store value here (branch for small objects and rows 13 and 14)
+            Line 3390: ChkRow13: CMP #$0d              ; row 13?
+              Branch exit: Line 3405: ChkSRows: CMP #$0c              ; row 12-15?
+              Line 3392: LDA #$22                        ; if so, load offset with 34
+                Branch exit: Line 3446: LeavePar: RTS 
+                Line 3398: LDA (AreaData),Y                ; otherwise, get byte again
+                  Branch exit: Line 3403: Mask2MSB: AND #%00111111        ; mask out d7 and d6
+                  Line 3402: INC LoopCommand                 ; if loop command, set loop command flag
+                  Line 3403: Mask2MSB: AND #%00111111        ; mask out d7 and d6
+                    Branch exit: Line 3433: NormObj: STA $00                ; store value here (branch for small objects and rows 13 and 14)
+              Line 3405: ChkSRows: CMP #$0c              ; row 12-15?
+                Branch exit: Line 3426: SpecObj: INY                    ; branch here for rows 12-15
+                Line 3407: INY                             ; if not, get second byte of level object
+                  Branch exit: Line 3416: LrgObj: STA $00                 ; store value here (branch for large objects)
+                  Line 3411: LDA #$16
+                    Branch exit: Line 3433: NormObj: STA $00                ; store value here (branch for small objects and rows 13 and 14)
+                  Line 3416: LrgObj: STA $00                 ; store value here (branch for large objects)
+                    Branch exit: Line 3424: NotWPipe: LDA $00               ; get value and jump ahead
+                    Line 3419: LDA (AreaData),Y                ; if not, reload second byte
+                      Branch exit: Line 3424: NotWPipe: LDA $00               ; get value and jump ahead
+                      Line 3422: LDA #$00                        ; otherwise, nullify value for warp pipe
+                    Line 3424: NotWPipe: LDA $00               ; get value and jump ahead
+                      Branch exit: Line 3429: MoveAOId: LSR                   ; move d6-d4 to lower nybble
+                Line 3426: SpecObj: INY                    ; branch here for rows 12-15
+                Line 3429: MoveAOId: LSR                   ; move d6-d4 to lower nybble
+            Line 3433: NormObj: STA $00                ; store value here (branch for small objects and rows 13 and 14)
+              Branch exit: Line 3466: RunAObj: LDA $00                ; get stored value and add offset to it
+              Line 3436: LDA AreaObjectPageLoc           ; otherwise check to see if the object we've loaded is on the
+                Branch exit: Line 3447: InitRear: LDA BackloadingFlag   ; check backloading flag to see if it's been initialized
+                Line 3439: LDY AreaDataOffset              ; if not, get old offset of level pointer
+                  Branch exit: Line 3446: LeavePar: RTS 
+                  Line 3444: LDA BackloadingFlag             ; if so, check backloading flag
+                    Branch exit: Line 3463: StrAObj: LDA AreaDataOffset     ; if so, load area obj offset and store in buffer
+                Line 3447: InitRear: LDA BackloadingFlag   ; check backloading flag to see if it's been initialized
+                  Branch exit: Line 3454: BackColC: LDY AreaDataOffset    ; get first byte again
+                  Line 3449: LDA #$00                        ; if not, initialize both backloading and
+                    Line 3453: LoopCmdE: RTS 
+                  Line 3454: BackColC: LDY AreaDataOffset    ; get first byte again
+                    Branch exit: Line 3446: LeavePar: RTS 
+                Line 3463: StrAObj: LDA AreaDataOffset     ; if so, load area obj offset and store in buffer
+              Line 3466: RunAObj: LDA $00                ; get stored value and add offset to it
+                Line 3535: AlterAreaAttributes: 
+                  Branch exit: Line 3554: Alter2: PLA 
+                  Line 3542: PLA 
+                  Line 3554: Alter2: PLA 
+                    Branch exit: Line 3560: SetFore: STA ForegroundScenery  ; otherwise set new foreground scenery bits
+                    Line 3558: STA BackgroundColorCtrl
+                    Line 3560: SetFore: STA ForegroundScenery  ; otherwise set new foreground scenery bits
+            Line 3446: LeavePar: RTS 
+
+Function PlayerBGCollision
+  Inputs: [$04, $06]
+  Outputs: [$04, $06]
+      Line 11901: PlayerBGCollision: 
+        Branch exit: Line 11926: ExPBGCol: RTS                   ; otherwise leave
+        Line 11904: LDA GameEngineSubroutine
+          Branch exit: Line 11926: ExPBGCol: RTS                   ; otherwise leave
+          Line 11907: CMP #$04
+            Branch exit: Line 11926: ExPBGCol: RTS                   ; otherwise leave
+            Line 11909: LDA #$01                        ; load default player state for swimming
+              Branch exit: Line 11917: SetPSte: STA Player_State       ; set whatever player state is appropriate
+              Line 11912: LDA Player_State                ; if player in normal state,
+                Branch exit: Line 11916: SetFallS: LDA #$02              ; load default player state for falling
+                Line 11914: CMP #$03
+                  Branch exit: Line 11918: ChkOnScr: LDA Player_Y_HighPos
+                Line 11916: SetFallS: LDA #$02              ; load default player state for falling
+              Line 11917: SetPSte: STA Player_State       ; set whatever player state is appropriate
+              Line 11918: ChkOnScr: LDA Player_Y_HighPos
+                Branch exit: Line 11926: ExPBGCol: RTS                   ; otherwise leave
+                Line 11921: LDA #$ff
+                  Branch exit: Line 11928: ChkCollSize: 
+        Line 11926: ExPBGCol: RTS                   ; otherwise leave
+

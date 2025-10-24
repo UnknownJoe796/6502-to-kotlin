@@ -117,7 +117,7 @@ class ControlsAnalyzeTest {
 
     @Test
     @Timeout(10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-    fun `analyzeControls handles pre-test loop shape (currently as IF-THEN with back-jump in THEN)`() {
+    fun `analyzeControls handles pre-test loop shape (now properly detected as LoopNode)`() {
         val code = """
             func:
               BEQ exit
@@ -137,26 +137,17 @@ class ControlsAnalyzeTest {
         val exitBlock = byLabel["exit"] ?: error("exit block not found")
 
         val nodes = functions[0].analyzeControls()
-        // Current analyzer recognizes this as IF-THEN, where THEN is the loop body ending with JMP back to header.
-        assertTrue(nodes[0] is IfNode, "First node should be an IfNode for this shape")
-        val ifn = nodes[0] as IfNode
+        // Now properly recognized as a PreTest LoopNode
+        assertTrue(nodes[0] is LoopNode, "First node should be a LoopNode")
+        val loopNode = nodes[0] as LoopNode
 
-        assertFalse(ifn.condition.sense)
-        assertEquals(exitBlock, ifn.join)
-        assertTrue(ifn.elseBranch.isEmpty())
-        assertTrue(ifn.thenBranch.isNotEmpty())
+        assertEquals(LoopKind.PreTest, loopNode.kind, "Should be PreTest loop")
+        assertNotNull(loopNode.condition, "PreTest loop should have condition")
+        assertEquals(header, loopNode.header, "Loop header should be func block")
+        assertTrue(loopNode.body.isNotEmpty(), "Loop body should not be empty")
+        assertTrue(loopNode.breakTargets.contains(exitBlock), "Exit block should be break target")
 
-        // The last block of THEN should end with JMP back to the header label
-        val lastThen = ifn.thenBranch.last() as BlockNode
-        val lastInstr = lastThen.block.lines.lastOrNull { it.instruction != null }?.instruction
-        assertNotNull(lastInstr)
-        assertEquals(AssemblyOp.JMP, lastInstr!!.op)
-        // Target should be the header block
-        val target = lastInstr.address as? AssemblyAddressing.Direct
-        assertNotNull(target)
-        assertEquals("func", target!!.label)
-
-        // After the IF node, we should see the exit block as a block node
+        // After the loop node, we should see the exit block as a block node
         val after = nodes[1]
         assertTrue(after is BlockNode)
         assertEquals(exitBlock, (after as BlockNode).block)
@@ -182,7 +173,7 @@ class ControlsAnalyzeTest {
             // Entry node of a function-level analysis should start at the function's starting block or soon after
             // We cannot guarantee shapes, but we can assert coverage includes the starting block
             val covered = nodes!!.flatMap { it.coveredBlocks }.toSet()
-            assertTrue(covered.contains(f.startingBlock), "Control coverage should include the function's starting block for ${'$'}{f.startingBlock.label}")
+            assertTrue(covered.contains(f.startingBlock), "Control coverage should include the function's starting block for ${f.startingBlock.label}")
         }
     }
 }

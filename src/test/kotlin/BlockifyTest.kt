@@ -16,6 +16,7 @@ class BlockifyTest {
         val blocks = code.lines.blockify()
 
         Assertions.assertEquals(1, blocks.size)
+        println(blocks[0].lines.joinToString("\n"))
         Assertions.assertEquals(3, blocks[0].lines.size)
         Assertions.assertNull(blocks[0].label)
     }

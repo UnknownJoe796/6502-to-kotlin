@@ -6,7 +6,7 @@ class AssemblyBlock(
     val lines: List<AssemblyLine>
 ) {
     init { lines.forEach { it.block = this } }
-    override fun toString(): String = "$originalLineIndex) ${lines.first()}"
+    override fun toString(): String = "Line $originalLineIndex: ${lines.first()}"
     val originalLineIndex = lines.first().originalLineIndex
     val label: String? = lines.firstOrNull()?.label
 
@@ -135,23 +135,21 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
     var currentBlock = ArrayList<AssemblyLine>()
     var previousBlock: AssemblyBlock? = null
     for (line in this) {
-        when {
-            line.label != null -> {
-                if (currentBlock.isNotEmpty()) {
-                    blocks.add(AssemblyBlock(currentBlock).also {
-                        previousBlock?.let { pb ->
-                            it.enteredFrom.add(pb)
-                            pb.fallThroughExit = it
-                        }
-                        previousBlock = it
-                    })
-                    currentBlock = ArrayList()
-                }
-                currentBlock.add(line)
+        if (line.label != null) {
+            if (currentBlock.isNotEmpty()) {
+                blocks.add(AssemblyBlock(currentBlock).also {
+                    previousBlock?.let { pb ->
+                        it.enteredFrom.add(pb)
+                        pb.fallThroughExit = it
+                    }
+                    previousBlock = it
+                })
+                currentBlock = ArrayList()
             }
-
+        }
+        currentBlock.add(line)
+        when {
             line.instruction?.op?.isBranch == true -> {
-                currentBlock.add(line)
                 blocks.add(AssemblyBlock(currentBlock).also {
                     previousBlock?.let { pb ->
                         it.enteredFrom.add(pb)
@@ -163,7 +161,6 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
             }
 
             line.instruction?.op == AssemblyOp.JMP -> {
-                currentBlock.add(line)
                 blocks.add(AssemblyBlock(currentBlock).also {
                     previousBlock?.let { pb ->
                         it.enteredFrom.add(pb)
@@ -176,7 +173,6 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
             }
 
             line.instruction?.op == AssemblyOp.RTS || line.instruction?.op == AssemblyOp.RTI -> {
-                currentBlock.add(line)
                 blocks.add(AssemblyBlock(currentBlock).also {
                     previousBlock?.let { pb ->
                         it.enteredFrom.add(pb)
@@ -188,9 +184,6 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
                 currentBlock = ArrayList()
             }
 
-            line.instruction != null || line.data != null -> {
-                currentBlock.add(line)
-            }
             else -> {
                 // We don't assemble lines that aren't instructions or labels into blocks.
             }
