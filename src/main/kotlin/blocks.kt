@@ -423,6 +423,22 @@ fun List<AssemblyBlock>.functionify(
                     .forEach { state ->
                         if(state !in defined) inputs.add(state)
                     }
+
+                // Also check if addressing mode uses X or Y registers
+                when (instruction.address) {
+                    is AssemblyAddressing.DirectX,
+                    is AssemblyAddressing.IndirectX -> {
+                        if (TrackedAsIo.X !in defined) inputs.add(TrackedAsIo.X)
+                    }
+                    is AssemblyAddressing.DirectY,
+                    is AssemblyAddressing.IndirectY -> {
+                        if (TrackedAsIo.Y !in defined) inputs.add(TrackedAsIo.Y)
+                    }
+                    else -> {
+                        // Other addressing modes don't use X or Y
+                    }
+                }
+
                 op.modifies(instruction.address?.let {it::class })
                     .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
                     .forEach { state ->

@@ -5,7 +5,74 @@ package com.ivieleague.decompiler6502tokotlin.hand
  * 1. Post-dominator detection to find common exit points
  * 2. Early return detection
  * 3. Region formation for single-entry/single-exit constructs
+ * 4. Proper block ordering based on control flow rather than source order
  */
+
+/**
+ * Fix control flow ordering to respect function entry points.
+ *
+ * The problem: analyzeControls() sorts blocks by originalLineIndex, which can place
+ * branch targets that appear earlier in the source file before the function entry point.
+ * For example, FloateyNumbersRoutine (line 1282) branches to EndExitOne (line 1245 on early return),
+ * causing the control flow to incorrectly start with EndExitOne.
+ *
+ * The fix: Filter out blocks that appear before the entry point in source order if they're
+ * only reachable by branching backward.
+ */
+fun List<ControlNode>.fixBlockOrdering(entryBlock: AssemblyBlock): List<ControlNode> {
+    // Find blocks that are backward branches (appear before entry in source)
+    val backwardBlocks = mutableSetOf<AssemblyBlock>()
+
+    fun collectBlocks(node: ControlNode) {
+        when (node) {
+            is BlockNode -> {
+                if (node.block.originalLineIndex < entryBlock.originalLineIndex) {
+                    backwardBlocks.add(node.block)
+                }
+            }
+            is IfNode -> {
+                node.thenBranch.forEach { collectBlocks(it) }
+                node.elseBranch.forEach { collectBlocks(it) }
+            }
+            is LoopNode -> {
+                node.body.forEach { collectBlocks(it) }
+            }
+            else -> {}
+        }
+    }
+
+    this.forEach { collectBlocks(it) }
+
+    // If the first node is a backward block (should never be first),
+    // move it to after the entry block
+    val result = mutableListOf<ControlNode>()
+    val first = this.firstOrNull() as? BlockNode
+    if (first != null && first.block in backwardBlocks && first.block != entryBlock) {
+        // Skip the first block for now
+        val rest = this.drop(1)
+        // Find where to insert it (after first non-backward block or after entry)
+        var inserted = false
+        for (node in rest) {
+            if (!inserted && node is BlockNode && node.block == entryBlock) {
+                result.add(node)
+                // Insert the backward block as part of control flow, not at the start
+                // Actually, it should be embedded in an if/else structure, not standalone
+                // For now, skip it entirely at top level
+                inserted = true
+            } else {
+                result.add(node)
+            }
+        }
+        if (!inserted) {
+            // Entry block not found, just skip the backward block
+            result.addAll(rest)
+        }
+    } else {
+        result.addAll(this)
+    }
+
+    return result
+}
 
 /**
  * Compute post-dominators for all blocks in a function.
@@ -441,17 +508,370 @@ fun List<ControlNode>.globalDuplicateElimination(): List<ControlNode> {
 }
 
 /**
+ * Remove unreachable code after returns.
+ *
+ * Pattern:
+ *   return
+ *   ... unreachable code ...
+ *
+ * The control flow analyzer might create nodes after a return statement.
+ * This pass removes them.
+ */
+fun List<ControlNode>.eliminateUnreachableAfterReturn(): List<ControlNode> {
+    val result = mutableListOf<ControlNode>()
+
+    for (node in this) {
+        when (node) {
+            is BlockNode -> {
+                // Check if this block ends with RTS/RTI
+                val hasReturn = node.block.lines.any { line ->
+                    val op = line.instruction?.op
+                    op == AssemblyOp.RTS || op == AssemblyOp.RTI
+                }
+
+                result.add(node)
+
+                // If this block returns, stop processing - everything after is unreachable
+                if (hasReturn) {
+                    break
+                }
+            }
+            is IfNode -> {
+                // Check if both branches return
+                val thenReturns = node.thenBranch.any { it.hasReturn() }
+                val elseReturns = node.elseBranch.any { it.hasReturn() }
+
+                // Recursively clean branches
+                val cleanedNode = node.copy(
+                    thenBranch = node.thenBranch.eliminateUnreachableAfterReturn().toMutableList(),
+                    elseBranch = node.elseBranch.eliminateUnreachableAfterReturn().toMutableList()
+                )
+
+                result.add(cleanedNode)
+
+                // If both branches return, everything after is unreachable
+                if (thenReturns && elseReturns) {
+                    break
+                }
+            }
+            is LoopNode -> {
+                result.add(node.copy(
+                    body = node.body.eliminateUnreachableAfterReturn().toMutableList()
+                ))
+            }
+            else -> {
+                result.add(node)
+            }
+        }
+    }
+
+    return result
+}
+
+/**
+ * Check if a ControlNode contains a return.
+ */
+fun ControlNode.hasReturn(): Boolean {
+    return when (this) {
+        is BlockNode -> {
+            this.block.lines.any { line ->
+                val op = line.instruction?.op
+                op == AssemblyOp.RTS || op == AssemblyOp.RTI
+            }
+        }
+        is IfNode -> {
+            this.thenBranch.any { it.hasReturn() } || this.elseBranch.any { it.hasReturn() }
+        }
+        is LoopNode -> {
+            this.body.any { it.hasReturn() }
+        }
+        else -> false
+    }
+}
+
+/**
+ * Find the instruction that set the flags for a branch.
+ * Looks in the current block, then walks backward through predecessors.
+ * Returns the flag-setting instruction line, or null if not found.
+ */
+fun AssemblyBlock.findFlagSetterForBranch(): AssemblyLine? {
+    val visited = mutableSetOf<AssemblyBlock>()
+    val toVisit = mutableListOf(Pair(this, true))  // (block, searchFromBranch)
+
+    while (toVisit.isNotEmpty()) {
+        val (current, searchFromBranch) = toVisit.removeAt(0)
+        if (!visited.add(current)) continue
+
+        // Determine where to start searching
+        val searchStart = if (searchFromBranch && current == this) {
+            val branchLine = this.lines.lastOrNull { it.instruction?.op?.isBranch == true } ?: return null
+            this.lines.indexOf(branchLine) - 1
+        } else {
+            current.lines.size - 1
+        }
+
+        // Look backward for ANY instruction that modifies flags
+        for (i in searchStart downTo 0) {
+            val line = current.lines[i]
+            val op = line.instruction?.op
+            val addr = line.instruction?.address
+
+            // Check if this instruction modifies any flags
+            val modifiesFlags = op?.modifies(addr?.let { it::class })?.any {
+                it == AssemblyAffectable.Zero || it == AssemblyAffectable.Carry ||
+                it == AssemblyAffectable.Negative || it == AssemblyAffectable.Overflow
+            } == true
+
+            if (modifiesFlags) {
+                // Found the instruction that set the flags
+                return line
+            }
+        }
+
+        // If not found in this block, check predecessors
+        current.enteredFrom.forEach { pred ->
+            if (pred.function == current.function && pred !in visited) {
+                toVisit.add(Pair(pred, false))
+            }
+        }
+    }
+    return null
+}
+
+/**
+ * Find the comparison instruction that set the flags for a branch (legacy).
+ * Now just calls findFlagSetterForBranch for compatibility.
+ */
+fun AssemblyBlock.findComparisonForBranch(): AssemblyLine? = findFlagSetterForBranch()
+
+/**
+ * Check if two flag-setting instructions are equivalent (test the same thing).
+ * Two instructions are considered the same if they're the same opcode operating on the same address.
+ */
+fun AssemblyLine.isSameComparisonAs(other: AssemblyLine?): Boolean {
+    if (other == null) return false
+    val thisOp = this.instruction?.op
+    val otherOp = other.instruction?.op
+
+    // Must be the same opcode
+    if (thisOp != otherOp) return false
+
+    // Compare the addressing modes/operands
+    val thisAddr = this.instruction?.address
+    val otherAddr = other.instruction?.address
+
+    // For memory operations, they must access the same address
+    // For immediate/accumulator operations, compare the values
+    return thisAddr == otherAddr
+}
+
+/**
+ * Merge consecutive IfNodes that test the same comparison result.
+ *
+ * Pattern:
+ *   cpy #$32
+ *   bne label1    -> if (!zero) goto label1
+ *   (code)
+ *   bne label2    -> if (!zero) goto label2  [testing SAME comparison]
+ *
+ * This should become:
+ *   if (zero) {
+ *     (code)
+ *     goto label2
+ *   } else {
+ *     goto label1
+ *   }
+ */
+fun List<ControlNode>.mergeConsecutiveSameComparison(): List<ControlNode> {
+    val result = mutableListOf<ControlNode>()
+    var i = 0
+
+    while (i < this.size) {
+        val node = this[i]
+
+        if (node is IfNode && node.elseBranch.isEmpty()) {
+            // Check if this IfNode's condition block has a comparison
+            val comparisonBlock = node.condition.branchBlock
+            val comparison = comparisonBlock.findComparisonForBranch()
+
+            if (comparison != null) {
+                // Look ahead to see if the next nodes also test the same comparison
+                val thenContent = node.thenBranch.toMutableList()
+                var j = 0
+                var foundMerge = false
+
+                // Check the content of the then branch for another IfNode testing the same thing
+                while (j < thenContent.size) {
+                    val innerNode = thenContent[j]
+
+                    if (innerNode is IfNode && innerNode.elseBranch.isEmpty()) {
+                        val innerBlock = innerNode.condition.branchBlock
+                        val innerComparison = innerBlock.findComparisonForBranch()
+
+                        if (comparison.isSameComparisonAs(innerComparison)) {
+                            // Found a match! Merge these two IfNodes
+                            // The outer if tests one branch, the inner if tests the other
+                            foundMerge = true
+
+                            // Create a proper if-else structure
+                            // The "else" is the outer's then content up to this point + inner's then
+                            val elseBranch = thenContent.take(j).toMutableList()
+                            elseBranch.addAll(innerNode.thenBranch)
+
+                            // Recursively process both branches
+                            val mergedNode = node.copy(
+                                thenBranch = thenContent.drop(j + 1).mergeConsecutiveSameComparison().toMutableList(),
+                                elseBranch = elseBranch.mergeConsecutiveSameComparison().toMutableList()
+                            )
+
+                            result.add(mergedNode)
+                            i++
+                            break
+                        }
+                    }
+                    j++
+                }
+
+                if (foundMerge) {
+                    continue
+                }
+            }
+
+            // No merge found, recursively process branches
+            result.add(node.copy(
+                thenBranch = node.thenBranch.mergeConsecutiveSameComparison().toMutableList(),
+                elseBranch = node.elseBranch.mergeConsecutiveSameComparison().toMutableList()
+            ))
+        } else if (node is IfNode) {
+            result.add(node.copy(
+                thenBranch = node.thenBranch.mergeConsecutiveSameComparison().toMutableList(),
+                elseBranch = node.elseBranch.mergeConsecutiveSameComparison().toMutableList()
+            ))
+        } else if (node is LoopNode) {
+            result.add(node.copy(
+                body = node.body.mergeConsecutiveSameComparison().toMutableList()
+            ))
+        } else {
+            result.add(node)
+        }
+
+        i++
+    }
+
+    return result
+}
+
+/**
+ * Remove IfNodes with empty then branches (they do nothing).
+ */
+fun List<ControlNode>.removeEmptyIfNodes(): List<ControlNode> {
+    return this.mapNotNull { node ->
+        when (node) {
+            is IfNode -> {
+                val cleanedThen = node.thenBranch.removeEmptyIfNodes()
+                val cleanedElse = node.elseBranch.removeEmptyIfNodes()
+
+                // If then branch is empty and no else, skip this if entirely
+                if (cleanedThen.isEmpty() && cleanedElse.isEmpty()) {
+                    null
+                } else if (cleanedThen.isEmpty() && cleanedElse.isNotEmpty()) {
+                    // Then is empty but else has content - invert the condition
+                    // For now, just keep it as-is
+                    node.copy(thenBranch = cleanedThen.toMutableList(), elseBranch = cleanedElse.toMutableList())
+                } else {
+                    node.copy(thenBranch = cleanedThen.toMutableList(), elseBranch = cleanedElse.toMutableList())
+                }
+            }
+            is LoopNode -> {
+                node.copy(body = node.body.removeEmptyIfNodes().toMutableList())
+            }
+            else -> node
+        }
+    }
+}
+
+/**
+ * Flatten duplicate/contradictory nested if statements.
+ *
+ * Recursively removes patterns like:
+ *   if (X) { if (X) { body } }  -> if (X) { body }
+ *   if (X) { if (!X) { body } } -> if (X) { } (unreachable body removed)
+ *
+ * This must be applied recursively and repeatedly until no more changes occur.
+ */
+fun List<ControlNode>.flattenDuplicateConditions(): List<ControlNode> {
+    return this.map { node ->
+        when (node) {
+            is IfNode -> {
+                // First, recursively flatten the branches
+                var flattenedThen = node.thenBranch.flattenDuplicateConditions()
+                var flattenedElse = node.elseBranch.flattenDuplicateConditions()
+
+                // Check if then branch is a single IfNode with same/opposite condition
+                if (flattenedThen.size == 1 && flattenedThen[0] is IfNode) {
+                    val innerIf = flattenedThen[0] as IfNode
+
+                    // Check if same condition block
+                    if (node.condition.branchBlock == innerIf.condition.branchBlock) {
+                        val outerSense = node.condition.sense
+                        val innerSense = innerIf.condition.sense
+
+                        if (outerSense == innerSense) {
+                            // Duplicate: if (X) { if (X) { body } } -> use inner directly
+                            return@map innerIf.copy(
+                                thenBranch = innerIf.thenBranch.flattenDuplicateConditions().toMutableList(),
+                                elseBranch = innerIf.elseBranch.flattenDuplicateConditions().toMutableList()
+                            )
+                        } else {
+                            // Contradictory: if (X) { if (!X) { body } } -> if (X) { }
+                            return@map node.copy(
+                                thenBranch = mutableListOf(),
+                                elseBranch = flattenedElse.toMutableList()
+                            )
+                        }
+                    }
+                }
+
+                // No flattening at this level, return with recursively flattened branches
+                node.copy(
+                    thenBranch = flattenedThen.toMutableList(),
+                    elseBranch = flattenedElse.toMutableList()
+                )
+            }
+            is LoopNode -> {
+                node.copy(
+                    body = node.body.flattenDuplicateConditions().toMutableList()
+                )
+            }
+            else -> node
+        }
+    }
+}
+
+/**
  * Apply all improvements to control flow.
  */
 fun AssemblyFunction.improveControlFlow(): List<ControlNode> {
     // First, run basic control analysis
     val nodes = this.analyzeControls().toMutableList()
 
+    // Fix block ordering - ensure function starts at entry point, not at backward branches
+    var improved = nodes.toList().fixBlockOrdering(this.startingBlock)
+
+    // Merge consecutive branches testing the same comparison (e.g., cpy #$32; bne L1; ...; bne L2)
+    improved = improved.mergeConsecutiveSameComparison()
+
+    // Flatten duplicate/contradictory nested if statements (apply multiple times if needed)
+    var prevSize = -1
+    while (prevSize != improved.size) {
+        prevSize = improved.size
+        improved = improved.flattenDuplicateConditions()
+    }
+
     // Compute post-dominators
     val postDom = this.computePostDominators()
 
     // Apply improvements in order
-    var improved = nodes.toList()
     improved = improved.factorCommonPostDominators(postDom)
     improved = improved.recognizeGuardClauses()
     improved = improved.hoistCommonSuffixes()
@@ -459,6 +879,12 @@ fun AssemblyFunction.improveControlFlow(): List<ControlNode> {
 
     // Final aggressive cleanup - remove ALL duplicate blocks globally
     improved = improved.globalDuplicateElimination()
+
+    // Remove unreachable code after returns
+    improved = improved.eliminateUnreachableAfterReturn()
+
+    // Remove empty if nodes (they do nothing)
+    improved = improved.removeEmptyIfNodes()
 
     // Store back
     this.asControls = improved

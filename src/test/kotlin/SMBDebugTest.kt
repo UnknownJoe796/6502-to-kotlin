@@ -29,7 +29,7 @@ class SMBDebugTest {
                 val traversed = HashSet<AssemblyBlock>()
                 out.appendLine("Function ${function.startingBlock.label}")
                 out.appendLine("  Inputs: ${function.inputs}")
-                out.appendLine("  Outputs: ${function.inputs}")
+                out.appendLine("  Outputs: ${function.outputs}")
                 fun emitBlock(block: AssemblyBlock) {
                     if (!traversed.add(block)) return
                     val tabLevel = "  ".repeat(block.dominationDepth)
