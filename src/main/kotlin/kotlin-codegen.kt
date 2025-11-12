@@ -154,13 +154,17 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
 
             // Generate: val sum = A + operand + (if (C) 1 else 0)
             val carryValue = KIfExpr(KVar("C"), KLiteral("1"), KLiteral("0"))
-            val sum = KBinaryOp(KBinaryOp(a, "+", operand), "+", carryValue)
+            val sumExpr = KBinaryOp(KBinaryOp(a, "+", operand), "+", carryValue)
+
+            // Declare temporary variable to avoid double evaluation
+            val tempVar = ctx.nextTempVar()
+            stmts.add(KVarDecl(tempVar, value = sumExpr, mutable = false))
 
             // C = sum > 0xFF
-            stmts.add(KAssignment(KVar("C"), KBinaryOp(sum, ">", KLiteral("0xFF"))))
+            stmts.add(KAssignment(KVar("C"), KBinaryOp(KVar(tempVar), ">", KLiteral("0xFF"))))
 
             // A = sum and 0xFF
-            val result = KBinaryOp(KParen(sum), "and", KLiteral("0xFF"))
+            val result = KBinaryOp(KVar(tempVar), "and", KLiteral("0xFF"))
             ctx.registerA = result
             stmts.add(KAssignment(KVar("A"), result))
 
@@ -176,13 +180,17 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
 
             // Generate: val diff = A - operand - (if (C) 0 else 1)
             val borrow = KIfExpr(KVar("C"), KLiteral("0"), KLiteral("1"))
-            val diff = KBinaryOp(KBinaryOp(a, "-", operand), "-", borrow)
+            val diffExpr = KBinaryOp(KBinaryOp(a, "-", operand), "-", borrow)
+
+            // Declare temporary variable to avoid double evaluation
+            val tempVar = ctx.nextTempVar()
+            stmts.add(KVarDecl(tempVar, value = diffExpr, mutable = false))
 
             // C = diff >= 0 (no borrow)
-            stmts.add(KAssignment(KVar("C"), KBinaryOp(diff, ">=", KLiteral("0"))))
+            stmts.add(KAssignment(KVar("C"), KBinaryOp(KVar(tempVar), ">=", KLiteral("0"))))
 
             // A = diff and 0xFF
-            val result = KBinaryOp(KParen(diff), "and", KLiteral("0xFF"))
+            val result = KBinaryOp(KVar(tempVar), "and", KLiteral("0xFF"))
             ctx.registerA = result
             stmts.add(KAssignment(KVar("A"), result))
 
