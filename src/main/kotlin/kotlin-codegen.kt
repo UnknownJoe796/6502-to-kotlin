@@ -69,16 +69,28 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
         AssemblyOp.LDA -> {
             val value = this.address.toKotlinExpr(ctx)
             ctx.registerA = value
+            // Emit assignment statement
+            stmts.add(KAssignment(KVar("A"), value))
+            // Update Z and N flags
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
         }
 
         AssemblyOp.LDX -> {
             val value = this.address.toKotlinExpr(ctx)
             ctx.registerX = value
+            // Emit assignment statement
+            stmts.add(KAssignment(KVar("X"), value))
+            // Update Z and N flags
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("X")))))
         }
 
         AssemblyOp.LDY -> {
             val value = this.address.toKotlinExpr(ctx)
             ctx.registerY = value
+            // Emit assignment statement
+            stmts.add(KAssignment(KVar("Y"), value))
+            // Update Z and N flags
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("Y")))))
         }
 
         // ===========================
@@ -106,19 +118,31 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
         // Transfer instructions
         // ===========================
         AssemblyOp.TAX -> {
-            ctx.registerX = ctx.registerA ?: KVar("A")
+            val value = ctx.registerA ?: KVar("A")
+            ctx.registerX = value
+            stmts.add(KAssignment(KVar("X"), value))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("X")))))
         }
 
         AssemblyOp.TAY -> {
-            ctx.registerY = ctx.registerA ?: KVar("A")
+            val value = ctx.registerA ?: KVar("A")
+            ctx.registerY = value
+            stmts.add(KAssignment(KVar("Y"), value))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("Y")))))
         }
 
         AssemblyOp.TXA -> {
-            ctx.registerA = ctx.registerX ?: KVar("X")
+            val value = ctx.registerX ?: KVar("X")
+            ctx.registerA = value
+            stmts.add(KAssignment(KVar("A"), value))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
         }
 
         AssemblyOp.TYA -> {
-            ctx.registerA = ctx.registerY ?: KVar("Y")
+            val value = ctx.registerY ?: KVar("Y")
+            ctx.registerA = value
+            stmts.add(KAssignment(KVar("A"), value))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
         }
 
         // ===========================
@@ -127,21 +151,45 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
         AssemblyOp.ADC -> {
             val operand = this.address.toKotlinExpr(ctx)
             val a = ctx.registerA ?: KVar("A")
-            val carry = ctx.carryFlag ?: KLiteral("0")
 
-            // A = A + operand + carry
-            val sum = KBinaryOp(KBinaryOp(a, "+", operand), "+", carry)
-            ctx.registerA = KBinaryOp(KParen(sum), "and", KLiteral("0xFF"))
+            // Generate: val sum = A + operand + (if (C) 1 else 0)
+            val carryValue = KIfExpr(KVar("C"), KLiteral("1"), KLiteral("0"))
+            val sum = KBinaryOp(KBinaryOp(a, "+", operand), "+", carryValue)
+
+            // C = sum > 0xFF
+            stmts.add(KAssignment(KVar("C"), KBinaryOp(sum, ">", KLiteral("0xFF"))))
+
+            // A = sum and 0xFF
+            val result = KBinaryOp(KParen(sum), "and", KLiteral("0xFF"))
+            ctx.registerA = result
+            stmts.add(KAssignment(KVar("A"), result))
+
+            // Update Z and N flags
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
+
+            // TODO: V flag (overflow) - complex calculation
         }
 
         AssemblyOp.SBC -> {
             val operand = this.address.toKotlinExpr(ctx)
             val a = ctx.registerA ?: KVar("A")
-            val carry = ctx.carryFlag ?: KLiteral("1")
 
-            // A = A - operand - (1 - carry)
-            val diff = KBinaryOp(KBinaryOp(a, "-", operand), "-", KParen(KBinaryOp(KLiteral("1"), "-", carry)))
-            ctx.registerA = KBinaryOp(KParen(diff), "and", KLiteral("0xFF"))
+            // Generate: val diff = A - operand - (if (C) 0 else 1)
+            val borrow = KIfExpr(KVar("C"), KLiteral("0"), KLiteral("1"))
+            val diff = KBinaryOp(KBinaryOp(a, "-", operand), "-", borrow)
+
+            // C = diff >= 0 (no borrow)
+            stmts.add(KAssignment(KVar("C"), KBinaryOp(diff, ">=", KLiteral("0"))))
+
+            // A = diff and 0xFF
+            val result = KBinaryOp(KParen(diff), "and", KLiteral("0xFF"))
+            ctx.registerA = result
+            stmts.add(KAssignment(KVar("A"), result))
+
+            // Update Z and N flags
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
+
+            // TODO: V flag (overflow) - complex calculation
         }
 
         AssemblyOp.INC -> {
@@ -158,22 +206,34 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
 
         AssemblyOp.INX -> {
             val x = ctx.registerX ?: KVar("X")
-            ctx.registerX = KBinaryOp(KParen(KBinaryOp(x, "+", KLiteral("1"))), "and", KLiteral("0xFF"))
+            val incremented = KBinaryOp(KParen(KBinaryOp(x, "+", KLiteral("1"))), "and", KLiteral("0xFF"))
+            ctx.registerX = incremented
+            stmts.add(KAssignment(KVar("X"), incremented))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("X")))))
         }
 
         AssemblyOp.INY -> {
             val y = ctx.registerY ?: KVar("Y")
-            ctx.registerY = KBinaryOp(KParen(KBinaryOp(y, "+", KLiteral("1"))), "and", KLiteral("0xFF"))
+            val incremented = KBinaryOp(KParen(KBinaryOp(y, "+", KLiteral("1"))), "and", KLiteral("0xFF"))
+            ctx.registerY = incremented
+            stmts.add(KAssignment(KVar("Y"), incremented))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("Y")))))
         }
 
         AssemblyOp.DEX -> {
             val x = ctx.registerX ?: KVar("X")
-            ctx.registerX = KBinaryOp(KParen(KBinaryOp(x, "-", KLiteral("1"))), "and", KLiteral("0xFF"))
+            val decremented = KBinaryOp(KParen(KBinaryOp(x, "-", KLiteral("1"))), "and", KLiteral("0xFF"))
+            ctx.registerX = decremented
+            stmts.add(KAssignment(KVar("X"), decremented))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("X")))))
         }
 
         AssemblyOp.DEY -> {
             val y = ctx.registerY ?: KVar("Y")
-            ctx.registerY = KBinaryOp(KParen(KBinaryOp(y, "-", KLiteral("1"))), "and", KLiteral("0xFF"))
+            val decremented = KBinaryOp(KParen(KBinaryOp(y, "-", KLiteral("1"))), "and", KLiteral("0xFF"))
+            ctx.registerY = decremented
+            stmts.add(KAssignment(KVar("Y"), decremented))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("Y")))))
         }
 
         // ===========================
@@ -182,19 +242,28 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
         AssemblyOp.AND -> {
             val operand = this.address.toKotlinExpr(ctx)
             val a = ctx.registerA ?: KVar("A")
-            ctx.registerA = KBinaryOp(a, "and", operand)
+            val result = KBinaryOp(a, "and", operand)
+            ctx.registerA = result
+            stmts.add(KAssignment(KVar("A"), result))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
         }
 
         AssemblyOp.ORA -> {
             val operand = this.address.toKotlinExpr(ctx)
             val a = ctx.registerA ?: KVar("A")
-            ctx.registerA = KBinaryOp(a, "or", operand)
+            val result = KBinaryOp(a, "or", operand)
+            ctx.registerA = result
+            stmts.add(KAssignment(KVar("A"), result))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
         }
 
         AssemblyOp.EOR -> {
             val operand = this.address.toKotlinExpr(ctx)
             val a = ctx.registerA ?: KVar("A")
-            ctx.registerA = KBinaryOp(a, "xor", operand)
+            val result = KBinaryOp(a, "xor", operand)
+            ctx.registerA = result
+            stmts.add(KAssignment(KVar("A"), result))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
         }
 
         // ===========================

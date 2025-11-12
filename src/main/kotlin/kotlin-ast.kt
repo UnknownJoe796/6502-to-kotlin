@@ -64,6 +64,11 @@ data class KCast(val expr: KotlinExpr, val type: String) : KotlinExpr {
     override fun toKotlin() = "${expr.toKotlin()} as $type"
 }
 
+/** If expression: if (cond) thenExpr else elseExpr */
+data class KIfExpr(val condition: KotlinExpr, val thenExpr: KotlinExpr, val elseExpr: KotlinExpr) : KotlinExpr {
+    override fun toKotlin() = "(if (${condition.toKotlin()}) ${thenExpr.toKotlin()} else ${elseExpr.toKotlin()})"
+}
+
 // ===========================
 // Statements
 // ===========================
