@@ -94,25 +94,37 @@ class Interpreter6502(
             // Arithmetic instructions
             AssemblyOp.ADC -> {
                 val operand = readOperand(instruction.address)
-                val result = cpu.A.toInt() + operand.toInt() + (if (cpu.C) 1 else 0)
-                cpu.C = result > 0xFF
-                val resultByte = (result and 0xFF).toUByte()
-                // Overflow: result sign differs from both operands
-                cpu.V = ((cpu.A.toInt() xor resultByte.toInt()) and 0x80) != 0 &&
-                        ((cpu.A.toInt() xor operand.toInt()) and 0x80) == 0
-                cpu.A = resultByte
-                cpu.updateZN(cpu.A)
+                if (cpu.D) {
+                    // Decimal mode (BCD arithmetic)
+                    executeBCDADC(operand)
+                } else {
+                    // Binary mode
+                    val result = cpu.A.toInt() + operand.toInt() + (if (cpu.C) 1 else 0)
+                    cpu.C = result > 0xFF
+                    val resultByte = (result and 0xFF).toUByte()
+                    // Overflow: result sign differs from both operands
+                    cpu.V = ((cpu.A.toInt() xor resultByte.toInt()) and 0x80) != 0 &&
+                            ((cpu.A.toInt() xor operand.toInt()) and 0x80) == 0
+                    cpu.A = resultByte
+                    cpu.updateZN(cpu.A)
+                }
             }
             AssemblyOp.SBC -> {
                 val operand = readOperand(instruction.address)
-                val result = cpu.A.toInt() - operand.toInt() - (if (cpu.C) 0 else 1)
-                cpu.C = result >= 0
-                val resultByte = (result and 0xFF).toUByte()
-                // Overflow: result sign differs from both operands
-                cpu.V = ((cpu.A.toInt() xor resultByte.toInt()) and 0x80) != 0 &&
-                        ((cpu.A.toInt() xor operand.toInt()) and 0x80) != 0
-                cpu.A = resultByte
-                cpu.updateZN(cpu.A)
+                if (cpu.D) {
+                    // Decimal mode (BCD arithmetic)
+                    executeBCDSBC(operand)
+                } else {
+                    // Binary mode
+                    val result = cpu.A.toInt() - operand.toInt() - (if (cpu.C) 0 else 1)
+                    cpu.C = result >= 0
+                    val resultByte = (result and 0xFF).toUByte()
+                    // Overflow: result sign differs from both operands
+                    cpu.V = ((cpu.A.toInt() xor resultByte.toInt()) and 0x80) != 0 &&
+                            ((cpu.A.toInt() xor operand.toInt()) and 0x80) != 0
+                    cpu.A = resultByte
+                    cpu.updateZN(cpu.A)
+                }
             }
 
             // Compare instructions
@@ -370,6 +382,84 @@ class Interpreter6502(
         // Use custom resolver if available
         return labelResolver?.invoke(label)
             ?: throw IllegalArgumentException("Cannot resolve label: $label")
+    }
+
+    /**
+     * Execute BCD (Binary Coded Decimal) addition
+     * Note: On NMOS 6502, N, V, Z flags are not reliable in decimal mode
+     */
+    private fun executeBCDADC(operand: UByte) {
+        val a = cpu.A.toInt()
+        val m = operand.toInt()
+        val c = if (cpu.C) 1 else 0
+
+        // BCD addition works on nibbles (4-bit values)
+        val lowNibble = (a and 0x0F) + (m and 0x0F) + c
+        var highNibble = (a shr 4) + (m shr 4)
+
+        // Adjust low nibble if > 9
+        var adjustedLow = lowNibble
+        if (lowNibble > 9) {
+            adjustedLow = (lowNibble + 6) and 0x0F
+            highNibble++
+        }
+
+        // Adjust high nibble if > 9
+        var carry = false
+        var adjustedHigh = highNibble
+        if (highNibble > 9) {
+            adjustedHigh = (highNibble + 6) and 0x0F
+            carry = true
+        }
+
+        val result = ((adjustedHigh shl 4) or adjustedLow).toUByte()
+
+        // Set flags
+        cpu.C = carry
+        cpu.A = result
+
+        // Note: N, V, Z flags are undefined in decimal mode on NMOS 6502
+        // We'll set them based on the BCD result for compatibility
+        cpu.updateZN(cpu.A)
+        // V flag is complex in BCD mode - simplified implementation
+        cpu.V = false
+    }
+
+    /**
+     * Execute BCD (Binary Coded Decimal) subtraction
+     * Note: On NMOS 6502, N, V, Z flags are not reliable in decimal mode
+     */
+    private fun executeBCDSBC(operand: UByte) {
+        val a = cpu.A.toInt()
+        val m = operand.toInt()
+        val c = if (cpu.C) 0 else 1  // Borrow is inverted carry
+
+        // BCD subtraction works on nibbles
+        var lowNibble = (a and 0x0F) - (m and 0x0F) - c
+        var highNibble = (a shr 4) - (m shr 4)
+
+        // Adjust low nibble if negative
+        if (lowNibble < 0) {
+            lowNibble -= 6
+            highNibble--
+        }
+
+        // Adjust high nibble if negative
+        var borrow = false
+        if (highNibble < 0) {
+            highNibble -= 6
+            borrow = true
+        }
+
+        val result = (((highNibble and 0x0F) shl 4) or (lowNibble and 0x0F)).toUByte()
+
+        // Set flags
+        cpu.C = !borrow
+        cpu.A = result
+
+        // Note: N, V, Z flags are undefined in decimal mode on NMOS 6502
+        cpu.updateZN(cpu.A)
+        cpu.V = false
     }
 
     /**
