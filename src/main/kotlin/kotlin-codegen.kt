@@ -274,30 +274,122 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
             stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
         }
 
+        AssemblyOp.BIT -> {
+            // BIT test - sets Z, N, and V flags based on memory value
+            val operand = this.address.toKotlinExpr(ctx)
+            val a = ctx.registerA ?: KVar("A")
+
+            // Z = (A and operand) == 0
+            stmts.add(KAssignment(KVar("Z"), KBinaryOp(KParen(KBinaryOp(a, "and", operand)), "==", KLiteral("0"))))
+            // N = (operand and 0x80) != 0  // Copy bit 7 of operand
+            stmts.add(KAssignment(KVar("N"), KBinaryOp(KParen(KBinaryOp(operand, "and", KLiteral("0x80"))), "!=", KLiteral("0"))))
+            // V = (operand and 0x40) != 0  // Copy bit 6 of operand
+            stmts.add(KAssignment(KVar("V"), KBinaryOp(KParen(KBinaryOp(operand, "and", KLiteral("0x40"))), "!=", KLiteral("0"))))
+
+            // Update context
+            ctx.zeroFlag = KVar("Z")
+            ctx.negativeFlag = KVar("N")
+            ctx.overflowFlag = KVar("V")
+        }
+
         // ===========================
         // Shift instructions
         // ===========================
         AssemblyOp.ASL -> {
+            // Arithmetic shift left (bit 7 goes to carry)
             if (this.address == null) {
                 // Accumulator mode
                 val a = ctx.registerA ?: KVar("A")
-                ctx.registerA = KBinaryOp(KParen(KBinaryOp(a, "shl", KLiteral("1"))), "and", KLiteral("0xFF"))
+                // C = (A and 0x80) != 0  // Save bit 7 to carry
+                stmts.add(KAssignment(KVar("C"), KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x80"))), "!=", KLiteral("0"))))
+                // A = (A shl 1) and 0xFF
+                val shifted = KBinaryOp(KParen(KBinaryOp(a, "shl", KLiteral("1"))), "and", KLiteral("0xFF"))
+                ctx.registerA = shifted
+                stmts.add(KAssignment(KVar("A"), shifted))
+                stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
             } else {
                 val target = this.address.toKotlinExpr(ctx)
+                // C = (target and 0x80) != 0
+                stmts.add(KAssignment(KVar("C"), KBinaryOp(KParen(KBinaryOp(target, "and", KLiteral("0x80"))), "!=", KLiteral("0"))))
+                // target = (target shl 1) and 0xFF
                 val shifted = KBinaryOp(KParen(KBinaryOp(target, "shl", KLiteral("1"))), "and", KLiteral("0xFF"))
                 stmts.add(KAssignment(target, shifted))
+                stmts.add(KExprStmt(KCall("updateZN", listOf(target))))
             }
         }
 
         AssemblyOp.LSR -> {
+            // Logical shift right (bit 0 goes to carry)
             if (this.address == null) {
                 // Accumulator mode
                 val a = ctx.registerA ?: KVar("A")
-                ctx.registerA = KBinaryOp(a, "shr", KLiteral("1"))
+                // C = (A and 0x01) != 0  // Save bit 0 to carry
+                stmts.add(KAssignment(KVar("C"), KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x01"))), "!=", KLiteral("0"))))
+                // A = A shr 1
+                val shifted = KBinaryOp(a, "shr", KLiteral("1"))
+                ctx.registerA = shifted
+                stmts.add(KAssignment(KVar("A"), shifted))
+                stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
             } else {
                 val target = this.address.toKotlinExpr(ctx)
+                // C = (target and 0x01) != 0
+                stmts.add(KAssignment(KVar("C"), KBinaryOp(KParen(KBinaryOp(target, "and", KLiteral("0x01"))), "!=", KLiteral("0"))))
+                // target = target shr 1
                 val shifted = KBinaryOp(target, "shr", KLiteral("1"))
                 stmts.add(KAssignment(target, shifted))
+                stmts.add(KExprStmt(KCall("updateZN", listOf(target))))
+            }
+        }
+
+        AssemblyOp.ROL -> {
+            // Rotate left through carry
+            if (this.address == null) {
+                // Accumulator mode
+                val a = ctx.registerA ?: KVar("A")
+                // Save old carry
+                val tempVar = ctx.nextTempVar()
+                stmts.add(KVarDecl(tempVar, value = KIfExpr(KVar("C"), KLiteral("1"), KLiteral("0")), mutable = false))
+                // C = (A and 0x80) != 0  // Bit 7 to carry
+                stmts.add(KAssignment(KVar("C"), KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x80"))), "!=", KLiteral("0"))))
+                // A = ((A shl 1) or oldCarry) and 0xFF
+                val rotated = KBinaryOp(KParen(KBinaryOp(KParen(KBinaryOp(a, "shl", KLiteral("1"))), "or", KVar(tempVar))), "and", KLiteral("0xFF"))
+                ctx.registerA = rotated
+                stmts.add(KAssignment(KVar("A"), rotated))
+                stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
+            } else {
+                val target = this.address.toKotlinExpr(ctx)
+                val tempVar = ctx.nextTempVar()
+                stmts.add(KVarDecl(tempVar, value = KIfExpr(KVar("C"), KLiteral("1"), KLiteral("0")), mutable = false))
+                stmts.add(KAssignment(KVar("C"), KBinaryOp(KParen(KBinaryOp(target, "and", KLiteral("0x80"))), "!=", KLiteral("0"))))
+                val rotated = KBinaryOp(KParen(KBinaryOp(KParen(KBinaryOp(target, "shl", KLiteral("1"))), "or", KVar(tempVar))), "and", KLiteral("0xFF"))
+                stmts.add(KAssignment(target, rotated))
+                stmts.add(KExprStmt(KCall("updateZN", listOf(target))))
+            }
+        }
+
+        AssemblyOp.ROR -> {
+            // Rotate right through carry
+            if (this.address == null) {
+                // Accumulator mode
+                val a = ctx.registerA ?: KVar("A")
+                // Save old carry
+                val tempVar = ctx.nextTempVar()
+                stmts.add(KVarDecl(tempVar, value = KIfExpr(KVar("C"), KLiteral("0x80"), KLiteral("0")), mutable = false))
+                // C = (A and 0x01) != 0  // Bit 0 to carry
+                stmts.add(KAssignment(KVar("C"), KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x01"))), "!=", KLiteral("0"))))
+                // A = (A shr 1) or oldCarry
+                val rotated = KBinaryOp(KParen(KBinaryOp(a, "shr", KLiteral("1"))), "or", KVar(tempVar))
+                ctx.registerA = rotated
+                stmts.add(KAssignment(KVar("A"), rotated))
+                stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
+            } else {
+                val target = this.address.toKotlinExpr(ctx)
+                val tempVar = ctx.nextTempVar()
+                stmts.add(KVarDecl(tempVar, value = KIfExpr(KVar("C"), KLiteral("0x80"), KLiteral("0")), mutable = false))
+                stmts.add(KAssignment(KVar("C"), KBinaryOp(KParen(KBinaryOp(target, "and", KLiteral("0x01"))), "!=", KLiteral("0"))))
+                val rotated = KBinaryOp(KParen(KBinaryOp(target, "shr", KLiteral("1"))), "or", KVar(tempVar))
+                stmts.add(KAssignment(target, rotated))
+                stmts.add(KExprStmt(KCall("updateZN", listOf(target))))
             }
         }
 
@@ -308,25 +400,60 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
             val operand = this.address.toKotlinExpr(ctx)
             val a = ctx.registerA ?: KVar("A")
 
-            // Set flags based on comparison
+            // Compute difference for flags
+            val tempVar = ctx.nextTempVar()
             val diff = KBinaryOp(a, "-", operand)
-            ctx.zeroFlag = KBinaryOp(diff, "==", KLiteral("0"))
-            ctx.carryFlag = KBinaryOp(a, ">=", operand)
-            ctx.negativeFlag = KBinaryOp(diff, "<", KLiteral("0"))
+            stmts.add(KVarDecl(tempVar, value = diff, mutable = false))
+
+            // Set flags based on comparison
+            stmts.add(KAssignment(KVar("Z"), KBinaryOp(KVar(tempVar), "==", KLiteral("0"))))
+            stmts.add(KAssignment(KVar("C"), KBinaryOp(a, ">=", operand)))
+            stmts.add(KAssignment(KVar("N"), KBinaryOp(KVar(tempVar), "<", KLiteral("0"))))
+
+            // Update context for later use
+            ctx.zeroFlag = KVar("Z")
+            ctx.carryFlag = KVar("C")
+            ctx.negativeFlag = KVar("N")
         }
 
         AssemblyOp.CPX -> {
             val operand = this.address.toKotlinExpr(ctx)
             val x = ctx.registerX ?: KVar("X")
-            ctx.zeroFlag = KBinaryOp(x, "==", operand)
-            ctx.carryFlag = KBinaryOp(x, ">=", operand)
+
+            // Compute difference for flags
+            val tempVar = ctx.nextTempVar()
+            val diff = KBinaryOp(x, "-", operand)
+            stmts.add(KVarDecl(tempVar, value = diff, mutable = false))
+
+            // Set flags
+            stmts.add(KAssignment(KVar("Z"), KBinaryOp(KVar(tempVar), "==", KLiteral("0"))))
+            stmts.add(KAssignment(KVar("C"), KBinaryOp(x, ">=", operand)))
+            stmts.add(KAssignment(KVar("N"), KBinaryOp(KVar(tempVar), "<", KLiteral("0"))))
+
+            // Update context
+            ctx.zeroFlag = KVar("Z")
+            ctx.carryFlag = KVar("C")
+            ctx.negativeFlag = KVar("N")
         }
 
         AssemblyOp.CPY -> {
             val operand = this.address.toKotlinExpr(ctx)
             val y = ctx.registerY ?: KVar("Y")
-            ctx.zeroFlag = KBinaryOp(y, "==", operand)
-            ctx.carryFlag = KBinaryOp(y, ">=", operand)
+
+            // Compute difference for flags
+            val tempVar = ctx.nextTempVar()
+            val diff = KBinaryOp(y, "-", operand)
+            stmts.add(KVarDecl(tempVar, value = diff, mutable = false))
+
+            // Set flags
+            stmts.add(KAssignment(KVar("Z"), KBinaryOp(KVar(tempVar), "==", KLiteral("0"))))
+            stmts.add(KAssignment(KVar("C"), KBinaryOp(y, ">=", operand)))
+            stmts.add(KAssignment(KVar("N"), KBinaryOp(KVar(tempVar), "<", KLiteral("0"))))
+
+            // Update context
+            ctx.zeroFlag = KVar("Z")
+            ctx.carryFlag = KVar("C")
+            ctx.negativeFlag = KVar("N")
         }
 
         // ===========================
@@ -379,26 +506,79 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
         // Stack instructions
         // ===========================
         AssemblyOp.PHA -> {
-            // Push A to stack - no Kotlin equivalent, handled by register tracking
+            // Push A to stack
+            stmts.add(KExprStmt(KCall("pushByte", listOf(KVar("A")))))
         }
 
         AssemblyOp.PLA -> {
-            // Pull A from stack - no Kotlin equivalent, handled by register tracking
+            // Pull A from stack
+            stmts.add(KAssignment(KVar("A"), KCall("pullByte")))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("A")))))
+            ctx.registerA = KVar("A")
+        }
+
+        AssemblyOp.PHP -> {
+            // Push processor status to stack
+            stmts.add(KExprStmt(KCall("pushByte", listOf(KCall("getStatusByte")))))
+        }
+
+        AssemblyOp.PLP -> {
+            // Pull processor status from stack
+            stmts.add(KExprStmt(KCall("setStatusByte", listOf(KCall("pullByte")))))
+        }
+
+        AssemblyOp.TSX -> {
+            // Transfer stack pointer to X
+            stmts.add(KAssignment(KVar("X"), KVar("SP")))
+            stmts.add(KExprStmt(KCall("updateZN", listOf(KVar("X")))))
+            ctx.registerX = KVar("SP")
+        }
+
+        AssemblyOp.TXS -> {
+            // Transfer X to stack pointer
+            stmts.add(KAssignment(KVar("SP"), KVar("X")))
+            // Note: TXS does NOT update flags
         }
 
         // ===========================
         // Flag instructions
         // ===========================
         AssemblyOp.CLC -> {
-            ctx.carryFlag = KLiteral("0")
+            // Clear carry flag
+            stmts.add(KAssignment(KVar("C"), KLiteral("false")))
+            ctx.carryFlag = KLiteral("false")
         }
 
         AssemblyOp.SEC -> {
-            ctx.carryFlag = KLiteral("1")
+            // Set carry flag
+            stmts.add(KAssignment(KVar("C"), KLiteral("true")))
+            ctx.carryFlag = KLiteral("true")
         }
 
         AssemblyOp.CLV -> {
-            ctx.overflowFlag = KLiteral("0")
+            // Clear overflow flag
+            stmts.add(KAssignment(KVar("V"), KLiteral("false")))
+            ctx.overflowFlag = KLiteral("false")
+        }
+
+        AssemblyOp.CLD -> {
+            // Clear decimal mode flag
+            stmts.add(KAssignment(KVar("D"), KLiteral("false")))
+        }
+
+        AssemblyOp.SED -> {
+            // Set decimal mode flag
+            stmts.add(KAssignment(KVar("D"), KLiteral("true")))
+        }
+
+        AssemblyOp.CLI -> {
+            // Clear interrupt disable flag
+            stmts.add(KAssignment(KVar("I"), KLiteral("false")))
+        }
+
+        AssemblyOp.SEI -> {
+            // Set interrupt disable flag
+            stmts.add(KAssignment(KVar("I"), KLiteral("true")))
         }
 
         // ===========================
