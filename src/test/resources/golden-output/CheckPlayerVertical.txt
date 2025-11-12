@@ -1,0 +1,5 @@
+Function: CheckPlayerVertical
+Inputs: 
+Outputs: CarryFlag
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y
+Control flow nodes: 2

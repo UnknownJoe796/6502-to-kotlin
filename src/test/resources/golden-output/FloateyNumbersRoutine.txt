@@ -1,0 +1,5 @@
+Function: FloateyNumbersRoutine
+Inputs: X
+Outputs: X
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, X, OverflowFlag
+Control flow nodes: 6

@@ -1,0 +1,142 @@
+ImpedePlayerMove function:
+  Starting block: ImpedePlayerMove
+  Starting block line: 12317
+
+Blocks in function (9):
+  Block: ImpedePlayerMove
+    Lines (6):
+      ImpedePlayerMove:
+      lda #$00                  ;initialize value here
+      ldy Player_X_Speed        ;get player's horizontal speed
+      ldx $00                   ;check value set earlier for
+      dex                       ;left side collision
+      bne RImpd                 ;if right side collision, skip this part
+  Block: @12323
+    Lines (3):
+      inx                       ;return value to X
+      cpy #$00                  ;if player moving to the left,
+      bmi ExIPM                 ;branch to invert bit and leave
+  Block: @12326
+    Lines (2):
+      lda #$ff                  ;otherwise load A with value to be used later
+      jmp NXSpd                 ;and jump to affect movement
+  Block: RImpd
+    Lines (3):
+      RImpd: ldx #$02                  ;return $02 to X
+      cpy #$01                  ;if player moving to the right,
+      bpl ExIPM                 ;branch to invert bit and leave
+  Block: @12331
+    Lines (1):
+      lda #$01                  ;otherwise load A with value to be used here
+  Block: NXSpd
+    Lines (6):
+      NXSpd: ldy #$10
+      sty SideCollisionTimer    ;set timer of some sort
+      ldy #$00
+      sty Player_X_Speed        ;nullify player's horizontal speed
+      cmp #$00                  ;if value set in A not set to $ff,
+      bpl PlatF                 ;branch ahead, do not decrement Y
+  Block: @12338
+    Lines (1):
+      dey                       ;otherwise decrement Y now
+  Block: PlatF
+    Lines (7):
+      PlatF: sty $00                   ;store Y as high bits of horizontal adder
+      clc
+      adc Player_X_Position     ;add contents of A to player's horizontal
+      sta Player_X_Position     ;position to move player left or right
+      lda Player_PageLoc
+      adc $00                   ;add high bits and carry to
+      sta Player_PageLoc        ;page location if necessary
+  Block: ExIPM
+    Lines (5):
+      ExIPM: txa                       ;invert contents of X
+      eor #$ff
+      and Player_CollisionBits  ;mask out bit that was set here
+      sta Player_CollisionBits  ;store to clear bit
+      rts
+
+Control flow (improveControlFlow):
+    - If (block ImpedePlayerMove)
+        Then (1 nodes):
+        - If (block @12323)
+            Then (2 nodes):
+            - Block: @12326
+              Lines: 2
+                lda #$ff                  ;otherwise load A with value to be used later
+                jmp NXSpd                 ;and jump to affect movement
+            - If (block RImpd)
+                Then (3 nodes):
+                - Block: @12331
+                  Lines: 1
+                    lda #$01                  ;otherwise load A with value to be used here
+                - If (block NXSpd)
+                    Then (1 nodes):
+                    - Block: @12338
+                      Lines: 1
+                        dey                       ;otherwise decrement Y now
+                - Block: PlatF
+                  Lines: 7
+                    PlatF: sty $00                   ;store Y as high bits of horizontal adder
+                    clc
+                    adc Player_X_Position     ;add contents of A to player's horizontal
+    - Block: ExIPM
+      Lines: 5
+        ExIPM: txa                       ;invert contents of X
+        eor #$ff
+        and Player_CollisionBits  ;mask out bit that was set here
+
+Generated Kotlin:
+// Decompiled from ImpedePlayerMove
+fun impedePlayerMove() {
+    var A: Int = 0
+    //> ImpedePlayerMove:
+    //> lda #$00                  ;initialize value here
+    //> ldy Player_X_Speed        ;get player's horizontal speed
+    //> ldx $00                   ;check value set earlier for
+    //> dex                       ;left side collision
+    //> bne RImpd                 ;if right side collision, skip this part
+    if (zeroFlag) {
+        //> inx                       ;return value to X
+        //> cpy #$00                  ;if player moving to the left,
+        //> bmi ExIPM                 ;branch to invert bit and leave
+        if (!negativeFlag) {
+            //> lda #$ff                  ;otherwise load A with value to be used later
+            //> jmp NXSpd                 ;and jump to affect movement
+            //> RImpd: ldx #$02                  ;return $02 to X
+            //> cpy #$01                  ;if player moving to the right,
+            //> bpl ExIPM                 ;branch to invert bit and leave
+            if (negativeFlag) {
+                //> lda #$01                  ;otherwise load A with value to be used here
+                //> NXSpd: ldy #$10
+                //> sty SideCollisionTimer    ;set timer of some sort
+                SideCollisionTimer = 0x10
+                //> ldy #$00
+                //> sty Player_X_Speed        ;nullify player's horizontal speed
+                Player_X_Speed = 0x00
+                //> cmp #$00                  ;if value set in A not set to $ff,
+                //> bpl PlatF                 ;branch ahead, do not decrement Y
+                if (A - 0x00 < 0) {
+                    //> dey                       ;otherwise decrement Y now
+                }
+                //> PlatF: sty $00                   ;store Y as high bits of horizontal adder
+                zp_00 = (0x00 - 1) and 0xFF
+                //> clc
+                //> adc Player_X_Position     ;add contents of A to player's horizontal
+                //> sta Player_X_Position     ;position to move player left or right
+                Player_X_Position = (0x01 + Player_X_Position + 0) and 0xFF
+                //> lda Player_PageLoc
+                //> adc $00                   ;add high bits and carry to
+                //> sta Player_PageLoc        ;page location if necessary
+                Player_PageLoc = (Player_PageLoc + zp_00 + 0) and 0xFF
+            }
+        }
+    }
+    //> ExIPM: txa                       ;invert contents of X
+    //> eor #$ff
+    //> and Player_CollisionBits  ;mask out bit that was set here
+    //> sta Player_CollisionBits  ;store to clear bit
+    Player_CollisionBits = 0x02 xor 0xFF and Player_CollisionBits
+    //> rts
+    return
+}

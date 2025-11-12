@@ -1,0 +1,5 @@
+Function: MoveSpritesOffscreen
+Inputs: 
+Outputs: 
+Clobbers: Y, NegativeFlag, ZeroFlag, A
+Control flow nodes: 3

@@ -3,7 +3,6 @@ package com.ivieleague.decompiler6502tokotlin.hand
 import java.io.File
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertTrue
-import kotlin.test.assertEquals
 
 class SMBAnnotatedEmitTest {
     @Test

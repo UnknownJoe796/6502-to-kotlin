@@ -43,35 +43,55 @@ fun List<ControlNode>.fixBlockOrdering(entryBlock: AssemblyBlock): List<ControlN
 
     this.forEach { collectBlocks(it) }
 
-    // If the first node is a backward block (should never be first),
-    // move it to after the entry block
-    val result = mutableListOf<ControlNode>()
-    val first = this.firstOrNull() as? BlockNode
-    if (first != null && first.block in backwardBlocks && first.block != entryBlock) {
-        // Skip the first block for now
-        val rest = this.drop(1)
-        // Find where to insert it (after first non-backward block or after entry)
-        var inserted = false
-        for (node in rest) {
-            if (!inserted && node is BlockNode && node.block == entryBlock) {
-                result.add(node)
-                // Insert the backward block as part of control flow, not at the start
-                // Actually, it should be embedded in an if/else structure, not standalone
-                // For now, skip it entirely at top level
-                inserted = true
-            } else {
-                result.add(node)
-            }
-        }
-        if (!inserted) {
-            // Entry block not found, just skip the backward block
-            result.addAll(rest)
-        }
-    } else {
-        result.addAll(this)
+    // Check if first node involves backward blocks
+    val first = this.firstOrNull()
+    val firstIsBackward = when (first) {
+        is BlockNode -> first.block in backwardBlocks && first.block != entryBlock
+        is LoopNode -> first.entry.originalLineIndex < entryBlock.originalLineIndex
+        else -> false
     }
 
-    return result
+    if (firstIsBackward) {
+        // The first node is a backward block or contains one - need to reorder
+        // Find the actual entry node and put it first
+        val result = mutableListOf<ControlNode>()
+
+        // Look for the entry block in the remaining nodes
+        var foundEntry = false
+        for (i in this.indices) {
+            val node = this[i]
+            if (node is BlockNode && node.block == entryBlock) {
+                // Found the entry - move everything before it to after it
+                result.add(node)
+                result.addAll(this.drop(i + 1))
+                // Add the backward nodes at the end (they should be inside ifs/loops already)
+                for (j in 0 until i) {
+                    val backwardNode = this[j]
+                    // Only add if not redundant (backward blocks should be referenced within control flow)
+                    // For now, skip them at top level to avoid duplication
+                }
+                foundEntry = true
+                break
+            }
+        }
+
+        if (!foundEntry) {
+            // Entry not found in nodes - this shouldn't happen but handle it
+            // Skip the first backward node(s) and keep the rest
+            val filtered = this.dropWhile { node ->
+                when (node) {
+                    is BlockNode -> node.block in backwardBlocks && node.block != entryBlock
+                    is LoopNode -> node.entry.originalLineIndex < entryBlock.originalLineIndex
+                    else -> false
+                }
+            }
+            return filtered
+        }
+
+        return result
+    } else {
+        return this
+    }
 }
 
 /**
@@ -342,8 +362,8 @@ fun List<ControlNode>.recognizeGuardClauses(): List<ControlNode> {
     while (i < this.size) {
         val node = this[i]
 
+        // Check if then branch ends with same block that follows
         if (node is IfNode && node.elseBranch.isEmpty()) {
-            // Check if this is a guard clause (then branch ends with a common block)
             val thenExit = node.thenBranch.lastOrNull() as? BlockNode
             val followingBlock = this.getOrNull(i + 1) as? BlockNode
 

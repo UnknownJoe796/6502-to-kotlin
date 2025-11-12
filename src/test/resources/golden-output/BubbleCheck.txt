@@ -1,0 +1,5 @@
+Function: BubbleCheck
+Inputs: X
+Outputs: 
+Clobbers: A, NegativeFlag, ZeroFlag, $07, CarryFlag, Y, OverflowFlag
+Control flow nodes: 2

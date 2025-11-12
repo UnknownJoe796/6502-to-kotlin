@@ -12,32 +12,49 @@ class AssemblyBlock(
 
     /**
      * The blocks that could enter this block.
+     * Automatically maintained by fallThroughExit and branchExit bidirectional delegates.
      */
-    val enteredFrom = ArrayList<AssemblyBlock>()
+    private val enteredFromDelegate = BackwardCollectionDelegate<AssemblyBlock>()
+    val enteredFrom: List<AssemblyBlock> by enteredFromDelegate
 
     /**
      * The exit from either falling through to the next block or a jump.
      * If it is null, that indicates this block performs an RTS or RTI.
      * Note that the code we're analyzing does not use any indirect jumps.
+     * Automatically updates the target's enteredFrom list.
      */
-    var fallThroughExit: AssemblyBlock? = null
+    var fallThroughExit: AssemblyBlock? by BidirectionalDelegate({ it.enteredFromDelegate.getMutable() })
 
     /**
      * The alternate exit from a conditional branch, or the target of an unconditional JMP.
      * Note that the code we're analyzing does not use any indirect jumps.
+     * Always comes from last assembly line.
+     * Automatically updates the target's enteredFrom list.
      */
-    var branchExit: AssemblyBlock? = null  // Always comes from last assembly line
+    var branchExit: AssemblyBlock? by BidirectionalDelegate({ it.enteredFromDelegate.getMutable() })
+
+    /**
+     * The blocks dominated by this block (inverse of immediateDominator).
+     * Automatically maintained by immediateDominator bidirectional delegate.
+     */
+    private val dominatesDelegate = BackwardCollectionDelegate<AssemblyBlock>()
+    val dominates: List<AssemblyBlock> by dominatesDelegate
 
     /**
      * The immediate dominator of this block - in other words, the only block this block can come from.
+     * Automatically updates the dominator's dominates list.
+     * Can be reset because dominator analysis may run multiple times.
      */
-    var immediateDominator: AssemblyBlock? = null
+    var immediateDominator: AssemblyBlock? by BidirectionalDelegate(
+        backwardGetter = { it.dominatesDelegate.getMutable() },
+        allowReset = true
+    )
 
     /**
-     * The immediate dominator of this block - in other words, the only block this block can come from.
+     * The function this block belongs to.
+     * Note: A block may be reachable from multiple functions, in which case this will be
+     * set to whichever function's analysis runs last. This is acceptable for shared epilogue code.
      */
-    val dominates = ArrayList<AssemblyBlock>()
-
     var function: AssemblyFunction? = null
 
     val dominationDepth: Int get() = generateSequence(this.immediateDominator) { it.immediateDominator }.count()
@@ -139,7 +156,7 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
             if (currentBlock.isNotEmpty()) {
                 blocks.add(AssemblyBlock(currentBlock).also {
                     previousBlock?.let { pb ->
-                        it.enteredFrom.add(pb)
+                        // Bidirectional delegate automatically updates it.enteredFrom
                         pb.fallThroughExit = it
                     }
                     previousBlock = it
@@ -152,7 +169,7 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
             line.instruction?.op?.isBranch == true -> {
                 blocks.add(AssemblyBlock(currentBlock).also {
                     previousBlock?.let { pb ->
-                        it.enteredFrom.add(pb)
+                        // Bidirectional delegate automatically updates it.enteredFrom
                         pb.fallThroughExit = it
                     }
                     previousBlock = it
@@ -163,7 +180,7 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
             line.instruction?.op == AssemblyOp.JMP -> {
                 blocks.add(AssemblyBlock(currentBlock).also {
                     previousBlock?.let { pb ->
-                        it.enteredFrom.add(pb)
+                        // Bidirectional delegate automatically updates it.enteredFrom
                         pb.fallThroughExit = it
                     }
                     // The next found block isn't connected to this one.
@@ -175,7 +192,7 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
             line.instruction?.op == AssemblyOp.RTS || line.instruction?.op == AssemblyOp.RTI -> {
                 blocks.add(AssemblyBlock(currentBlock).also {
                     previousBlock?.let { pb ->
-                        it.enteredFrom.add(pb)
+                        // Bidirectional delegate automatically updates it.enteredFrom
                         pb.fallThroughExit = it
                     }
                     // The next found block isn't connected to this one.
@@ -192,7 +209,7 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
     if (currentBlock.isNotEmpty()) {
         blocks.add(AssemblyBlock(currentBlock).also {
             previousBlock?.let { pb ->
-                it.enteredFrom.add(pb)
+                // Bidirectional delegate automatically updates it.enteredFrom
                 pb.fallThroughExit = it
             }
         })
@@ -205,8 +222,8 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
         when {
             op.isBranch -> {
                 val otherBlock = blocksByLabel[lastInstruction.addressAsLabel.label]!!
+                // Bidirectional delegate automatically updates otherBlock.enteredFrom
                 block.branchExit = otherBlock
-                otherBlock.enteredFrom.add(block)
             }
 
             op == AssemblyOp.JMP -> {
@@ -214,8 +231,8 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
                 if (addr is AssemblyAddressing.Direct) {
                     val otherBlock = blocksByLabel[addr.label]
                     if (otherBlock != null) {
+                        // Bidirectional delegate automatically updates otherBlock.enteredFrom
                         block.branchExit = otherBlock
-                        otherBlock.enteredFrom.add(block)
                     }
                 }
             }
@@ -321,8 +338,7 @@ fun List<AssemblyBlock>.dominators() {
         }
     }
 
-    // Clear existing dominance info
-    for (block in this) block.dominates.clear()
+    // No need to clear dominates - the bidirectional delegate handles cleanup when we reassign immediateDominator
 
     // Write results back to blocks, skipping the synthetic node
     for (i in 0 until n) {
@@ -335,6 +351,7 @@ fun List<AssemblyBlock>.dominators() {
         val isRealRoot = preds[i].isEmpty()
         val parent = idom[i]
 
+        // Bidirectional delegate automatically updates dominates when we set immediateDominator
         block.immediateDominator = when {
             isRealRoot -> null
             parent == -1 -> null
@@ -342,8 +359,6 @@ fun List<AssemblyBlock>.dominators() {
             parent == i -> null
             else -> this[parent]
         }
-
-        block.immediateDominator?.dominates?.add(block)
     }
 }
 
@@ -498,3 +513,58 @@ fun List<AssemblyBlock>.functionify(
 
     return functions
 }
+
+/**
+ * Validates that this block's control flow graph references are bidirectionally consistent.
+ * Throws IllegalStateException if inconsistencies are found.
+ */
+fun AssemblyBlock.validateConsistency() {
+    // Check forward -> backward consistency for fallThroughExit
+    fallThroughExit?.let { target ->
+        check(this in target.enteredFrom) {
+            "Block ${label ?: "@$originalLineIndex"} has fallThroughExit to ${target.label ?: "@${target.originalLineIndex}"}, " +
+            "but this block is not in target's enteredFrom list"
+        }
+    }
+
+    // Check forward -> backward consistency for branchExit
+    branchExit?.let { target ->
+        check(this in target.enteredFrom) {
+            "Block ${label ?: "@$originalLineIndex"} has branchExit to ${target.label ?: "@${target.originalLineIndex}"}, " +
+            "but this block is not in target's enteredFrom list"
+        }
+    }
+
+    // Check backward -> forward consistency for enteredFrom
+    for (pred in enteredFrom) {
+        check(pred.fallThroughExit == this || pred.branchExit == this) {
+            "Block ${pred.label ?: "@${pred.originalLineIndex}"} is in enteredFrom of ${label ?: "@$originalLineIndex"}, " +
+            "but doesn't have this block as fallThroughExit or branchExit"
+        }
+    }
+
+    // Check dominator consistency
+    immediateDominator?.let { idom ->
+        check(this in idom.dominates) {
+            "Block ${label ?: "@$originalLineIndex"} has immediateDominator ${idom.label ?: "@${idom.originalLineIndex}"}, " +
+            "but this block is not in dominator's dominates list"
+        }
+    }
+
+    // Check dominates consistency
+    for (dominated in dominates) {
+        check(dominated.immediateDominator == this) {
+            "Block ${dominated.label ?: "@${dominated.originalLineIndex}"} is in dominates list of ${label ?: "@$originalLineIndex"}, " +
+            "but has different immediateDominator: ${dominated.immediateDominator?.label ?: "null"}"
+        }
+    }
+}
+
+/**
+ * Validates consistency of all blocks in the list.
+ * Useful for debugging and catching graph corruption early.
+ */
+fun List<AssemblyBlock>.validateAllConsistency() {
+    forEach { it.validateConsistency() }
+}
+

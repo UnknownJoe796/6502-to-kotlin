@@ -1,0 +1,993 @@
+
+========== FloateyNumbersRoutine ==========
+
+--- Function Info ---
+Entry: FloateyNumbersRoutine
+Inputs: X
+Outputs: X
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, X, OverflowFlag
+
+--- Control Flow Nodes (6 nodes) ---
+
+[0] IfNode
+  Condition block: @1285
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
+
+[1] IfNode
+  Condition block: ChkNumTimer
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
+
+[2] IfNode
+  Condition block: DecNumTimer
+  Sense: false
+  Then branch: 2 nodes
+  Else branch: 0 nodes
+
+[3] IfNode
+  Condition block: ChkTallEnemy
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
+
+[4] IfNode
+  Condition block: FloateyPart
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
+
+[5] BlockNode
+  Block: SetupNumSpr
+  Lines: 20
+    LDA FloateyNum_Y_Pos,X
+    SBC #$08
+    JSR DumpTwoSpr
+    ... (17 more)
+
+--- Blocks Graph ---
+
+FloateyNumbersRoutine
+  Lines: 3
+  Fall through: 1285
+  Branch: EndExitOne
+  Entered from: [ScoreUpdateData]
+  Dominator: ScoreUpdateData
+
+@1285
+  Lines: 2
+  Fall through: 1287
+  Branch: ChkNumTimer
+  Entered from: [FloateyNumbersRoutine]
+  Dominator: FloateyNumbersRoutine
+
+@1287
+  Lines: 2
+  Fall through: ChkNumTimer
+  Branch: null
+  Entered from: [@1285]
+  Dominator: 1285
+
+ChkNumTimer
+  Lines: 3
+  Fall through: 1292
+  Branch: DecNumTimer
+  Entered from: [@1287, @1285]
+  Dominator: 1285
+
+@1292
+  Lines: 2
+  Fall through: null
+  Branch: null
+  Entered from: [ChkNumTimer]
+  Dominator: ChkNumTimer
+
+DecNumTimer
+  Lines: 3
+  Fall through: 1297
+  Branch: ChkTallEnemy
+  Entered from: [ChkNumTimer]
+  Dominator: ChkNumTimer
+
+@1297
+  Lines: 2
+  Fall through: 1299
+  Branch: LoadNumTiles
+  Entered from: [DecNumTimer]
+  Dominator: DecNumTimer
+
+@1299
+  Lines: 3
+  Fall through: LoadNumTiles
+  Branch: null
+  Entered from: [@1297]
+  Dominator: 1297
+
+LoadNumTiles
+  Lines: 10
+  Fall through: ChkTallEnemy
+  Branch: null
+  Entered from: [@1299, @1297]
+  Dominator: 1297
+
+ChkTallEnemy
+  Lines: 4
+  Fall through: 1316
+  Branch: FloateyPart
+  Entered from: [LoadNumTiles, DecNumTimer]
+  Dominator: DecNumTimer
+
+@1316
+  Lines: 2
+  Fall through: 1318
+  Branch: FloateyPart
+  Entered from: [ChkTallEnemy]
+  Dominator: ChkTallEnemy
+
+@1318
+  Lines: 2
+  Fall through: 1320
+  Branch: GetAltOffset
+  Entered from: [@1316]
+  Dominator: 1316
+
+@1320
+  Lines: 2
+  Fall through: 1322
+  Branch: FloateyPart
+  Entered from: [@1318]
+  Dominator: 1318
+
+@1322
+  Lines: 2
+  Fall through: 1324
+  Branch: FloateyPart
+  Entered from: [@1320]
+  Dominator: 1320
+
+@1324
+  Lines: 2
+  Fall through: 1326
+  Branch: GetAltOffset
+  Entered from: [@1322]
+  Dominator: 1322
+
+@1326
+  Lines: 3
+  Fall through: GetAltOffset
+  Branch: FloateyPart
+  Entered from: [@1324]
+  Dominator: 1324
+
+GetAltOffset
+  Lines: 3
+  Fall through: FloateyPart
+  Branch: null
+  Entered from: [@1326, @1318, @1324]
+  Dominator: 1318
+
+FloateyPart
+  Lines: 3
+  Fall through: 1335
+  Branch: SetupNumSpr
+  Entered from: [GetAltOffset, ChkTallEnemy, @1316, @1320, @1322, @1326]
+  Dominator: ChkTallEnemy
+
+@1335
+  Lines: 2
+  Fall through: SetupNumSpr
+  Branch: null
+  Entered from: [FloateyPart]
+  Dominator: FloateyPart
+
+SetupNumSpr
+  Lines: 20
+  Fall through: null
+  Branch: null
+  Entered from: [@1335, FloateyPart]
+  Dominator: FloateyPart
+
+EndExitOne
+  Lines: 1
+  Fall through: null
+  Branch: null
+  Entered from: [@1236, PlayerEndWorld, FloateyNumbersRoutine]
+  Dominator: null
+
+
+
+========== MusicHandler ==========
+
+--- Function Info ---
+Entry: MusicHandler
+Inputs: 
+Outputs: 
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, X, Y
+
+--- Control Flow Nodes (4 nodes) ---
+
+[0] BlockNode
+  Block: MusicHandler
+  Lines: 3
+    LDA EventMusicQueue
+    BNE LoadEventMusic
+
+[1] BlockNode
+  Block: @15612
+  Lines: 2
+    LDA AreaMusicQueue
+    BNE LoadAreaMusic
+
+[2] BlockNode
+  Block: @15614
+  Lines: 3
+    LDA EventMusicBuffer
+    ORA AreaMusicBuffer
+    BNE ContinueMusic
+
+[3] BlockNode
+  Block: @15617
+  Lines: 1
+    RTS 
+
+--- Blocks Graph ---
+
+MusicHandler
+  Lines: 3
+  Fall through: 15612
+  Branch: LoadEventMusic
+  Entered from: [@15608]
+  Dominator: 15608
+
+@15612
+  Lines: 2
+  Fall through: 15614
+  Branch: LoadAreaMusic
+  Entered from: [MusicHandler]
+  Dominator: MusicHandler
+
+@15614
+  Lines: 3
+  Fall through: 15617
+  Branch: ContinueMusic
+  Entered from: [@15612]
+  Dominator: 15612
+
+@15617
+  Lines: 1
+  Fall through: null
+  Branch: null
+  Entered from: [@15614]
+  Dominator: 15614
+
+ContinueMusic
+  Lines: 2
+  Fall through: null
+  Branch: HandleSquare2Music
+  Entered from: [@15603, @15614]
+  Dominator: null
+
+HandleSquare2Music
+  Lines: 3
+  Fall through: 15697
+  Branch: MiscSqu2MusicTasks
+  Entered from: [LoadHeader, ContinueMusic]
+  Dominator: null
+
+@15697
+  Lines: 4
+  Fall through: 15701
+  Branch: EndOfMusicData
+  Entered from: [HandleSquare2Music]
+  Dominator: HandleSquare2Music
+
+@15701
+  Lines: 1
+  Fall through: 15702
+  Branch: Squ2NoteHandler
+  Entered from: [@15697]
+  Dominator: 15697
+
+@15702
+  Lines: 1
+  Fall through: 15703
+  Branch: Squ2LengthHandler
+  Entered from: [@15701]
+  Dominator: 15701
+
+@15703
+  Lines: 1
+  Fall through: EndOfMusicData
+  Branch: null
+  Entered from: [@15702]
+  Dominator: 15702
+
+EndOfMusicData
+  Lines: 4
+  Fall through: 15708
+  Branch: NotTRO
+  Entered from: [@15703, @15697]
+  Dominator: 15697
+
+@15708
+  Lines: 2
+  Fall through: NotTRO
+  Branch: MusicLoopBack
+  Entered from: [EndOfMusicData]
+  Dominator: EndOfMusicData
+
+NotTRO
+  Lines: 2
+  Fall through: 15712
+  Branch: VictoryMLoopBack
+  Entered from: [@15708, EndOfMusicData]
+  Dominator: EndOfMusicData
+
+@15712
+  Lines: 3
+  Fall through: 15715
+  Branch: MusicLoopBack
+  Entered from: [NotTRO]
+  Dominator: NotTRO
+
+@15715
+  Lines: 8
+  Fall through: null
+  Branch: null
+  Entered from: [@15712]
+  Dominator: 15712
+
+MusicLoopBack
+  Lines: 2
+  Fall through: null
+  Branch: HandleAreaMusicLoopB
+  Entered from: [@15723, @15708, @15712]
+  Dominator: null
+
+HandleAreaMusicLoopB
+  Lines: 6
+  Fall through: 15649
+  Branch: FindAreaMusicHeader
+  Entered from: [GMLoopB, MusicLoopBack]
+  Dominator: null
+
+@15649
+  Lines: 4
+  Fall through: 15653
+  Branch: LoadHeader
+  Entered from: [HandleAreaMusicLoopB]
+  Dominator: HandleAreaMusicLoopB
+
+@15653
+  Lines: 2
+  Fall through: 15655
+  Branch: GMLoopB
+  Entered from: [@15649]
+  Dominator: 15649
+
+@15655
+  Lines: 1
+  Fall through: FindAreaMusicHeader
+  Branch: null
+  Entered from: [@15653]
+  Dominator: 15653
+
+FindAreaMusicHeader
+  Lines: 4
+  Fall through: FindEventMusicHeader
+  Branch: null
+  Entered from: [@15655, HandleAreaMusicLoopB]
+  Dominator: HandleAreaMusicLoopB
+
+FindEventMusicHeader
+  Lines: 4
+  Fall through: 15664
+  Branch: FindEventMusicHeader
+  Entered from: [FindAreaMusicHeader, NoStopSfx, @15632, FindEventMusicHeader]
+  Dominator: null
+
+@15664
+  Lines: 1
+  Fall through: LoadHeader
+  Branch: null
+  Entered from: [FindEventMusicHeader]
+  Dominator: FindEventMusicHeader
+
+LoadHeader
+  Lines: 29
+  Fall through: HandleSquare2Music
+  Branch: null
+  Entered from: [@15664, @15649]
+  Dominator: null
+
+GMLoopB
+  Lines: 2
+  Fall through: HandleAreaMusicLoopB
+  Branch: null
+  Entered from: [NoStop1, @15653]
+  Dominator: null
+
+VictoryMLoopBack
+  Lines: 2
+  Fall through: null
+  Branch: LoadEventMusic
+  Entered from: [@15726, NotTRO]
+  Dominator: null
+
+LoadEventMusic
+  Lines: 4
+  Fall through: 15623
+  Branch: NoStopSfx
+  Entered from: [@15618, MusicHandler, VictoryMLoopBack]
+  Dominator: null
+
+@15623
+  Lines: 2
+  Fall through: NoStopSfx
+  Branch: null
+  Entered from: [LoadEventMusic]
+  Dominator: LoadEventMusic
+
+NoStopSfx
+  Lines: 7
+  Fall through: 15632
+  Branch: FindEventMusicHeader
+  Entered from: [@15623, LoadEventMusic]
+  Dominator: LoadEventMusic
+
+@15632
+  Lines: 3
+  Fall through: 15635
+  Branch: FindEventMusicHeader
+  Entered from: [NoStopSfx]
+  Dominator: NoStopSfx
+
+@15635
+  Lines: 1
+  Fall through: LoadAreaMusic
+  Branch: null
+  Entered from: [@15632]
+  Dominator: 15632
+
+LoadAreaMusic
+  Lines: 3
+  Fall through: 15639
+  Branch: NoStop1
+  Entered from: [@15635, @15612]
+  Dominator: null
+
+@15639
+  Lines: 1
+  Fall through: NoStop1
+  Branch: null
+  Entered from: [LoadAreaMusic]
+  Dominator: LoadAreaMusic
+
+NoStop1
+  Lines: 1
+  Fall through: GMLoopB
+  Branch: null
+  Entered from: [@15639, LoadAreaMusic]
+  Dominator: LoadAreaMusic
+
+Squ2LengthHandler
+  Lines: 7
+  Fall through: Squ2NoteHandler
+  Branch: null
+  Entered from: [@15729, @15702]
+  Dominator: null
+
+Squ2NoteHandler
+  Lines: 3
+  Fall through: 15740
+  Branch: SkipFqL1
+  Entered from: [Squ2LengthHandler, @15701]
+  Dominator: null
+
+@15740
+  Lines: 2
+  Fall through: 15742
+  Branch: Rest
+  Entered from: [Squ2NoteHandler]
+  Dominator: Squ2NoteHandler
+
+@15742
+  Lines: 1
+  Fall through: Rest
+  Branch: null
+  Entered from: [@15740]
+  Dominator: 15740
+
+Rest
+  Lines: 2
+  Fall through: SkipFqL1
+  Branch: null
+  Entered from: [@15742, @15740]
+  Dominator: 15740
+
+SkipFqL1
+  Lines: 3
+  Fall through: MiscSqu2MusicTasks
+  Branch: null
+  Entered from: [Rest, Squ2NoteHandler]
+  Dominator: Squ2NoteHandler
+
+MiscSqu2MusicTasks
+  Lines: 3
+  Fall through: 15751
+  Branch: HandleSquare1Music
+  Entered from: [SkipFqL1, HandleSquare2Music]
+  Dominator: null
+
+@15751
+  Lines: 3
+  Fall through: 15754
+  Branch: HandleSquare1Music
+  Entered from: [MiscSqu2MusicTasks]
+  Dominator: MiscSqu2MusicTasks
+
+@15754
+  Lines: 2
+  Fall through: 15756
+  Branch: NoDecEnv1
+  Entered from: [@15751]
+  Dominator: 15751
+
+@15756
+  Lines: 1
+  Fall through: NoDecEnv1
+  Branch: null
+  Entered from: [@15754]
+  Dominator: 15754
+
+NoDecEnv1
+  Lines: 5
+  Fall through: HandleSquare1Music
+  Branch: null
+  Entered from: [@15756, @15754]
+  Dominator: 15754
+
+HandleSquare1Music
+  Lines: 3
+  Fall through: 15765
+  Branch: HandleTriangleMusic
+  Entered from: [NoDecEnv1, MiscSqu2MusicTasks, @15751]
+  Dominator: MiscSqu2MusicTasks
+
+@15765
+  Lines: 2
+  Fall through: 15767
+  Branch: MiscSqu1MusicTasks
+  Entered from: [HandleSquare1Music]
+  Dominator: HandleSquare1Music
+
+@15767
+  Lines: 1
+  Fall through: FetchSqu1MusicData
+  Branch: null
+  Entered from: [@15765]
+  Dominator: 15765
+
+FetchSqu1MusicData
+  Lines: 5
+  Fall through: 15773
+  Branch: Squ1NoteHandler
+  Entered from: [@15767, @15773]
+  Dominator: 15767
+
+@15773
+  Lines: 6
+  Fall through: 15779
+  Branch: FetchSqu1MusicData
+  Entered from: [FetchSqu1MusicData]
+  Dominator: FetchSqu1MusicData
+
+@15779
+  Lines: 1
+  Fall through: Squ1NoteHandler
+  Branch: null
+  Entered from: [@15773]
+  Dominator: 15773
+
+Squ1NoteHandler
+  Lines: 5
+  Fall through: 15785
+  Branch: HandleTriangleMusic
+  Entered from: [@15779, FetchSqu1MusicData]
+  Dominator: FetchSqu1MusicData
+
+@15785
+  Lines: 4
+  Fall through: 15789
+  Branch: SkipCtrlL
+  Entered from: [Squ1NoteHandler]
+  Dominator: Squ1NoteHandler
+
+@15789
+  Lines: 1
+  Fall through: SkipCtrlL
+  Branch: null
+  Entered from: [@15785]
+  Dominator: 15785
+
+SkipCtrlL
+  Lines: 3
+  Fall through: MiscSqu1MusicTasks
+  Branch: null
+  Entered from: [@15789, @15785]
+  Dominator: 15785
+
+MiscSqu1MusicTasks
+  Lines: 3
+  Fall through: 15796
+  Branch: HandleTriangleMusic
+  Entered from: [SkipCtrlL, @15765]
+  Dominator: 15765
+
+@15796
+  Lines: 3
+  Fall through: 15799
+  Branch: DeathMAltReg
+  Entered from: [MiscSqu1MusicTasks]
+  Dominator: MiscSqu1MusicTasks
+
+@15799
+  Lines: 2
+  Fall through: 15801
+  Branch: NoDecEnv2
+  Entered from: [@15796]
+  Dominator: 15796
+
+@15801
+  Lines: 1
+  Fall through: NoDecEnv2
+  Branch: null
+  Entered from: [@15799]
+  Dominator: 15799
+
+NoDecEnv2
+  Lines: 2
+  Fall through: DeathMAltReg
+  Branch: null
+  Entered from: [@15801, @15799]
+  Dominator: 15799
+
+DeathMAltReg
+  Lines: 2
+  Fall through: 15806
+  Branch: DoAltLoad
+  Entered from: [NoDecEnv2, @15796]
+  Dominator: 15796
+
+@15806
+  Lines: 1
+  Fall through: DoAltLoad
+  Branch: null
+  Entered from: [DeathMAltReg]
+  Dominator: DeathMAltReg
+
+DoAltLoad
+  Lines: 2
+  Fall through: HandleTriangleMusic
+  Branch: null
+  Entered from: [@15806, DeathMAltReg]
+  Dominator: DeathMAltReg
+
+HandleTriangleMusic
+  Lines: 4
+  Fall through: 15813
+  Branch: HandleNoiseMusic
+  Entered from: [DoAltLoad, HandleSquare1Music, Squ1NoteHandler, MiscSqu1MusicTasks]
+  Dominator: HandleSquare1Music
+
+@15813
+  Lines: 4
+  Fall through: 15817
+  Branch: LoadTriCtrlReg
+  Entered from: [HandleTriangleMusic]
+  Dominator: HandleTriangleMusic
+
+@15817
+  Lines: 1
+  Fall through: 15818
+  Branch: TriNoteHandler
+  Entered from: [@15813]
+  Dominator: 15813
+
+@15818
+  Lines: 8
+  Fall through: 15826
+  Branch: LoadTriCtrlReg
+  Entered from: [@15817]
+  Dominator: 15817
+
+@15826
+  Lines: 1
+  Fall through: TriNoteHandler
+  Branch: null
+  Entered from: [@15818]
+  Dominator: 15818
+
+TriNoteHandler
+  Lines: 7
+  Fall through: 15834
+  Branch: NotDOrD4
+  Entered from: [@15826, @15817]
+  Dominator: 15817
+
+@15834
+  Lines: 3
+  Fall through: NotDOrD4
+  Branch: HandleNoiseMusic
+  Entered from: [TriNoteHandler]
+  Dominator: TriNoteHandler
+
+NotDOrD4
+  Lines: 3
+  Fall through: 15840
+  Branch: LongN
+  Entered from: [@15834, TriNoteHandler]
+  Dominator: TriNoteHandler
+
+@15840
+  Lines: 3
+  Fall through: 15843
+  Branch: MediN
+  Entered from: [NotDOrD4]
+  Dominator: NotDOrD4
+
+@15843
+  Lines: 2
+  Fall through: MediN
+  Branch: LoadTriCtrlReg
+  Entered from: [@15840]
+  Dominator: 15840
+
+MediN
+  Lines: 2
+  Fall through: LongN
+  Branch: LoadTriCtrlReg
+  Entered from: [@15843, @15840]
+  Dominator: 15840
+
+LongN
+  Lines: 2
+  Fall through: LoadTriCtrlReg
+  Branch: null
+  Entered from: [MediN, NotDOrD4]
+  Dominator: NotDOrD4
+
+LoadTriCtrlReg
+  Lines: 3
+  Fall through: HandleNoiseMusic
+  Branch: null
+  Entered from: [LongN, @15813, @15818, @15843, MediN]
+  Dominator: 15813
+
+HandleNoiseMusic
+  Lines: 4
+  Fall through: 15856
+  Branch: ExitMusicHandler
+  Entered from: [LoadTriCtrlReg, HandleTriangleMusic, @15834]
+  Dominator: HandleTriangleMusic
+
+@15856
+  Lines: 2
+  Fall through: 15858
+  Branch: ExitMusicHandler
+  Entered from: [HandleNoiseMusic]
+  Dominator: HandleNoiseMusic
+
+@15858
+  Lines: 1
+  Fall through: FetchNoiseBeatData
+  Branch: null
+  Entered from: [@15856]
+  Dominator: 15856
+
+FetchNoiseBeatData
+  Lines: 5
+  Fall through: 15864
+  Branch: NoiseBeatHandler
+  Entered from: [@15858, @15864]
+  Dominator: 15858
+
+@15864
+  Lines: 3
+  Fall through: 15867
+  Branch: FetchNoiseBeatData
+  Entered from: [FetchNoiseBeatData]
+  Dominator: FetchNoiseBeatData
+
+@15867
+  Lines: 1
+  Fall through: NoiseBeatHandler
+  Branch: null
+  Entered from: [@15864]
+  Dominator: 15864
+
+NoiseBeatHandler
+  Lines: 6
+  Fall through: 15874
+  Branch: SilentBeat
+  Entered from: [@15867, FetchNoiseBeatData]
+  Dominator: FetchNoiseBeatData
+
+@15874
+  Lines: 2
+  Fall through: 15876
+  Branch: LongBeat
+  Entered from: [NoiseBeatHandler]
+  Dominator: NoiseBeatHandler
+
+@15876
+  Lines: 2
+  Fall through: 15878
+  Branch: StrongBeat
+  Entered from: [@15874]
+  Dominator: 15874
+
+@15878
+  Lines: 2
+  Fall through: 15880
+  Branch: SilentBeat
+  Entered from: [@15876]
+  Dominator: 15876
+
+@15880
+  Lines: 4
+  Fall through: 15884
+  Branch: PlayBeat
+  Entered from: [@15878]
+  Dominator: 15878
+
+@15884
+  Lines: 1
+  Fall through: StrongBeat
+  Branch: null
+  Entered from: [@15880]
+  Dominator: 15880
+
+StrongBeat
+  Lines: 5
+  Fall through: 15890
+  Branch: PlayBeat
+  Entered from: [@15884, @15876]
+  Dominator: 15876
+
+@15890
+  Lines: 1
+  Fall through: LongBeat
+  Branch: null
+  Entered from: [StrongBeat]
+  Dominator: StrongBeat
+
+LongBeat
+  Lines: 5
+  Fall through: 15896
+  Branch: PlayBeat
+  Entered from: [@15890, @15874]
+  Dominator: 15874
+
+@15896
+  Lines: 1
+  Fall through: SilentBeat
+  Branch: null
+  Entered from: [LongBeat]
+  Dominator: LongBeat
+
+SilentBeat
+  Lines: 3
+  Fall through: PlayBeat
+  Branch: null
+  Entered from: [@15896, NoiseBeatHandler, @15878]
+  Dominator: NoiseBeatHandler
+
+PlayBeat
+  Lines: 5
+  Fall through: ExitMusicHandler
+  Branch: null
+  Entered from: [SilentBeat, @15880, StrongBeat, LongBeat]
+  Dominator: NoiseBeatHandler
+
+ExitMusicHandler
+  Lines: 2
+  Fall through: null
+  Branch: null
+  Entered from: [PlayBeat, HandleNoiseMusic, @15856]
+  Dominator: HandleNoiseMusic
+
+
+
+========== ImpedePlayerMove ==========
+
+--- Function Info ---
+Entry: ImpedePlayerMove
+Inputs: $00
+Outputs: 
+Clobbers: A, NegativeFlag, ZeroFlag, Y, X, CarryFlag, $00, OverflowFlag
+
+--- Control Flow Nodes (2 nodes) ---
+
+[0] IfNode
+  Condition block: ImpedePlayerMove
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
+
+[1] BlockNode
+  Block: ExIPM
+  Lines: 5
+    TXA 
+    EOR #$ff
+    AND Player_CollisionBits
+    ... (2 more)
+
+--- Blocks Graph ---
+
+ImpedePlayerMove
+  Lines: 6
+  Fall through: 12323
+  Branch: RImpd
+  Entered from: [@12316, @12011]
+  Dominator: null
+
+@12323
+  Lines: 3
+  Fall through: 12326
+  Branch: ExIPM
+  Entered from: [ImpedePlayerMove]
+  Dominator: ImpedePlayerMove
+
+@12326
+  Lines: 2
+  Fall through: null
+  Branch: NXSpd
+  Entered from: [@12323]
+  Dominator: 12323
+
+NXSpd
+  Lines: 6
+  Fall through: 12338
+  Branch: PlatF
+  Entered from: [@12331, @12326]
+  Dominator: ImpedePlayerMove
+
+@12338
+  Lines: 1
+  Fall through: PlatF
+  Branch: null
+  Entered from: [NXSpd]
+  Dominator: NXSpd
+
+PlatF
+  Lines: 7
+  Fall through: ExIPM
+  Branch: null
+  Entered from: [@12338, NXSpd]
+  Dominator: NXSpd
+
+ExIPM
+  Lines: 5
+  Fall through: null
+  Branch: null
+  Entered from: [PlatF, @12323, RImpd]
+  Dominator: ImpedePlayerMove
+
+RImpd
+  Lines: 3
+  Fall through: 12331
+  Branch: ExIPM
+  Entered from: [ImpedePlayerMove]
+  Dominator: ImpedePlayerMove
+
+@12331
+  Lines: 1
+  Fall through: NXSpd
+  Branch: null
+  Entered from: [RImpd]
+  Dominator: RImpd
+
+

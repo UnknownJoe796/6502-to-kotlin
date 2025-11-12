@@ -1,0 +1,138 @@
+
+========== InitializeMemory ==========
+
+--- Function Info ---
+Entry: InitializeMemory
+Inputs: Y
+Outputs: A
+Clobbers: X, NegativeFlag, ZeroFlag, A, $06, $07, CarryFlag, Y
+
+--- Control Flow Nodes (3 nodes) ---
+
+[0] BlockNode
+  Block: InitializeMemory
+  Lines: 4
+    LDX #$07
+    LDA #$00
+    ... (1 more)
+
+[1] LoopNode
+  Type: LoopNode
+  Body nodes: 6
+  Entry: InitPageLoop
+
+[2] BlockNode
+  Block: @2784
+  Lines: 1
+    RTS 
+
+--- Blocks Graph ---
+
+InitializeMemory
+  Lines: 4
+  Fall through: InitPageLoop
+  Branch: null
+  Entered from: [@2763]
+  Dominator: 2763
+
+InitPageLoop
+  Lines: 1
+  Fall through: InitByteLoop
+  Branch: null
+  Entered from: [InitializeMemory, @2782]
+  Dominator: InitializeMemory
+
+InitByteLoop
+  Lines: 2
+  Fall through: 2776
+  Branch: InitByte
+  Entered from: [InitPageLoop, SkipByte]
+  Dominator: InitPageLoop
+
+@2776
+  Lines: 2
+  Fall through: InitByte
+  Branch: SkipByte
+  Entered from: [InitByteLoop]
+  Dominator: InitByteLoop
+
+InitByte
+  Lines: 1
+  Fall through: SkipByte
+  Branch: null
+  Entered from: [@2776, InitByteLoop]
+  Dominator: InitByteLoop
+
+SkipByte
+  Lines: 3
+  Fall through: 2782
+  Branch: InitByteLoop
+  Entered from: [InitByte, @2776]
+  Dominator: InitByteLoop
+
+@2782
+  Lines: 2
+  Fall through: 2784
+  Branch: InitPageLoop
+  Entered from: [SkipByte]
+  Dominator: SkipByte
+
+@2784
+  Lines: 1
+  Fall through: null
+  Branch: null
+  Entered from: [@2782]
+  Dominator: 2782
+
+
+
+========== MoveSpritesOffscreen ==========
+
+--- Function Info ---
+Entry: MoveSpritesOffscreen
+Inputs: 
+Outputs: 
+Clobbers: Y, NegativeFlag, ZeroFlag, A
+
+--- Control Flow Nodes (3 nodes) ---
+
+[0] BlockNode
+  Block: MoveSpritesOffscreen
+  Lines: 3
+    LDY #$04
+    LDA #$f8
+
+[1] LoopNode
+  Type: LoopNode
+  Body nodes: 1
+  Entry: SprInitLoop
+
+[2] BlockNode
+  Block: @952
+  Lines: 1
+    RTS 
+
+--- Blocks Graph ---
+
+MoveSpritesOffscreen
+  Lines: 3
+  Fall through: SprInitLoop
+  Branch: null
+  Entered from: [MoveAllSpritesOffscreen]
+  Dominator: MoveAllSpritesOffscreen
+
+SprInitLoop
+  Lines: 6
+  Fall through: 952
+  Branch: SprInitLoop
+  Entered from: [MoveSpritesOffscreen, SprInitLoop]
+  Dominator: MoveSpritesOffscreen
+
+@952
+  Lines: 1
+  Fall through: null
+  Branch: null
+  Entered from: [SprInitLoop]
+  Dominator: SprInitLoop
+
+

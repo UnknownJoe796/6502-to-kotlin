@@ -1,0 +1,5 @@
+Function: PlayerEnemyDiff
+Inputs: X
+Outputs: NegativeFlag
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, OverflowFlag, $00
+Control flow nodes: 1

@@ -1,0 +1,528 @@
+
+========== CheckPlayerVertical ==========
+
+--- Function Info ---
+Entry: CheckPlayerVertical
+Inputs: 
+Outputs: CarryFlag
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y
+
+--- Control Flow Nodes (2 nodes) ---
+
+[0] IfNode
+  Condition block: CheckPlayerVertical
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
+
+[1] BlockNode
+  Block: ExCPV
+  Lines: 1
+    RTS 
+
+--- Blocks Graph ---
+
+CheckPlayerVertical
+  Lines: 4
+  Fall through: 11870
+  Branch: ExCPV
+  Entered from: [@11863]
+  Dominator: 11863
+
+@11870
+  Lines: 3
+  Fall through: 11873
+  Branch: ExCPV
+  Entered from: [CheckPlayerVertical]
+  Dominator: CheckPlayerVertical
+
+@11873
+  Lines: 2
+  Fall through: ExCPV
+  Branch: null
+  Entered from: [@11870]
+  Dominator: 11870
+
+ExCPV
+  Lines: 1
+  Fall through: null
+  Branch: null
+  Entered from: [@11873, CheckPlayerVertical, @11870]
+  Dominator: CheckPlayerVertical
+
+
+
+========== HandlePipeEntry ==========
+
+--- Function Info ---
+Entry: HandlePipeEntry
+Inputs: $00, $01
+Outputs: 
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, X, Y
+
+--- Control Flow Nodes (2 nodes) ---
+
+[0] IfNode
+  Condition block: HandlePipeEntry
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
+
+[1] BlockNode
+  Block: ExPipeE
+  Lines: 1
+    RTS 
+
+--- Blocks Graph ---
+
+HandlePipeEntry
+  Lines: 4
+  Fall through: 12273
+  Branch: ExPipeE
+  Entered from: [@12268]
+  Dominator: 12268
+
+@12273
+  Lines: 3
+  Fall through: 12276
+  Branch: ExPipeE
+  Entered from: [HandlePipeEntry]
+  Dominator: HandlePipeEntry
+
+@12276
+  Lines: 3
+  Fall through: 12279
+  Branch: ExPipeE
+  Entered from: [@12273]
+  Dominator: 12273
+
+@12279
+  Lines: 10
+  Fall through: 12289
+  Branch: ExPipeE
+  Entered from: [@12276]
+  Dominator: 12276
+
+@12289
+  Lines: 7
+  Fall through: 12296
+  Branch: GetWNum
+  Entered from: [@12279]
+  Dominator: 12279
+
+@12296
+  Lines: 3
+  Fall through: 12299
+  Branch: GetWNum
+  Entered from: [@12289]
+  Dominator: 12289
+
+@12299
+  Lines: 1
+  Fall through: GetWNum
+  Branch: null
+  Entered from: [@12296]
+  Dominator: 12296
+
+GetWNum
+  Lines: 15
+  Fall through: ExPipeE
+  Branch: null
+  Entered from: [@12299, @12289, @12296]
+  Dominator: 12289
+
+ExPipeE
+  Lines: 1
+  Fall through: null
+  Branch: null
+  Entered from: [GetWNum, HandlePipeEntry, @12273, @12276, @12279]
+  Dominator: HandlePipeEntry
+
+
+
+========== OffscreenBoundsCheck ==========
+
+--- Function Info ---
+Entry: OffscreenBoundsCheck
+Inputs: X
+Outputs: 
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, OverflowFlag, $01, $00, $03, $02
+
+--- Control Flow Nodes (2 nodes) ---
+
+[0] IfNode
+  Condition block: OffscreenBoundsCheck
+  Sense: false
+  Then branch: 2 nodes
+  Else branch: 0 nodes
+
+[1] BlockNode
+  Block: ExScrnBd
+  Lines: 1
+    RTS 
+
+--- Blocks Graph ---
+
+OffscreenBoundsCheck
+  Lines: 4
+  Fall through: 11009
+  Branch: ExScrnBd
+  Entered from: [@10998, SkipMove, RunBowserFlame, RunFirebarObj, RunSmallPlatform, SkipPT]
+  Dominator: null
+
+@11009
+  Lines: 4
+  Fall through: 11013
+  Branch: LimitB
+  Entered from: [OffscreenBoundsCheck]
+  Dominator: OffscreenBoundsCheck
+
+@11013
+  Lines: 2
+  Fall through: LimitB
+  Branch: ExtendLB
+  Entered from: [@11009]
+  Dominator: 11009
+
+LimitB
+  Lines: 1
+  Fall through: ExtendLB
+  Branch: null
+  Entered from: [@11013, @11009]
+  Dominator: 11009
+
+ExtendLB
+  Lines: 16
+  Fall through: 11032
+  Branch: TooFar
+  Entered from: [LimitB, @11013]
+  Dominator: 11009
+
+@11032
+  Lines: 5
+  Fall through: 11037
+  Branch: ExScrnBd
+  Entered from: [ExtendLB]
+  Dominator: ExtendLB
+
+@11037
+  Lines: 3
+  Fall through: 11040
+  Branch: ExScrnBd
+  Entered from: [@11032]
+  Dominator: 11032
+
+@11040
+  Lines: 2
+  Fall through: 11042
+  Branch: ExScrnBd
+  Entered from: [@11037]
+  Dominator: 11037
+
+@11042
+  Lines: 2
+  Fall through: 11044
+  Branch: ExScrnBd
+  Entered from: [@11040]
+  Dominator: 11040
+
+@11044
+  Lines: 2
+  Fall through: 11046
+  Branch: ExScrnBd
+  Entered from: [@11042]
+  Dominator: 11042
+
+@11046
+  Lines: 2
+  Fall through: TooFar
+  Branch: ExScrnBd
+  Entered from: [@11044]
+  Dominator: 11044
+
+TooFar
+  Lines: 1
+  Fall through: ExScrnBd
+  Branch: null
+  Entered from: [@11046, ExtendLB]
+  Dominator: ExtendLB
+
+ExScrnBd
+  Lines: 1
+  Fall through: null
+  Branch: null
+  Entered from: [TooFar, OffscreenBoundsCheck, @11032, @11037, @11040, @11042, @11044, @11046]
+  Dominator: OffscreenBoundsCheck
+
+
+
+========== BubbleCheck ==========
+
+--- Function Info ---
+Entry: BubbleCheck
+Inputs: X
+Outputs: 
+Clobbers: A, NegativeFlag, ZeroFlag, $07, CarryFlag, Y, OverflowFlag
+
+--- Control Flow Nodes (2 nodes) ---
+
+[0] IfNode
+  Condition block: BubbleCheck
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
+
+[1] BlockNode
+  Block: ExitBubl
+  Lines: 1
+    RTS 
+
+--- Blocks Graph ---
+
+BubbleCheck
+  Lines: 7
+  Fall through: 6390
+  Branch: MoveBubl
+  Entered from: [@6382]
+  Dominator: 6382
+
+@6390
+  Lines: 2
+  Fall through: 6392
+  Branch: ExitBubl
+  Entered from: [BubbleCheck]
+  Dominator: BubbleCheck
+
+@6392
+  Lines: 1
+  Fall through: SetupBubble
+  Branch: null
+  Entered from: [@6390]
+  Dominator: 6390
+
+SetupBubble
+  Lines: 5
+  Fall through: 6398
+  Branch: PosBubl
+  Entered from: [@6392]
+  Dominator: 6392
+
+@6398
+  Lines: 1
+  Fall through: PosBubl
+  Branch: null
+  Entered from: [SetupBubble]
+  Dominator: SetupBubble
+
+PosBubl
+  Lines: 15
+  Fall through: MoveBubl
+  Branch: null
+  Entered from: [@6398, SetupBubble]
+  Dominator: SetupBubble
+
+MoveBubl
+  Lines: 9
+  Fall through: 6423
+  Branch: Y_Bubl
+  Entered from: [PosBubl, BubbleCheck]
+  Dominator: BubbleCheck
+
+@6423
+  Lines: 1
+  Fall through: Y_Bubl
+  Branch: null
+  Entered from: [MoveBubl]
+  Dominator: MoveBubl
+
+Y_Bubl
+  Lines: 1
+  Fall through: ExitBubl
+  Branch: null
+  Entered from: [@6423, MoveBubl]
+  Dominator: MoveBubl
+
+ExitBubl
+  Lines: 1
+  Fall through: null
+  Branch: null
+  Entered from: [Y_Bubl, @6390]
+  Dominator: BubbleCheck
+
+
+
+========== PlayerLakituDiff ==========
+
+--- Function Info ---
+Entry: PlayerLakituDiff
+Inputs: $00, X
+Outputs: 
+Clobbers: Y, NegativeFlag, ZeroFlag, A, CarryFlag, OverflowFlag, $00
+
+--- Control Flow Nodes (4 nodes) ---
+
+[0] IfNode
+  Condition block: PlayerLakituDiff
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
+
+[1] IfNode
+  Condition block: ChkLakDif
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
+
+[2] LoopNode
+  Type: LoopNode
+  Body nodes: 0
+  Entry: SPixelLak
+
+[3] BlockNode
+  Block: ExMoveLak
+  Lines: 1
+    RTS 
+
+--- Blocks Graph ---
+
+PlayerLakituDiff
+  Lines: 4
+  Fall through: 10005
+  Branch: ChkLakDif
+  Entered from: [@10000]
+  Dominator: 10000
+
+@10005
+  Lines: 6
+  Fall through: ChkLakDif
+  Branch: null
+  Entered from: [PlayerLakituDiff]
+  Dominator: PlayerLakituDiff
+
+ChkLakDif
+  Lines: 3
+  Fall through: 10014
+  Branch: ChkPSpeed
+  Entered from: [@10005, PlayerLakituDiff]
+  Dominator: PlayerLakituDiff
+
+@10014
+  Lines: 5
+  Fall through: 10019
+  Branch: ChkPSpeed
+  Entered from: [ChkLakDif]
+  Dominator: ChkLakDif
+
+@10019
+  Lines: 3
+  Fall through: 10022
+  Branch: ChkPSpeed
+  Entered from: [@10014]
+  Dominator: 10014
+
+@10022
+  Lines: 2
+  Fall through: 10024
+  Branch: SetLMovD
+  Entered from: [@10019]
+  Dominator: 10019
+
+@10024
+  Lines: 3
+  Fall through: SetLMovD
+  Branch: ExMoveLak
+  Entered from: [@10022]
+  Dominator: 10022
+
+SetLMovD
+  Lines: 2
+  Fall through: ChkPSpeed
+  Branch: null
+  Entered from: [@10024, @10022]
+  Dominator: 10022
+
+ChkPSpeed
+  Lines: 8
+  Fall through: 10037
+  Branch: SubDifAdj
+  Entered from: [SetLMovD, ChkLakDif, @10014, @10019]
+  Dominator: ChkLakDif
+
+@10037
+  Lines: 2
+  Fall through: 10039
+  Branch: SubDifAdj
+  Entered from: [ChkPSpeed]
+  Dominator: ChkPSpeed
+
+@10039
+  Lines: 4
+  Fall through: 10043
+  Branch: ChkSpinyO
+  Entered from: [@10037]
+  Dominator: 10037
+
+@10043
+  Lines: 3
+  Fall through: 10046
+  Branch: ChkSpinyO
+  Entered from: [@10039]
+  Dominator: 10039
+
+@10046
+  Lines: 1
+  Fall through: ChkSpinyO
+  Branch: null
+  Entered from: [@10043]
+  Dominator: 10043
+
+ChkSpinyO
+  Lines: 3
+  Fall through: 10050
+  Branch: ChkEmySpd
+  Entered from: [@10046, @10039, @10043]
+  Dominator: 10039
+
+@10050
+  Lines: 2
+  Fall through: ChkEmySpd
+  Branch: SubDifAdj
+  Entered from: [ChkSpinyO]
+  Dominator: ChkSpinyO
+
+ChkEmySpd
+  Lines: 2
+  Fall through: 10054
+  Branch: SubDifAdj
+  Entered from: [@10050, ChkSpinyO]
+  Dominator: ChkSpinyO
+
+@10054
+  Lines: 1
+  Fall through: SubDifAdj
+  Branch: null
+  Entered from: [ChkEmySpd]
+  Dominator: ChkEmySpd
+
+SubDifAdj
+  Lines: 2
+  Fall through: SPixelLak
+  Branch: null
+  Entered from: [@10054, ChkPSpeed, @10037, @10050, ChkEmySpd]
+  Dominator: ChkPSpeed
+
+SPixelLak
+  Lines: 4
+  Fall through: ExMoveLak
+  Branch: SPixelLak
+  Entered from: [SubDifAdj, SPixelLak]
+  Dominator: SubDifAdj
+
+ExMoveLak
+  Lines: 1
+  Fall through: null
+  Branch: null
+  Entered from: [SPixelLak, @10024]
+  Dominator: ChkLakDif
+
+

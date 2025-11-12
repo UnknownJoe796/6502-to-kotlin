@@ -1,0 +1,797 @@
+NoiseSfxHandler function:
+  Starting block: NoiseSfxHandler
+  Blocks in function (109):
+    - PlayBrickShatter
+        lda #$20                 ;load length of brick shatter sound
+        sta Noise_SfxLenCounter
+        
+    - ContinueBrickShatter
+        lda Noise_SfxLenCounter
+        lsr                         ;divide by 2 and check for bit set to use offset
+        bcc DecrementSfx3Length
+    - @15555
+        ldx BrickShatterFreqData,y  ;load reg contents of brick shatter sound
+        lda BrickShatterEnvData,y
+        
+    - PlayNoiseSfx
+        lda #$18
+        sta SND_NOISE_REG+3
+        
+    - DecrementSfx3Length
+        DecrementSfx3Length:
+        dec Noise_SfxLenCounter  ;decrement length of sfx
+        bne ExSfx3
+    - @15568
+        sta SND_NOISE_REG
+        lda #$00
+        sta NoiseSoundBuffer
+    - ExSfx3 [HAS RTS]
+        ExSfx3: rts
+    - NoiseSfxHandler
+        NoiseSfxHandler:
+        ldy NoiseSoundQueue   ;check for sfx in queue
+        beq CheckNoiseBuffer
+    - @15577
+        sty NoiseSoundBuffer  ;if found, put in buffer
+        lsr NoiseSoundQueue
+        bcs PlayBrickShatter  ;brick shatter
+    - @15580
+        lsr NoiseSoundQueue
+        bcs PlayBowserFlame   ;bowser flame
+    - @15582
+        
+    - CheckNoiseBuffer
+        CheckNoiseBuffer:
+        lda NoiseSoundBuffer      ;check for sfx in buffer
+        beq ExNH                  ;if not found, exit sub
+    - @15586
+        lsr
+        bcs ContinueBrickShatter  ;brick shatter
+    - @15588
+        lsr
+        bcs ContinueBowserFlame   ;bowser flame
+    - ExNH [HAS RTS]
+        ExNH:   rts
+    - PlayBowserFlame
+        lda #$40                    ;load length of bowser flame sound
+        sta Noise_SfxLenCounter
+        
+    - ContinueBowserFlame
+        ldx #$0f                    ;load reg contents of bowser flame sound
+        lda BowserFlameEnvData-1,y
+        bne PlayNoiseSfx            ;unconditional branch here
+    - @15603
+        
+        ;--------------------------------
+        
+    - ContinueMusic
+        ContinueMusic:
+        jmp HandleSquare2Music  ;if we have music, start with square 2 channel
+    - LoadEventMusic
+        sta EventMusicBuffer      ;copy event music queue contents to buffer
+        cmp #DeathMusic           ;is it death music?
+        bne NoStopSfx             ;if not, jump elsewhere
+    - @15623
+        jsr StopSquare1Sfx        ;stop sfx in square 1 and 2
+        jsr StopSquare2Sfx        ;but clear only square 1's sfx buffer
+    - NoStopSfx
+        sty AreaMusicBuffer       ;clear area music buffer
+        cmp #TimeRunningOutMusic  ;is it time running out music?
+        bne FindEventMusicHeader
+    - @15632
+        ldx #$08                  ;load offset to be added to length byte of header
+        stx NoteLengthTblAdder
+        bne FindEventMusicHeader  ;unconditional branch
+    - @15635
+        
+    - LoadAreaMusic
+        LoadAreaMusic:
+        cmp #$04                  ;is it underground music?
+        bne NoStop1               ;no, do not stop square 1 sfx
+    - @15639
+        jsr StopSquare1Sfx
+    - NoStop1
+        NoStop1: ldy #$10                  ;start counter used only by ground level music
+    - GMLoopB
+        GMLoopB: sty GroundMusicHeaderOfs
+        
+    - HandleAreaMusicLoopB
+        sta AreaMusicBuffer       ;copy area music queue contents to buffer
+        cmp #$01                  ;is it ground level music?
+        bne FindAreaMusicHeader
+    - @15649
+        ldy GroundMusicHeaderOfs  ;is it time to loopback ground level music?
+        cpy #$32
+        bne LoadHeader            ;branch ahead with alternate offset
+    - @15653
+        ldy #$11
+        bne GMLoopB               ;unconditional branch
+    - @15655
+        
+    - FindAreaMusicHeader
+        ldy #$08                   ;load Y for offset of area music
+        sty MusicOffset_Square2    ;residual instruction here
+        
+    - FindEventMusicHeader
+        iny                       ;increment Y pointer based on previously loaded queue contents
+        lsr                       ;bit shift and increment until we find a set bit for music
+        bcc FindEventMusicHeader
+    - @15664
+        
+    - LoadHeader
+        lda #$0f
+        sta SND_MASTERCTRL_REG
+        
+    - HandleSquare2Music
+        HandleSquare2Music:
+        dec Squ2_NoteLenCounter  ;decrement square 2 note length
+        bne MiscSqu2MusicTasks   ;is it time for more data?  if not, branch to end tasks
+    - @15697
+        inc MusicOffset_Square2
+        lda (MusicData),y
+        beq EndOfMusicData       ;if zero, the data is a null terminator
+    - @15701
+        bpl Squ2NoteHandler      ;if non-negative, data is a note
+    - @15702
+        bne Squ2LengthHandler    ;otherwise it is length data
+    - @15703
+        
+    - EndOfMusicData
+        lda EventMusicBuffer     ;check secondary buffer for time running out music
+        cmp #TimeRunningOutMusic
+        bne NotTRO
+    - @15708
+        lda AreaMusicBuffer_Alt  ;load previously saved contents of primary buffer
+        bne MusicLoopBack        ;and start playing the song again if there is one
+    - NotTRO
+        NotTRO: and #VictoryMusic        ;check for victory music (the only secondary that loops)
+        bne VictoryMLoopBack
+    - @15712
+        lda AreaMusicBuffer      ;check primary buffer for any music except pipe intro
+        and #%01011111
+        bne MusicLoopBack        ;if any area music except pipe intro, music loops
+    - @15715 [HAS RTS]
+        sta SND_SQUARE1_REG
+        sta SND_SQUARE2_REG
+        rts
+    - MusicLoopBack
+        MusicLoopBack:
+        jmp HandleAreaMusicLoopB
+    - VictoryMLoopBack
+        VictoryMLoopBack:
+        jmp LoadEventMusic
+    - Squ2LengthHandler
+        inc MusicOffset_Square2
+        lda (MusicData),y
+        
+    - Squ2NoteHandler
+        Squ2NoteHandler:
+        ldx Square2SoundBuffer     ;is there a sound playing on this channel?
+        bne SkipFqL1
+    - @15740
+        jsr SetFreq_Squ2           ;no, then play the note
+        beq Rest                   ;check to see if note is rest
+    - @15742
+        jsr LoadControlRegs        ;if not, load control regs for square 2
+    - Rest
+        Rest:     sta Squ2_EnvelopeDataCtrl  ;save contents of A
+        jsr Dump_Sq2_Regs          ;dump X and Y into square 2 control regs
+    - SkipFqL1
+        SkipFqL1: lda Squ2_NoteLenBuffer     ;save length in square 2 note counter
+        sta Squ2_NoteLenCounter
+        
+    - MiscSqu2MusicTasks
+        MiscSqu2MusicTasks:
+        lda Square2SoundBuffer     ;is there a sound playing on square 2?
+        bne HandleSquare1Music
+    - @15751
+        lda EventMusicBuffer       ;check for death music or d4 set on secondary buffer
+        and #%10010001             ;note that regs for death music or d4 are loaded by default
+        bne HandleSquare1Music
+    - @15754
+        ldy Squ2_EnvelopeDataCtrl  ;check for contents saved from LoadControlRegs
+        beq NoDecEnv1
+    - @15756
+        dec Squ2_EnvelopeDataCtrl  ;decrement unless already zero
+    - NoDecEnv1
+        ldx #$7f                   ;death music or d4 set on secondary buffer
+        stx SND_SQUARE2_REG+1
+        
+    - HandleSquare1Music
+        HandleSquare1Music:
+        ldy MusicOffset_Square1    ;is there a nonzero offset here?
+        beq HandleTriangleMusic    ;if not, skip ahead to the triangle channel
+    - @15765
+        dec Squ1_NoteLenCounter    ;decrement square 1 note length
+        bne MiscSqu1MusicTasks     ;is it time for more data?
+    - @15767
+        
+    - FetchSqu1MusicData
+        inc MusicOffset_Square1
+        lda (MusicData),y
+        bne Squ1NoteHandler        ;if nonzero, then skip this part
+    - @15773
+        sta SND_SQUARE1_REG+1      ;death music its unique sound
+        sta AltRegContentFlag
+        bne FetchSqu1MusicData     ;unconditional branch
+    - @15779
+        
+    - Squ1NoteHandler
+        sta Squ1_NoteLenCounter    ;save contents of A in square 1 note counter
+        ldy Square1SoundBuffer     ;is there a sound playing on square 1?
+        bne HandleTriangleMusic
+    - @15785
+        and #%00111110             ;change saved data to appropriate note format
+        jsr SetFreq_Squ1           ;play the note
+        beq SkipCtrlL
+    - @15789
+        jsr LoadControlRegs
+    - SkipCtrlL
+        SkipCtrlL: sta Squ1_EnvelopeDataCtrl  ;save envelope offset
+        jsr Dump_Squ1_Regs
+        
+    - MiscSqu1MusicTasks
+        MiscSqu1MusicTasks:
+        lda Square1SoundBuffer     ;is there a sound playing on square 1?
+        bne HandleTriangleMusic
+    - @15796
+        lda EventMusicBuffer       ;check for death music or d4 set on secondary buffer
+        and #%10010001
+        bne DeathMAltReg
+    - @15799
+        ldy Squ1_EnvelopeDataCtrl  ;check saved envelope offset
+        beq NoDecEnv2
+    - @15801
+        dec Squ1_EnvelopeDataCtrl  ;decrement unless already zero
+    - NoDecEnv2
+        NoDecEnv2:    jsr LoadEnvelopeData       ;do a load of envelope data
+        sta SND_SQUARE1_REG        ;based on offset set by first load
+    - DeathMAltReg
+        DeathMAltReg: lda AltRegContentFlag      ;check for alternate control reg data
+        bne DoAltLoad
+    - @15806
+        lda #$7f                   ;load this value if zero, the alternate value
+    - DoAltLoad
+        DoAltLoad:    sta SND_SQUARE1_REG+1      ;if nonzero, and let's move on
+        
+    - HandleTriangleMusic
+        lda MusicOffset_Triangle
+        dec Tri_NoteLenCounter    ;decrement triangle note length
+        bne HandleNoiseMusic      ;is it time for more data?
+    - @15813
+        inc MusicOffset_Triangle
+        lda (MusicData),y
+        beq LoadTriCtrlReg        ;if zero, skip all this and move on to noise
+    - @15817
+        bpl TriNoteHandler        ;if non-negative, data is note
+    - @15818
+        inc MusicOffset_Triangle
+        lda (MusicData),y
+        beq LoadTriCtrlReg        ;check once more for nonzero data
+    - @15826
+        
+    - TriNoteHandler
+        lda EventMusicBuffer
+        and #%01101110          ;check for death music or d4 set on secondary buffer
+        bne NotDOrD4            ;if playing any other secondary, skip primary buffer check
+    - @15834
+        lda AreaMusicBuffer     ;check primary buffer for water or castle level music
+        and #%00001010
+        beq HandleNoiseMusic    ;if playing any other primary, or death or d4, go on to noise routine
+    - NotDOrD4
+        NotDOrD4: txa                     ;if playing water or castle music or any secondary
+        cmp #$12                ;besides death music or d4 set, check length of note
+        bcs LongN
+    - @15840
+        lda EventMusicBuffer    ;check for win castle music again if not playing a long note
+        and #EndOfCastleMusic
+        beq MediN
+    - @15843
+        lda #$0f                ;load value $0f if playing the win castle music and playing a short
+        bne LoadTriCtrlReg      ;note, load value $1f if playing water or castle level music or any
+    - MediN
+        MediN:    lda #$1f                ;secondary besides death and d4 except win castle or win castle and playing
+        bne LoadTriCtrlReg      ;a short note, and load value $ff if playing a long note on water, castle
+    - LongN
+        LongN:    lda #$ff                ;or any secondary (including win castle) except death and d4
+        
+    - LoadTriCtrlReg
+        LoadTriCtrlReg:
+        sta SND_TRIANGLE_REG      ;save final contents of A into control reg for triangle
+        
+    - HandleNoiseMusic
+        lda AreaMusicBuffer       ;check if playing underground or castle music
+        and #%11110011
+        beq ExitMusicHandler      ;if so, skip the noise routine
+    - @15856
+        dec Noise_BeatLenCounter  ;decrement noise beat length
+        bne ExitMusicHandler      ;is it time for more data?
+    - @15858
+        
+    - FetchNoiseBeatData
+        inc MusicOffset_Noise
+        lda (MusicData),y           ;get noise beat data, if nonzero, branch to handle
+        bne NoiseBeatHandler
+    - @15864
+        lda NoiseDataLoopbackOfs    ;if data is zero, reload original noise beat offset
+        sta MusicOffset_Noise       ;and loopback next time around
+        bne FetchNoiseBeatData      ;unconditional branch
+    - @15867
+        
+    - NoiseBeatHandler
+        txa
+        and #%00111110              ;reload data and erase length bits
+        beq SilentBeat              ;if no beat data, silence
+    - @15874
+        cmp #$30                    ;check the beat data and play the appropriate
+        beq LongBeat                ;noise accordingly
+    - @15876
+        cmp #$20
+        beq StrongBeat
+    - @15878
+        and #%00010000
+        beq SilentBeat
+    - @15880
+        ldx #$03
+        ldy #$18
+        bne PlayBeat
+    - @15884
+        
+    - StrongBeat
+        ldx #$0c
+        ldy #$18
+        bne PlayBeat
+    - @15890
+        
+    - LongBeat
+        ldx #$03
+        ldy #$58
+        bne PlayBeat
+    - @15896
+        
+    - SilentBeat
+        SilentBeat:
+        lda #$10        ;silence
+        
+    - PlayBeat
+        stx SND_NOISE_REG+2
+        sty SND_NOISE_REG+3
+        
+    - ExitMusicHandler [HAS RTS]
+        ExitMusicHandler:
+        rts
+
+  Starting block for control flow: NoiseSfxHandler
+  Starting block line index: 15574
+  Reachable blocks from starting block (within function): 109
+  Assigned blocks: 109
+  Unreachable assigned blocks: 0
+
+  Control flow (analyzeControls):
+  Nodes: 22
+    - Block: PlayBrickShatter
+    - If:
+        Then:
+        - Block: @15555
+        - Block: PlayNoiseSfx
+    - If:
+        Then:
+        - Block: @15568
+    - Block: ExSfx3 [RETURN]
+    - If:
+        Then:
+        - Loop (PostTest):
+          - Block: PlayBrickShatter
+          - Block: ContinueBrickShatter
+          - Block: @15555
+          - Block: PlayNoiseSfx
+          - Block: DecrementSfx3Length
+          - Block: @15568
+          - Block: ExSfx3 [RETURN]
+          - Block: NoiseSfxHandler
+          - Block: @15577
+        - If:
+            Then:
+            - Block: @15582
+            - If:
+                Then:
+                - Block: @15586
+                - If:
+                    Then:
+                    - Block: ExNH [RETURN]
+                    - Block: PlayBowserFlame
+            - Block: ExNH [RETURN]
+    - If:
+        Then:
+        - Block: @15586
+        - If:
+            Then:
+            - Block: ExNH [RETURN]
+            - Block: PlayBowserFlame
+    - Block: ExNH [RETURN]
+    - Block: PlayBowserFlame
+    - Block: ContinueBowserFlame
+    - Block: @15603
+    - Block: ContinueMusic
+    - If:
+        Then:
+        - Block: @15623
+    - If:
+        Then:
+        - If:
+            Then:
+            - Block: @15635
+            - If:
+                Then:
+                - Block: @15639
+            - Block: NoStop1
+            - Loop (PreTest):
+              - Block: GMLoopB
+              - Block: HandleAreaMusicLoopB
+              - Block: @15649
+              - Block: @15653
+            - Block: @15655
+            - Block: FindAreaMusicHeader
+    - Loop (PostTest):
+      - Block: FindEventMusicHeader
+    - Block: @15664
+    - Block: LoadHeader
+    - If:
+        Then:
+        - If:
+            Then:
+            - If:
+                Then:
+                - If:
+                    Then:
+                    - Block: @15703
+                    - If:
+                        Then:
+                        - If:
+                            Then:
+                            - If:
+                                Then:
+                                - If:
+                                    Then:
+                                    - Block: @15715 [RETURN]
+                                - Loop (Infinite):
+                                  - Block: HandleAreaMusicLoopB
+                                  - Block: @15649
+                                  - Block: @15653
+                                  - Block: @15655
+                                  - Block: FindAreaMusicHeader
+                                  - Block: FindEventMusicHeader
+                                  - Block: @15664
+                                  - Block: LoadHeader
+                                  - Block: HandleSquare2Music
+                                  - Block: @15697
+                                  - Block: @15701
+                                  - Block: @15702
+                                  - Block: @15703
+                                  - Block: EndOfMusicData
+                                  - Block: @15708
+                                  - Block: NotTRO
+                                  - Block: @15712
+                                  - Block: @15715 [RETURN]
+                                  - Block: MusicLoopBack
+                    - If:
+                        Then:
+                        - If:
+                            Then:
+                            - Block: @15715 [RETURN]
+                        - Loop (Infinite):
+                          - Block: HandleAreaMusicLoopB
+                          - Block: @15649
+                          - Block: @15653
+                          - Block: @15655
+                          - Block: FindAreaMusicHeader
+                          - Block: FindEventMusicHeader
+                          - Block: @15664
+                          - Block: LoadHeader
+                          - Block: HandleSquare2Music
+                          - Block: @15697
+                          - Block: @15701
+                          - Block: @15702
+                          - Block: @15703
+                          - Block: EndOfMusicData
+                          - Block: @15708
+                          - Block: NotTRO
+                          - Block: @15712
+                          - Block: @15715 [RETURN]
+                          - Block: MusicLoopBack
+                    - Loop (Infinite):
+                      - Block: LoadEventMusic
+                      - Block: @15623
+                      - Block: NoStopSfx
+                      - Block: @15632
+                      - Block: @15635
+                      - Block: LoadAreaMusic
+                      - Block: @15639
+                      - Block: NoStop1
+                      - Block: GMLoopB
+                      - Block: HandleAreaMusicLoopB
+                      - Block: @15649
+                      - Block: @15653
+                      - Block: @15655
+                      - Block: FindAreaMusicHeader
+                      - Block: FindEventMusicHeader
+                      - Block: @15664
+                      - Block: LoadHeader
+                      - Block: HandleSquare2Music
+                      - Block: @15697
+                      - Block: @15701
+                      - Block: @15702
+                      - Block: @15703
+                      - Block: EndOfMusicData
+                      - Block: @15708
+                      - Block: NotTRO
+                      - Block: @15712
+                      - Block: @15715 [RETURN]
+                      - Block: MusicLoopBack
+                      - Block: VictoryMLoopBack
+                - Block: Squ2LengthHandler
+        - If:
+            Then:
+            - If:
+                Then:
+                - If:
+                    Then:
+                    - If:
+                        Then:
+                        - Block: @15715 [RETURN]
+                    - Loop (Infinite):
+                      - Block: HandleAreaMusicLoopB
+                      - Block: @15649
+                      - Block: @15653
+                      - Block: @15655
+                      - Block: FindAreaMusicHeader
+                      - Block: FindEventMusicHeader
+                      - Block: @15664
+                      - Block: LoadHeader
+                      - Block: HandleSquare2Music
+                      - Block: @15697
+                      - Block: @15701
+                      - Block: @15702
+                      - Block: @15703
+                      - Block: EndOfMusicData
+                      - Block: @15708
+                      - Block: NotTRO
+                      - Block: @15712
+                      - Block: @15715 [RETURN]
+                      - Block: MusicLoopBack
+        - If:
+            Then:
+            - If:
+                Then:
+                - Block: @15715 [RETURN]
+            - Loop (Infinite):
+              - Block: HandleAreaMusicLoopB
+              - Block: @15649
+              - Block: @15653
+              - Block: @15655
+              - Block: FindAreaMusicHeader
+              - Block: FindEventMusicHeader
+              - Block: @15664
+              - Block: LoadHeader
+              - Block: HandleSquare2Music
+              - Block: @15697
+              - Block: @15701
+              - Block: @15702
+              - Block: @15703
+              - Block: EndOfMusicData
+              - Block: @15708
+              - Block: NotTRO
+              - Block: @15712
+              - Block: @15715 [RETURN]
+              - Block: MusicLoopBack
+        - Loop (Infinite):
+          - Block: LoadEventMusic
+          - Block: @15623
+          - Block: NoStopSfx
+          - Block: @15632
+          - Block: @15635
+          - Block: LoadAreaMusic
+          - Block: @15639
+          - Block: NoStop1
+          - Block: GMLoopB
+          - Block: HandleAreaMusicLoopB
+          - Block: @15649
+          - Block: @15653
+          - Block: @15655
+          - Block: FindAreaMusicHeader
+          - Block: FindEventMusicHeader
+          - Block: @15664
+          - Block: LoadHeader
+          - Block: HandleSquare2Music
+          - Block: @15697
+          - Block: @15701
+          - Block: @15702
+          - Block: @15703
+          - Block: EndOfMusicData
+          - Block: @15708
+          - Block: NotTRO
+          - Block: @15712
+          - Block: @15715 [RETURN]
+          - Block: MusicLoopBack
+          - Block: VictoryMLoopBack
+        - Block: Squ2LengthHandler
+        - If:
+            Then:
+            - If:
+                Then:
+                - Block: @15742
+            - Block: Rest
+        - Block: SkipFqL1
+    - If:
+        Then:
+        - If:
+            Then:
+            - If:
+                Then:
+                - Block: @15756
+            - Block: NoDecEnv1
+    - If:
+        Then:
+        - If:
+            Then:
+            - Block: @15767
+            - Loop (PreTest):
+              - Loop (PostTest):
+                - Block: FetchSqu1MusicData
+                - Block: @15773
+            - Block: @15779
+            - If:
+                Then:
+                - If:
+                    Then:
+                    - Block: @15789
+                - Block: SkipCtrlL
+                - If:
+                    Then:
+                    - If:
+                        Then:
+                        - If:
+                            Then:
+                            - Block: @15801
+                        - Block: NoDecEnv2
+                    - If:
+                        Then:
+                        - Block: @15806
+                    - Block: DoAltLoad
+        - If:
+            Then:
+            - If:
+                Then:
+                - If:
+                    Then:
+                    - Block: @15801
+                - Block: NoDecEnv2
+            - If:
+                Then:
+                - Block: @15806
+            - Block: DoAltLoad
+    - If:
+        Then:
+        - If:
+            Then:
+            - If:
+                Then:
+                - If:
+                    Then:
+                    - Block: @15826
+                    - If:
+                        Then:
+                        - If:
+                            Then:
+                            - If:
+                                Then:
+                                - If:
+                                    Then:
+                                    - If:
+                                        Then:
+                                        - If:
+                                            Then:
+                                            - Block: LongN
+                                - If:
+                                    Then:
+                                    - Block: LongN
+                            - Block: LongN
+                            - Block: LoadTriCtrlReg
+                    - If:
+                        Then:
+                        - If:
+                            Then:
+                            - If:
+                                Then:
+                                - If:
+                                    Then:
+                                    - Block: LongN
+                        - If:
+                            Then:
+                            - Block: LongN
+                    - Block: LongN
+            - If:
+                Then:
+                - If:
+                    Then:
+                    - If:
+                        Then:
+                        - If:
+                            Then:
+                            - If:
+                                Then:
+                                - If:
+                                    Then:
+                                    - Block: LongN
+                        - If:
+                            Then:
+                            - Block: LongN
+                    - Block: LongN
+                    - Block: LoadTriCtrlReg
+            - If:
+                Then:
+                - If:
+                    Then:
+                    - If:
+                        Then:
+                        - If:
+                            Then:
+                            - Block: LongN
+                - If:
+                    Then:
+                    - Block: LongN
+            - Block: LongN
+        - Block: LoadTriCtrlReg
+    - If:
+        Then:
+        - If:
+            Then:
+            - Block: @15858
+            - Loop (PreTest):
+              - Loop (PostTest):
+                - Block: FetchNoiseBeatData
+                - Block: @15864
+            - Block: @15867
+            - If:
+                Then:
+                - If:
+                    Then:
+                    - If:
+                        Then:
+                        - If:
+                            Then:
+                            - If:
+                                Then:
+                                - Block: @15884
+                                - If:
+                                    Then:
+                                    - Block: @15890
+                                    - If:
+                                        Then:
+                                        - Block: @15896
+                                        - Block: SilentBeat
+                    - If:
+                        Then:
+                        - Block: @15890
+                        - If:
+                            Then:
+                            - Block: @15896
+                            - Block: SilentBeat
+                - If:
+                    Then:
+                    - Block: @15896
+                    - Block: SilentBeat
+            - Block: SilentBeat
+            - Block: PlayBeat
+    - Block: ExitMusicHandler [RETURN]
+
+  Control flow (improveControlFlow):
+  Nodes: 3
+    - If:
+        Then:
+        - Block: @15555
+        - Block: PlayNoiseSfx
+    - If:
+        Then:
+        - Block: @15568
+    - Block: ExSfx3 [RETURN]

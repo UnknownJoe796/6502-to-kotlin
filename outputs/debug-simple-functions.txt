@@ -1,0 +1,113 @@
+
+========== GetAreaObjXPosition ==========
+
+--- Function Info ---
+Entry: GetAreaObjXPosition
+Inputs: 
+Outputs: A
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag
+
+--- Control Flow Nodes (1 nodes) ---
+
+[0] BlockNode
+  Block: GetAreaObjXPosition
+  Lines: 7
+    LDA CurrentColumnPos
+    ASL 
+    ... (4 more)
+
+--- Blocks Graph ---
+
+GetAreaObjXPosition
+  Lines: 7
+  Fall through: null
+  Branch: null
+  Entered from: [@4297]
+  Dominator: 4297
+
+
+
+========== GetAreaObjYPosition ==========
+
+--- Function Info ---
+Entry: GetAreaObjYPosition
+Inputs: $07
+Outputs: A
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, OverflowFlag
+
+--- Control Flow Nodes (1 nodes) ---
+
+[0] BlockNode
+  Block: GetAreaObjYPosition
+  Lines: 9
+    LDA $07
+    ASL 
+    ... (6 more)
+
+--- Blocks Graph ---
+
+GetAreaObjYPosition
+  Lines: 9
+  Fall through: null
+  Branch: null
+  Entered from: [@4307]
+  Dominator: 4307
+
+
+
+========== PlayerEnemyDiff ==========
+
+--- Function Info ---
+Entry: PlayerEnemyDiff
+Inputs: X
+Outputs: NegativeFlag
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, OverflowFlag, $00
+
+--- Control Flow Nodes (1 nodes) ---
+
+[0] BlockNode
+  Block: PlayerEnemyDiff
+  Lines: 8
+    LDA Enemy_X_Position,X
+    SEC 
+    ... (5 more)
+
+--- Blocks Graph ---
+
+PlayerEnemyDiff
+  Lines: 8
+  Fall through: null
+  Branch: null
+  Entered from: [@12630]
+  Dominator: 12630
+
+
+
+========== InitVStf ==========
+
+--- Function Info ---
+Entry: InitVStf
+Inputs: X
+Outputs: A
+Clobbers: A, NegativeFlag, ZeroFlag
+
+--- Control Flow Nodes (1 nodes) ---
+
+[0] BlockNode
+  Block: InitVStf
+  Lines: 4
+    LDA #$00
+    STA Enemy_Y_Speed,X
+    STA Enemy_Y_MoveForce,X
+    ... (1 more)
+
+--- Blocks Graph ---
+
+InitVStf
+  Lines: 4
+  Fall through: null
+  Branch: null
+  Entered from: [SetBBox]
+  Dominator: SetBBox
+
+

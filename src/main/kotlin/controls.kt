@@ -460,12 +460,11 @@ data class ContinueNode(
 // ===========================
 
 /**
- * ValueExpr: Represents a computed value (for switch selectors, etc.).
+ * ValueExpr: Represents a computed value (for switch selectors, conditions, etc.).
  *
- * This is a placeholder for future expression analysis. Eventually will contain
- * semantic representations of 6502 register/memory operations (e.g., "A + X", "$00 & #$0F").
+ * Implemented below with concrete types for registers, memory, and literals.
  */
-sealed interface ValueExpr
+// sealed interface ValueExpr - defined below after CompareOp
 
 /**
  * ConditionExpr: Represents a boolean condition (for if/loop tests).
@@ -479,9 +478,99 @@ sealed interface ValueExpr
  *
  * Currently all conditions are UnknownCond placeholders.
  */
-sealed interface ConditionExpr
+sealed interface ConditionExpr {
+    /** Convert to Kotlin boolean expression */
+    fun toKotlinExpr(): KotlinExpr
+}
 
-object UnknownCond : ConditionExpr
+object UnknownCond : ConditionExpr {
+    override fun toKotlinExpr() = KVar("unknownCondition")
+}
+
+/** Direct flag test: if (zeroFlag), if (!carryFlag) */
+data class FlagTest(
+    val flag: AssemblyAffectable, // One of: Negative, Zero, Carry, Overflow
+    val positive: Boolean // true = test if set, false = test if clear
+) : ConditionExpr {
+    override fun toKotlinExpr(): KotlinExpr {
+        val flagVar = when (flag) {
+            AssemblyAffectable.Negative -> KVar("negativeFlag")
+            AssemblyAffectable.Zero -> KVar("zeroFlag")
+            AssemblyAffectable.Carry -> KVar("carryFlag")
+            AssemblyAffectable.Overflow -> KVar("overflowFlag")
+            else -> KVar("unknownFlag")
+        }
+        return if (positive) flagVar else KUnaryOp("!", flagVar)
+    }
+}
+
+/** Comparison expression: A == value, X < #$10, memory[addr] != 0 */
+data class ComparisonExpr(
+    val left: ValueExpr,
+    val op: CompareOp,
+    val right: ValueExpr
+) : ConditionExpr {
+    override fun toKotlinExpr(): KotlinExpr {
+        val opStr = when (op) {
+            CompareOp.EQ -> "=="
+            CompareOp.NE -> "!="
+            CompareOp.LT_UNSIGNED -> "<"
+            CompareOp.LE_UNSIGNED -> "<="
+            CompareOp.GT_UNSIGNED -> ">"
+            CompareOp.GE_UNSIGNED -> ">="
+            CompareOp.LT_SIGNED -> "<"
+            CompareOp.LE_SIGNED -> "<="
+            CompareOp.GT_SIGNED -> ">"
+            CompareOp.GE_SIGNED -> ">="
+        }
+        return KBinaryOp(left.toKotlinExpr(), opStr, right.toKotlinExpr())
+    }
+}
+
+enum class CompareOp {
+    EQ, NE,
+    LT_UNSIGNED, LE_UNSIGNED, GT_UNSIGNED, GE_UNSIGNED,
+    LT_SIGNED, LE_SIGNED, GT_SIGNED, GE_SIGNED
+}
+
+/** Value expressions: registers, memory, literals */
+sealed interface ValueExpr {
+    fun toKotlinExpr(): KotlinExpr
+}
+
+data class RegisterValue(val register: AssemblyAffectable) : ValueExpr {
+    override fun toKotlinExpr() = when (register) {
+        AssemblyAffectable.A -> KVar("A")
+        AssemblyAffectable.X -> KVar("X")
+        AssemblyAffectable.Y -> KVar("Y")
+        else -> KVar("unknown")
+    }
+}
+
+data class MemoryValue(val address: String) : ValueExpr {
+    override fun toKotlinExpr() = KMemberAccess(KVar("memory"), KLiteral(address), isIndexed = true)
+}
+
+data class LiteralValue(val value: Int) : ValueExpr {
+    override fun toKotlinExpr() = KLiteral("0x${value.toString(16).uppercase().padStart(2, '0')}")
+}
+
+/** Bitwise test: (value & mask) != 0 */
+data class BitwiseTest(
+    val value: ValueExpr,
+    val mask: Int,
+    val nonZero: Boolean // true = test if any bits set, false = test if all bits clear
+) : ConditionExpr {
+    override fun toKotlinExpr(): KotlinExpr {
+        val masked = KBinaryOp(
+            value.toKotlinExpr(),
+            "and",
+            KLiteral("0x${mask.toString(16).uppercase()}")
+        )
+        val comparison = KBinaryOp(masked, if (nonZero) "!=" else "==", KLiteral("0"))
+        return comparison
+    }
+}
 
 /**
  * Condition: Encapsulates a conditional branch and its semantic meaning.
@@ -515,8 +604,8 @@ object UnknownCond : ConditionExpr
  *    skip:
  * → if (value != 0) { then }
  *
- * Future: The expr field will contain the actual condition (e.g., "A == 0", "C flag set").
- * For now, all expr are UnknownCond, but the sense tells us which path is affirmative.
+ * The expr field contains the actual condition expression that can be reconstructed
+ * by analyzing the instructions before the branch.
  */
 data class Condition(
     /** The block containing the conditional branch instruction */
@@ -529,8 +618,22 @@ data class Condition(
      * - false: fall-through is the "yes" path (then/continue)
      */
     val sense: Boolean,
+    /**
+     * The reconstructed condition expression.
+     * Can be set by expression analysis passes.
+     */
+    var expr: ConditionExpr = UnknownCond
 ) {
     override fun toString(): String = "Condition(${branchLine.instruction})"
+
+    /**
+     * Get the condition as a Kotlin expression, respecting the sense.
+     * If sense is false, negates the expression.
+     */
+    fun toKotlinCondition(): KotlinExpr {
+        val base = expr.toKotlinExpr()
+        return if (sense) base else KUnaryOp("!", base)
+    }
 }
 
 fun List<ControlNode>.coveredBlocks(): Set<AssemblyBlock> =
