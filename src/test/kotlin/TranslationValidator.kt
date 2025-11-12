@@ -1,0 +1,331 @@
+package com.ivieleague.decompiler6502tokotlin
+
+import com.ivieleague.decompiler6502tokotlin.hand.*
+import com.ivieleague.decompiler6502tokotlin.interpreter.*
+import kotlin.random.Random
+
+/**
+ * Utility for validating that translated Kotlin code behaves identically to
+ * the original 6502 code when executed through the interpreter.
+ *
+ * This is the core validation framework for the decompiler.
+ */
+object TranslationValidator {
+
+    /**
+     * Comparison result showing differences between interpreter and translated execution.
+     */
+    data class ComparisonResult(
+        val matches: Boolean,
+        val interpreterState: IntegrationTest.CPUState,
+        val translatedState: IntegrationTest.CPUState? = null,
+        val differences: List<String> = emptyList(),
+        val error: String? = null
+    ) {
+        fun printReport() {
+            println("\n=== Translation Validation Report ===")
+            if (matches) {
+                println("✓ PASS: Interpreter and translated code produce identical results")
+            } else {
+                println("✗ FAIL: Differences detected")
+                if (error != null) {
+                    println("Error: $error")
+                }
+                differences.forEach { diff ->
+                    println("  - $diff")
+                }
+            }
+
+            println("\nInterpreter Final State:")
+            println("  A:  0x${interpreterState.A.toString(16).padStart(2, '0')}")
+            println("  X:  0x${interpreterState.X.toString(16).padStart(2, '0')}")
+            println("  Y:  0x${interpreterState.Y.toString(16).padStart(2, '0')}")
+            println("  N:  ${interpreterState.N}")
+            println("  V:  ${interpreterState.V}")
+            println("  Z:  ${interpreterState.Z}")
+            println("  C:  ${interpreterState.C}")
+
+            translatedState?.let { state ->
+                println("\nTranslated Code Final State:")
+                println("  A:  0x${state.A.toString(16).padStart(2, '0')}")
+                println("  X:  0x${state.X.toString(16).padStart(2, '0')}")
+                println("  Y:  0x${state.Y.toString(16).padStart(2, '0')}")
+                println("  N:  ${state.N}")
+                println("  V:  ${state.V}")
+                println("  Z:  ${state.Z}")
+                println("  C:  ${state.C}")
+            }
+        }
+    }
+
+    /**
+     * Test runner that executes a sequence of instructions through the interpreter
+     * and compares against expected behavior.
+     *
+     * For now, this only validates the interpreter execution. In the future,
+     * we can add dynamic Kotlin code execution and comparison.
+     */
+    class TestRunner(
+        val instructions: List<AssemblyInstruction>,
+        val labelResolver: (String) -> Int = { 0 }
+    ) {
+        /**
+         * Execute through interpreter with a given initial state.
+         */
+        fun executeInInterpreter(initialState: IntegrationTest.CPUState): IntegrationTest.CPUState {
+            val interp = Interpreter6502()
+            interp.labelResolver = labelResolver
+
+            // Set up initial state
+            initialState.applyTo(interp.cpu, interp.memory)
+
+            // Execute all instructions
+            instructions.forEach { instruction ->
+                interp.executeInstruction(instruction)
+            }
+
+            // Capture final state
+            return IntegrationTest.CPUState.capture(
+                interp.cpu,
+                interp.memory,
+                initialState.memory.keys.toList()
+            )
+        }
+
+        /**
+         * Generate Kotlin code for the instruction sequence.
+         */
+        fun generateKotlinCode(): String {
+            val ctx = CodeGenContext()
+            val stmts = mutableListOf<KotlinStmt>()
+
+            instructions.forEach { instruction ->
+                stmts.addAll(instruction.toKotlin(ctx))
+            }
+
+            return stmts.joinToString("\n") { it.toKotlin() }
+        }
+
+        /**
+         * Execute the translated Kotlin code with a given initial state.
+         *
+         * TODO: This requires a Kotlin scripting engine or compilation step.
+         * For now, this is a placeholder that returns null.
+         */
+        fun executeTranslatedCode(
+            initialState: IntegrationTest.CPUState,
+            kotlinCode: String
+        ): IntegrationTest.CPUState? {
+            // TODO: Implement dynamic Kotlin code execution
+            // Options:
+            // 1. Use kotlin-scripting-jvm
+            // 2. Generate a file, compile it, and load it
+            // 3. Use a Kotlin interpreter/REPL
+
+            return null
+        }
+
+        /**
+         * Compare interpreter execution against translated code execution.
+         */
+        fun compare(initialState: IntegrationTest.CPUState): ComparisonResult {
+            val interpreterState = executeInInterpreter(initialState)
+            val kotlinCode = generateKotlinCode()
+
+            val translatedState = executeTranslatedCode(initialState, kotlinCode)
+
+            return if (translatedState == null) {
+                // Can't compare yet - just return interpreter state
+                ComparisonResult(
+                    matches = false,
+                    interpreterState = interpreterState,
+                    translatedState = null,
+                    differences = emptyList(),
+                    error = "Translated code execution not yet implemented"
+                )
+            } else {
+                val differences = mutableListOf<String>()
+
+                if (interpreterState.A != translatedState.A) {
+                    differences.add("A register: 0x${interpreterState.A.toString(16)} vs 0x${translatedState.A.toString(16)}")
+                }
+                if (interpreterState.X != translatedState.X) {
+                    differences.add("X register: 0x${interpreterState.X.toString(16)} vs 0x${translatedState.X.toString(16)}")
+                }
+                if (interpreterState.Y != translatedState.Y) {
+                    differences.add("Y register: 0x${interpreterState.Y.toString(16)} vs 0x${translatedState.Y.toString(16)}")
+                }
+                if (interpreterState.N != translatedState.N) {
+                    differences.add("N flag: ${interpreterState.N} vs ${translatedState.N}")
+                }
+                if (interpreterState.V != translatedState.V) {
+                    differences.add("V flag: ${interpreterState.V} vs ${translatedState.V}")
+                }
+                if (interpreterState.Z != translatedState.Z) {
+                    differences.add("Z flag: ${interpreterState.Z} vs ${translatedState.Z}")
+                }
+                if (interpreterState.C != translatedState.C) {
+                    differences.add("C flag: ${interpreterState.C} vs ${translatedState.C}")
+                }
+
+                // Compare memory
+                for ((addr, interpValue) in interpreterState.memory) {
+                    val transValue = translatedState.memory[addr]
+                    if (transValue != null && interpValue != transValue) {
+                        differences.add(
+                            "Memory[0x${addr.toString(16)}]: 0x${interpValue.toString(16)} vs 0x${transValue.toString(16)}"
+                        )
+                    }
+                }
+
+                ComparisonResult(
+                    matches = differences.isEmpty(),
+                    interpreterState = interpreterState,
+                    translatedState = translatedState,
+                    differences = differences
+                )
+            }
+        }
+
+        /**
+         * Run the test with multiple random initial states and verify consistency.
+         */
+        fun validateWithRandomStates(
+            count: Int = 10,
+            random: Random = Random.Default,
+            stateGenerator: (Random) -> IntegrationTest.CPUState = { r -> IntegrationTest.CPUState.random(r) }
+        ): List<ComparisonResult> {
+            return (0 until count).map { i ->
+                val initialState = stateGenerator(random)
+                println("\n--- Test $i ---")
+                println("Initial state: A=0x${initialState.A.toString(16)}, X=0x${initialState.X.toString(16)}, Y=0x${initialState.Y.toString(16)}")
+
+                val result = compare(initialState)
+                println("Result: ${if (result.matches) "PASS" else "FAIL"}")
+
+                result
+            }
+        }
+    }
+
+    /**
+     * Create a test runner for a simple instruction sequence.
+     */
+    fun testInstructions(
+        vararg instructions: AssemblyInstruction,
+        labelResolver: (String) -> Int = { 0 }
+    ): TestRunner {
+        return TestRunner(instructions.toList(), labelResolver)
+    }
+
+    /**
+     * Create a test runner from assembly source code.
+     */
+    fun testAssemblyCode(
+        assemblySource: String,
+        labelResolver: (String) -> Int = { 0 }
+    ): TestRunner {
+        val lines = assemblySource.parseToAssemblyCodeFile().lines
+        val instructions = lines.mapNotNull { it.instruction }
+        return TestRunner(instructions, labelResolver)
+    }
+
+    /**
+     * Convenience method to test a sequence and print results.
+     */
+    fun quickTest(
+        vararg instructions: AssemblyInstruction,
+        initialState: IntegrationTest.CPUState = IntegrationTest.CPUState(),
+        labelResolver: (String) -> Int = { 0 }
+    ) {
+        val runner = testInstructions(*instructions, labelResolver = labelResolver)
+
+        println("\n=== Quick Test ===")
+        println("Instructions:")
+        instructions.forEachIndexed { i, instr ->
+            println("  $i: $instr")
+        }
+
+        println("\nGenerated Kotlin code:")
+        println(runner.generateKotlinCode())
+
+        val result = runner.compare(initialState)
+        result.printReport()
+    }
+}
+
+/**
+ * Example usage demonstrations.
+ */
+object TranslationValidatorExamples {
+
+    /**
+     * Example 1: Test a simple load instruction.
+     */
+    fun exampleSimpleLoad() {
+        TranslationValidator.quickTest(
+            AssemblyInstruction(
+                AssemblyOp.LDA,
+                AssemblyAddressing.ByteValue(0x42u, AssemblyAddressing.Radix.Hex)
+            )
+        )
+    }
+
+    /**
+     * Example 2: Test arithmetic operations.
+     */
+    fun exampleArithmetic() {
+        TranslationValidator.quickTest(
+            AssemblyInstruction(
+                AssemblyOp.LDA,
+                AssemblyAddressing.ByteValue(0x10u, AssemblyAddressing.Radix.Hex)
+            ),
+            AssemblyInstruction(
+                AssemblyOp.ADC,
+                AssemblyAddressing.ByteValue(0x20u, AssemblyAddressing.Radix.Hex)
+            ),
+            initialState = IntegrationTest.CPUState(C = false)
+        )
+    }
+
+    /**
+     * Example 3: Test with random states.
+     */
+    fun exampleRandomStates() {
+        val runner = TranslationValidator.testInstructions(
+            AssemblyInstruction(
+                AssemblyOp.LDA,
+                AssemblyAddressing.ByteValue(0x42u, AssemblyAddressing.Radix.Hex)
+            ),
+            AssemblyInstruction(AssemblyOp.TAX)
+        )
+
+        val results = runner.validateWithRandomStates(count = 5)
+
+        println("\n=== Summary ===")
+        val passed = results.count { it.matches }
+        println("Passed: $passed/${results.size}")
+    }
+
+    /**
+     * Example 4: Test from assembly source.
+     */
+    fun exampleFromSource() {
+        val assembly = """
+            LDA #$10
+            ADC #$20
+            STA $1000
+        """.trimIndent()
+
+        val runner = TranslationValidator.testAssemblyCode(
+            assembly,
+            labelResolver = { label -> if (label == "1000") 0x1000 else 0 }
+        )
+
+        val result = runner.compare(
+            IntegrationTest.CPUState(C = false)
+        )
+
+        result.printReport()
+    }
+}
