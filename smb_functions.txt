@@ -1,0 +1,64 @@
+# SMB Functions
+
+## Leaf Functions (42)
+BoundingBoxCore
+CheckForCoinMTiles
+CyclePlayerPalette
+DoNothing2
+DonePlayerTask
+Dump_Sq2_Regs
+Dump_Squ1_Regs
+EnemyGfxHandler
+EraseEnemyObject
+ExecGameLoopback
+FindAreaPointer
+FirebarSpin
+GetAreaObjXPosition
+GetAreaObjYPosition
+GetAreaType
+GetBlockBufferAddr
+GetEnemyBoundBoxOfsArg
+GetLrgObjAttrib
+GetObjRelativePosition
+GetProperObjOffset
+GetScreenPosition
+GoContinue
+HandlePipeEntry
+IncAreaObjOffset
+InitBlock_XY_Pos
+InitScroll
+InitVStf
+LoadEnvelopeData
+MoveLiftPlatforms
+MovePlayerYAxis
+MusicHandler
+OperModeExecutionTree
+PlayerEnemyDiff
+PosPlatform
+ProcessLengthData
+ReadJoypads
+RemBridge
+ResetPalStar
+SoundEngine
+SpawnBrickChunks
+SubtEnemyYPos
+WritePPUReg1
+
+## Non-Leaf Functions (17)
+BrickShatter -> CheckTopOfBlock,SpawnBrickChunks,AddToScore
+CheckForClimbMTiles -> GetMTileAttrib
+CheckForSolidMTiles -> GetMTileAttrib
+DrawExplosion_Fireworks -> DumpFourSpr
+DrawPlayerLoop -> DrawOneSpriteRow
+EnemyLanding -> InitVStf
+FireballBGCollision -> BlockBufferChk_FBall,ChkForNonSolids
+GameCoreRoutine -> GameRoutines
+GetPipeHeight -> ChkLrgObjFixedLength,GetLrgObjAttrib
+KillEnemyAboveBlock -> ShellOrBlockDefeat
+MoveESprColOffscreen -> MoveColOffscreen
+MoveEnemyHorizontally -> MoveObjectHorizontally
+ReplaceBlockMetatile -> WriteBlockMetatile
+SetXMoveAmt -> ImposeGravitySprObj
+StopPlatforms -> InitVStf
+TerminateGame -> TransposePlayers
+VariableObjOfsRelPos -> GetObjRelativePosition
