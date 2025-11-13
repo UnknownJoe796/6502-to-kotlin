@@ -12,7 +12,7 @@ All critical bugs found through manual code review have been fixed. The decompil
 
 Systematically reviewed the code generator and execution environment **before running any tests**.
 
-**Result:** Found and fixed **4 critical bugs** that would have caused 95%+ test failures.
+**Result:** Found and fixed **6 critical bugs** that would have caused 95%+ test failures.
 
 ### 🐛 Bugs Found and Fixed
 
@@ -22,9 +22,11 @@ Systematically reviewed the code generator and execution environment **before ru
 | 2 | INC/DEC don't update flags | **HIGH** | All loops/counters | ✅ 314fc4f |
 | 3 | No constant resolution | **HIGH** | All memory ops | ✅ f5b567c |
 | 4 | Executor missing function calls & temp vars | **HIGH** | All complex ops | ✅ 812919a |
+| 5 | Missing stack operation functions | **HIGH** | All stack ops | ✅ 85ffc74 |
+| 6 | Missing if expression support | **HIGH** | ADC/SBC arithmetic | ✅ dc3c113 |
 
-**Total Commits:** 6 (5 fixes + 1 documentation)
-**Total Lines Changed:** ~200 lines
+**Total Commits:** 10 (6 fixes + 4 documentation)
+**Total Lines Changed:** ~250 lines
 **Test Coverage:** 0% (bugs found through code review, not testing)
 
 ---
@@ -175,9 +177,9 @@ kotlin standalone-test.kt
 | Non-leaf functions | 17 |
 | 6502 instructions supported | 56/56 (100%) |
 | Addressing modes supported | All |
-| Critical bugs fixed | 4 |
-| Commits made | 6 |
-| Lines changed | ~200 |
+| Critical bugs fixed | 6 |
+| Commits made | 10 |
+| Lines changed | ~250 |
 | Tests run | 0 (pending) |
 
 ---
