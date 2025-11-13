@@ -129,6 +129,53 @@ Need to implement proper constant resolution in code generator:
 
 ---
 
+### 4. ⚠️ HIGH: KotlinExecutor Doesn't Handle Function Calls or Temp Variables
+
+**Severity:** HIGH - Affects all functions using complex operations
+**Commit:** 812919a
+
+**Problem:**
+The `executeDirectly` method in KotlinExecutor had two major gaps:
+1. Didn't handle function calls like `updateZN(A)`
+2. Didn't track temporary variables like `val temp0 = ...`
+
+**Example 1 - Missing Function Calls:**
+```kotlin
+A = 0x42
+updateZN(A)  // This line was silently ignored!
+```
+
+**Result:** Flags would never be updated, causing all comparisons and branches to fail.
+
+**Example 2 - Missing Temp Variables:**
+```kotlin
+val temp0 = A + 0x20 + (if (C) 1 else 0)  // temp0 not stored
+C = temp0 > 0xFF  // Error: temp0 is undefined!
+A = temp0 and 0xFF
+```
+
+**Result:** ADC/SBC and ROL/ROR operations would crash because temp variables weren't tracked.
+
+**Impact:**
+- Every instruction that updates flags would have wrong flag state
+- ADC/SBC arithmetic would fail (use temps to avoid double evaluation)
+- ROL/ROR rotates would fail (use temps to save old carry)
+- Essentially all complex operations broken
+
+**Fix Applied:**
+1. Added function call handler that recognizes `updateZN(...)` pattern
+2. Added temporary variable storage: `val temp0 = expr` now stores the value
+3. Added temp variable lookup in expression evaluator
+4. Threaded `tempVars` map through all evaluation functions
+
+**Code Changed:**
+- `src/test/kotlin/KotlinExecutor.kt` lines 217-445
+- Added tempVars tracking
+- Added function call pattern matching
+- Updated evaluateExpression to check tempVars
+
+---
+
 ## Bugs Still To Find
 
 Based on systematic review, potential remaining issues:
@@ -188,19 +235,22 @@ Test simplest leaf functions to find systematic bugs:
 
 ## Statistics
 
-### Bugs Found: 3 (all critical/high severity)
-1. Direct addressing mode bug (CRITICAL)
-2. INC/DEC flag updates (HIGH)
-3. Missing constant resolution (HIGH)
+### Bugs Found: 4 (all critical/high severity)
+1. Direct addressing mode bug (CRITICAL) - affects 95% of functions
+2. INC/DEC flag updates (HIGH) - affects loops and counters
+3. Missing constant resolution (HIGH) - affects all memory operations
+4. KotlinExecutor missing features (HIGH) - affects all complex operations
 
-### Commits: 3
+### Commits: 5
 - 8c02c82: Fix addressing modes
 - 314fc4f: Fix INC/DEC flags
 - f5b567c: Add constants support
+- 050cd18: Document bugs found
+- 812919a: Fix KotlinExecutor
 
-### Lines Changed: ~150 lines
+### Lines Changed: ~200 lines
 - kotlin-codegen.kt: ~75 lines
-- KotlinExecutor.kt: ~40 lines
+- KotlinExecutor.kt: ~90 lines
 - New test files: ~35 lines
 
 ### Test Coverage: 0% (haven't run tests yet)
