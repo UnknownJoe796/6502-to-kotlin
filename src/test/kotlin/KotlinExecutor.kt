@@ -133,6 +133,49 @@ object KotlinExecutor {
             Z = (value == 0.toUByte())
             N = (value.toInt() and 0x80) != 0
         }
+
+        /**
+         * Push a byte onto the stack.
+         */
+        fun pushByte(value: UByte) {
+            writeByte(0x0100 + SP.toInt(), value)
+            SP = ((SP.toInt() - 1) and 0xFF).toUByte()
+        }
+
+        /**
+         * Pull a byte from the stack.
+         */
+        fun pullByte(): UByte {
+            SP = ((SP.toInt() + 1) and 0xFF).toUByte()
+            return readByte(0x0100 + SP.toInt())
+        }
+
+        /**
+         * Get processor status as a byte (for PHP).
+         */
+        fun getStatusByte(): UByte {
+            var status = 0b00100000 // Bit 5 is always set
+            if (N) status = status or 0b10000000
+            if (V) status = status or 0b01000000
+            if (D) status = status or 0b00001000
+            if (I) status = status or 0b00000100
+            if (Z) status = status or 0b00000010
+            if (C) status = status or 0b00000001
+            return status.toUByte()
+        }
+
+        /**
+         * Set processor status from a byte (for PLP).
+         */
+        fun setStatusByte(value: UByte) {
+            val v = value.toInt()
+            N = (v and 0b10000000) != 0
+            V = (v and 0b01000000) != 0
+            D = (v and 0b00001000) != 0
+            I = (v and 0b00000100) != 0
+            Z = (v and 0b00000010) != 0
+            C = (v and 0b00000001) != 0
+        }
     }
 
     /**
@@ -306,7 +349,7 @@ object KotlinExecutor {
             return
         }
 
-        // Handle function calls: updateZN(value)
+        // Handle function calls: updateZN(value), pushByte(value), etc.
         val functionCallPattern = """^(\w+)\((.+?)\)$""".toRegex()
         val functionCallMatch = functionCallPattern.find(line)
         if (functionCallMatch != null) {
@@ -316,7 +359,31 @@ object KotlinExecutor {
                     val value = evaluateExpression(argExpr, env, tempVars)
                     env.updateZN(value)
                 }
+                "pushByte" -> {
+                    val value = evaluateExpression(argExpr, env, tempVars)
+                    env.pushByte(value)
+                }
+                "setStatusByte" -> {
+                    val value = evaluateExpression(argExpr, env, tempVars)
+                    env.setStatusByte(value)
+                }
                 // Add other function handlers as needed
+            }
+            return
+        }
+
+        // Handle function calls with no args or returning values
+        val zeroArgFunctionPattern = """^(\w+)\(\s*\)$""".toRegex()
+        val zeroArgMatch = zeroArgFunctionPattern.find(line)
+        if (zeroArgMatch != null) {
+            val funcName = zeroArgMatch.groupValues[1]
+            when (funcName) {
+                "pullByte" -> {
+                    // This shouldn't appear alone - should be in an assignment
+                }
+                "getStatusByte" -> {
+                    // This shouldn't appear alone - should be in an assignment
+                }
             }
             return
         }
@@ -363,6 +430,19 @@ object KotlinExecutor {
         val constantValue = SMB_CONSTANTS[trimmed]
         if (constantValue != null) {
             return constantValue.toUByte()
+        }
+
+        // Function calls that return values: pullByte(), getStatusByte()
+        val funcCallPattern = """(\w+)\((.*)?\)""".toRegex()
+        val funcMatch = funcCallPattern.find(trimmed)
+        if (funcMatch != null) {
+            val funcName = funcMatch.groupValues[1]
+            val args = funcMatch.groupValues[2]
+            return when (funcName) {
+                "pullByte" -> env.pullByte()
+                "getStatusByte" -> env.getStatusByte()
+                else -> 0u
+            }
         }
 
         // Memory read: memory[addr]
