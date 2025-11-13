@@ -176,6 +176,97 @@ A = temp0 and 0xFF
 
 ---
 
+### 5. ⚠️ HIGH: Missing Stack Operation Functions in KotlinExecutor
+
+**Severity:** HIGH - Affects all functions using stack operations
+**Commit:** 85ffc74
+
+**Problem:**
+The code generator emits calls to stack operation functions (pushByte, pullByte, getStatusByte, setStatusByte), but KotlinExecutor didn't have these functions implemented.
+
+**Example - Generated Code:**
+```assembly
+PHA  ; Push accumulator
+```
+
+**Generated Kotlin:**
+```kotlin
+pushByte(A)  // Function doesn't exist!
+```
+
+**Impact:**
+- PHA, PLA, PHP, PLP instructions would all fail
+- Any function using stack for temporary storage would crash
+- Function prologue/epilogue code would fail
+- Interrupt handling code would fail
+
+**Fix Applied:**
+
+1. **Added stack operation functions to ExecutionEnvironment:**
+```kotlin
+fun pushByte(value: UByte) {
+    writeByte(0x0100 + SP.toInt(), value)
+    SP = ((SP.toInt() - 1) and 0xFF).toUByte()
+}
+
+fun pullByte(): UByte {
+    SP = ((SP.toInt() + 1) and 0xFF).toUByte()
+    return readByte(0x0100 + SP.toInt())
+}
+
+fun getStatusByte(): UByte {
+    // Pack all flags into a byte (N,V,-,B,D,I,Z,C)
+    var status = 0b00100000 // Bit 5 always set
+    if (N) status = status or 0b10000000
+    if (V) status = status or 0b01000000
+    if (D) status = status or 0b00001000
+    if (I) status = status or 0b00000100
+    if (Z) status = status or 0b00000010
+    if (C) status = status or 0b00000001
+    return status.toUByte()
+}
+
+fun setStatusByte(value: UByte) {
+    // Unpack flags from byte
+    val v = value.toInt()
+    N = (v and 0b10000000) != 0
+    V = (v and 0b01000000) != 0
+    D = (v and 0b00001000) != 0
+    I = (v and 0b00000100) != 0
+    Z = (v and 0b00000010) != 0
+    C = (v and 0b00000001) != 0
+}
+```
+
+2. **Updated executeLine to handle function calls:**
+```kotlin
+when (funcName) {
+    "updateZN" -> env.updateZN(value)
+    "pushByte" -> env.pushByte(value)
+    "setStatusByte" -> env.setStatusByte(value)
+}
+```
+
+3. **Updated evaluateExpression to handle functions that return values:**
+```kotlin
+when (funcName) {
+    "pullByte" -> env.pullByte()
+    "getStatusByte" -> env.getStatusByte()
+}
+```
+
+**Supported Operations:**
+- `PHA`: `pushByte(A)` ✓
+- `PLA`: `A = pullByte()` ✓
+- `PHP`: `pushByte(getStatusByte())` ✓
+- `PLP`: `setStatusByte(pullByte())` ✓
+- `PHX`, `PLX`, `PHY`, `PLY`: Same pattern ✓
+
+**Code Changed:**
+- `src/test/kotlin/KotlinExecutor.kt` lines 140-178, 362-369, 435-446
+
+---
+
 ## Bugs Still To Find
 
 Based on systematic review, potential remaining issues:
@@ -184,7 +275,7 @@ Based on systematic review, potential remaining issues:
 - ✅ Direct addressing fixed
 - ✅ Indexed addressing fixed
 - ✅ Indirect addressing fixed
-- ❓ Stack operations (PHA/PLA/PHP/PLP) - need to verify
+- ✅ Stack operations (PHA/PLA/PHP/PLP) fixed
 - ❓ Boundary conditions (wrapping, page crosses)
 
 ### Flag Operations
@@ -235,18 +326,20 @@ Test simplest leaf functions to find systematic bugs:
 
 ## Statistics
 
-### Bugs Found: 4 (all critical/high severity)
+### Bugs Found: 5 (all critical/high severity)
 1. Direct addressing mode bug (CRITICAL) - affects 95% of functions
 2. INC/DEC flag updates (HIGH) - affects loops and counters
 3. Missing constant resolution (HIGH) - affects all memory operations
 4. KotlinExecutor missing features (HIGH) - affects all complex operations
+5. Missing stack operations (HIGH) - affects all stack-using functions
 
-### Commits: 5
+### Commits: 6
 - 8c02c82: Fix addressing modes
 - 314fc4f: Fix INC/DEC flags
 - f5b567c: Add constants support
 - 050cd18: Document bugs found
-- 812919a: Fix KotlinExecutor
+- 812919a: Fix KotlinExecutor function calls/temps
+- 85ffc74: Fix KotlinExecutor stack operations
 
 ### Lines Changed: ~200 lines
 - kotlin-codegen.kt: ~75 lines
