@@ -1068,32 +1068,74 @@ fun AssemblyAddressing?.toKotlinExpr(ctx: CodeGenContext): KotlinExpr {
         }
 
         is AssemblyAddressing.Direct -> {
-            KVar(sanitizeLabel(this.label))
+            // Direct addressing is a memory access: memory[address]
+            val address = KVar(sanitizeLabel(this.label))
+            KMemberAccess(KVar("memory"), address, isIndexed = true)
         }
 
         is AssemblyAddressing.DirectX -> {
+            // Indexed addressing: memory[address + X]
+            val baseAddr = KVar(sanitizeLabel(this.label))
             val index = ctx.registerX ?: KVar("X")
-            KMemberAccess(KVar(sanitizeLabel(this.label)), index, isIndexed = true)
+            val addr = if (this.offset == 0) {
+                KBinaryOp(baseAddr, "+", index)
+            } else {
+                KBinaryOp(KBinaryOp(baseAddr, "+", KLiteral(this.offset.toString())), "+", index)
+            }
+            KMemberAccess(KVar("memory"), addr, isIndexed = true)
         }
 
         is AssemblyAddressing.DirectY -> {
+            // Indexed addressing: memory[address + Y]
+            val baseAddr = KVar(sanitizeLabel(this.label))
             val index = ctx.registerY ?: KVar("Y")
-            KMemberAccess(KVar(sanitizeLabel(this.label)), index, isIndexed = true)
+            val addr = if (this.offset == 0) {
+                KBinaryOp(baseAddr, "+", index)
+            } else {
+                KBinaryOp(KBinaryOp(baseAddr, "+", KLiteral(this.offset.toString())), "+", index)
+            }
+            KMemberAccess(KVar("memory"), addr, isIndexed = true)
         }
 
         is AssemblyAddressing.IndirectX -> {
-            // (label,X) - indirect indexed by X
-            KComment("/* indirect X: ${this} */").let { KVar("TODO") }
+            // (label,X) - indirect indexed by X: memory[memory[(address+X) & 0xFF] + memory[(address+X+1) & 0xFF]*256]
+            val baseAddr = KVar(sanitizeLabel(this.label))
+            val index = ctx.registerX ?: KVar("X")
+            val zpAddr = KBinaryOp(KParen(KBinaryOp(baseAddr, "+", index)), "and", KLiteral("0xFF"))
+
+            // Read 16-bit address from zero page
+            val lowByte = KMemberAccess(KVar("memory"), zpAddr, isIndexed = true)
+            val highByte = KMemberAccess(KVar("memory"), KBinaryOp(KParen(KBinaryOp(zpAddr, "+", KLiteral("1"))), "and", KLiteral("0xFF")), isIndexed = true)
+            val indirectAddr = KBinaryOp(lowByte, "+", KBinaryOp(highByte, "*", KLiteral("256")))
+
+            KMemberAccess(KVar("memory"), indirectAddr, isIndexed = true)
         }
 
         is AssemblyAddressing.IndirectY -> {
-            // (label),Y - indirect indexed by Y
-            KComment("/* indirect Y: ${this} */").let { KVar("TODO") }
+            // (label),Y - indirect indexed by Y: memory[memory[address] + memory[address+1]*256 + Y]
+            val baseAddr = KVar(sanitizeLabel(this.label))
+            val zpAddr = KBinaryOp(baseAddr, "and", KLiteral("0xFF"))
+
+            // Read 16-bit address from zero page
+            val lowByte = KMemberAccess(KVar("memory"), zpAddr, isIndexed = true)
+            val highByte = KMemberAccess(KVar("memory"), KBinaryOp(KParen(KBinaryOp(zpAddr, "+", KLiteral("1"))), "and", KLiteral("0xFF")), isIndexed = true)
+            val baseIndirectAddr = KBinaryOp(lowByte, "+", KBinaryOp(highByte, "*", KLiteral("256")))
+
+            // Add Y index
+            val index = ctx.registerY ?: KVar("Y")
+            val finalAddr = KBinaryOp(baseIndirectAddr, "+", index)
+
+            KMemberAccess(KVar("memory"), finalAddr, isIndexed = true)
         }
 
         is AssemblyAddressing.IndirectAbsolute -> {
-            // (label) - absolute indirect
-            KComment("/* indirect: ${this} */").let { KVar("TODO") }
+            // (label) - absolute indirect (JMP only): memory[address] + memory[address+1]*256
+            val addr = KVar(sanitizeLabel(this.label))
+            val lowByte = KMemberAccess(KVar("memory"), addr, isIndexed = true)
+            val highByte = KMemberAccess(KVar("memory"), KBinaryOp(addr, "+", KLiteral("1")), isIndexed = true)
+            val indirectAddr = KBinaryOp(lowByte, "+", KBinaryOp(highByte, "*", KLiteral("256")))
+
+            indirectAddr  // This is used for JMP, not memory access
         }
 
         is AssemblyAddressing.ValueLowerSelection -> {
