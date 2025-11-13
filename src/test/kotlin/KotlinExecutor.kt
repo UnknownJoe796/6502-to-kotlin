@@ -224,13 +224,16 @@ object KotlinExecutor {
             val env = ExecutionEnvironment()
             env.loadState(initialState)
 
+            // Track temporary variables
+            val tempVars = mutableMapOf<String, UByte>()
+
             // Parse and execute each line of the generated code
             // This is a simplified interpreter for the generated Kotlin code
             val lines = kotlinCode.lines().map { it.trim() }.filter { it.isNotEmpty() }
 
             for (line in lines) {
                 try {
-                    executeLine(line, env)
+                    executeLine(line, env, tempVars)
                 } catch (e: Exception) {
                     // Continue on errors - some generated code may be invalid
                     println("Warning: Failed to execute line '$line': ${e.message}")
@@ -248,7 +251,7 @@ object KotlinExecutor {
      *
      * This is a simplified interpreter that handles common patterns from the code generator.
      */
-    private fun executeLine(line: String, env: ExecutionEnvironment) {
+    private fun executeLine(line: String, env: ExecutionEnvironment, tempVars: MutableMap<String, UByte>) {
         // Skip empty lines and comments
         if (line.isEmpty() || line.startsWith("//")) return
 
@@ -257,7 +260,7 @@ object KotlinExecutor {
         val assignmentMatch = assignmentPattern.find(line)
         if (assignmentMatch != null) {
             val (target, expr) = assignmentMatch.destructured
-            val value = evaluateExpression(expr, env)
+            val value = evaluateExpression(expr, env, tempVars)
 
             when (target) {
                 "A" -> {
@@ -281,7 +284,7 @@ object KotlinExecutor {
         val flagMatch = flagPattern.find(line)
         if (flagMatch != null) {
             val (flag, expr) = flagMatch.destructured
-            val value = evaluateBooleanExpression(expr, env)
+            val value = evaluateBooleanExpression(expr, env, tempVars)
 
             when (flag) {
                 "N" -> env.N = value
@@ -297,9 +300,34 @@ object KotlinExecutor {
         val memWriteMatch = memWritePattern.find(line)
         if (memWriteMatch != null) {
             val (addrExpr, valueExpr) = memWriteMatch.destructured
-            val addr = evaluateExpression(addrExpr, env).toInt()
-            val value = evaluateExpression(valueExpr, env)
+            val addr = evaluateExpression(addrExpr, env, tempVars).toInt()
+            val value = evaluateExpression(valueExpr, env, tempVars)
             env.writeByte(addr, value)
+            return
+        }
+
+        // Handle function calls: updateZN(value)
+        val functionCallPattern = """^(\w+)\((.+?)\)$""".toRegex()
+        val functionCallMatch = functionCallPattern.find(line)
+        if (functionCallMatch != null) {
+            val (funcName, argExpr) = functionCallMatch.destructured
+            when (funcName) {
+                "updateZN" -> {
+                    val value = evaluateExpression(argExpr, env, tempVars)
+                    env.updateZN(value)
+                }
+                // Add other function handlers as needed
+            }
+            return
+        }
+
+        // Handle variable declarations: val temp0 = expression
+        val varDeclPattern = """^val\s+(\w+)\s*=\s*(.+)$""".toRegex()
+        val varDeclMatch = varDeclPattern.find(line)
+        if (varDeclMatch != null) {
+            val (varName, expr) = varDeclMatch.destructured
+            val value = evaluateExpression(expr, env, tempVars)
+            tempVars[varName] = value
             return
         }
     }
@@ -307,7 +335,7 @@ object KotlinExecutor {
     /**
      * Evaluate a Kotlin expression to a UByte value.
      */
-    private fun evaluateExpression(expr: String, env: ExecutionEnvironment): UByte {
+    private fun evaluateExpression(expr: String, env: ExecutionEnvironment, tempVars: Map<String, UByte>): UByte {
         val trimmed = expr.trim()
 
         // Literal values
@@ -325,6 +353,12 @@ object KotlinExecutor {
             "Y" -> return env.Y
         }
 
+        // Temporary variables
+        val tempValue = tempVars[trimmed]
+        if (tempValue != null) {
+            return tempValue
+        }
+
         // SMB constants (memory-mapped addresses)
         val constantValue = SMB_CONSTANTS[trimmed]
         if (constantValue != null) {
@@ -336,22 +370,22 @@ object KotlinExecutor {
         val memReadMatch = memReadPattern.find(trimmed)
         if (memReadMatch != null) {
             val addrExpr = memReadMatch.groupValues[1]
-            val addr = evaluateExpression(addrExpr, env).toInt()
+            val addr = evaluateExpression(addrExpr, env, tempVars).toInt()
             return env.readByte(addr)
         }
 
         // Binary operations
         // Handle parentheses first
         if (trimmed.startsWith("(") && trimmed.endsWith(")")) {
-            return evaluateExpression(trimmed.substring(1, trimmed.length - 1), env)
+            return evaluateExpression(trimmed.substring(1, trimmed.length - 1), env, tempVars)
         }
 
         // Try to parse binary operations
         for (op in listOf("+", "-", "and", "or", "xor", "shl", "shr")) {
             val parts = splitByOperator(trimmed, op)
             if (parts.size == 2) {
-                val left = evaluateExpression(parts[0], env)
-                val right = evaluateExpression(parts[1], env)
+                val left = evaluateExpression(parts[0], env, tempVars)
+                val right = evaluateExpression(parts[1], env, tempVars)
 
                 return when (op) {
                     "+" -> ((left.toInt() + right.toInt()) and 0xFF).toUByte()
@@ -373,7 +407,7 @@ object KotlinExecutor {
     /**
      * Evaluate a boolean expression.
      */
-    private fun evaluateBooleanExpression(expr: String, env: ExecutionEnvironment): Boolean {
+    private fun evaluateBooleanExpression(expr: String, env: ExecutionEnvironment, tempVars: Map<String, UByte>): Boolean {
         val trimmed = expr.trim()
 
         when (trimmed) {
@@ -389,8 +423,8 @@ object KotlinExecutor {
         for (op in listOf("==", "!=", ">", "<", ">=", "<=")) {
             val parts = splitByOperator(trimmed, op)
             if (parts.size == 2) {
-                val left = evaluateExpression(parts[0], env).toInt()
-                val right = evaluateExpression(parts[1], env).toInt()
+                val left = evaluateExpression(parts[0], env, tempVars).toInt()
+                val right = evaluateExpression(parts[1], env, tempVars).toInt()
 
                 return when (op) {
                     "==" -> left == right
