@@ -17,6 +17,34 @@ import kotlin.script.experimental.jvmhost.createJvmCompilationConfigurationFromT
 object KotlinExecutor {
 
     /**
+     * Common SMB constants (memory-mapped addresses).
+     * TODO: This should be generated from the assembly file's constant definitions.
+     */
+    private val SMB_CONSTANTS = mapOf(
+        // PPU Registers
+        "PPU_CTRL_REG1" to 0x2000,
+        "PPU_CTRL_REG2" to 0x2001,
+        "PPU_STATUS" to 0x2002,
+        "PPU_SPR_ADDR" to 0x2003,
+        "PPU_SPR_DATA" to 0x2004,
+        "PPU_SCROLL_REG" to 0x2005,
+        "PPU_ADDRESS" to 0x2006,
+        "PPU_DATA" to 0x2007,
+
+        // APU Registers
+        "JOYPAD_PORT" to 0x4016,
+        "JOYPAD_PORT1" to 0x4016,
+        "JOYPAD_PORT2" to 0x4017,
+
+        // Mirror registers (common SMB addresses)
+        "Mirror_PPU_CTRL_REG1" to 0x0778,
+        "Mirror_PPU_CTRL_REG2" to 0x0779,
+
+        // Other common addresses can be added as needed
+        // For now, unknown constants will return 0 (like an unmapped address)
+    )
+
+    /**
      * Execution environment that mimics 6502 processor state.
      * Generated Kotlin code will read from and write to these variables.
      */
@@ -295,6 +323,12 @@ object KotlinExecutor {
             "A" -> return env.A
             "X" -> return env.X
             "Y" -> return env.Y
+        }
+
+        // SMB constants (memory-mapped addresses)
+        val constantValue = SMB_CONSTANTS[trimmed]
+        if (constantValue != null) {
+            return constantValue.toUByte()
         }
 
         // Memory read: memory[addr]
