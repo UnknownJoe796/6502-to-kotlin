@@ -267,6 +267,66 @@ when (funcName) {
 
 ---
 
+### 6. ⚠️ HIGH: Missing If Expression Support in KotlinExecutor
+
+**Severity:** HIGH - Affects ADC and SBC instructions
+**Commit:** dc3c113
+
+**Problem:**
+The code generator uses if expressions for conditional values, particularly in ADC and SBC operations to handle carry/borrow. The executor's evaluateExpression function didn't have support for parsing and evaluating if expressions.
+
+**Example - Generated Code:**
+```assembly
+ADC #$20  ; Add with carry
+```
+
+**Generated Kotlin:**
+```kotlin
+val temp0 = A + 0x20 + (if (C) 1 else 0)  // Executor couldn't parse "if (C) 1 else 0"
+C = temp0 > 0xFF
+A = temp0 and 0xFF
+updateZN(A)
+```
+
+**Impact:**
+- ADC instruction would fail (all addition with carry)
+- SBC instruction would fail (all subtraction with borrow)
+- Any function doing arithmetic would crash
+- This is a common operation in games (score updates, timer math, etc.)
+
+**Fix Applied:**
+
+Added if expression parsing to evaluateExpression:
+```kotlin
+// If expressions: (if (C) 1 else 0)
+val ifExprPattern = """\(?\s*if\s*\((.+?)\)\s*(.+?)\s+else\s+(.+?)\s*\)?""".toRegex()
+val ifMatch = ifExprPattern.find(trimmed)
+if (ifMatch != null) {
+    val (condition, thenExpr, elseExpr) = ifMatch.destructured
+    val conditionValue = evaluateBooleanExpression(condition.trim(), env, tempVars)
+    return if (conditionValue) {
+        evaluateExpression(thenExpr.trim(), env, tempVars)
+    } else {
+        evaluateExpression(elseExpr.trim(), env, tempVars)
+    }
+}
+```
+
+**How It Works:**
+1. Parse the pattern: `if (condition) thenValue else elseValue`
+2. Evaluate the condition as a boolean
+3. Evaluate and return either thenValue or elseValue based on result
+
+**Supported Patterns:**
+- `if (C) 1 else 0` - Carry flag check (ADC)
+- `if (C) 0 else 1` - Borrow calculation (SBC)
+- Any boolean condition with numeric expressions
+
+**Code Changed:**
+- `src/test/kotlin/KotlinExecutor.kt` lines 457-468
+
+---
+
 ## Bugs Still To Find
 
 Based on systematic review, potential remaining issues:
@@ -326,20 +386,23 @@ Test simplest leaf functions to find systematic bugs:
 
 ## Statistics
 
-### Bugs Found: 5 (all critical/high severity)
+### Bugs Found: 6 (all critical/high severity)
 1. Direct addressing mode bug (CRITICAL) - affects 95% of functions
 2. INC/DEC flag updates (HIGH) - affects loops and counters
 3. Missing constant resolution (HIGH) - affects all memory operations
 4. KotlinExecutor missing features (HIGH) - affects all complex operations
 5. Missing stack operations (HIGH) - affects all stack-using functions
+6. Missing if expression support (HIGH) - affects ADC/SBC arithmetic
 
-### Commits: 6
+### Commits: 8
 - 8c02c82: Fix addressing modes
 - 314fc4f: Fix INC/DEC flags
 - f5b567c: Add constants support
 - 050cd18: Document bugs found
 - 812919a: Fix KotlinExecutor function calls/temps
 - 85ffc74: Fix KotlinExecutor stack operations
+- 7d89c27: Document Bug #5
+- dc3c113: Fix if expressions
 
 ### Lines Changed: ~200 lines
 - kotlin-codegen.kt: ~75 lines
