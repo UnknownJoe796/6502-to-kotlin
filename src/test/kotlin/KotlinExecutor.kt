@@ -454,6 +454,19 @@ object KotlinExecutor {
             return env.readByte(addr)
         }
 
+        // If expressions: (if (C) 1 else 0)
+        val ifExprPattern = """\(?\s*if\s*\((.+?)\)\s*(.+?)\s+else\s+(.+?)\s*\)?""".toRegex()
+        val ifMatch = ifExprPattern.find(trimmed)
+        if (ifMatch != null) {
+            val (condition, thenExpr, elseExpr) = ifMatch.destructured
+            val conditionValue = evaluateBooleanExpression(condition.trim(), env, tempVars)
+            return if (conditionValue) {
+                evaluateExpression(thenExpr.trim(), env, tempVars)
+            } else {
+                evaluateExpression(elseExpr.trim(), env, tempVars)
+            }
+        }
+
         // Binary operations
         // Handle parentheses first
         if (trimmed.startsWith("(") && trimmed.endsWith(")")) {
