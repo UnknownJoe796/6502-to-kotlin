@@ -204,12 +204,16 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
             val target = this.address.toKotlinExpr(ctx)
             val incremented = KBinaryOp(KParen(KBinaryOp(target, "+", KLiteral("1"))), "and", KLiteral("0xFF"))
             stmts.add(KAssignment(target, incremented))
+            // INC updates Z and N flags
+            stmts.add(KExprStmt(KCall("updateZN", listOf(target))))
         }
 
         AssemblyOp.DEC -> {
             val target = this.address.toKotlinExpr(ctx)
             val decremented = KBinaryOp(KParen(KBinaryOp(target, "-", KLiteral("1"))), "and", KLiteral("0xFF"))
             stmts.add(KAssignment(target, decremented))
+            // DEC updates Z and N flags
+            stmts.add(KExprStmt(KCall("updateZN", listOf(target))))
         }
 
         AssemblyOp.INX -> {
