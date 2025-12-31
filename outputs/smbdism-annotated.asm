@@ -929,7 +929,7 @@ RTS                                                                             
 OperModeExecutionTree:                                                                              ; fun():  B
 LDA OperMode                  ; this is the heart of the entire program,                            ; 
 JSR JumpEngine                ; most of what goes on starts here                                    ; 
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=TitleScreenMode)                                                                    ; 
 DATA: Expr(expr=GameMode)                                                                           ; 
 DATA: Expr(expr=VictoryMode)                                                                        ; 
@@ -957,7 +957,7 @@ RTS                                                                             
 TitleScreenMode:                                                                                    ;  B
 LDA OperMode_Task                                                                                   ; 
 JSR JumpEngine                                                                                      ; 
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=InitializeGame)                                                                     ; 
 DATA: Expr(expr=ScreenRoutines)                                                                     ; 
 DATA: Expr(expr=PrimaryGameSetup)                                                                   ; 
@@ -1122,7 +1122,7 @@ JMP PlayerGfxHandler          ; draw the player, then leave                     
 VictoryModeSubroutines:                                                                             ; fun():  B
 LDA OperMode_Task                                                                                   ; 
 JSR JumpEngine                                                                                      ; 
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=BridgeCollapse)                                                                     ; 
 DATA: Expr(expr=SetupVictoryMode)                                                                   ; 
 DATA: Expr(expr=PlayerVictoryWalk)                                                                  ; 
@@ -1361,7 +1361,7 @@ RTS                                                                             
 ScreenRoutines:                                                                                     ;  B
 LDA ScreenRoutineTask         ; run one of the following subroutines                                ; 
 JSR JumpEngine                                                                                      ; 
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=InitScreen)                                                                         ; 
 DATA: Expr(expr=SetupIntermediate)                                                                  ; 
 DATA: Expr(expr=WriteTopStatusLine)                                                                 ; 
@@ -2946,7 +2946,7 @@ JMP ContinueGame              ; continue the game                               
 GameOverMode:                                                                                       ;  B
 LDA OperMode_Task                                                                                   ; 
 JSR JumpEngine                                                                                      ; 
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=SetupGameOver)                                                                      ; 
 DATA: Expr(expr=ScreenRoutines)                                                                     ; 
 DATA: Expr(expr=RunGameOver)                                                                        ; 
@@ -3047,7 +3047,7 @@ SkipATRender:  RTS                                                              
                                                                                                     ;  B
 AreaParserTasks:                                                                                    ; fun():  B
 JSR JumpEngine                                                                                      ; 
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=IncrementColumnPos)                                                                 ; 
 DATA: Expr(expr=RenderAreaGraphics)                                                                 ; 
 DATA: Expr(expr=RenderAreaGraphics)                                                                 ; 
@@ -3468,7 +3468,7 @@ RunAObj:  LDA $00             ; get stored value and add offset to it           
 CLC                           ; then use the jump engine with current contents of A                 ; 
 ADC $07                                                                                             ; 
 JSR JumpEngine                                                                                      ; 
-                                                                                                    ; 
+                                                                                                    ;  B
                               ; large objects (rows $00-$0b or 00-11, d6-d4 set)                    ; 
 DATA: Expr(expr=VerticalPipe) ; used by warp pipes                                                  ; 
 DATA: Expr(expr=AreaStyleObject)                                                                    ; 
@@ -3621,7 +3621,7 @@ RTS                                                                             
 AreaStyleObject:                                                                                    ;  B
 LDA AreaStyle                 ; load level object style and jump to the right sub                   ; 
 JSR JumpEngine                                                                                      ; 
-DATA: Expr(expr=TreeLedge)    ; also used for cloud type levels                                     ; 
+DATA: Expr(expr=TreeLedge)    ; also used for cloud type levels                                     ;  B
 DATA: Expr(expr=MushroomLedge)                                                                      ; 
 DATA: Expr(expr=BulletBillCannon)                                                                   ; 
                                                                                                     ; 
@@ -5290,7 +5290,7 @@ DATA: ByteValue(value=255)                                                      
 GameMode:                                                                                           ;  B
 LDA OperMode_Task                                                                                   ; 
 JSR JumpEngine                                                                                      ; 
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=InitializeArea)                                                                     ; 
 DATA: Expr(expr=ScreenRoutines)                                                                     ; 
 DATA: Expr(expr=SecondaryGameSetup)                                                                 ; 
@@ -5474,7 +5474,7 @@ RTS                                                                             
 GameRoutines:                                                                                       ; fun():  B
 LDA GameEngineSubroutine      ; run routine based on number (a few of these routines are            ; 
 JSR JumpEngine                ; merely placeholders as conditions for other routines)               ; 
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=Entrance_GameTimerSetup)                                                            ; 
 DATA: Expr(expr=Vine_AutoClimb)                                                                     ; 
 DATA: Expr(expr=SideExitPipeEntry)                                                                  ; 
@@ -5889,7 +5889,7 @@ BEQ MoveSubs                  ; if climbing, branch ahead, leave timer unset    
 LDY #$18                                                                                            ;  B
 STY ClimbSideTimer            ; otherwise reset timer now                                           ; 
 MoveSubs:  JSR JumpEngine                                                                           ;  B
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=OnGroundStateSub)                                                                   ; 
 DATA: Expr(expr=JumpSwimSub)                                                                        ; 
 DATA: Expr(expr=FallingSub)                                                                         ; 
@@ -7322,7 +7322,7 @@ CMP #$09                      ; if block number was within 0-8 range,           
 BCC BlockCode                 ; branch to use current number                                        ; 
 SBC #$05                      ; otherwise subtract 5 for second set to get proper number            ;  B
 BlockCode:  JSR JumpEngine    ; run appropriate subroutine depending on block number                ;  B
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=MushFlowerBlock)                                                                    ; 
 DATA: Expr(expr=CoinBlock)                                                                          ; 
 DATA: Expr(expr=CoinBlock)                                                                          ; 
@@ -8066,7 +8066,7 @@ TYA                           ; get identifier back and use as offset for jump e
                                                                                                     ; 
 InitEnemyRoutines:                                                                                  ;  B
 JSR JumpEngine                                                                                      ; 
-                                                                                                    ; 
+                                                                                                    ;  B
                               ; jump engine table for newly loaded enemy objects                    ; 
                                                                                                     ; 
 DATA: Expr(expr=InitNormalEnemy); for objects $00-$0f                                               ; 
@@ -8833,7 +8833,7 @@ STA EnemyFrenzyBuffer         ; save in enemy frenzy buffer                     
 SEC                                                                                                 ; 
 SBC #$12                      ; subtract 12 and use as offset for jump engine                       ; 
 JSR JumpEngine                                                                                      ; 
-                                                                                                    ; 
+                                                                                                    ;  B
                               ; frenzy object jump table                                            ; 
 DATA: Expr(expr=LakituAndSpinyHandler)                                                              ; 
 DATA: Expr(expr=NoFrenzyCode)                                                                       ; 
@@ -9011,7 +9011,7 @@ BCC JmpEO                                                                       
 TYA                           ; otherwise subtract $14 from the value and use                       ;  B
 SBC #$14                      ; as value for jump engine                                            ; 
 JmpEO:  JSR JumpEngine                                                                              ;  B
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=RunNormalEnemies); for objects $00-$14                                              ; 
                                                                                                     ; 
 DATA: Expr(expr=RunBowserFlame); for objects $15-$1f                                                ; 
@@ -9082,7 +9082,7 @@ SkipMove:  JMP OffscreenBoundsCheck                                             
 EnemyMovementSubs:                                                                                  ; fun(X):  B
 LDA Enemy_ID,X                                                                                      ; 
 JSR JumpEngine                                                                                      ; 
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=MoveNormalEnemy); only objects $00-$14 use this table                               ; 
 DATA: Expr(expr=MoveNormalEnemy)                                                                    ; 
 DATA: Expr(expr=MoveNormalEnemy)                                                                    ; 
@@ -9159,7 +9159,7 @@ LDA Enemy_ID,X                ; subtract $24 to get proper offset for jump table
 SEC                                                                                                 ; 
 SBC #$24                                                                                            ; 
 JSR JumpEngine                                                                                      ; 
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=BalancePlatform); table used by objects $24-$2a                                     ; 
 DATA: Expr(expr=YMovingPlatform)                                                                    ; 
 DATA: Expr(expr=MoveLargeLiftPlat)                                                                  ; 
@@ -10456,7 +10456,7 @@ LDA StarFlagTaskControl       ; check star flag object task number here         
 CMP #$05                      ; if greater than 5, branch to exit                                   ; 
 BCS StarFlagExit                                                                                    ; 
 JSR JumpEngine                ; otherwise jump to appropriate sub                                   ;  B
-                                                                                                    ; 
+                                                                                                    ;  B
 DATA: Expr(expr=StarFlagExit)                                                                       ; 
 DATA: Expr(expr=GameTimerFireworks)                                                                 ; 
 DATA: Expr(expr=AwardGameTimerPoints)                                                               ; 

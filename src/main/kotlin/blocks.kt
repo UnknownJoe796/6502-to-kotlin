@@ -142,6 +142,25 @@ class AssemblyFunction(
 }
 
 /**
+ * Terminal subroutines are subroutines that don't return to the caller.
+ * They use the return address on the stack for other purposes (like jump tables).
+ */
+private val TERMINAL_SUBROUTINES = setOf(
+    "JumpEngine",  // Uses return address to index into jump table
+)
+
+/**
+ * Check if a JSR instruction calls a terminal subroutine.
+ */
+fun isTerminalSubroutine(instruction: AssemblyInstruction): Boolean {
+    val targetLabel = (instruction.address as? AssemblyAddressing.Direct)?.label
+        ?: (instruction.address as? AssemblyAddressing.DirectX)?.label
+        ?: (instruction.address as? AssemblyAddressing.DirectY)?.label
+        ?: return false
+    return targetLabel in TERMINAL_SUBROUTINES
+}
+
+/**
  * Organizes lines into linear blocks, where instructions are guaranteed to execute together.
  * All labels with an instruction immediately following become blocks, regardless of whether they are referenced or not.
  * In other words, reachability is not a concern.
@@ -201,6 +220,19 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
                 currentBlock = ArrayList()
             }
 
+            // JSR to terminal subroutines (like JumpEngine) that don't return to caller
+            line.instruction?.op == AssemblyOp.JSR && isTerminalSubroutine(line.instruction) -> {
+                blocks.add(AssemblyBlock(currentBlock).also {
+                    previousBlock?.let { pb ->
+                        // Bidirectional delegate automatically updates it.enteredFrom
+                        pb.fallThroughExit = it
+                    }
+                    // Terminal subroutines don't return, so no fallthrough
+                    previousBlock = null
+                })
+                currentBlock = ArrayList()
+            }
+
             else -> {
                 // We don't assemble lines that aren't instructions or labels into blocks.
             }
@@ -221,9 +253,13 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
         val op = lastInstruction.op
         when {
             op.isBranch -> {
-                val otherBlock = blocksByLabel[lastInstruction.addressAsLabel.label]!!
-                // Bidirectional delegate automatically updates otherBlock.enteredFrom
-                block.branchExit = otherBlock
+                val label = lastInstruction.addressAsLabel.label
+                val otherBlock = blocksByLabel[label]
+                if (otherBlock != null) {
+                    // Bidirectional delegate automatically updates otherBlock.enteredFrom
+                    block.branchExit = otherBlock
+                }
+                // If label not found, branch points to external code - leave branchExit null
             }
 
             op == AssemblyOp.JMP -> {

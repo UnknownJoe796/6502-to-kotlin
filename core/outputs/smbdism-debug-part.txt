@@ -1,0 +1,19 @@
+Function DrawMushroomIcon
+  Inputs: []
+  Outputs: []
+  Line 0: DrawMushroomIcon: 
+    Fallthrough exit: Line 2: IconDataRead: LDA MushroomIconData,Y; note that the default position is set for a
+    Branch exit: null
+  Line 2: IconDataRead: LDA MushroomIconData,Y; note that the default position is set for a
+    Fallthrough exit: Line 6: LDA NumberOfPlayers             ; check number of players
+    Branch exit: Line 2: IconDataRead: LDA MushroomIconData,Y; note that the default position is set for a
+  Line 6: LDA NumberOfPlayers             ; check number of players
+    Fallthrough exit: Line 8: LDA #$24                        ; otherwise, load blank tile in 1-player position
+    Branch exit: Line 12: ExitIcon: RTS 
+  Line 8: LDA #$24                        ; otherwise, load blank tile in 1-player position
+    Fallthrough exit: Line 12: ExitIcon: RTS 
+    Branch exit: null
+  Line 12: ExitIcon: RTS 
+    Fallthrough exit: null
+    Branch exit: null
+

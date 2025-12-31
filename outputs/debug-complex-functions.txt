@@ -206,30 +206,75 @@ Inputs:
 Outputs: 
 Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, X, Y
 
---- Control Flow Nodes (4 nodes) ---
+--- Control Flow Nodes (12 nodes) ---
 
-[0] BlockNode
-  Block: MusicHandler
-  Lines: 3
-    LDA EventMusicQueue
-    BNE LoadEventMusic
+[0] IfNode
+  Condition block: MusicHandler
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
 
-[1] BlockNode
-  Block: @15612
-  Lines: 2
-    LDA AreaMusicQueue
-    BNE LoadAreaMusic
+[1] IfNode
+  Condition block: LoadEventMusic
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
 
-[2] BlockNode
-  Block: @15614
-  Lines: 3
-    LDA EventMusicBuffer
-    ORA AreaMusicBuffer
-    BNE ContinueMusic
+[2] IfNode
+  Condition block: NoStopSfx
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
 
-[3] BlockNode
-  Block: @15617
+[3] LoopNode
+  Type: LoopNode
+  Body nodes: 1
+  Entry: FindEventMusicHeader
+
+[4] BlockNode
+  Block: @15664
   Lines: 1
+
+[5] BlockNode
+  Block: LoadHeader
+  Lines: 29
+    LDA MusicHeaderOffsetData,Y
+    TAY 
+    ... (26 more)
+
+[6] IfNode
+  Condition block: HandleSquare2Music
+  Sense: false
+  Then branch: 6 nodes
+  Else branch: 0 nodes
+
+[7] IfNode
+  Condition block: MiscSqu2MusicTasks
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
+
+[8] IfNode
+  Condition block: HandleSquare1Music
+  Sense: false
+  Then branch: 2 nodes
+  Else branch: 0 nodes
+
+[9] IfNode
+  Condition block: HandleTriangleMusic
+  Sense: false
+  Then branch: 2 nodes
+  Else branch: 0 nodes
+
+[10] IfNode
+  Condition block: HandleNoiseMusic
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
+
+[11] BlockNode
+  Block: ExitMusicHandler
+  Lines: 2
     RTS 
 
 --- Blocks Graph ---
@@ -909,21 +954,27 @@ Inputs: $00
 Outputs: 
 Clobbers: A, NegativeFlag, ZeroFlag, Y, X, CarryFlag, $00, OverflowFlag
 
---- Control Flow Nodes (2 nodes) ---
+--- Control Flow Nodes (3 nodes) ---
 
 [0] IfNode
   Condition block: ImpedePlayerMove
   Sense: false
   Then branch: 1 nodes
+  Else branch: 1 nodes
+
+[1] IfNode
+  Condition block: NXSpd
+  Sense: false
+  Then branch: 1 nodes
   Else branch: 0 nodes
 
-[1] BlockNode
-  Block: ExIPM
-  Lines: 5
-    TXA 
-    EOR #$ff
-    AND Player_CollisionBits
-    ... (2 more)
+[2] BlockNode
+  Block: PlatF
+  Lines: 7
+    STY $00
+    CLC 
+    ADC Player_X_Position
+    ... (4 more)
 
 --- Blocks Graph ---
 

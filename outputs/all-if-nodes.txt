@@ -3,331 +3,256 @@ Printing ALL if nodes in MusicHandler control flow:
   Branch block: MusicHandler
   Sense: false
   Flag setter: lda EventMusicQueue     ;check event music queue
-  Kotlin condition: zeroFlag
+  Kotlin condition: flagZ
   Then branch has 1 nodes, else has 0 nodes
   Then:
     [2] IfNode:
       Branch block: @15612
       Sense: false
       Flag setter: lda AreaMusicQueue      ;check area music queue
-      Kotlin condition: zeroFlag
+      Kotlin condition: flagZ
       Then branch has 2 nodes, else has 0 nodes
       Then:
-        LoopNode (PostTest):
 [3] IfNode:
+  Branch block: LoadEventMusic
+  Sense: false
+  Flag setter: cmp #DeathMusic           ;is it death music?
+  Kotlin condition: flagZ
+  Then branch has 1 nodes, else has 0 nodes
+  Then:
+[4] IfNode:
   Branch block: NoStopSfx
   Sense: false
   Flag setter: cmp #TimeRunningOutMusic  ;is it time running out music?
-  Kotlin condition: A - TimeRunningOutMusic == 0
+  Kotlin condition: flagZ
   Then branch has 1 nodes, else has 0 nodes
   Then:
-    [4] IfNode:
+    [5] IfNode:
       Branch block: @15632
       Sense: false
       Flag setter: ldx #$08                  ;load offset to be added to length byte of header
-      Kotlin condition: zeroFlag
-      Then branch has 1 nodes, else has 0 nodes
+      Kotlin condition: flagZ
+      Then branch has 6 nodes, else has 0 nodes
       Then:
+        [6] IfNode:
+          Branch block: LoadAreaMusic
+          Sense: false
+          Flag setter: cmp #$04                  ;is it underground music?
+          Kotlin condition: flagZ
+          Then branch has 1 nodes, else has 0 nodes
+          Then:
         LoopNode (PreTest):
 LoopNode (PostTest):
-[5] IfNode:
+[7] IfNode:
   Branch block: HandleSquare2Music
   Sense: false
   Flag setter: dec Squ2_NoteLenCounter  ;decrement square 2 note length
-  Kotlin condition: zeroFlag
+  Kotlin condition: flagZ
   Then branch has 6 nodes, else has 0 nodes
   Then:
-    [6] IfNode:
+    [8] IfNode:
       Branch block: @15697
       Sense: false
       Flag setter: lda (MusicData),y
-      Kotlin condition: !zeroFlag
-      Then branch has 0 nodes, else has 2 nodes
+      Kotlin condition: !flagZ
+      Then branch has 0 nodes, else has 1 nodes
       Else:
-        [7] IfNode:
+        [9] IfNode:
           Branch block: @15702
           Sense: false
           Flag setter: lda (MusicData),y
-          Kotlin condition: zeroFlag
-          Then branch has 4 nodes, else has 0 nodes
-          Then:
-            [8] IfNode:
-              Branch block: EndOfMusicData
-              Sense: false
-              Flag setter: cmp #TimeRunningOutMusic
-              Kotlin condition: EventMusicBuffer - TimeRunningOutMusic == 0
-              Then branch has 1 nodes, else has 0 nodes
-              Then:
-                [9] IfNode:
-                  Branch block: @15708
-                  Sense: false
-                  Flag setter: lda AreaMusicBuffer_Alt  ;load previously saved contents of primary buffer
-                  Kotlin condition: zeroFlag
-                  Then branch has 1 nodes, else has 0 nodes
-                  Then:
-                    [10] IfNode:
-                      Branch block: NotTRO
-                      Sense: false
-                      Flag setter: NotTRO: and #VictoryMusic        ;check for victory music (the only secondary that loops)
-                      Kotlin condition: zeroFlag
-                      Then branch has 2 nodes, else has 0 nodes
-                      Then:
-                        [11] IfNode:
-                          Branch block: @15712
-                          Sense: false
-                          Flag setter: and #%01011111
-                          Kotlin condition: zeroFlag
-                          Then branch has 1 nodes, else has 0 nodes
-                          Then:
-                        LoopNode (Infinite):
-            [12] IfNode:
-              Branch block: NotTRO
-              Sense: false
-              Flag setter: NotTRO: and #VictoryMusic        ;check for victory music (the only secondary that loops)
-              Kotlin condition: zeroFlag
-              Then branch has 1 nodes, else has 0 nodes
-              Then:
-                LoopNode (Infinite):
-            LoopNode (Infinite):
-    [13] IfNode:
-      Branch block: EndOfMusicData
-      Sense: false
-      Flag setter: cmp #TimeRunningOutMusic
-      Kotlin condition: EventMusicBuffer - TimeRunningOutMusic == 0
-      Then branch has 1 nodes, else has 0 nodes
-      Then:
-        [14] IfNode:
-          Branch block: @15708
-          Sense: false
-          Flag setter: lda AreaMusicBuffer_Alt  ;load previously saved contents of primary buffer
-          Kotlin condition: zeroFlag
+          Kotlin condition: flagZ
           Then branch has 1 nodes, else has 0 nodes
           Then:
-            [15] IfNode:
-              Branch block: NotTRO
-              Sense: false
-              Flag setter: NotTRO: and #VictoryMusic        ;check for victory music (the only secondary that loops)
-              Kotlin condition: zeroFlag
-              Then branch has 1 nodes, else has 0 nodes
-              Then:
-                LoopNode (Infinite):
-    [16] IfNode:
+    [10] IfNode:
       Branch block: NotTRO
       Sense: false
       Flag setter: NotTRO: and #VictoryMusic        ;check for victory music (the only secondary that loops)
-      Kotlin condition: zeroFlag
-      Then branch has 1 nodes, else has 0 nodes
+      Kotlin condition: flagZ
+      Then branch has 2 nodes, else has 0 nodes
       Then:
+        [11] IfNode:
+          Branch block: @15712
+          Sense: false
+          Flag setter: and #%01011111
+          Kotlin condition: flagZ
+          Then branch has 1 nodes, else has 0 nodes
+          Then:
         LoopNode (Infinite):
     LoopNode (Infinite):
-    [17] IfNode:
+    [12] IfNode:
       Branch block: Squ2NoteHandler
       Sense: false
       Flag setter: ldx Square2SoundBuffer     ;is there a sound playing on this channel?
-      Kotlin condition: zeroFlag
+      Kotlin condition: flagZ
       Then branch has 1 nodes, else has 1 nodes
       Then:
       Else:
-[18] IfNode:
+[13] IfNode:
   Branch block: MiscSqu2MusicTasks
   Sense: false
   Flag setter: lda Square2SoundBuffer     ;is there a sound playing on square 2?
-  Kotlin condition: zeroFlag
+  Kotlin condition: flagZ
   Then branch has 1 nodes, else has 0 nodes
   Then:
-    [19] IfNode:
+    [14] IfNode:
       Branch block: @15751
       Sense: false
       Flag setter: and #%10010001             ;note that regs for death music or d4 are loaded by default
-      Kotlin condition: zeroFlag
+      Kotlin condition: flagZ
       Then branch has 2 nodes, else has 0 nodes
       Then:
-        [20] IfNode:
+        [15] IfNode:
           Branch block: @15754
           Sense: false
           Flag setter: ldy Squ2_EnvelopeDataCtrl  ;check for contents saved from LoadControlRegs
-          Kotlin condition: !zeroFlag
+          Kotlin condition: !flagZ
           Then branch has 1 nodes, else has 0 nodes
           Then:
-[21] IfNode:
+[16] IfNode:
   Branch block: HandleSquare1Music
   Sense: false
   Flag setter: ldy MusicOffset_Square1    ;is there a nonzero offset here?
-  Kotlin condition: !zeroFlag
-  Then branch has 1 nodes, else has 0 nodes
+  Kotlin condition: !flagZ
+  Then branch has 2 nodes, else has 0 nodes
   Then:
-    [22] IfNode:
+    [17] IfNode:
       Branch block: @15765
       Sense: false
       Flag setter: dec Squ1_NoteLenCounter    ;decrement square 1 note length
-      Kotlin condition: zeroFlag
+      Kotlin condition: flagZ
       Then branch has 4 nodes, else has 0 nodes
       Then:
         LoopNode (PreTest):
           LoopNode (PostTest):
-        [23] IfNode:
+        [18] IfNode:
           Branch block: Squ1NoteHandler
           Sense: false
           Flag setter: ldy Square1SoundBuffer     ;is there a sound playing on square 1?
-          Kotlin condition: zeroFlag
-          Then branch has 3 nodes, else has 0 nodes
+          Kotlin condition: flagZ
+          Then branch has 2 nodes, else has 0 nodes
           Then:
-            [24] IfNode:
+            [19] IfNode:
               Branch block: @15785
               Sense: false
               Flag setter: and #%00111110             ;change saved data to appropriate note format
-              Kotlin condition: !zeroFlag
+              Kotlin condition: !flagZ
               Then branch has 1 nodes, else has 0 nodes
               Then:
-            [25] IfNode:
-              Branch block: MiscSqu1MusicTasks
+    [20] IfNode:
+      Branch block: MiscSqu1MusicTasks
+      Sense: false
+      Flag setter: lda Square1SoundBuffer     ;is there a sound playing on square 1?
+      Kotlin condition: flagZ
+      Then branch has 3 nodes, else has 0 nodes
+      Then:
+        [21] IfNode:
+          Branch block: @15796
+          Sense: false
+          Flag setter: and #%10010001
+          Kotlin condition: flagZ
+          Then branch has 2 nodes, else has 0 nodes
+          Then:
+            [22] IfNode:
+              Branch block: @15799
               Sense: false
-              Flag setter: lda Square1SoundBuffer     ;is there a sound playing on square 1?
-              Kotlin condition: zeroFlag
-              Then branch has 3 nodes, else has 0 nodes
+              Flag setter: ldy Squ1_EnvelopeDataCtrl  ;check saved envelope offset
+              Kotlin condition: !flagZ
+              Then branch has 1 nodes, else has 0 nodes
               Then:
-                [26] IfNode:
-                  Branch block: @15796
-                  Sense: false
-                  Flag setter: and #%10010001
-                  Kotlin condition: zeroFlag
-                  Then branch has 2 nodes, else has 0 nodes
-                  Then:
-                    [27] IfNode:
-                      Branch block: @15799
-                      Sense: false
-                      Flag setter: ldy Squ1_EnvelopeDataCtrl  ;check saved envelope offset
-                      Kotlin condition: !zeroFlag
-                      Then branch has 1 nodes, else has 0 nodes
-                      Then:
-                [28] IfNode:
-                  Branch block: DeathMAltReg
-                  Sense: false
-                  Flag setter: DeathMAltReg: lda AltRegContentFlag      ;check for alternate control reg data
-                  Kotlin condition: zeroFlag
-                  Then branch has 1 nodes, else has 0 nodes
-                  Then:
-[29] IfNode:
+        [23] IfNode:
+          Branch block: DeathMAltReg
+          Sense: false
+          Flag setter: DeathMAltReg: lda AltRegContentFlag      ;check for alternate control reg data
+          Kotlin condition: flagZ
+          Then branch has 1 nodes, else has 0 nodes
+          Then:
+[24] IfNode:
   Branch block: HandleTriangleMusic
   Sense: false
   Flag setter: dec Tri_NoteLenCounter    ;decrement triangle note length
-  Kotlin condition: zeroFlag
-  Then branch has 1 nodes, else has 0 nodes
+  Kotlin condition: flagZ
+  Then branch has 2 nodes, else has 0 nodes
   Then:
-    [30] IfNode:
+    [25] IfNode:
       Branch block: @15813
       Sense: false
       Flag setter: lda (MusicData),y
-      Kotlin condition: !zeroFlag
+      Kotlin condition: !flagZ
       Then branch has 1 nodes, else has 1 nodes
       Then:
-        [31] IfNode:
-          Branch block: TriNoteHandler
-          Sense: false
-          Flag setter: and #%01101110          ;check for death music or d4 set on secondary buffer
-          Kotlin condition: zeroFlag
-          Then branch has 1 nodes, else has 0 nodes
-          Then:
-            [32] IfNode:
-              Branch block: @15834
-              Sense: false
-              Flag setter: and #%00001010
-              Kotlin condition: !zeroFlag
-              Then branch has 2 nodes, else has 0 nodes
-              Then:
-                [33] IfNode:
-                  Branch block: NotDOrD4
-                  Sense: false
-                  Flag setter: cmp #$12                ;besides death music or d4 set, check length of note
-                  Kotlin condition: !(X >= 0x12)
-                  Then branch has 1 nodes, else has 0 nodes
-                  Then:
-                    [34] IfNode:
-                      Branch block: @15840
-                      Sense: false
-                      Flag setter: and #EndOfCastleMusic
-                      Kotlin condition: !zeroFlag
-                      Then branch has 1 nodes, else has 0 nodes
-                      Then:
-                        [35] IfNode:
-                          Branch block: @15843
-                          Sense: false
-                          Flag setter: lda #$0f                ;load value $0f if playing the win castle music and playing a short
-                          Kotlin condition: zeroFlag
-                          Then branch has 1 nodes, else has 0 nodes
-                          Then:
-                            [36] IfNode:
-                              Branch block: MediN
-                              Sense: false
-                              Flag setter: MediN:    lda #$1f                ;secondary besides death and d4 except win castle or win castle and playing
-                              Kotlin condition: zeroFlag
-                              Then branch has 1 nodes, else has 0 nodes
-                              Then:
       Else:
-        [37] IfNode:
+        [26] IfNode:
           Branch block: @15818
           Sense: false
           Flag setter: lda (MusicData),y
-          Kotlin condition: !zeroFlag
+          Kotlin condition: !flagZ
           Then branch has 1 nodes, else has 0 nodes
           Then:
-[38] IfNode:
+[27] IfNode:
   Branch block: HandleNoiseMusic
   Sense: false
   Flag setter: and #%11110011
-  Kotlin condition: !zeroFlag
+  Kotlin condition: !flagZ
   Then branch has 1 nodes, else has 0 nodes
   Then:
-    [39] IfNode:
+    [28] IfNode:
       Branch block: @15856
       Sense: false
       Flag setter: dec Noise_BeatLenCounter  ;decrement noise beat length
-      Kotlin condition: zeroFlag
-      Then branch has 5 nodes, else has 0 nodes
+      Kotlin condition: flagZ
+      Then branch has 6 nodes, else has 0 nodes
       Then:
         LoopNode (PreTest):
           LoopNode (PostTest):
-        [40] IfNode:
+        [29] IfNode:
           Branch block: NoiseBeatHandler
           Sense: false
           Flag setter: and #%00111110              ;reload data and erase length bits
-          Kotlin condition: !zeroFlag
-          Then branch has 1 nodes, else has 0 nodes
+          Kotlin condition: !flagZ
+          Then branch has 2 nodes, else has 0 nodes
           Then:
-            [41] IfNode:
+            [30] IfNode:
               Branch block: @15874
               Sense: false
               Flag setter: cmp #$30                    ;check the beat data and play the appropriate
-              Kotlin condition: !(A - 0x30 == 0)
-              Then branch has 1 nodes, else has 0 nodes
+              Kotlin condition: !flagZ
+              Then branch has 2 nodes, else has 0 nodes
               Then:
-                [42] IfNode:
+                [31] IfNode:
                   Branch block: @15876
                   Sense: false
                   Flag setter: cmp #$20
-                  Kotlin condition: !(A - 0x20 == 0)
+                  Kotlin condition: !flagZ
                   Then branch has 1 nodes, else has 0 nodes
                   Then:
-                    [43] IfNode:
+                    [32] IfNode:
                       Branch block: @15878
                       Sense: false
                       Flag setter: and #%00010000
-                      Kotlin condition: !zeroFlag
+                      Kotlin condition: !flagZ
                       Then branch has 1 nodes, else has 0 nodes
                       Then:
-                        [44] IfNode:
+                        [33] IfNode:
                           Branch block: @15880
                           Sense: false
                           Flag setter: ldy #$18
-                          Kotlin condition: zeroFlag
-                          Then branch has 0 nodes, else has 3 nodes
-                          Else:
-                            [45] IfNode:
-                              Branch block: LongBeat
-                              Sense: false
-                              Flag setter: ldy #$58
-                              Kotlin condition: zeroFlag
-                              Then branch has 2 nodes, else has 0 nodes
-                              Then:
+                          Kotlin condition: flagZ
+                          Then branch has 1 nodes, else has 0 nodes
+                          Then:
+                [34] IfNode:
+                  Branch block: StrongBeat
+                  Sense: false
+                  Flag setter: ldy #$18
+                  Kotlin condition: flagZ
+                  Then branch has 1 nodes, else has 0 nodes
+                  Then:
+            [35] IfNode:
+              Branch block: LongBeat
+              Sense: false
+              Flag setter: ldy #$58
+              Kotlin condition: flagZ
+              Then branch has 1 nodes, else has 0 nodes
+              Then:
 
-Total if nodes: 45
+Total if nodes: 35

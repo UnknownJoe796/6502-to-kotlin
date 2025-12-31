@@ -112,6 +112,229 @@ class KotlinCodeGenTest {
         val outDir = File("outputs")
         if (!outDir.exists()) outDir.mkdirs()
         val outFile = outDir.resolve("smb-decompiled.kt")
+        val constantsFile = outDir.resolve("smb-constants.kt")
+
+        // Extract all constants from the assembly
+        val constants = code.lines.mapNotNull { it.constant }
+            .sortedBy { it.name }
+
+        // Calculate ROM addresses for code labels and collect data bytes
+        val codeLabels = mutableMapOf<String, Int>()
+        val romData = mutableListOf<Pair<Int, List<Int>>>() // address -> bytes
+        var currentAddress = 0x8000  // Default start address
+        for (line in code.lines) {
+            // Check for .org directive
+            line.originalLine?.let { originalText ->
+                val orgMatch = Regex("""\\.org\\s+\$([0-9a-fA-F]+)""").find(originalText)
+                if (orgMatch != null) {
+                    currentAddress = orgMatch.groupValues[1].toInt(16)
+                    return@let
+                }
+            }
+
+            // Track code labels
+            if (line.label != null && !line.label.startsWith("$")) {
+                codeLabels[line.label] = currentAddress
+            }
+
+            // Count bytes for this line and collect data
+            val byteCount = when {
+                line.instruction != null -> {
+                    // Instruction size = 1 (opcode) + addressing mode size
+                    val addrSize = when (line.instruction.address) {
+                        null -> 0  // Implied/accumulator
+                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.ByteValue,
+                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.ConstantReference -> 1
+                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.Direct,
+                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.DirectX,
+                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.DirectY,
+                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.IndirectX,
+                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.IndirectY,
+                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.IndirectAbsolute,
+                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.ShortValue -> 2
+                        else -> 0
+                    }
+                    1 + addrSize
+                }
+                line.data != null -> {
+                    when (val d = line.data) {
+                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyData.Db -> {
+                            // Collect actual byte values
+                            val bytes = d.items.flatMap { item ->
+                                when (item) {
+                                    is com.ivieleague.decompiler6502tokotlin.hand.AssemblyData.DbItem.ByteValue ->
+                                        listOf(item.value)
+                                    is com.ivieleague.decompiler6502tokotlin.hand.AssemblyData.DbItem.StringLiteral ->
+                                        item.text.map { it.code }
+                                    is com.ivieleague.decompiler6502tokotlin.hand.AssemblyData.DbItem.Expr -> {
+                                        // Expression references - resolve from codeLabels if possible
+                                        val expr = item.expr.removePrefix("<").removePrefix(">")
+                                        val labelAddr = codeLabels[expr]
+                                        if (labelAddr != null) {
+                                            if (item.expr.startsWith("<")) {
+                                                listOf(labelAddr and 0xFF)
+                                            } else if (item.expr.startsWith(">")) {
+                                                listOf((labelAddr shr 8) and 0xFF)
+                                            } else {
+                                                // Full word - lo, hi
+                                                listOf(labelAddr and 0xFF, (labelAddr shr 8) and 0xFF)
+                                            }
+                                        } else {
+                                            // Placeholder for unresolved expression
+                                            if (item.expr.startsWith("<") || item.expr.startsWith(">")) {
+                                                listOf(0)
+                                            } else {
+                                                listOf(0, 0)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (bytes.isNotEmpty()) {
+                                romData.add(currentAddress to bytes)
+                            }
+                            d.byteCount()
+                        }
+                        else -> 0
+                    }
+                }
+                else -> 0
+            }
+            currentAddress += byteCount
+        }
+
+        // Generate ROM data initialization file
+        val romDataFile = outDir.resolve("smb-rom-data.kt")
+        var totalRomBytes = 0
+        romDataFile.bufferedWriter().use { out ->
+            out.appendLine("@file:OptIn(ExperimentalUnsignedTypes::class)")
+            out.appendLine()
+            out.appendLine("package com.ivieleague.smb")
+            out.appendLine()
+            out.appendLine("import com.ivieleague.decompiler6502tokotlin.hand.memory")
+            out.appendLine()
+            out.appendLine("/**")
+            out.appendLine(" * Initialize ROM data in memory.")
+            out.appendLine(" * This loads all data tables, sprite data, palettes, etc. into memory")
+            out.appendLine(" * at their correct ROM addresses.")
+            out.appendLine(" */")
+            out.appendLine("fun initializeRomData() {")
+
+            // Group consecutive bytes to reduce output size
+            for ((addr, bytes) in romData) {
+                if (bytes.size == 1) {
+                    out.appendLine("    memory[0x${addr.toString(16).uppercase()}] = 0x${bytes[0].toString(16).uppercase().padStart(2, '0')}.toUByte()")
+                } else {
+                    out.appendLine("    // ${bytes.size} bytes at 0x${addr.toString(16).uppercase()}")
+                    bytes.forEachIndexed { i, b ->
+                        out.appendLine("    memory[0x${(addr + i).toString(16).uppercase()}] = 0x${b.toString(16).uppercase().padStart(2, '0')}.toUByte()")
+                    }
+                }
+                totalRomBytes += bytes.size
+            }
+
+            out.appendLine("}")
+            out.appendLine()
+            out.appendLine("// Total ROM data: $totalRomBytes bytes")
+        }
+        println("Generated ROM data initialization: ${romDataFile.absolutePath} ($totalRomBytes bytes)")
+
+        // Generate main entry point file
+        val mainFile = outDir.resolve("smb-main.kt")
+        mainFile.bufferedWriter().use { out ->
+            out.appendLine("@file:OptIn(ExperimentalUnsignedTypes::class)")
+            out.appendLine()
+            out.appendLine("package com.ivieleague.smb")
+            out.appendLine()
+            out.appendLine("import com.ivieleague.decompiler6502tokotlin.hand.*")
+            out.appendLine()
+            out.appendLine("/**")
+            out.appendLine(" * Main entry point for the decompiled Super Mario Bros.")
+            out.appendLine(" *")
+            out.appendLine(" * This initializes the system and starts the game loop.")
+            out.appendLine(" * The game runs in an infinite loop, processing frames until")
+            out.appendLine(" * the NMI (vertical blank) interrupt updates the screen.")
+            out.appendLine(" */")
+            out.appendLine("fun main() {")
+            out.appendLine("    // Initialize CPU state")
+            out.appendLine("    resetCPU()")
+            out.appendLine("    clearMemory()")
+            out.appendLine()
+            out.appendLine("    // Load ROM data into memory")
+            out.appendLine("    initializeRomData()")
+            out.appendLine()
+            out.appendLine("    // Start the game - this is the reset vector entry point")
+            out.appendLine("    // In the original NES, the CPU reads the reset vector from 0xFFFC-0xFFFD")
+            out.appendLine("    // and jumps to that address (0x8000 for SMB)")
+            out.appendLine("    func_0()  // Entry point at the beginning of ROM")
+            out.appendLine("}")
+            out.appendLine()
+            out.appendLine("/**")
+            out.appendLine(" * NMI handler - called every frame during vertical blank.")
+            out.appendLine(" * This updates PPU, handles input, and calls the main game loop.")
+            out.appendLine(" */")
+            out.appendLine("fun nmiHandler() {")
+            out.appendLine("    // TODO: Implement NMI handler")
+            out.appendLine("    // This should push registers, update PPU, call game logic, pop registers")
+            out.appendLine("}")
+        }
+        println("Generated main entry point: ${mainFile.absolutePath}")
+
+        // Generate constants file
+        constantsFile.bufferedWriter().use { out ->
+            out.appendLine("@file:OptIn(ExperimentalUnsignedTypes::class)")
+            out.appendLine()
+            out.appendLine("package com.ivieleague.smb")
+            out.appendLine()
+            out.appendLine("import com.ivieleague.decompiler6502tokotlin.hand.MemoryByte")
+            out.appendLine()
+            out.appendLine("// Memory address variables from smbdism.asm")
+            out.appendLine("// Each variable delegates to a specific memory location using property delegates")
+            out.appendLine("// Access: `operMode.toInt()` reads from memory[0x0770]")
+            out.appendLine("// Store: `operMode = 5u` writes to memory[0x0770]")
+            out.appendLine()
+
+            for (const in constants) {
+                // Extract numeric value from the constant
+                val valueStr = when (val value = const.value) {
+                    is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.ByteValue ->
+                        "0x${value.value.toString(16).uppercase().padStart(2, '0')}"
+                    is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.ShortValue ->
+                        "0x${value.value.toString(16).uppercase().padStart(4, '0')}"
+                    else -> continue  // Skip non-numeric constants
+                }
+                // Convert label to camelCase property name for direct access
+                // Preserves internal capitalization: SwimmingFlag -> swimmingFlag
+                val propName = const.name.split('_')
+                    .mapIndexed { index, part ->
+                        if (part.isEmpty()) return@mapIndexed ""
+                        if (index == 0) part.replaceFirstChar { it.lowercase() }
+                        else part.replaceFirstChar { it.uppercase() }
+                    }
+                    .joinToString("")
+
+                // Generate property delegate for direct access
+                out.appendLine("var $propName by MemoryByte($valueStr)")
+                // Also generate uppercase constant for indexed access (Label,X or Label,Y)
+                out.appendLine("const val ${const.name.uppercase()} = $valueStr")
+            }
+
+            // Add ROM code label constants (data table addresses)
+            if (codeLabels.isNotEmpty()) {
+                out.appendLine()
+                out.appendLine("// ROM code label constants (data table addresses)")
+                out.appendLine("// These are addresses in ROM where data tables and code are located")
+                out.appendLine()
+
+                for ((label, address) in codeLabels.toSortedMap()) {
+                    val upperLabel = label.uppercase()
+                    val addrStr = "0x${address.toString(16).uppercase().padStart(4, '0')}"
+                    out.appendLine("const val $upperLabel = $addrStr")
+                }
+            }
+        }
+
+        println("Generated ${constants.size} constants and ${codeLabels.size} ROM labels to: ${constantsFile.absolutePath}")
 
         // Build function registry: map of function names to AssemblyFunction
         val functionRegistry = functions.associateBy { func ->
@@ -120,8 +343,15 @@ class KotlinCodeGenTest {
             } ?: "func_${func.startingBlock.originalLineIndex}"
         }
 
+        // Detect JumpEngine dispatch tables
+        val jumpEngineTables = com.ivieleague.decompiler6502tokotlin.hand.detectJumpEngineTables(code.lines)
+
         outFile.bufferedWriter().use { out ->
+            out.appendLine("@file:OptIn(ExperimentalUnsignedTypes::class)")
+            out.appendLine()
             out.appendLine("package com.ivieleague.smb")
+            out.appendLine()
+            out.appendLine("import com.ivieleague.decompiler6502tokotlin.hand.*")
             out.appendLine()
             out.appendLine("// Decompiled Super Mario Bros. NES ROM")
             out.appendLine("// Generated from smbdism.asm")
@@ -130,7 +360,7 @@ class KotlinCodeGenTest {
             // Convert all functions
             for (func in functions.sortedBy { it.startingBlock.originalLineIndex }) {
                 try {
-                    val kFunc = func.toKotlinFunction(functionRegistry)
+                    val kFunc = func.toKotlinFunction(functionRegistry, jumpEngineTables)
                     out.appendLine(kFunc.toKotlin())
                     out.appendLine()
                 } catch (e: Exception) {
