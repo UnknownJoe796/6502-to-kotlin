@@ -1,5 +1,0 @@
-Function: GetAreaObjYPosition
-Inputs: $07
-Outputs: A
-Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, OverflowFlag
-Control flow nodes: 1

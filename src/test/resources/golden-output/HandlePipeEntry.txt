@@ -1,5 +1,0 @@
-Function: HandlePipeEntry
-Inputs: $00, $01
-Outputs: 
-Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, X, Y
-Control flow nodes: 2

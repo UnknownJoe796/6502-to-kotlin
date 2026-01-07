@@ -43,3 +43,23 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Project Specific ###
+# Temporary analysis outputs
+outputs/
+core/outputs/
+
+# Archived documentation (optional - can be committed if desired)
+docs/archive/
+
+# Test data and analysis dumps
+data/tas/*-dump.txt
+data/tas/*-dump.bin
+data/tas/*-report.txt
+data/tas/*.bin
+
+# Old local directory (if it still exists)
+local/
+
+# Task output files
+/tmp/claude/

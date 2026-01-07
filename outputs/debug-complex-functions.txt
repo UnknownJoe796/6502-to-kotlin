@@ -7,39 +7,45 @@ Inputs: X
 Outputs: X
 Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, X, OverflowFlag
 
---- Control Flow Nodes (6 nodes) ---
+--- Control Flow Nodes (7 nodes) ---
 
-[0] IfNode
+[0] BlockNode
+  Block: FloateyNumbersRoutine
+  Lines: 3
+    LDA FloateyNum_Control,X
+    BEQ EndExitOne
+
+[1] IfNode
   Condition block: @1285
   Sense: false
   Then branch: 1 nodes
   Else branch: 0 nodes
 
-[1] IfNode
+[2] IfNode
   Condition block: ChkNumTimer
   Sense: false
   Then branch: 1 nodes
   Else branch: 0 nodes
 
-[2] IfNode
+[3] IfNode
   Condition block: DecNumTimer
   Sense: false
   Then branch: 2 nodes
   Else branch: 0 nodes
 
-[3] IfNode
+[4] IfNode
   Condition block: ChkTallEnemy
   Sense: false
   Then branch: 1 nodes
   Else branch: 0 nodes
 
-[4] IfNode
+[5] IfNode
   Condition block: FloateyPart
   Sense: false
   Then branch: 1 nodes
   Else branch: 0 nodes
 
-[5] BlockNode
+[6] BlockNode
   Block: SetupNumSpr
   Lines: 20
     LDA FloateyNum_Y_Pos,X

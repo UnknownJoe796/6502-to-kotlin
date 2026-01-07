@@ -1381,10 +1381,6 @@ fun playerVictoryWalk() {
     //> ExitVWalk:   lda VictoryWalkControl  ;load value set here
     temp0 = victoryWalkControl
     //> beq IncModeTask_A       ;if zero, branch to change modes
-    if (temp0 == 0) {
-        //  goto IncModeTask_A
-        return
-    }
     if (temp0 != 0) {
         //> rts                     ;otherwise leave
         return
@@ -1511,6 +1507,10 @@ fun printVictoryMessages() {
     primaryMsgCounter = temp0
     //> cmp #$07                      ;check primary counter one more time
     //> SetEndTimer:   bcc ExitMsgs                  ;if not reached value yet, branch to leave
+    if (!(temp0 >= 0x07)) {
+        //  goto ExitMsgs
+        return
+    }
     if (temp0 >= 0x07) {
         //> lda #$06
         temp0 = 0x06
@@ -2109,6 +2109,10 @@ fun drawTitleScreen() {
     //> DrawTitleScreen:
     //> lda OperMode                 ;are we in title screen mode?
     //> bne IncModeTask_B            ;if not, exit
+    if (!(operMode == 0)) {
+        //  goto IncModeTask_B
+        return
+    }
     temp0 = operMode
     if (operMode == 0) {
         //> lda #>TitleScreenDataOffset  ;load address $1ec0 into
@@ -2240,6 +2244,10 @@ fun resetSpritesAndScreenTimer() {
     //> ResetSpritesAndScreenTimer:
     //> lda ScreenTimer             ;check if screen timer has expired
     //> bne NoReset                 ;if not, branch to leave
+    if (!(screenTimer == 0)) {
+        //  goto NoReset
+        return
+    }
     temp0 = screenTimer
     if (screenTimer == 0) {
         //> jsr MoveAllSpritesOffscreen ;otherwise reset sprites now
@@ -4174,10 +4182,6 @@ fun runGameOver() {
     } else {
         //> lda ScreenTimer       ;if not pressed, wait for
         //> bne GameIsOn          ;screen timer to expire
-        if (!(screenTimer == 0)) {
-            //  goto GameIsOn
-            return
-        }
     }
     //> GameIsOn:  rts
     return
@@ -4204,10 +4208,6 @@ fun terminateGame() {
     //> jsr TransposePlayers  ;check if other player can keep
     transposePlayers()
     //> bcc ContinueGame      ;going, and do so if possible
-    if (!(flagC)) {
-        //  goto ContinueGame
-        return
-    }
     temp0 = Silence
     if (flagC) {
         //> lda WorldNumber       ;otherwise put world number of current
@@ -5928,6 +5928,8 @@ fun emptyBlock() {
     //> lda #$c4
     //> ColObj: ldy #$00             ;column length of 1
     //> jmp RenderUnderPart
+    // Fall-through tail call to chainObj
+    chainObj()
 }
 
 // Decompiled from RowOfBricks
@@ -5983,8 +5985,6 @@ fun rowOfSolidBlocks() {
     //> pla
     temp0 = pull()
     //> jmp RenderUnderPart        ;render object
-    // Fall-through tail call to rowOfCoins
-    rowOfCoins()
 }
 
 // Decompiled from ColumnOfBricks
@@ -7816,6 +7816,10 @@ fun verticalPipeEntry() {
     //> ldy #$00             ;load default mode of entry
     //> lda WarpZoneControl  ;check warp zone control variable/flag
     //> bne ChgAreaPipe      ;if set, branch to use mode 0
+    if (!(warpZoneControl == 0)) {
+        //  goto ChgAreaPipe
+        return
+    }
     temp0 = warpZoneControl
     temp1 = 0x00
     if (warpZoneControl == 0) {
@@ -7825,6 +7829,10 @@ fun verticalPipeEntry() {
         temp0 = areaType
         //> cmp #$03
         //> bne ChgAreaPipe      ;if not castle type level, use mode 1
+        if (!(temp0 - 0x03 == 0)) {
+            //  goto ChgAreaPipe
+            return
+        }
         if (temp0 == 0x03) {
             //> iny
             temp1 = (temp1 + 1) and 0xFF
@@ -7834,6 +7842,10 @@ fun verticalPipeEntry() {
     //> ChgAreaPipe: dec ChangeAreaTimer       ;decrement timer for change of area
     changeAreaTimer = (changeAreaTimer - 1) and 0xFF
     //> bne ExitCAPipe
+    if (!(changeAreaTimer == 0)) {
+        //  goto ExitCAPipe
+        return
+    }
     if (changeAreaTimer == 0) {
         //> sty AltEntranceControl    ;when timer expires set mode of alternate entry
         altEntranceControl = temp1
@@ -7868,6 +7880,10 @@ fun sideExitPipeEntry() {
     //> ChgAreaPipe: dec ChangeAreaTimer       ;decrement timer for change of area
     changeAreaTimer = (changeAreaTimer - 1) and 0xFF
     //> bne ExitCAPipe
+    if (!(changeAreaTimer == 0)) {
+        //  goto ExitCAPipe
+        return
+    }
     temp0 = 0x02
     if (changeAreaTimer == 0) {
         //> sty AltEntranceControl    ;when timer expires set mode of alternate entry
@@ -8458,10 +8474,6 @@ fun jumpSwimSub() {
     //> ProcSwim: lda SwimmingFlag           ;if swimming flag not set,
     temp3 = swimmingFlag
     //> beq LRAir                  ;branch ahead to last part
-    if (temp3 == 0) {
-        //  goto LRAir
-        return
-    }
     if (temp3 != 0) {
         //> jsr GetPlayerAnimSpeed     ;do a sub to get animation frame timing
         getPlayerAnimSpeed()
@@ -8478,10 +8490,6 @@ fun jumpSwimSub() {
         //> LRWater:  lda Left_Right_Buttons     ;check left/right controller bits (check for swimming)
         temp3 = leftRightButtons
         //> beq LRAir                  ;if not pressing any, skip
-        if (temp3 == 0) {
-            //  goto LRAir
-            return
-        }
         if (temp3 != 0) {
             //> sta PlayerFacingDir        ;otherwise set facing direction accordingly
             playerFacingDir = temp3
@@ -9683,24 +9691,44 @@ fun runGameTimer() {
     //> RunGameTimer:
     //> lda OperMode               ;get primary mode of operation
     //> beq ExGTimer               ;branch to leave if in title screen mode
+    if (operMode == 0) {
+        //  goto ExGTimer
+        return
+    }
     temp0 = operMode
     if (operMode != 0) {
         //> lda GameEngineSubroutine
         temp0 = gameEngineSubroutine
         //> cmp #$08                   ;if routine number less than eight running,
         //> bcc ExGTimer               ;branch to leave
+        if (!(temp0 >= 0x08)) {
+            //  goto ExGTimer
+            return
+        }
         if (temp0 >= 0x08) {
             //> cmp #$0b                   ;if running death routine,
             //> beq ExGTimer               ;branch to leave
+            if (temp0 - 0x0B == 0) {
+                //  goto ExGTimer
+                return
+            }
             if (temp0 != 0x0B) {
                 //> lda Player_Y_HighPos
                 temp0 = playerYHighpos
                 //> cmp #$02                   ;if player below the screen,
                 //> bcs ExGTimer               ;branch to leave regardless of level type
+                if (temp0 >= 0x02) {
+                    //  goto ExGTimer
+                    return
+                }
                 if (!(temp0 >= 0x02)) {
                     //> lda GameTimerCtrlTimer     ;if game timer control not yet expired,
                     temp0 = gameTimerCtrlTimer
                     //> bne ExGTimer               ;branch to leave
+                    if (!(temp0 == 0)) {
+                        //  goto ExGTimer
+                        return
+                    }
                     if (temp0 == 0) {
                         //> lda GameTimerDisplay
                         temp0 = gameTimerDisplay[0]
@@ -12084,6 +12112,10 @@ fun moveDropPlatform() {
     //> MoveDropPlatform:
     //> ldy #$7f      ;set movement amount for drop platform
     //> bne SetMdMax  ;skip ahead of other value set here
+    if (!(0x7F == 0)) {
+        //  goto SetMdMax
+        return
+    }
     temp0 = 0x7F
     if (0x7F == 0) {
     }
@@ -12111,8 +12143,8 @@ fun moveEnemySlowVert() {
     } else {
         //> ;--------------------------------
     }
-    // Fall-through tail call to moveDropPlatform
-    moveDropPlatform()
+    // Fall-through tail call to movejEnemyvertically
+    movejEnemyvertically()
 }
 
 // Decompiled from MoveJ_EnemyVertically
@@ -12804,6 +12836,10 @@ fun enemiesAndLoopsCore(X: Int) {
         temp0 = vineFlagOffset
         //> cmp #$01
         //> bne ExEPar               ;if other value <> 1, leave
+        if (!(temp0 - 0x01 == 0)) {
+            //  goto ExEPar
+            return
+        }
         if (temp0 == 0x01) {
             //> lda #VineObject          ;otherwise put vine in enemy identifier
             temp0 = VineObject
@@ -13475,6 +13511,8 @@ fun initNormalEnemy(X: Int) {
     temp0 = 0x02
     //> sta Enemy_MovingDir,x
     enemyMovingdir[X] = temp0
+    // Fall-through tail call to initVStf
+    initVStf(X)
 }
 
 // Decompiled from InitRedKoopa
@@ -13558,6 +13596,10 @@ fun smallBBox(X: Int): Int {
     val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
     //> SmallBBox: lda #$09               ;set specific bounding box size control
     //> bne SetBBox            ;unconditional branch
+    if (!(0x09 == 0)) {
+        //  goto SetBBox
+        return A
+    }
     temp0 = 0x09
     if (0x09 == 0) {
         //> ;--------------------------------
@@ -13609,8 +13651,8 @@ fun initRedPTroopa(X: Int) {
     temp0 = 0x02
     //> sta Enemy_MovingDir,x
     enemyMovingdir[X] = temp0
-    // Fall-through tail call to smallBBox
-    smallBBox(X)
+    // Fall-through tail call to initNormalEnemy
+    initNormalEnemy(X)
 }
 
 // Decompiled from InitVStf
@@ -14982,10 +15024,6 @@ fun procHammerBro(X: Int) {
             //> and #%00001100             ;check offscreen bits
             temp2 = temp1 and 0x0C
             //> bne MoveHammerBroXDir      ;if hammer bro a little offscreen, skip to movement code
-            if (!(temp2 == 0)) {
-                //  goto MoveHammerBroXDir
-                return
-            }
             temp1 = temp2
             if (temp2 == 0) {
                 //> lda HammerThrowingTimer,x  ;check hammer throwing timer
@@ -15031,10 +15069,6 @@ fun procHammerBro(X: Int) {
             temp5 = temp1 and 0x07
             //> cmp #$01                    ;check for d0 set (for jumping)
             //> beq MoveHammerBroXDir       ;if set, branch ahead to moving code
-            if (temp5 - 0x01 == 0) {
-                //  goto MoveHammerBroXDir
-                return
-            }
             temp1 = temp5
             if (temp5 != 0x01) {
                 //> lda #$00                    ;load default value here
@@ -15046,10 +15080,6 @@ fun procHammerBro(X: Int) {
                 //> lda Enemy_Y_Position,x      ;check hammer bro's vertical coordinate
                 temp1 = enemyYPosition[X]
                 //> bmi SetHJ                   ;if on the bottom half of the screen, use current speed
-                if ((temp1 and 0x80) != 0) {
-                    //  goto SetHJ
-                    return
-                }
                 if ((temp1 and 0x80) == 0) {
                     //> ldy #$fd                    ;otherwise set alternate vertical speed
                     temp3 = 0xFD
@@ -15057,10 +15087,6 @@ fun procHammerBro(X: Int) {
                     //> inc $00                     ;increment preset value to $01
                     memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
                     //> bcc SetHJ                   ;if above the middle of the screen, use current speed and $01
-                    if (!(temp1 >= 0x70)) {
-                        //  goto SetHJ
-                        return
-                    }
                     if (temp1 >= 0x70) {
                         //> dec $00                     ;otherwise return value to $00
                         memory[0x0] = ((memory[0x0].toInt() - 1) and 0xFF).toUByte()
@@ -15069,10 +15095,6 @@ fun procHammerBro(X: Int) {
                         //> and #$01
                         temp6 = temp1 and 0x01
                         //> bne SetHJ                   ;if d0 of LSFR set, branch and use current speed and $00
-                        if (!(temp6 == 0)) {
-                            //  goto SetHJ
-                            return
-                        }
                         temp1 = temp6
                         if (temp6 == 0) {
                             //> ldy #$fa                    ;otherwise reset to default vertical speed
@@ -15152,8 +15174,8 @@ fun procHammerBro(X: Int) {
     //> jsr MoveD_EnemyVertically      ;execute sub to move defeated enemy downwards
     movedEnemyvertically(X)
     //> jmp MoveEnemyHorizontally      ;now move defeated enemy horizontally
-    // Fall-through tail call to chkforbumpHammerbroj
-    chkforbumpHammerbroj(X)
+    // Fall-through tail call to moveNormalEnemy
+    moveNormalEnemy(X)
 }
 
 // Decompiled from MoveNormalEnemy
@@ -17523,8 +17545,8 @@ fun gameTimerFireworks(X: Int) {
     //> IncrementSFTask1:
     //> inc StarFlagTaskControl  ;increment star flag object task number
     starFlagTaskControl = (starFlagTaskControl + 1) and 0xFF
-    // Fall-through tail call to awardGameTimerPoints
-    awardGameTimerPoints()
+    // Fall-through tail call to starFlagExit
+    starFlagExit()
 }
 
 // Decompiled from StarFlagExit
@@ -17559,6 +17581,10 @@ fun awardGameTimerPoints() {
         //> ora GameTimerDisplay+2
         temp1 = temp0 or gameTimerDisplay[2]
         //> beq IncrementSFTask1   ;if no time left on game timer at all, branch to next task
+        if (temp1 == 0) {
+            //  goto IncrementSFTask1
+            return
+        }
     } while (temp1 == 0)
     //> lda FrameCounter
     //> and #%00000100         ;check frame counter for d2 set (skip ahead
@@ -17611,8 +17637,6 @@ fun awardGameTimerPoints() {
     //> ora #%00000100         ;add four to set nybble for game timer
     temp5 = temp3 or 0x04
     //> jmp UpdateNumber       ;jump to print the new score and game timer
-    // Fall-through tail call to starFlagExit
-    starFlagExit()
 }
 
 // Decompiled from RaiseFlagSetoffFWorks
@@ -18610,6 +18634,10 @@ fun moveSmallPlatform(X: Int) {
     //> ChkSmallPlatCollision:
     //> lda PlatformCollisionFlag,x ;get bounding box counter saved in collision flag
     //> beq ExLiftP                 ;if none found, leave player position alone
+    if (platformCollisionFlag[X] == 0) {
+        //  goto ExLiftP
+        return
+    }
     temp0 = platformCollisionFlag[X]
     if (platformCollisionFlag[X] != 0) {
         //> jsr PositionPlayerOnS_Plat  ;use to position player correctly
@@ -18632,10 +18660,6 @@ fun moveLiftPlatforms(X: Int) {
     //> MoveLiftPlatforms:
     //> lda TimerControl         ;if master timer control set, skip all of this
     //> bne ExLiftP              ;and branch to leave
-    if (!(timerControl == 0)) {
-        //  goto ExLiftP
-        return
-    }
     temp0 = timerControl
     if (timerControl == 0) {
         //> lda Enemy_YMF_Dummy,x
@@ -19220,6 +19244,7 @@ fun playerEnemyCollision(X: Int) {
     var powerUpType by MemoryByte(PowerUpType)
     var square2SoundQueue by MemoryByte(Square2SoundQueue)
     var starInvincibleTimer by MemoryByte(StarInvincibleTimer)
+    val demotedKoopaXSpdData by MemoryByteIndexed(DemotedKoopaXSpdData)
     val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
     val enemyOffscrBitsMasked by MemoryByteIndexed(EnemyOffscrBitsMasked)
     val enemyCollisionbits by MemoryByteIndexed(Enemy_CollisionBits)
@@ -19231,6 +19256,8 @@ fun playerEnemyCollision(X: Int) {
     val floateynumControl by MemoryByteIndexed(FloateyNum_Control)
     val kickedShellPtsData by MemoryByteIndexed(KickedShellPtsData)
     val kickedShellXSpdData by MemoryByteIndexed(KickedShellXSpdData)
+    val revivalRateData by MemoryByteIndexed(RevivalRateData)
+    val stompedEnemyPtsData by MemoryByteIndexed(StompedEnemyPtsData)
     //> HandlePowerUpCollision:
     //> jsr EraseEnemyObject    ;erase the power-up object
     eraseEnemyObject(X)
@@ -19363,6 +19390,10 @@ fun injurePlayer() {
     //> InjurePlayer:
     //> lda InjuryTimer          ;check again to see if injured invincibility timer is
     //> bne ExInjColRoutines     ;at zero, and branch to leave if so
+    if (!(injuryTimer == 0)) {
+        //  goto ExInjColRoutines
+        return
+    }
     temp0 = injuryTimer
     if (injuryTimer == 0) {
     }
@@ -19383,13 +19414,10 @@ fun forceInjury(A: Int) {
     var playerXSpeed by MemoryByte(Player_X_Speed)
     var playerYSpeed by MemoryByte(Player_Y_Speed)
     var square1SoundQueue by MemoryByte(Square1SoundQueue)
-    val demotedKoopaXSpdData by MemoryByteIndexed(DemotedKoopaXSpdData)
-    val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
     val enemyId by MemoryByteIndexed(Enemy_ID)
     val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
     val enemyState by MemoryByteIndexed(Enemy_State)
     val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
-    val revivalRateData by MemoryByteIndexed(RevivalRateData)
     val stompedEnemyPtsData by MemoryByteIndexed(StompedEnemyPtsData)
     //> ForceInjury:
     //> ldx PlayerStatus          ;check player's status
@@ -23736,6 +23764,10 @@ fun enemyGfxHandler(X: Int) {
                     temp4 = frenzyEnemyTimer
                     //> cpx #$10
                     //> bcs SprObjectOffscrChk      ;branch if timer has not reached a certain range
+                    if (temp4 >= 0x10) {
+                        //  goto SprObjectOffscrChk
+                        return
+                    }
                     temp0 = temp30
                     if (!(temp4 >= 0x10)) {
                         //> sta Sprite_Attributes+12,y  ;otherwise set same for second row right sprite
@@ -23745,6 +23777,10 @@ fun enemyGfxHandler(X: Int) {
                         //> sta Sprite_Attributes+8,y   ;preserve vertical flip and palette bits for left sprite
                         spriteAttributes[8 + temp1] = temp31
                         //> bcc SprObjectOffscrChk      ;unconditional branch
+                        if (!(temp4 >= 0x10)) {
+                            //  goto SprObjectOffscrChk
+                            return
+                        }
                         temp0 = temp31
                         if (temp4 >= 0x10) {
                         }
@@ -23768,6 +23804,10 @@ fun enemyGfxHandler(X: Int) {
             temp0 = memory[0xEF].toInt()
             //> cmp #$18
             //> bcc SprObjectOffscrChk      ;branch if not jumpspring object at all
+            if (!(temp0 >= 0x18)) {
+                //  goto SprObjectOffscrChk
+                return
+            }
             if (temp0 >= 0x18) {
                 //> lda #$82
                 temp0 = 0x82
@@ -26311,6 +26351,7 @@ fun setfreqTri(A: Int) {
     var temp2: Int = 0
     val freqRegLookupTbl by MemoryByteIndexed(FreqRegLookupTbl)
     val sndRegister by MemoryByteIndexed(SND_REGISTER)
+    val sndSquare1Reg by MemoryByteIndexed(SND_SQUARE1_REG)
     //> Dump_Freq_Regs:
     //> tay
     //> lda FreqRegLookupTbl+1,y  ;use previous contents of A for sound reg offset
@@ -26444,13 +26485,25 @@ fun square1SfxHandler() {
                 //> sty Square1SoundBuffer  ;if found, put in buffer
                 square1SoundBuffer = temp2
                 //> bmi PlaySmallJump       ;small jump
+                if ((temp2 and 0x80) != 0) {
+                    //  goto PlaySmallJump
+                    return
+                }
                 //> lsr Square1SoundQueue
                 square1SoundQueue = square1SoundQueue shr 1
                 //> bcs PlayBigJump         ;big jump
+                if ((square1SoundQueue and 0x01) != 0) {
+                    //  goto PlayBigJump
+                    return
+                }
                 do {
                     //> lsr Square1SoundQueue
                     square1SoundQueue = square1SoundQueue shr 1
                     //> bcs PlayBump            ;bump
+                    if ((square1SoundQueue and 0x01) != 0) {
+                        //  goto PlayBump
+                        return
+                    }
                 } while ((square1SoundQueue and 0x01) != 0)
                 //> lsr Square1SoundQueue
                 square1SoundQueue = square1SoundQueue shr 1
@@ -26459,6 +26512,10 @@ fun square1SfxHandler() {
                     //> lsr Square1SoundQueue
                     square1SoundQueue = square1SoundQueue shr 1
                     //> bcs PlaySmackEnemy      ;smack enemy
+                    if ((square1SoundQueue and 0x01) != 0) {
+                        //  goto PlaySmackEnemy
+                        return
+                    }
                     if ((square1SoundQueue and 0x01) == 0) {
                         //> lsr Square1SoundQueue
                         square1SoundQueue = square1SoundQueue shr 1
@@ -26467,9 +26524,17 @@ fun square1SfxHandler() {
                             //> lsr Square1SoundQueue
                             square1SoundQueue = square1SoundQueue shr 1
                             //> bcs PlayFireballThrow   ;fireball throw
+                            if ((square1SoundQueue and 0x01) != 0) {
+                                //  goto PlayFireballThrow
+                                return
+                            }
                             //> lsr Square1SoundQueue
                             square1SoundQueue = square1SoundQueue shr 1
                             //> bcs PlayFlagpoleSlide   ;slide flagpole
+                            if ((square1SoundQueue and 0x01) != 0) {
+                                //  goto PlayFlagpoleSlide
+                                return
+                            }
                         }
                     }
                 }
@@ -26480,12 +26545,24 @@ fun square1SfxHandler() {
             //> beq ExS1H                ;if not found, exit sub
             if (temp0 != 0) {
                 //> bmi ContinueSndJump      ;small mario jump
+                if ((temp0 and 0x80) != 0) {
+                    //  goto ContinueSndJump
+                    return
+                }
                 //> lsr
                 temp0 = temp0 shr 1
                 //> bcs ContinueSndJump      ;big mario jump
+                if ((temp0 and 0x01) != 0) {
+                    //  goto ContinueSndJump
+                    return
+                }
                 //> lsr
                 temp0 = temp0 shr 1
                 //> bcs ContinueBumpThrow    ;bump
+                if ((temp0 and 0x01) != 0) {
+                    //  goto ContinueBumpThrow
+                    return
+                }
                 //> lsr
                 temp0 = temp0 shr 1
                 //> bcs ContinueSwimStomp    ;swim/stomp
@@ -26493,6 +26570,10 @@ fun square1SfxHandler() {
                     //> lsr
                     temp0 = temp0 shr 1
                     //> bcs ContinueSmackEnemy   ;smack enemy
+                    if ((temp0 and 0x01) != 0) {
+                        //  goto ContinueSmackEnemy
+                        return
+                    }
                     if ((temp0 and 0x01) == 0) {
                         //> lsr
                         temp0 = temp0 shr 1
@@ -26501,6 +26582,10 @@ fun square1SfxHandler() {
                             //> lsr
                             temp0 = temp0 shr 1
                             //> bcs ContinueBumpThrow    ;fireball throw
+                            if ((temp0 and 0x01) != 0) {
+                                //  goto ContinueBumpThrow
+                                return
+                            }
                         }
                     }
                 }
@@ -26513,6 +26598,10 @@ fun square1SfxHandler() {
     //> lsr
     temp0 = temp0 shr 1
     //> bcs DecrementSfx1Length  ;slide flagpole
+    if ((temp0 and 0x01) != 0) {
+        //  goto DecrementSfx1Length
+        return
+    }
     if ((temp0 and 0x01) == 0) {
         //> PlaySwimStomp:
         //> lda #$0e               ;store length of swim/stomp sound
@@ -26536,6 +26625,10 @@ fun square1SfxHandler() {
         sndSquare1Reg[0] = temp0
         //> cpy #$06
         //> bne BranchToDecLength1
+        if (!(temp2 == 0x06)) {
+            //  goto BranchToDecLength1
+            return
+        }
         if (temp2 == 0x06) {
             //> lda #$9e                      ;when the length counts down to a certain point, put this
             temp0 = 0x9E
@@ -26724,6 +26817,10 @@ fun square2SfxHandler() {
     //> dec Squ2_SfxLenCounter   ;decrement length of sfx
     squ2Sfxlencounter = (squ2Sfxlencounter - 1) and 0xFF
     //> bne ExSfx2
+    if (!(squ2Sfxlencounter == 0)) {
+        //  goto ExSfx2
+        return
+    }
     if (squ2Sfxlencounter == 0) {
         //> EmptySfx2Buffer:
         //> ldx #$00                ;initialize square 2's sound effects buffer
@@ -26743,12 +26840,7 @@ fun noiseSfxHandler() {
     val bowserFlameEnvData by MemoryByteIndexed(BowserFlameEnvData)
     val brickShatterEnvData by MemoryByteIndexed(BrickShatterEnvData)
     val brickShatterFreqData by MemoryByteIndexed(BrickShatterFreqData)
-    val musicHeaderData by MemoryByteIndexed(MusicHeaderData)
-    val musicHeaderOffsetData by MemoryByteIndexed(MusicHeaderOffsetData)
     val sndNoiseReg by MemoryByteIndexed(SND_NOISE_REG)
-    val sndSquare1Reg by MemoryByteIndexed(SND_SQUARE1_REG)
-    val sndSquare2Reg by MemoryByteIndexed(SND_SQUARE2_REG)
-    val sndTriangleReg by MemoryByteIndexed(SND_TRIANGLE_REG)
     //> PlayBrickShatter:
     //> lda #$20                 ;load length of brick shatter sound
     //> sta Noise_SfxLenCounter
@@ -26847,19 +26939,11 @@ fun musicHandler() {
     //> MusicHandler:
     //> lda EventMusicQueue     ;check event music queue
     //> bne LoadEventMusic
-    if (!(eventMusicQueue == 0)) {
-        //  goto LoadEventMusic
-        return
-    }
     temp0 = eventMusicQueue
     if (eventMusicQueue == 0) {
         //> lda AreaMusicQueue      ;check area music queue
         temp0 = areaMusicQueue
         //> bne LoadAreaMusic
-        if (!(temp0 == 0)) {
-            //  goto LoadAreaMusic
-            return
-        }
         if (temp0 == 0) {
             //> lda EventMusicBuffer    ;check both buffers
             temp0 = eventMusicBuffer

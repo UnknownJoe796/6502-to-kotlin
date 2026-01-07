@@ -1,5 +1,0 @@
-Function: InitializeMemory
-Inputs: Y
-Outputs: A
-Clobbers: X, NegativeFlag, ZeroFlag, A, $06, $07, CarryFlag, Y
-Control flow nodes: 3

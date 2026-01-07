@@ -162,12 +162,14 @@ fun impedePlayerMove() {
     //> clc
     //> adc Player_X_Position     ;add contents of A to player's horizontal
     temp5 = temp1 + playerXPosition
+    temp1 = temp5 and 0xFF
     //> sta Player_X_Position     ;position to move player left or right
-    playerXPosition = temp5 and 0xFF
+    playerXPosition = temp1
     //> lda Player_PageLoc
     temp1 = playerPageloc
     //> adc $00                   ;add high bits and carry to
     temp6 = temp1 + memory[0x0].toInt() + (if (temp5 > 0xFF) 1 else 0)
+    temp1 = temp6 and 0xFF
     //> sta Player_PageLoc        ;page location if necessary
-    playerPageloc = temp6 and 0xFF
+    playerPageloc = temp1
 }

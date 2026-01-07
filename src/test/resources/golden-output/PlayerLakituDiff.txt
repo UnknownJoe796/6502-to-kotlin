@@ -1,5 +1,0 @@
-Function: PlayerLakituDiff
-Inputs: $00, X
-Outputs: 
-Clobbers: Y, NegativeFlag, ZeroFlag, A, CarryFlag, OverflowFlag, $00
-Control flow nodes: 4

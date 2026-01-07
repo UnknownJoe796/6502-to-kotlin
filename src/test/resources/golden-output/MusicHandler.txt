@@ -1,5 +1,0 @@
-Function: MusicHandler
-Inputs: 
-Outputs: 
-Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, X, Y
-Control flow nodes: 11

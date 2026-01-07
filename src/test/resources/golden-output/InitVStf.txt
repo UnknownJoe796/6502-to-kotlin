@@ -1,5 +1,0 @@
-Function: InitVStf
-Inputs: X
-Outputs: A
-Clobbers: A, NegativeFlag, ZeroFlag
-Control flow nodes: 1
