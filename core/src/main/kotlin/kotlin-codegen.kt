@@ -151,8 +151,13 @@ class CodeGenContext(
     /**
      * Register an indexed memory access and return the property name.
      * Example: registerIndexedAccess("Enemy_Flag") -> "enemyFlag"
+     *
+     * If the label was previously registered as a direct access, it gets upgraded
+     * to an indexed access (the direct access is removed).
      */
     fun registerIndexedAccess(constant: String): String {
+        // If we previously registered this as a direct access, remove it - indexed takes precedence
+        directMemoryAccesses.remove(constant)
         return indexedMemoryAccesses.getOrPut(constant) {
             toCamelCase(constant)
         }
@@ -502,11 +507,32 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
 
             // Full sum (may exceed 255)
             val fullSum = KBinaryOp(KBinaryOp(a, "+", wrapPropertyRead(operand)), "+", carryInt)
-            // Result masked to 8 bits
-            val result = KBinaryOp(KParen(fullSum), "and", KLiteral("0xFF"))
-            ctx.registerA = result
-            // Carry set if result > 255
-            ctx.carryFlag = KBinaryOp(fullSum, ">", KLiteral("0xFF"))
+
+            // CRITICAL FIX: Store the full sum in a temp variable so the carry check
+            // is based on the value at the time of the ADC, not after A is reassigned.
+            // Without this, the carryFlag expression would reference A (e.g., temp2) which
+            // will have a different value after the masked result is assigned.
+            val sumVarName = ctx.nextTempVar()
+            stmts.add(KVarDecl(sumVarName, "Int", fullSum, mutable = false))
+            val sumVar = KVar(sumVarName)
+
+            // Result masked to 8 bits (now using the captured sum variable)
+            val result = KBinaryOp(sumVar, "and", KLiteral("0xFF"))
+
+            // CRITICAL FIX: If there's a function-level variable for A, we need to update it
+            // so that stores after merged branches use the correct value.
+            // Without this, code inside an if-block would compute a new value but the
+            // store after the if would use the old function-level var value.
+            val funcLevelVar = ctx.getFunctionLevelVar("A")
+            if (funcLevelVar != null) {
+                stmts.add(KAssignment(funcLevelVar, result))
+                ctx.registerA = funcLevelVar
+            } else {
+                ctx.registerA = result
+            }
+
+            // Carry set if sum > 255 (using the captured sum variable)
+            ctx.carryFlag = KBinaryOp(sumVar, ">", KLiteral("0xFF"))
             ctx.zeroFlag = KBinaryOp(result, "==", KLiteral("0"))
             ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(result, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
@@ -526,11 +552,28 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
 
             // Full difference (may go negative)
             val fullDiff = KBinaryOp(KBinaryOp(a, "-", wrapPropertyRead(operand)), "-", borrowInt)
-            // Result masked to 8 bits
-            val result = KBinaryOp(KParen(fullDiff), "and", KLiteral("0xFF"))
-            ctx.registerA = result
-            // Carry set if no borrow (result >= 0 before masking)
-            ctx.carryFlag = KBinaryOp(fullDiff, ">=", KLiteral("0"))
+
+            // CRITICAL FIX: Store the difference in a temp variable so the carry check
+            // is based on the value at the time of the SBC, not after A is reassigned.
+            val diffVarName = ctx.nextTempVar()
+            stmts.add(KVarDecl(diffVarName, "Int", fullDiff, mutable = false))
+            val diffVar = KVar(diffVarName)
+
+            // Result masked to 8 bits (now using the captured diff variable)
+            val result = KBinaryOp(diffVar, "and", KLiteral("0xFF"))
+
+            // CRITICAL FIX: If there's a function-level variable for A, we need to update it
+            // so that stores after merged branches use the correct value.
+            val funcLevelVar = ctx.getFunctionLevelVar("A")
+            if (funcLevelVar != null) {
+                stmts.add(KAssignment(funcLevelVar, result))
+                ctx.registerA = funcLevelVar
+            } else {
+                ctx.registerA = result
+            }
+
+            // Carry set if no borrow (diff >= 0 before masking)
+            ctx.carryFlag = KBinaryOp(diffVar, ">=", KLiteral("0"))
             ctx.zeroFlag = KBinaryOp(result, "==", KLiteral("0"))
             ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(result, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
@@ -541,8 +584,11 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
             val result = KBinaryOp(KParen(KBinaryOp(readValue, "+", KLiteral("1"))), "and", KLiteral("0xFF"))
             val wrappedResult = wrapPropertyWrite(target, result)
             stmts.add(KAssignment(target, wrappedResult))
-            ctx.zeroFlag = KBinaryOp(result, "==", KLiteral("0"))
-            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(result, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            // CRITICAL FIX: Set flags based on fresh read of target (after assignment), not the result expression
+            // The result expression contains `+1` which would be applied again when evaluating a loop condition
+            val newValue = wrapPropertyRead(target)
+            ctx.zeroFlag = KBinaryOp(newValue, "==", KLiteral("0"))
+            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(newValue, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
 
         AssemblyOp.DEC -> {
@@ -551,8 +597,11 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
             val result = KBinaryOp(KParen(KBinaryOp(readValue, "-", KLiteral("1"))), "and", KLiteral("0xFF"))
             val wrappedResult = wrapPropertyWrite(target, result)
             stmts.add(KAssignment(target, wrappedResult))
-            ctx.zeroFlag = KBinaryOp(result, "==", KLiteral("0"))
-            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(result, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            // CRITICAL FIX: Set flags based on fresh read of target (after assignment), not the result expression
+            // The result expression contains `-1` which would be applied again when evaluating a loop condition
+            val newValue = wrapPropertyRead(target)
+            ctx.zeroFlag = KBinaryOp(newValue, "==", KLiteral("0"))
+            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(newValue, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
 
         AssemblyOp.INX -> {
@@ -844,8 +893,13 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                     val targetFunction = ctx.functionRegistry[targetFunctionName]
 
                     // Build argument list for target function
+                    // For JumpEngine dispatch, A contains the index value
                     val args = mutableListOf<KotlinExpr>()
                     if (targetFunction?.inputs != null) {
+                        if (TrackedAsIo.A in targetFunction.inputs!!) {
+                            // Pass the index value as A (since A holds the dispatch index)
+                            args.add(KLiteral("$index"))
+                        }
                         if (TrackedAsIo.X in targetFunction.inputs!!) {
                             args.add(ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X"))
                         }
@@ -1190,7 +1244,9 @@ fun Condition.toKotlinExpr(ctx: CodeGenContext): KotlinExpr {
         AssemblyOp.BCC, AssemblyOp.BCS -> ctx.carryFlag ?: KVar("flagC")
         AssemblyOp.BMI, AssemblyOp.BPL -> ctx.negativeFlag ?: KVar("flagN")
         AssemblyOp.BVC, AssemblyOp.BVS -> ctx.overflowFlag ?: KVar("flagV")
-        else -> KLiteral("/* unknown branch */")
+        // Unknown branch type - default to true to create valid syntax
+        // TODO: Investigate control flow to determine proper condition
+        else -> KLiteral("true /* unknown branch ${branchInstr.op} */")
     }
 
     // Determine the polarity (positive or negative test)
@@ -1432,6 +1488,64 @@ fun convertTempDeclsToAssignments(stmts: List<KotlinStmt>, tempVars: Set<String>
     return stmts.map { convertStmt(it) }
 }
 
+// Hardware register prefixes that commonly have multiple registers at offsets
+// (e.g., SND_SQUARE1_REG at $4000 has registers at +0, +1, +2, +3)
+private val HARDWARE_REGISTER_PREFIXES = setOf(
+    "SND_SQUARE1_REG", "SND_SQUARE2_REG", "SND_TRIANGLE_REG", "SND_NOISE_REG",
+    "PPU_CTRL_REG", "PPU_STATUS", "PPU_SPR_ADDR", "PPU_SPR_DATA",
+    "SND_DELTA_REG"
+)
+
+/**
+ * Pre-scan all instructions in a function to identify indexed memory accesses.
+ * This ensures that memory locations like AreaObjectLength that are accessed
+ * both directly and with an offset will use the indexed delegate consistently.
+ */
+fun AssemblyFunction.preScanMemoryAccesses(ctx: CodeGenContext) {
+    val blocksToVisit = mutableListOf(startingBlock)
+    val visitedBlocks = mutableSetOf<AssemblyBlock>()
+
+    while (blocksToVisit.isNotEmpty()) {
+        val block = blocksToVisit.removeAt(0)
+        if (!visitedBlocks.add(block)) continue
+        if (block.function != this) continue
+
+        for (line in block.lines) {
+            val address = line.instruction?.address
+            // Check for offset accesses (e.g., AreaObjectLength+1)
+            when (address) {
+                is AssemblyAddressing.Direct -> {
+                    if (!address.label.startsWith("$")) {
+                        if (address.offset != 0) {
+                            // This is an offset access - register the base label as indexed
+                            ctx.registerIndexedAccess(address.label)
+                        } else if (address.label in HARDWARE_REGISTER_PREFIXES) {
+                            // Hardware registers that commonly have multiple registers
+                            ctx.registerIndexedAccess(address.label)
+                        }
+                    }
+                }
+                is AssemblyAddressing.DirectX -> {
+                    if (!address.label.startsWith("$")) {
+                        // X-indexed access - register as indexed
+                        ctx.registerIndexedAccess(address.label)
+                    }
+                }
+                is AssemblyAddressing.DirectY -> {
+                    if (!address.label.startsWith("$")) {
+                        // Y-indexed access - register as indexed
+                        ctx.registerIndexedAccess(address.label)
+                    }
+                }
+                else -> {}
+            }
+        }
+
+        block.fallThroughExit?.let { if (it.function == this) blocksToVisit.add(it) }
+        block.branchExit?.let { if (it.function == this) blocksToVisit.add(it) }
+    }
+}
+
 /**
  * Convert an AssemblyFunction to a KFunction.
  * @param functionRegistry Map of function names to AssemblyFunction for looking up call signatures
@@ -1442,6 +1556,11 @@ fun AssemblyFunction.toKotlinFunction(
     jumpEngineTables: Map<Int, JumpEngineTable> = emptyMap()
 ): KFunction {
     val ctx = CodeGenContext(functionRegistry, jumpEngineTables)
+
+    // Pre-scan all instructions to identify indexed memory accesses.
+    // This ensures that labels like AreaObjectLength that are accessed both
+    // directly and with an offset use the indexed delegate consistently.
+    preScanMemoryAccesses(ctx)
 
     // Get improved control flow
     val controlNodes = this.asControls ?: this.improveControlFlow()
@@ -1653,7 +1772,7 @@ fun AssemblyFunction.toKotlinFunction(
 
     // If function has a return type, update return statements to return the appropriate value
     val bodyWithReturns = if (returnType != null) {
-        finalBody.map { stmt ->
+        val updated = finalBody.map { stmt ->
             when (stmt) {
                 is KReturn -> if (stmt.value == null) KReturn(KVar("A")) else stmt
                 is KIf -> KIf(
@@ -1666,6 +1785,12 @@ fun AssemblyFunction.toKotlinFunction(
                 is KLoop -> KLoop(stmt.body.addReturnValues())
                 else -> stmt
             }
+        }
+        // If function doesn't end with a return, add one
+        if (updated.lastOrNull() !is KReturn) {
+            updated + KReturn(KVar("A"))
+        } else {
+            updated
         }
     } else {
         finalBody
@@ -1980,6 +2105,10 @@ fun AssemblyAddressing?.toKotlinExpr(ctx: CodeGenContext): KotlinExpr {
                     // Direct access but we already have an indexed delegate for this
                     // Use indexed access with index 0 to avoid duplicate declarations
                     val propName = ctx.indexedMemoryAccesses[this.label]!!
+                    KMemberAccess(KVar(propName), KLiteral("0"), isIndexed = true)
+                } else if (this.label in HARDWARE_REGISTER_PREFIXES) {
+                    // Hardware registers are always indexed (they have multiple sub-registers)
+                    val propName = ctx.registerIndexedAccess(this.label)
                     KMemberAccess(KVar(propName), KLiteral("0"), isIndexed = true)
                 } else {
                     // Direct access - use simple delegate

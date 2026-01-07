@@ -96,6 +96,8 @@ fun impedePlayerMove() {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var playerCollisionbits by MemoryByte(Player_CollisionBits)
     var playerPageloc by MemoryByte(Player_PageLoc)
     var playerXPosition by MemoryByte(Player_X_Position)
@@ -159,11 +161,13 @@ fun impedePlayerMove() {
     memory[0x0] = temp2.toUByte()
     //> clc
     //> adc Player_X_Position     ;add contents of A to player's horizontal
+    temp5 = temp1 + playerXPosition
     //> sta Player_X_Position     ;position to move player left or right
-    playerXPosition = (temp1 + playerXPosition) and 0xFF
+    playerXPosition = temp5 and 0xFF
     //> lda Player_PageLoc
     temp1 = playerPageloc
     //> adc $00                   ;add high bits and carry to
+    temp6 = temp1 + memory[0x0].toInt() + (if (temp5 > 0xFF) 1 else 0)
     //> sta Player_PageLoc        ;page location if necessary
-    playerPageloc = (temp1 + memory[0x0].toInt() + (if (temp1 + playerXPosition > 0xFF) 1 else 0)) and 0xFF
+    playerPageloc = temp6 and 0xFF
 }

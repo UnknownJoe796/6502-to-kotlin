@@ -954,7 +954,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-TitleScreenMode:                                                                                    ;  B
+TitleScreenMode:                                                                                    ; fun():  B
 LDA OperMode_Task                                                                                   ; 
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
@@ -968,7 +968,7 @@ DATA: Expr(expr=GameMenuRoutine)                                                
 WSelectBufferTemplate:                                                                              ;  B
 DATA: ByteValue(value=4), ByteValue(value=32), ByteValue(value=115), ByteValue(value=1), ByteValue(value=0), ByteValue(value=0); 
                                                                                                     ; 
-GameMenuRoutine:                                                                                    ;  B
+GameMenuRoutine:                                                                                    ; fun():  B
 LDY #$00                                                                                            ; 
 LDA SavedJoypad1Bits          ; check to see if either player pressed                               ; 
 ORA SavedJoypad2Bits          ; only the start button (either joypad)                               ; 
@@ -1109,7 +1109,7 @@ DemoOver:  RTS                                                                  
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-VictoryMode:                                                                                        ;  B
+VictoryMode:                                                                                        ; fun():  B
 JSR VictoryModeSubroutines    ; run victory mode subroutines                                        ; 
 LDA OperMode_Task             ; get current task of victory mode                                    ; 
 BEQ AutoPlayer                ; if on bridge collapse, skip enemy processing                        ; 
@@ -1131,7 +1131,7 @@ DATA: Expr(expr=PlayerEndWorld)                                                 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-SetupVictoryMode:                                                                                   ;  B
+SetupVictoryMode:                                                                                   ; fun():  B
 LDX ScreenRight_PageLoc       ; get page location of right side of screen                           ; 
 INX                           ; increment to next page                                              ; 
 STX DestinationPageLoc        ; store here                                                          ; 
@@ -1141,7 +1141,7 @@ JMP IncModeTask_B             ; jump to set next major task in victory mode     
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-PlayerVictoryWalk:                                                                                  ;  B
+PlayerVictoryWalk:                                                                                  ; fun():  B
 LDY #$00                      ; set value here to not walk player by default                        ; 
 STY VictoryWalkControl                                                                              ; 
 LDA Player_PageLoc            ; get player's page location                                          ; 
@@ -1173,7 +1173,7 @@ RTS                           ; otherwise leave                                 
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-PrintVictoryMessages:                                                                               ;  B
+PrintVictoryMessages:                                                                               ; fun():  B
 LDA SecondaryMsgCounter       ; load secondary message counter                                      ; 
 BNE IncMsgCounter             ; if set, branch to increment message counters                        ; 
 LDA PrimaryMsgCounter         ; otherwise load primary message counter                              ;  B
@@ -1228,7 +1228,7 @@ ExitMsgs:  RTS                ; leave                                           
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-PlayerEndWorld:                                                                                     ;  B
+PlayerEndWorld:                                                                                     ; fun():  B
 LDA WorldEndTimer             ; check to see if world end timer expired                             ; 
 BNE EndExitOne                ; branch to leave if not                                              ; 
 LDY WorldNumber               ; check world number                                                  ;  B
@@ -1358,7 +1358,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-ScreenRoutines:                                                                                     ;  B
+ScreenRoutines:                                                                                     ; fun():  B
 LDA ScreenRoutineTask         ; run one of the following subroutines                                ; 
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
@@ -1380,7 +1380,7 @@ DATA: Expr(expr=WriteTopScore)                                                  
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-InitScreen:                                                                                         ;  B
+InitScreen:                                                                                         ; fun():  B
 JSR MoveAllSpritesOffscreen   ; initialize all sprites including sprite #0                          ; 
 JSR InitializeNameTables      ; and erase both name and attribute tables                            ; 
 LDA OperMode                                                                                        ; 
@@ -1390,7 +1390,7 @@ JMP SetVRAMAddr_A                                                               
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-SetupIntermediate:                                                                                  ;  B
+SetupIntermediate:                                                                                  ; fun():  B
 LDA BackgroundColorCtrl       ; save current background color control                               ; 
 PHA                           ; and player status to stack                                          ; 
 LDA PlayerStatus                                                                                    ; 
@@ -1411,7 +1411,7 @@ JMP IncSubtask                ; then move onto the next task                    
 AreaPalette:                                                                                        ;  B
 DATA: ByteValue(value=1), ByteValue(value=2), ByteValue(value=3), ByteValue(value=4)                ; 
                                                                                                     ; 
-GetAreaPalette:                                                                                     ;  B
+GetAreaPalette:                                                                                     ; fun():  B
 LDY AreaType                  ; select appropriate palette to load                                  ; 
 LDX AreaPalette,Y             ; based on area type                                                  ; 
 SetVRAMAddr_A:  STX VRAM_Buffer_AddrCtrl; store offset into buffer control                          ;  B
@@ -1432,7 +1432,7 @@ DATA: ByteValue(value=34), ByteValue(value=22), ByteValue(value=39), ByteValue(v
 DATA: ByteValue(value=34), ByteValue(value=48), ByteValue(value=39), ByteValue(value=25); luigi's colors; 
 DATA: ByteValue(value=34), ByteValue(value=55), ByteValue(value=39), ByteValue(value=22); fiery (used by both); 
                                                                                                     ; 
-GetBackgroundColor:                                                                                 ;  B
+GetBackgroundColor:                                                                                 ; fun():  B
 LDY BackgroundColorCtrl       ; check background color control                                      ; 
 BEQ NoBGColor                 ; if not set, increment task and fetch palette                        ; 
 LDA BGColorCtrl_Addr-4,Y      ; put appropriate palette into vram                                   ;  B
@@ -1479,7 +1479,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-GetAlternatePalette1:                                                                               ;  B
+GetAlternatePalette1:                                                                               ; fun():  B
 LDA AreaStyle                 ; check for mushroom level style                                      ; 
 CMP #$01                                                                                            ; 
 BNE NoAltPal                                                                                        ; 
@@ -1489,14 +1489,14 @@ NoAltPal:  JMP IncSubtask     ; now onto the next task                          
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-WriteTopStatusLine:                                                                                 ;  B
+WriteTopStatusLine:                                                                                 ; fun():  B
 LDA #$00                      ; select main status bar                                              ; 
 JSR WriteGameText             ; output it                                                           ; 
 JMP IncSubtask                ; onto the next task                                                  ; 
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-WriteBottomStatusLine:                                                                              ;  B
+WriteBottomStatusLine:                                                                              ; fun():  B
 JSR GetSBNybbles              ; write player's score and coin tally to screen                       ; 
 LDX VRAM_Buffer1_Offset                                                                             ; 
 LDA #$20                      ; write address for world-area number on screen                       ; 
@@ -1525,7 +1525,7 @@ JMP IncSubtask                                                                  
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-DisplayTimeUp:                                                                                      ;  B
+DisplayTimeUp:                                                                                      ; fun():  B
 LDA GameTimerExpiredFlag      ; if game timer not expired, increment task                           ; 
 BEQ NoTimeUp                  ; control 2 tasks forward, otherwise, stay here                       ; 
 LDA #$00                                                                                            ;  B
@@ -1537,7 +1537,7 @@ JMP IncSubtask                                                                  
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-DisplayIntermediate:                                                                                ;  B
+DisplayIntermediate:                                                                                ; fun():  B
 LDA OperMode                  ; check primary mode of operation                                     ; 
 BEQ NoInter                   ; if in title screen mode, skip this                                  ; 
 CMP #GameOverModeValue        ; are we in game over mode?                                           ;  B
@@ -1567,7 +1567,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-AreaParserTaskControl:                                                                              ;  B
+AreaParserTaskControl:                                                                              ; fun():  B
 INC DisableScreenFlag         ; turn off screen                                                     ; 
 TaskLoop:  JSR AreaParserTaskHandler; render column set of current area                             ;  B
 LDA AreaParserTaskNum         ; check number of tasks                                               ; 
@@ -1584,7 +1584,7 @@ RTS                                                                             
                               ; $00 - vram buffer address table low                                 ; 
                               ; $01 - vram buffer address table high                                ; 
                                                                                                     ; 
-DrawTitleScreen:                                                                                    ;  B
+DrawTitleScreen:                                                                                    ; fun():  B
 LDA OperMode                  ; are we in title screen mode?                                        ; 
 BNE IncModeTask_B             ; if not, exit                                                        ; 
 LDA                           ; load address $1ec0 into                                             ;  B
@@ -1611,7 +1611,7 @@ JMP SetVRAMAddr_B             ; increment task and exit                         
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-ClearBuffersDrawIcon:                                                                               ;  B
+ClearBuffersDrawIcon:                                                                               ; fun():  B
 LDA OperMode                  ; check game mode                                                     ; 
 BNE IncModeTask_B             ; if not title screen mode, leave                                     ; 
 LDX #$00                      ; otherwise, clear buffer space                                       ;  B
@@ -1625,7 +1625,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-WriteTopScore:                                                                                      ;  B
+WriteTopScore:                                                                                      ; fun():  B
 LDA #$fa                      ; run display routine to display top score on title                   ; 
 JSR UpdateNumber                                                                                    ; 
 IncModeTask_B:  INC OperMode_Task; move onto next mode                                              ;  B
@@ -1776,7 +1776,7 @@ JMP SetVRAMOffset                                                               
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-ResetSpritesAndScreenTimer:                                                                         ;  B
+ResetSpritesAndScreenTimer:                                                                         ; fun():  B
 LDA ScreenTimer               ; check if screen timer has expired                                   ; 
 BNE NoReset                   ; if not, branch to leave                                             ; 
 JSR MoveAllSpritesOffscreen   ; otherwise reset sprites now                                         ;  B
@@ -1797,7 +1797,7 @@ NoReset:  RTS                                                                   
                               ; $06 - metatile graphics table address low                           ; 
                               ; $07 - metatile graphics table address high                          ; 
                                                                                                     ; 
-RenderAreaGraphics:                                                                                 ;  B
+RenderAreaGraphics:                                                                                 ; fun():  B
 LDA CurrentColumnPos          ; store LSB of where we're at                                         ; 
 AND #$01                                                                                            ; 
 STA $05                                                                                             ; 
@@ -2646,7 +2646,7 @@ DATA: ByteValue(value=24), ByteValue(value=255), ByteValue(value=35), ByteValue(
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-InitializeGame:                                                                                     ;  B
+InitializeGame:                                                                                     ; fun(A):  B
 LDY #$6f                      ; clear all memory as in initialization procedure,                    ; 
 JSR InitializeMemory          ; but this time, clear only as far as $076f                           ; 
 LDY #$1f                                                                                            ; 
@@ -2657,7 +2657,7 @@ LDA #$18                      ; set demo timer                                  
 STA DemoTimer                                                                                       ; 
 JSR LoadAreaPointer                                                                                 ; 
                                                                                                     ; 
-InitializeArea:                                                                                     ;  B
+InitializeArea:                                                                                     ; fun():  B
 LDY #$4b                      ; clear all memory again, only as far as $074b                        ; 
 JSR InitializeMemory          ; this is only necessary if branching from                            ; 
 LDX #$21                                                                                            ; 
@@ -2714,7 +2714,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-PrimaryGameSetup:                                                                                   ;  B
+PrimaryGameSetup:                                                                                   ; fun():  B
 LDA #$01                                                                                            ; 
 STA FetchNewGameTimerFlag     ; set flag to load game timer from header                             ; 
 STA PlayerSize                ; set player's size to small                                          ; 
@@ -2722,7 +2722,7 @@ LDA #$02                                                                        
 STA NumberofLives             ; give each player three lives                                        ; 
 STA OffScr_NumberofLives                                                                            ; 
                                                                                                     ; 
-SecondaryGameSetup:                                                                                 ;  B
+SecondaryGameSetup:                                                                                 ; fun():  B
 LDA #$00                                                                                            ; 
 STA DisableScreenFlag         ; enable screen output                                                ; 
 TAY                                                                                                 ; 
@@ -2830,7 +2830,7 @@ GameTimerData:                                                                  
 DATA: ByteValue(value=32)     ; dummy byte, used as part of bg priority data                        ; 
 DATA: ByteValue(value=4), ByteValue(value=3), ByteValue(value=2)                                    ; 
                                                                                                     ; 
-Entrance_GameTimerSetup:                                                                            ;  B
+Entrance_GameTimerSetup:                                                                            ; fun():  B
 LDA ScreenLeft_PageLoc        ; set current page for area objects                                   ; 
 STA Player_PageLoc            ; as page location for player                                         ; 
 LDA #$28                      ; store value here                                                    ; 
@@ -2903,7 +2903,7 @@ DATA: ByteValue(value=102), ByteValue(value=96)                                 
 DATA: ByteValue(value=101), ByteValue(value=112)                                                    ; 
 DATA: ByteValue(value=0), ByteValue(value=0)                                                        ; 
                                                                                                     ; 
-PlayerLoseLife:                                                                                     ;  B
+PlayerLoseLife:                                                                                     ; fun():  B
 INC DisableScreenFlag         ; disable screen and sprite 0 check                                   ; 
 LDA #$00                                                                                            ; 
 STA Sprite0HitDetectFlag                                                                            ; 
@@ -2943,7 +2943,7 @@ JMP ContinueGame              ; continue the game                               
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-GameOverMode:                                                                                       ;  B
+GameOverMode:                                                                                       ; fun():  B
 LDA OperMode_Task                                                                                   ; 
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
@@ -2953,7 +2953,7 @@ DATA: Expr(expr=RunGameOver)                                                    
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-SetupGameOver:                                                                                      ;  B
+SetupGameOver:                                                                                      ; fun():  B
 LDA #$00                      ; reset screen routine task control for title screen, game,           ; 
 STA ScreenRoutineTask         ; and game over modes                                                 ; 
 STA Sprite0HitDetectFlag      ; disable sprite 0 check                                              ; 
@@ -2965,7 +2965,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-RunGameOver:                                                                                        ;  B
+RunGameOver:                                                                                        ; fun():  B
 LDA #$00                      ; reenable screen                                                     ; 
 STA DisableScreenFlag                                                                               ; 
 LDA SavedJoypad1Bits          ; check controller for start pressed                                  ; 
@@ -3059,7 +3059,7 @@ DATA: Expr(expr=AreaParserCore)                                                 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-IncrementColumnPos:                                                                                 ;  B
+IncrementColumnPos:                                                                                 ; fun():  B
 INC CurrentColumnPos          ; increment column where we're at                                     ; 
 LDA CurrentColumnPos                                                                                ; 
 AND #%00001111                ; mask out higher nybble                                              ; 
@@ -3151,7 +3151,7 @@ DATA: ByteValue(value=249), ByteValue(value=24); ceiling 1, middle 5, floor 2   
 DATA: ByteValue(value=241), ByteValue(value=24); ceiling 1, middle 4, floor 2                       ; 
 DATA: ByteValue(value=255), ByteValue(value=31); completely solid top to bottom                     ; 
                                                                                                     ; 
-AreaParserCore:                                                                                     ;  B
+AreaParserCore:                                                                                     ; fun():  B
 LDA BackloadingFlag           ; check to see if we are starting right of start                      ; 
 BEQ RenderSceneryTerrain      ; if not, go ahead and render background, foreground and terrain      ; 
 JSR ProcessAreaData           ; otherwise skip ahead and load level data                            ;  B
@@ -3451,7 +3451,7 @@ LDA #$00                      ; if not, initialize both backloading and         
 STA BackloadingFlag           ; behind-renderer flags and leave                                     ; 
 STA BehindAreaParserFlag                                                                            ; 
 STA ObjectOffset                                                                                    ; 
-LoopCmdE:  RTS                                                                                      ;  B
+LoopCmdE:  RTS                                                                                      ; fun():  B
 BackColC:  LDY AreaDataOffset ; get first byte again                                                ;  B
 LDA (AreaData),Y                                                                                    ; 
 AND #%11110000                ; mask out low nybble and move high to low                            ; 
@@ -3533,7 +3533,7 @@ DATA: Expr(expr=AlterAreaAttributes)                                            
                               ; $00 - used to store offset used to find object code                 ; 
                               ; $07 - starts with adder from area parser, used to store row offset  ; 
                                                                                                     ; 
-AlterAreaAttributes:                                                                                ;  B
+AlterAreaAttributes:                                                                                ; fun(X):  B
 LDY AreaObjOffsetBuffer,X     ; load offset for level object data saved in buffer                   ; 
 INY                           ; load second byte                                                    ; 
 LDA (AreaData),Y                                                                                    ; 
@@ -3563,7 +3563,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-ScrollLockObject_Warp:                                                                              ;  B
+ScrollLockObject_Warp:                                                                              ; fun():  B
 LDX #$04                      ; load value of 4 for game text routine as default                    ; 
 LDA WorldNumber               ; warp zone (4-3-2), then check world number                          ; 
 BEQ WarpNum                                                                                         ; 
@@ -3578,7 +3578,7 @@ JSR WriteGameText             ; print text and warp zone numbers                
 LDA #PiranhaPlant                                                                                   ; 
 JSR KillEnemies               ; load identifier for piranha plants and do sub                       ; 
                                                                                                     ; 
-ScrollLockObject:                                                                                   ;  B
+ScrollLockObject:                                                                                   ; fun():  B
 LDA ScrollLock                ; invert scroll lock to turn it on                                    ; 
 EOR #%00000001                                                                                      ; 
 STA ScrollLock                                                                                      ; 
@@ -3604,7 +3604,7 @@ RTS                                                                             
 FrenzyIDData:                                                                                       ;  B
 DATA: Expr(expr=FlyCheepCheepFrenzy), Expr(expr=BBill_CCheep_Frenzy), Expr(expr=Stop_Frenzy)        ; 
                                                                                                     ; 
-AreaFrenzy:  LDX $00          ; use area object identifier bit as offset                            ;  B
+AreaFrenzy:  LDX $00          ; use area object identifier bit as offset                            ; fun($00):  B
 LDA FrenzyIDData-8,X          ; note that it starts at 8, thus weird address here                   ; 
 LDY #$05                                                                                            ; 
 FreCompLoop:  DEY             ; check regular slots of enemy object buffer                          ;  B
@@ -3618,14 +3618,14 @@ RTS                                                                             
                               ; --------------------------------                                    ; 
                               ; $06 - used by MushroomLedge to store length                         ; 
                                                                                                     ; 
-AreaStyleObject:                                                                                    ;  B
+AreaStyleObject:                                                                                    ; fun():  B
 LDA AreaStyle                 ; load level object style and jump to the right sub                   ; 
 JSR JumpEngine                                                                                      ; 
 DATA: Expr(expr=TreeLedge)    ; also used for cloud type levels                                     ;  B
 DATA: Expr(expr=MushroomLedge)                                                                      ; 
 DATA: Expr(expr=BulletBillCannon)                                                                   ; 
                                                                                                     ; 
-TreeLedge:                                                                                          ;  B
+TreeLedge:                                                                                          ; fun(XY$07):  B
 JSR GetLrgObjAttrib           ; get row and length of green ledge                                   ; 
 LDA AreaObjectLength,X        ; check length counter for expiration                                 ; 
 BEQ EndTreeL                                                                                        ; 
@@ -3645,7 +3645,7 @@ JMP AllUnder                  ; now render the part underneath                  
 EndTreeL:  LDA #$18           ; render end of tree ledge                                            ;  B
 JMP NoUnder                                                                                         ; 
                                                                                                     ;  B
-MushroomLedge:                                                                                      ;  B
+MushroomLedge:                                                                                      ; fun(YCarryFlagX$07):  B
 JSR ChkLrgObjLength           ; get shroom dimensions                                               ; 
 STY $06                       ; store length here for now                                           ; 
 BCC EndMushL                                                                                        ; 
@@ -3681,7 +3681,7 @@ JMP RenderUnderPart                                                             
 PulleyRopeMetatiles:                                                                                ;  B
 DATA: ByteValue(value=66), ByteValue(value=65), ByteValue(value=67)                                 ; 
                                                                                                     ; 
-PulleyRopeObject:                                                                                   ;  B
+PulleyRopeObject:                                                                                   ; fun(CarryFlagX):  B
 JSR ChkLrgObjLength           ; get length of pulley/rope object                                    ; 
 LDY #$00                      ; initialize metatile offset                                          ; 
 BCS RenderPul                 ; if starting, render left pulley                                     ; 
@@ -3709,7 +3709,7 @@ DATA: ByteValue(value=71), ByteValue(value=71), ByteValue(value=71), ByteValue(v
 DATA: ByteValue(value=74), ByteValue(value=71), ByteValue(value=74), ByteValue(value=71), ByteValue(value=74); 
 DATA: ByteValue(value=75), ByteValue(value=71), ByteValue(value=75), ByteValue(value=71), ByteValue(value=75); 
                                                                                                     ; 
-CastleObject:                                                                                       ;  B
+CastleObject:                                                                                       ; fun(YX):  B
 JSR GetLrgObjAttrib           ; save lower nybble as starting row                                   ; 
 STY $07                       ; if starting row is above $0a, game will crash!!!                    ; 
 LDY #$04                                                                                            ; 
@@ -3767,7 +3767,7 @@ ExitCastle:  RTS                                                                
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-WaterPipe:                                                                                          ;  B
+WaterPipe:                                                                                          ; fun(X$07):  B
 JSR GetLrgObjAttrib           ; get row and lower nybble                                            ; 
 LDY AreaObjectLength,X        ; get length (residual code, water pipe is 1 col thick)               ; 
 LDX $07                       ; get row                                                             ; 
@@ -3782,7 +3782,7 @@ RTS                                                                             
                               ; $06 - used to store leftover horizontal length in RenderSidewaysPipe; 
                               ; and vertical length in VerticalPipe and GetPipeHeight               ; 
                                                                                                     ; 
-IntroPipe:                                                                                          ;  B
+IntroPipe:                                                                                          ; fun(CarryFlag):  B
 LDY #$03                      ; check if length set, if not set, set it                             ; 
 JSR ChkLrgObjFixedLength                                                                            ; 
 LDY #$0a                      ; set fixed value and render the sideways part                        ; 
@@ -3807,7 +3807,7 @@ SidePipeBottomPart:                                                             
 DATA: ByteValue(value=21), ByteValue(value=33); bottom part of sideways part of pipe                ; 
 DATA: ByteValue(value=32), ByteValue(value=31)                                                      ; 
                                                                                                     ; 
-ExitPipe:                                                                                           ;  B
+ExitPipe:                                                                                           ; fun():  B
 LDY #$03                      ; check if length set, if not set, set it                             ; 
 JSR ChkLrgObjFixedLength                                                                            ; 
 JSR GetLrgObjAttrib           ; get vertical length, then plow on through RenderSidewaysPipe        ; 
@@ -3840,7 +3840,7 @@ DATA: ByteValue(value=21), ByteValue(value=20)                                  
 DATA: ByteValue(value=19), ByteValue(value=18); used by decoration pipes                            ; 
 DATA: ByteValue(value=21), ByteValue(value=20)                                                      ; 
                                                                                                     ; 
-VerticalPipe:                                                                                       ;  B
+VerticalPipe:                                                                                       ; fun($00YX$07$06CarryFlag):  B
 JSR GetPipeHeight                                                                                   ; 
 LDA $00                       ; check to see if value was nullified earlier                         ; 
 BEQ WarpPipe                  ; (if d3, the usage control bit of second byte, was set)              ; 
@@ -3905,7 +3905,7 @@ ExitEmptyChk:  RTS            ; if all values nonzero, carry flag is set        
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-Hole_Water:                                                                                         ;  B
+Hole_Water:                                                                                         ; fun():  B
 JSR ChkLrgObjLength           ; get low nybble and save as length                                   ; 
 LDA #$86                      ; render waves                                                        ; 
 STA MetatileBuffer+10                                                                               ; 
@@ -3916,11 +3916,11 @@ JMP RenderUnderPart                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-QuestionBlockRow_High:                                                                              ;  B
+QuestionBlockRow_High:                                                                              ; fun():  B
 LDA #$03                      ; start on the fourth row                                             ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-QuestionBlockRow_Low:                                                                               ;  B
+QuestionBlockRow_Low:                                                                               ; fun():  B
 LDA #$07                      ; start on the eighth row                                             ; 
 PHA                           ; save whatever row to the stack for now                              ; 
 JSR ChkLrgObjLength           ; get low nybble and save as length                                   ; 
@@ -3932,15 +3932,15 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-Bridge_High:                                                                                        ;  B
+Bridge_High:                                                                                        ; fun():  B
 LDA #$06                      ; start on the seventh row from top of screen                         ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-Bridge_Middle:                                                                                      ;  B
+Bridge_Middle:                                                                                      ; fun():  B
 LDA #$07                      ; start on the eighth row                                             ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-Bridge_Low:                                                                                         ;  B
+Bridge_Low:                                                                                         ; fun():  B
 LDA #$09                      ; start on the tenth row                                              ; 
 PHA                           ; save whatever row to the stack for now                              ; 
 JSR ChkLrgObjLength           ; get low nybble and save as length                                   ; 
@@ -3955,7 +3955,7 @@ JMP RenderUnderPart                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-FlagBalls_Residual:                                                                                 ;  B
+FlagBalls_Residual:                                                                                 ; fun():  B
 JSR GetLrgObjAttrib           ; get low nybble from object byte                                     ; 
 LDX #$02                      ; render flag balls on third row from top                             ; 
 LDA #$6d                      ; of screen downwards based on low nybble                             ; 
@@ -3963,7 +3963,7 @@ JMP RenderUnderPart                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-FlagpoleObject:                                                                                     ;  B
+FlagpoleObject:                                                                                     ; fun():  B
 LDA #$24                      ; render flagpole ball on top                                         ; 
 STA MetatileBuffer                                                                                  ; 
 LDX #$01                      ; now render the flagpole shaft                                       ; 
@@ -3990,12 +3990,12 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-EndlessRope:                                                                                        ;  B
+EndlessRope:                                                                                        ; fun():  B
 LDX #$00                      ; render rope from the top to the bottom of screen                    ; 
 LDY #$0f                                                                                            ; 
 JMP DrawRope                                                                                        ; 
                                                                                                     ;  B
-BalancePlatRope:                                                                                    ;  B
+BalancePlatRope:                                                                                    ; fun(X):  B
 TXA                           ; save object buffer offset for now                                   ; 
 PHA                                                                                                 ; 
 LDX #$01                      ; blank out all from second row to the bottom                         ; 
@@ -4014,7 +4014,7 @@ JMP RenderUnderPart                                                             
 CoinMetatileData:                                                                                   ;  B
 DATA: ByteValue(value=195), ByteValue(value=194), ByteValue(value=194), ByteValue(value=194)        ; 
                                                                                                     ; 
-RowOfCoins:                                                                                         ;  B
+RowOfCoins:                                                                                         ; fun($07):  B
 LDY AreaType                  ; get area type                                                       ; 
 LDA CoinMetatileData,Y        ; load appropriate coin metatile                                      ; 
 JMP GetRow                                                                                          ; 
@@ -4027,22 +4027,22 @@ DATA: ByteValue(value=6), ByteValue(value=7), ByteValue(value=8)                
 C_ObjectMetatile:                                                                                   ;  B
 DATA: ByteValue(value=197), ByteValue(value=12), ByteValue(value=137)                               ; 
                                                                                                     ; 
-CastleBridgeObj:                                                                                    ;  B
+CastleBridgeObj:                                                                                    ; fun():  B
 LDY #$0c                      ; load length of 13 columns                                           ; 
 JSR ChkLrgObjFixedLength                                                                            ; 
 JMP ChainObj                                                                                        ; 
                                                                                                     ;  B
-AxeObj:                                                                                             ;  B
+AxeObj:                                                                                             ; fun():  B
 LDA #$08                      ; load bowser's palette into sprite portion of palette                ; 
 STA VRAM_Buffer_AddrCtrl                                                                            ; 
                                                                                                     ; 
-ChainObj:                                                                                           ;  B
+ChainObj:                                                                                           ; fun($00):  B
 LDY $00                       ; get value loaded earlier from decoder                               ; 
 LDX C_ObjectRow-2,Y           ; get appropriate row and metatile for object                         ; 
 LDA C_ObjectMetatile-2,Y                                                                            ; 
 JMP ColObj                                                                                          ; 
                                                                                                     ;  B
-EmptyBlock:                                                                                         ;  B
+EmptyBlock:                                                                                         ; fun($07):  B
 JSR GetLrgObjAttrib           ; get row location                                                    ; 
 LDX $07                                                                                             ; 
 LDA #$c4                                                                                            ; 
@@ -4058,7 +4058,7 @@ BrickMetatiles:                                                                 
 DATA: ByteValue(value=34), ByteValue(value=81), ByteValue(value=82), ByteValue(value=82)            ; 
 DATA: ByteValue(value=136)    ; used only by row of bricks object                                   ; 
                                                                                                     ; 
-RowOfBricks:                                                                                        ;  B
+RowOfBricks:                                                                                        ; fun($07):  B
 LDY AreaType                  ; load area type obtained from area offset pointer                    ; 
 LDA CloudTypeOverride         ; check for cloud type override                                       ; 
 BEQ DrawBricks                                                                                      ; 
@@ -4066,7 +4066,7 @@ LDY #$04                      ; if cloud type, override area type               
 DrawBricks:  LDA BrickMetatiles,Y; get appropriate metatile                                         ;  B
 JMP GetRow                    ; and go render it                                                    ; 
                                                                                                     ;  B
-RowOfSolidBlocks:                                                                                   ;  B
+RowOfSolidBlocks:                                                                                   ; fun($07):  B
 LDY AreaType                  ; load area type obtained from area offset pointer                    ; 
 LDA SolidBlockMetatiles,Y     ; get metatile                                                        ; 
 GetRow:  PHA                  ; store metatile here                                                 ;  B
@@ -4076,12 +4076,12 @@ LDY #$00                      ; set vertical height of 1                        
 PLA                                                                                                 ; 
 JMP RenderUnderPart           ; render object                                                       ; 
                                                                                                     ;  B
-ColumnOfBricks:                                                                                     ;  B
+ColumnOfBricks:                                                                                     ; fun($07):  B
 LDY AreaType                  ; load area type obtained from area offset                            ; 
 LDA BrickMetatiles,Y          ; get metatile (no cloud override as for row)                         ; 
 JMP GetRow2                                                                                         ; 
                                                                                                     ;  B
-ColumnOfSolidBlocks:                                                                                ;  B
+ColumnOfSolidBlocks:                                                                                ; fun($07):  B
 LDY AreaType                  ; load area type obtained from area offset                            ; 
 LDA SolidBlockMetatiles,Y     ; get metatile                                                        ; 
 GetRow2:  PHA                 ; save metatile to stack for now                                      ;  B
@@ -4092,7 +4092,7 @@ JMP RenderUnderPart           ; now render the column                           
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-BulletBillCannon:                                                                                   ;  B
+BulletBillCannon:                                                                                   ; fun($07Y):  B
 JSR GetLrgObjAttrib           ; get row and length of bullet bill cannon                            ; 
 LDX $07                       ; start at first row                                                  ; 
 LDA #$64                      ; render bullet bill cannon                                           ; 
@@ -4129,7 +4129,7 @@ DATA: ByteValue(value=7), ByteValue(value=7), ByteValue(value=6), ByteValue(valu
 StaircaseRowData:                                                                                   ;  B
 DATA: ByteValue(value=3), ByteValue(value=3), ByteValue(value=4), ByteValue(value=5), ByteValue(value=6), ByteValue(value=7), ByteValue(value=8), ByteValue(value=9), ByteValue(value=10); 
                                                                                                     ; 
-StaircaseObject:                                                                                    ;  B
+StaircaseObject:                                                                                    ; fun(CarryFlag):  B
 JSR ChkLrgObjLength           ; check and load length                                               ; 
 BCC NextStair                 ; if length already loaded, skip init part                            ; 
 LDA #$09                      ; start past the end for the bottom                                   ;  B
@@ -4144,7 +4144,7 @@ JMP RenderUnderPart                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-Jumpspring:                                                                                         ;  B
+Jumpspring:                                                                                         ; fun(AX$07):  B
 JSR GetLrgObjAttrib                                                                                 ; 
 JSR FindEmptyEnemySlot        ; find empty space in enemy object buffer                             ; 
 JSR GetAreaObjXPosition       ; get horizontal coordinate for jumpspring                            ; 
@@ -4169,22 +4169,22 @@ RTS                                                                             
                               ; --------------------------------                                    ; 
                               ; $07 - used to save ID of brick object                               ; 
                                                                                                     ; 
-Hidden1UpBlock:                                                                                     ;  B
+Hidden1UpBlock:                                                                                     ; fun():  B
 LDA Hidden1UpFlag             ; if flag not set, do not render object                               ; 
 BEQ ExitDecBlock                                                                                    ; 
 LDA #$00                      ; if set, init for the next one                                       ;  B
 STA Hidden1UpFlag                                                                                   ; 
 JMP BrickWithItem             ; jump to code shared with unbreakable bricks                         ; 
                                                                                                     ;  B
-QuestionBlock:                                                                                      ;  B
+QuestionBlock:                                                                                      ; fun(Y$07):  B
 JSR GetAreaObjectID           ; get value from level decoder routine                                ; 
 JMP DrawQBlk                  ; go to render it                                                     ; 
                                                                                                     ;  B
-BrickWithCoins:                                                                                     ;  B
+BrickWithCoins:                                                                                     ; fun():  B
 LDA #$00                      ; initialize multi-coin timer flag                                    ; 
 STA BrickCoinTimerFlag                                                                              ; 
                                                                                                     ; 
-BrickWithItem:                                                                                      ;  B
+BrickWithItem:                                                                                      ; fun(Y):  B
 JSR GetAreaObjectID           ; save area object ID                                                 ; 
 STY $07                                                                                             ; 
 LDA #$00                      ; load default adder for bricks with lines                            ; 
@@ -4212,7 +4212,7 @@ ExitDecBlock:  RTS                                                              
 HoleMetatiles:                                                                                      ;  B
 DATA: ByteValue(value=135), ByteValue(value=0), ByteValue(value=0), ByteValue(value=0)              ; 
                                                                                                     ; 
-Hole_Empty:                                                                                         ;  B
+Hole_Empty:                                                                                         ; fun(CarryFlag):  B
 JSR ChkLrgObjLength           ; get lower nybble and save as length                                 ; 
 BCC NoWhirlP                  ; skip this part if length already loaded                             ; 
 LDA AreaType                  ; check for water type level                                          ;  B
@@ -5287,7 +5287,7 @@ DATA: ByteValue(value=255)                                                      
                                                                                                     ; 
                               ; indirect jump routine called when                                   ; 
                               ; $0770 is set to 1                                                   ; 
-GameMode:                                                                                           ;  B
+GameMode:                                                                                           ; fun():  B
 LDA OperMode_Task                                                                                   ; 
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
@@ -5491,7 +5491,7 @@ DATA: Expr(expr=PlayerFireFlower)                                               
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-PlayerEntrance:                                                                                     ;  B
+PlayerEntrance:                                                                                     ; fun():  B
 LDA AltEntranceControl        ; check for mode of alternate entry                                   ; 
 CMP #$02                                                                                            ; 
 BEQ EntrMode2                 ; if found, branch to enter from pipe or with vine                    ; 
@@ -5555,7 +5555,7 @@ ExitEntr:  RTS                ; leave!                                          
 AutoControlPlayer:                                                                                  ; fun(A):  B
 STA SavedJoypadBits           ; override controller bits with contents of A if executing here       ; 
                                                                                                     ; 
-PlayerCtrlRoutine:                                                                                  ;  B
+PlayerCtrlRoutine:                                                                                  ; fun():  B
 LDA GameEngineSubroutine      ; check task here                                                     ; 
 CMP #$0b                      ; if certain value is set, branch to skip controller bit loading      ; 
 BEQ SizeChk                                                                                         ; 
@@ -5663,7 +5663,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-Vine_AutoClimb:                                                                                     ;  B
+Vine_AutoClimb:                                                                                     ; fun():  B
 LDA Player_Y_HighPos          ; check to see whether player reached position                        ; 
 BNE AutoClimb                 ; above the status bar yet and if so, set modes                       ; 
 LDA Player_Y_Position                                                                               ;  B
@@ -5680,7 +5680,7 @@ JMP ChgAreaMode               ; set modes                                       
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-VerticalPipeEntry:                                                                                  ;  B
+VerticalPipeEntry:                                                                                  ; fun():  B
 LDA #$01                      ; set 1 as movement amount                                            ; 
 JSR MovePlayerYAxis           ; do sub to move player downwards                                     ; 
 JSR ScrollHandler             ; do sub to scroll screen with saved force if necessary               ; 
@@ -5702,7 +5702,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-SideExitPipeEntry:                                                                                  ;  B
+SideExitPipeEntry:                                                                                  ; fun():  B
 JSR EnterSidePipe             ; execute sub to move player to the right                             ; 
 LDY #$02                                                                                            ; 
 ChgAreaPipe:  DEC ChangeAreaTimer; decrement timer for change of area                               ;  B
@@ -5729,7 +5729,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-PlayerChangeSize:                                                                                   ;  B
+PlayerChangeSize:                                                                                   ; fun():  B
 LDA TimerControl              ; check master timer control                                          ; 
 CMP #$f8                      ; for specific moment in time                                         ; 
 BNE EndChgSize                ; branch if before or after that point                                ; 
@@ -5741,7 +5741,7 @@ ExitChgSize:  RTS             ; and then leave                                  
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-PlayerInjuryBlink:                                                                                  ;  B
+PlayerInjuryBlink:                                                                                  ; fun():  B
 LDA TimerControl              ; check master timer control                                          ; 
 CMP #$f0                      ; for specific moment in time                                         ; 
 BCS ExitBlink                 ; branch if before that point                                         ; 
@@ -5763,7 +5763,7 @@ ExitBoth:  RTS                ; leave                                           
                               ; -------------------------------------------------------------------------------------; 
                               ; $00 - used in CyclePlayerPalette to store current palette to cycle  ; 
                                                                                                     ; 
-PlayerDeath:                                                                                        ;  B
+PlayerDeath:                                                                                        ; fun():  B
 LDA TimerControl              ; check master timer control                                          ; 
 CMP #$f0                      ; for specific moment in time                                         ; 
 BCS ExitDeath                 ; branch to leave if before that point                                ; 
@@ -5776,7 +5776,7 @@ LDA #$08                                                                        
 STA GameEngineSubroutine      ; set player control routine to run next frame                        ; 
 RTS                           ; leave                                                               ; 
                                                                                                     ;  B
-PlayerFireFlower:                                                                                   ;  B
+PlayerFireFlower:                                                                                   ; fun():  B
 LDA TimerControl              ; check master timer control                                          ; 
 CMP #$c0                      ; for specific moment in time                                         ; 
 BEQ ResetPalFireFlower        ; branch if at moment, not before or after                            ; 
@@ -5807,7 +5807,7 @@ RTS                           ; leave from death routine                        
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-FlagpoleSlide:                                                                                      ;  B
+FlagpoleSlide:                                                                                      ; fun():  B
 LDA Enemy_ID+5                ; check special use enemy slot                                        ; 
 CMP #FlagpoleFlagObject       ; for flagpole flag object                                            ; 
 BNE NoFPObj                   ; if not found, branch to something residual                          ; 
@@ -5828,7 +5828,7 @@ RTS                           ; be residual code)                               
 Hidden1UpCoinAmts:                                                                                  ;  B
 DATA: ByteValue(value=21), ByteValue(value=35), ByteValue(value=22), ByteValue(value=27), ByteValue(value=23), ByteValue(value=24), ByteValue(value=35), ByteValue(value=99); 
                                                                                                     ; 
-PlayerEndLevel:                                                                                     ;  B
+PlayerEndLevel:                                                                                     ; fun():  B
 LDA #$01                      ; force player to walk to the right                                   ; 
 JSR AutoControlPlayer                                                                               ; 
 LDA Player_Y_Position         ; check player's vertical position                                    ; 
@@ -5900,7 +5900,7 @@ NoMoveSub:  RTS                                                                 
                               ; -------------------------------------------------------------------------------------; 
                               ; $00 - used by ClimbingSub to store high vertical adder              ; 
                                                                                                     ; 
-OnGroundStateSub:                                                                                   ;  B
+OnGroundStateSub:                                                                                   ; fun():  B
 JSR GetPlayerAnimSpeed        ; do a sub to set animation frame timing                              ; 
 LDA Left_Right_Buttons                                                                              ; 
 BEQ GndMove                   ; if left/right controller bits not set, skip instruction             ; 
@@ -5912,14 +5912,14 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-FallingSub:                                                                                         ;  B
+FallingSub:                                                                                         ; fun():  B
 LDA VerticalForceDown                                                                               ; 
 STA VerticalForce             ; dump vertical movement force for falling into main one              ; 
 JMP LRAir                     ; movement force, then skip ahead to process left/right movement      ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-JumpSwimSub:                                                                                        ;  B
+JumpSwimSub:                                                                                        ; fun():  B
 LDY Player_Y_Speed            ; if player's vertical speed zero                                     ; 
 BPL DumpFall                  ; or moving downwards, branch to falling                              ; 
 LDA A_B_Buttons                                                                                     ;  B
@@ -5963,7 +5963,7 @@ DATA: ByteValue(value=14), ByteValue(value=4), ByteValue(value=252), ByteValue(v
 ClimbAdderHigh:                                                                                     ;  B
 DATA: ByteValue(value=0), ByteValue(value=0), ByteValue(value=255), ByteValue(value=255)            ; 
                                                                                                     ; 
-ClimbingSub:                                                                                        ;  B
+ClimbingSub:                                                                                        ; fun():  B
 LDA Player_YMF_Dummy                                                                                ; 
 CLC                           ; add movement force to dummy variable                                ; 
 ADC Player_Y_MoveForce        ; save with carry                                                     ; 
@@ -6473,7 +6473,7 @@ ExGTimer:  RTS                ; leave                                           
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-WarpZoneObject:                                                                                     ;  B
+WarpZoneObject:                                                                                     ; fun():  B
 LDA ScrollLock                ; check for scroll lock flag                                          ; 
 BEQ ExGTimer                  ; branch if not set to leave                                          ; 
 LDA Player_Y_Position         ; check to see if player's vertical coordinate has                    ;  B
@@ -6625,7 +6625,7 @@ ExitFlagP:  RTS                                                                 
 Jumpspring_Y_PosData:                                                                               ;  B
 DATA: ByteValue(value=8), ByteValue(value=16), ByteValue(value=8), ByteValue(value=0)               ; 
                                                                                                     ; 
-JumpspringHandler:                                                                                  ;  B
+JumpspringHandler:                                                                                  ; fun(X):  B
 JSR GetEnemyOffscreenBits     ; get offscreen information                                           ; 
 LDA TimerControl              ; check master timer control                                          ; 
 BNE DrawJSpr                  ; branch to last section if set                                       ; 
@@ -6702,7 +6702,7 @@ RTS                                                                             
 VineHeightData:                                                                                     ;  B
 DATA: ByteValue(value=48), ByteValue(value=96)                                                      ; 
                                                                                                     ; 
-VineObjectHandler:                                                                                  ;  B
+VineObjectHandler:                                                                                  ; fun(X$02):  B
 CPX #$05                      ; check enemy offset for special use slot                             ; 
 BNE ExitVH                    ; if not in last slot, branch to leave                                ; 
 LDY VineFlagOffset                                                                                  ;  B
@@ -6960,7 +6960,7 @@ RTS                           ; and we are done here                            
                               ; $02 - used to store vertical high nybble offset from block buffer routine; 
                               ; $06 - used to store low byte of block buffer address                ; 
                                                                                                     ; 
-CoinBlock:                                                                                          ;  B
+CoinBlock:                                                                                          ; fun(XYCarryFlag):  B
 JSR FindEmptyMiscSlot         ; set offset for empty or last misc object buffer slot                ; 
 LDA Block_PageLoc,X           ; get page location of block object                                   ; 
 STA Misc_PageLoc,Y            ; store as page location of misc object                               ; 
@@ -7135,7 +7135,7 @@ LDA Block_Y_Position,X        ; get vertical coordinate of block object         
 SEC                                                                                                 ; 
 SBC #$08                      ; subtract 8 pixels                                                   ; 
 STA Enemy_Y_Position+5        ; and use as vertical coordinate of power-up object                   ; 
-PwrUpJmp:  LDA #$01           ; this is a residual jump point in enemy object jump table            ;  B
+PwrUpJmp:  LDA #$01           ; this is a residual jump point in enemy object jump table            ; fun():  B
 STA Enemy_State+5             ; set power-up object's state                                         ; 
 STA Enemy_Flag+5              ; set buffer flag                                                     ; 
 LDA #$03                                                                                            ; 
@@ -7156,7 +7156,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-PowerUpObjHandler:                                                                                  ;  B
+PowerUpObjHandler:                                                                                  ; fun():  B
 LDX #$05                      ; set object offset for last slot in enemy object buffer              ; 
 STX ObjectOffset                                                                                    ; 
 LDA Enemy_State+5             ; check power-up object's state                                       ; 
@@ -7335,20 +7335,20 @@ DATA: Expr(expr=ExtraLifeMushBlock)                                             
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-MushFlowerBlock:                                                                                    ;  B
+MushFlowerBlock:                                                                                    ; fun():  B
 LDA #$00                      ; load mushroom/fire flower into power-up type                        ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-StarBlock:                                                                                          ;  B
+StarBlock:                                                                                          ; fun():  B
 LDA #$02                      ; load star into power-up type                                        ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-ExtraLifeMushBlock:                                                                                 ;  B
+ExtraLifeMushBlock:                                                                                 ; fun(X):  B
 LDA #$03                      ; load 1-up mushroom into power-up type                               ; 
 STA $39                       ; store correct power-up type                                         ; 
 JMP SetupPowerUp                                                                                    ; 
                                                                                                     ;  B
-VineBlock:                                                                                          ;  B
+VineBlock:                                                                                          ; fun():  B
 LDX #$05                      ; load last slot for enemy object buffer                              ; 
 LDY SprDataOffset_Ctrl        ; get control bit                                                     ; 
 JSR Setup_Vine                ; set up vine object                                                  ; 
@@ -8130,12 +8130,12 @@ DATA: Expr(expr=EndOfEnemyInitCode)                                             
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-NoInitCode:                                                                                         ;  B
+NoInitCode:                                                                                         ; fun():  B
 RTS                           ; this executed when enemy object has no init code                    ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitGoomba:                                                                                         ;  B
+InitGoomba:                                                                                         ; fun():  B
 JSR InitNormalEnemy           ; set appropriate horizontal speed                                    ; 
 JMP SmallBBox                 ; set $09 as bounding box control, set other values                   ; 
                                                                                                     ;  B
@@ -8153,7 +8153,7 @@ JMP SmallBBox                 ; $09 as bounding box size and set other things   
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitRetainerObj:                                                                                    ;  B
+InitRetainerObj:                                                                                    ; fun(X):  B
 LDA #$b8                      ; set fixed vertical position for                                     ; 
 STA Enemy_Y_Position,X        ; princess/mushroom retainer object                                   ; 
 RTS                                                                                                 ; 
@@ -8174,7 +8174,7 @@ JMP TallBBox                  ; branch to set bounding box control and other dat
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitRedKoopa:                                                                                       ;  B
+InitRedKoopa:                                                                                       ; fun(X):  B
 JSR InitNormalEnemy           ; load appropriate horizontal speed                                   ; 
 LDA #$01                      ; set enemy state for red koopa troopa $03                            ; 
 STA Enemy_State,X                                                                                   ; 
@@ -8185,7 +8185,7 @@ RTS                                                                             
 HBroWalkingTimerData:                                                                               ;  B
 DATA: ByteValue(value=128), ByteValue(value=80)                                                     ; 
                                                                                                     ; 
-InitHammerBro:                                                                                      ;  B
+InitHammerBro:                                                                                      ; fun(X):  B
 LDA #$00                      ; init horizontal speed and timer used by hammer bro                  ; 
 STA HammerThrowingTimer,X     ; apparently to time hammer throwing                                  ; 
 STA Enemy_X_Speed,X                                                                                 ; 
@@ -8203,15 +8203,15 @@ JMP SetESpd                                                                     
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitBloober:                                                                                        ;  B
+InitBloober:                                                                                        ; fun(X):  B
 LDA #$00                      ; initialize horizontal speed                                         ; 
 STA BlooperMoveSpeed,X                                                                              ; 
-SmallBBox:  LDA #$09          ; set specific bounding box size control                              ; fun(XCarryFlag): A B
+SmallBBox:  LDA #$09          ; set specific bounding box size control                              ; fun(X): A B
 BNE SetBBox                   ; unconditional branch                                                ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitRedPTroopa:                                                                                     ;  B
+InitRedPTroopa:                                                                                     ; fun(XCarryFlag):  B
 LDY #$30                      ; load central position adder for 48 pixels down                      ; 
 LDA Enemy_Y_Position,X        ; set vertical coordinate into location to                            ; 
 STA RedPTroopaOrigXPos,X      ; be used as original vertical coordinate                             ; 
@@ -8231,7 +8231,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitBulletBill:                                                                                     ;  B
+InitBulletBill:                                                                                     ; fun(X):  B
 LDA #$02                      ; set moving direction for left                                       ; 
 STA Enemy_MovingDir,X                                                                               ; 
 LDA #$09                      ; set bounding box control for $09                                    ; 
@@ -8240,7 +8240,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitCheepCheep:                                                                                     ;  B
+InitCheepCheep:                                                                                     ; fun(X):  B
 JSR SmallBBox                 ; set vertical bounding box, speed, init others                       ; 
 LDA PseudoRandomBitReg,X      ; check one portion of LSFR                                           ; 
 AND #%00010000                ; get d4 from it                                                      ; 
@@ -8251,7 +8251,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitLakitu:                                                                                         ;  B
+InitLakitu:                                                                                         ; fun():  B
 LDA EnemyFrenzyBuffer         ; check to see if an enemy is already in                              ; 
 BNE KillLakitu                ; the frenzy buffer, and branch to kill lakitu if so                  ; 
                                                                                                     ;  B
@@ -8272,7 +8272,7 @@ DATA: ByteValue(value=38), ByteValue(value=44), ByteValue(value=50), ByteValue(v
 DATA: ByteValue(value=32), ByteValue(value=34), ByteValue(value=36), ByteValue(value=38)            ; 
 DATA: ByteValue(value=19), ByteValue(value=20), ByteValue(value=21), ByteValue(value=22)            ; 
                                                                                                     ; 
-LakituAndSpinyHandler:                                                                              ;  B
+LakituAndSpinyHandler:                                                                              ; fun(X):  B
 LDA FrenzyEnemyTimer          ; if timer here not expired, leave                                    ; 
 BNE ExLSHand                                                                                        ; 
 CPX #$05                      ; if we are on the special use slot, leave                            ;  B
@@ -8372,10 +8372,10 @@ DATA: ByteValue(value=40), ByteValue(value=56), ByteValue(value=40), ByteValue(v
 FirebarSpinDirData:                                                                                 ;  B
 DATA: ByteValue(value=0), ByteValue(value=0), ByteValue(value=16), ByteValue(value=16), ByteValue(value=0); 
                                                                                                     ; 
-InitLongFirebar:                                                                                    ;  B
+InitLongFirebar:                                                                                    ; fun():  B
 JSR DuplicateEnemyObj         ; create enemy object for long firebar                                ; 
                                                                                                     ; 
-InitShortFirebar:                                                                                   ;  B
+InitShortFirebar:                                                                                   ; fun(X):  B
 LDA #$00                      ; initialize low byte of spin state                                   ; 
 STA FirebarSpinState_Low,X                                                                          ; 
 LDA Enemy_ID,X                ; subtract $1b from enemy identifier                                  ; 
@@ -8416,7 +8416,7 @@ DATA: ByteValue(value=30), ByteValue(value=34), ByteValue(value=24), ByteValue(v
 FlyCCTimerData:                                                                                     ;  B
 DATA: ByteValue(value=16), ByteValue(value=96), ByteValue(value=32), ByteValue(value=72)            ; 
                                                                                                     ; 
-InitFlyingCheepCheep:                                                                               ;  B
+InitFlyingCheepCheep:                                                                               ; fun(X):  B
 LDA FrenzyEnemyTimer          ; if timer here not expired yet, branch to leave                      ; 
 BNE ChpChpEx                                                                                        ; 
 JSR SmallBBox                 ; jump to set bounding box size $09 and init other values             ;  B
@@ -8501,7 +8501,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitBowser:                                                                                         ;  B
+InitBowser:                                                                                         ; fun(X):  B
 JSR DuplicateEnemyObj         ; jump to create another bowser object                                ; 
 STX BowserFront_Offset        ; save offset of first here                                           ; 
 LDA #$00                                                                                            ; 
@@ -8551,7 +8551,7 @@ DATA: ByteValue(value=144), ByteValue(value=128), ByteValue(value=112), ByteValu
 FlameYMFAdderData:                                                                                  ;  B
 DATA: ByteValue(value=255), ByteValue(value=1)                                                      ; 
                                                                                                     ; 
-InitBowserFlame:                                                                                    ;  B
+InitBowserFlame:                                                                                    ; fun(X):  B
 LDA FrenzyEnemyTimer          ; if timer not expired yet, branch to leave                           ; 
 BNE FlmEx                                                                                           ; 
 STA Enemy_Y_MoveForce,X       ; reset something here                                                ;  B
@@ -8631,7 +8631,7 @@ DATA: ByteValue(value=0), ByteValue(value=48), ByteValue(value=96), ByteValue(va
 FireworksYPosData:                                                                                  ;  B
 DATA: ByteValue(value=96), ByteValue(value=64), ByteValue(value=112), ByteValue(value=64), ByteValue(value=96), ByteValue(value=48); 
                                                                                                     ; 
-InitFireworks:                                                                                      ;  B
+InitFireworks:                                                                                      ; fun(X):  B
 LDA FrenzyEnemyTimer          ; if timer not expired yet, branch to leave                           ; 
 BNE ExitFWk                                                                                         ; 
 LDA #$20                      ; otherwise reset timer                                               ;  B
@@ -8682,7 +8682,7 @@ DATA: ByteValue(value=64), ByteValue(value=48), ByteValue(value=144), ByteValue(
 SwimCC_IDData:                                                                                      ;  B
 DATA: ByteValue(value=10), ByteValue(value=11)                                                      ; 
                                                                                                     ; 
-BulletBillCheepCheep:                                                                               ;  B
+BulletBillCheepCheep:                                                                               ; fun(X):  B
 LDA FrenzyEnemyTimer          ; if timer not expired yet, branch to leave                           ; 
 BNE ExF17                                                                                           ; 
 LDA AreaType                  ; are we in a water-type level?                                       ;  B
@@ -8827,7 +8827,7 @@ JMP SetBBox2                  ; set specific value for bounding box control     
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitEnemyFrenzy:                                                                                    ;  B
+InitEnemyFrenzy:                                                                                    ; fun(X):  B
 LDA Enemy_ID,X                ; load enemy identifier                                               ; 
 STA EnemyFrenzyBuffer         ; save in enemy frenzy buffer                                         ; 
 SEC                                                                                                 ; 
@@ -8844,12 +8844,12 @@ DATA: Expr(expr=BulletBillCheepCheep)                                           
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-NoFrenzyCode:                                                                                       ;  B
+NoFrenzyCode:                                                                                       ; fun():  B
 RTS                                                                                                 ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-EndFrenzy:                                                                                          ;  B
+EndFrenzy:                                                                                          ; fun(X):  B
 LDY #$05                      ; start at last slot                                                  ; 
 LakituChk:  LDA Enemy_ID,Y    ; check enemy identifiers                                             ;  B
 CMP #Lakitu                   ; for lakitu                                                          ; 
@@ -8865,7 +8865,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitJumpGPTroopa:                                                                                   ;  B
+InitJumpGPTroopa:                                                                                   ; fun(X):  B
 LDA #$02                      ; set for movement to the left                                        ; 
 STA Enemy_MovingDir,X                                                                               ; 
 LDA #$f8                      ; set horizontal speed                                                ; 
@@ -8876,7 +8876,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitBalPlatform:                                                                                    ;  B
+InitBalPlatform:                                                                                    ; fun(X):  B
 DEC Enemy_Y_Position,X        ; raise vertical position by two pixels                               ; 
 DEC Enemy_Y_Position,X                                                                              ; 
 LDY SecondaryHardMode         ; if secondary hard mode flag not set,                                ; 
@@ -8897,21 +8897,21 @@ JSR PosPlatform               ; do a sub to add 8 pixels, then run shared code h
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitDropPlatform:                                                                                   ;  B
+InitDropPlatform:                                                                                   ; fun(X):  B
 LDA #$ff                                                                                            ; 
 STA PlatformCollisionFlag,X   ; set some value here                                                 ; 
 JMP CommonPlatCode            ; then jump ahead to execute more code                                ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitHoriPlatform:                                                                                   ;  B
+InitHoriPlatform:                                                                                   ; fun(X):  B
 LDA #$00                                                                                            ; 
 STA XMoveSecondaryCounter,X   ; init one of the moving counters                                     ; 
 JMP CommonPlatCode            ; jump ahead to execute more code                                     ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitVertPlatform:                                                                                   ;  B
+InitVertPlatform:                                                                                   ; fun(X):  B
 LDY #$40                      ; set default value here                                              ; 
 LDA Enemy_Y_Position,X        ; check vertical position                                             ; 
 BPL SetYO                     ; if above a certain point, skip this part                            ; 
@@ -8941,11 +8941,11 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-LargeLiftUp:                                                                                        ;  B
+LargeLiftUp:                                                                                        ; fun(X):  B
 JSR PlatLiftUp                ; execute code for platforms going up                                 ; 
 JMP LargeLiftBBox             ; overwrite bounding box for large platforms                          ; 
                                                                                                     ;  B
-LargeLiftDown:                                                                                      ;  B
+LargeLiftDown:                                                                                      ; fun(X):  B
 JSR PlatLiftDown              ; execute code for platforms going down                               ; 
                                                                                                     ; 
 LargeLiftBBox:                                                                                      ;  B
@@ -8997,7 +8997,7 @@ RTS                           ; and go back                                     
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-EndOfEnemyInitCode:                                                                                 ;  B
+EndOfEnemyInitCode:                                                                                 ; fun():  B
 RTS                                                                                                 ; 
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
@@ -9052,7 +9052,7 @@ DATA: Expr(expr=RunRetainerObj)                                                 
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-NoRunCode:                                                                                          ;  B
+NoRunCode:                                                                                          ; fun():  B
 RTS                                                                                                 ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
@@ -9064,7 +9064,7 @@ JMP EnemyGfxHandler                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-RunNormalEnemies:                                                                                   ;  B
+RunNormalEnemies:                                                                                   ; fun(X):  B
 LDA #$00                      ; init sprite attributes                                              ; 
 STA Enemy_SprAttrib,X                                                                               ; 
 JSR GetEnemyOffscreenBits                                                                           ; 
@@ -9107,12 +9107,12 @@ DATA: Expr(expr=MoveFlyingCheepCheep)                                           
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-NoMoveCode:                                                                                         ;  B
+NoMoveCode:                                                                                         ; fun():  B
 RTS                                                                                                 ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-RunBowserFlame:                                                                                     ;  B
+RunBowserFlame:                                                                                     ; fun():  B
 JSR ProcBowserFlame                                                                                 ; 
 JSR GetEnemyOffscreenBits                                                                           ; 
 JSR RelativeEnemyPosition                                                                           ; 
@@ -9122,13 +9122,13 @@ JMP OffscreenBoundsCheck                                                        
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-RunFirebarObj:                                                                                      ;  B
+RunFirebarObj:                                                                                      ; fun():  B
 JSR ProcFirebar                                                                                     ; 
 JMP OffscreenBoundsCheck                                                                            ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-RunSmallPlatform:                                                                                   ;  B
+RunSmallPlatform:                                                                                   ; fun():  B
 JSR GetEnemyOffscreenBits                                                                           ; 
 JSR RelativeEnemyPosition                                                                           ; 
 JSR SmallPlatformBoundBox                                                                           ; 
@@ -9140,7 +9140,7 @@ JMP OffscreenBoundsCheck                                                        
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-RunLargePlatform:                                                                                   ;  B
+RunLargePlatform:                                                                                   ; fun():  B
 JSR GetEnemyOffscreenBits                                                                           ; 
 JSR RelativeEnemyPosition                                                                           ; 
 JSR LargePlatformBoundBox                                                                           ; 
@@ -9184,7 +9184,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-MovePodoboo:                                                                                        ;  B
+MovePodoboo:                                                                                        ; fun(X):  B
 LDA EnemyIntervalTimer,X      ; check enemy timer                                                   ; 
 BNE PdbM                      ; branch to move enemy if not expired                                 ; 
 JSR InitPodoboo               ; otherwise set up podoboo again                                      ;  B
@@ -9210,7 +9210,7 @@ DATA: ByteValue(value=0), ByteValue(value=232), ByteValue(value=0), ByteValue(va
 RevivedXSpeed:                                                                                      ;  B
 DATA: ByteValue(value=8), ByteValue(value=248), ByteValue(value=12), ByteValue(value=244)           ; 
                                                                                                     ; 
-ProcHammerBro:                                                                                      ;  B
+ProcHammerBro:                                                                                      ; fun(X):  B
 LDA Enemy_State,X             ; check hammer bro's enemy state for d5 set                           ; 
 AND #%00100000                                                                                      ; 
 BEQ ChkJH                     ; if not set, go ahead with code                                      ; 
@@ -9374,7 +9374,7 @@ JMP MoveEnemyHorizontally     ; jump to move enemy horizontally                 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-ProcMoveRedPTroopa:                                                                                 ;  B
+ProcMoveRedPTroopa:                                                                                 ; fun(X):  B
 LDA Enemy_Y_Speed,X                                                                                 ; 
 ORA Enemy_Y_MoveForce,X       ; check for any vertical force or speed                               ; 
 BNE MoveRedPTUpOrDown         ; branch if any found                                                 ; 
@@ -9399,7 +9399,7 @@ MovPTDwn:  JMP MoveRedPTroopaDown; move downwards                               
                               ; $00 - used to store adder for movement, also used as adder for platform; 
                               ; $01 - used to store maximum value for secondary counter             ; 
                                                                                                     ; 
-MoveFlyGreenPTroopa:                                                                                ;  B
+MoveFlyGreenPTroopa:                                                                                ; fun(X):  B
 JSR XMoveCntr_GreenPTroopa    ; do sub to increment primary and secondary counters                  ; 
 JSR MoveWithXMCntrs           ; do sub to move green paratroopa accordingly, and horizontally       ; 
 LDY #$01                      ; set Y to move green paratroopa down                                 ; 
@@ -9465,7 +9465,7 @@ RTS                                                                             
 BlooberBitmasks:                                                                                    ;  B
 DATA: ByteValue(value=63), ByteValue(value=3)                                                       ; 
                                                                                                     ; 
-MoveBloober:                                                                                        ;  B
+MoveBloober:                                                                                        ; fun(X):  B
 LDA Enemy_State,X                                                                                   ; 
 AND #%00100000                ; check enemy state for d5 set                                        ; 
 BNE MoveDefeatedBloober       ; branch if set to move defeated bloober                              ; 
@@ -9575,7 +9575,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-MoveBulletBill:                                                                                     ;  B
+MoveBulletBill:                                                                                     ; fun(X):  B
 LDA Enemy_State,X             ; check bullet bill's enemy object state for d5 set                   ; 
 AND #%00100000                                                                                      ; 
 BEQ NotDefB                   ; if not set, continue with movement code                             ; 
@@ -9592,7 +9592,7 @@ SwimCCXMoveData:                                                                
 DATA: ByteValue(value=64), ByteValue(value=128)                                                     ; 
 DATA: ByteValue(value=4), ByteValue(value=4); residual data, not used                               ; 
                                                                                                     ; 
-MoveSwimmingCheepCheep:                                                                             ;  B
+MoveSwimmingCheepCheep:                                                                             ; fun(X):  B
 LDA Enemy_State,X             ; check cheep-cheep's enemy object state                              ; 
 AND #%00100000                ; for d5 set                                                          ; 
 BEQ CCSwim                    ; if not set, continue with movement code                             ; 
@@ -9919,7 +9919,7 @@ DATA: ByteValue(value=248), ByteValue(value=160), ByteValue(value=112), ByteValu
 FlyCCBPriority:                                                                                     ;  B
 DATA: ByteValue(value=32), ByteValue(value=32), ByteValue(value=32), ByteValue(value=0), ByteValue(value=0); 
                                                                                                     ; 
-MoveFlyingCheepCheep:                                                                               ;  B
+MoveFlyingCheepCheep:                                                                               ; fun(X):  B
 LDA Enemy_State,X             ; check cheep-cheep's enemy state                                     ; 
 AND #%00100000                ; for d5 set                                                          ; 
 BEQ FlyCC                     ; branch to continue code if not set                                  ; 
@@ -9965,7 +9965,7 @@ RTS                           ; drawing it next frame), then leave              
 LakituDiffAdj:                                                                                      ;  B
 DATA: ByteValue(value=21), ByteValue(value=48), ByteValue(value=64)                                 ; 
                                                                                                     ; 
-MoveLakitu:                                                                                         ;  B
+MoveLakitu:                                                                                         ; fun(X):  B
 LDA Enemy_State,X             ; check lakitu's enemy state                                          ; 
 AND #%00100000                ; for d5 set                                                          ; 
 BEQ ChkLS                     ; if not set, continue with code                                      ; 
@@ -10070,7 +10070,7 @@ DATA: ByteValue(value=88)     ; chain                                           
 DATA: ByteValue(value=152), ByteValue(value=150), ByteValue(value=148), ByteValue(value=146), ByteValue(value=144), ByteValue(value=142), ByteValue(value=140); bridge; 
 DATA: ByteValue(value=138), ByteValue(value=136), ByteValue(value=134), ByteValue(value=132), ByteValue(value=130), ByteValue(value=128); 
                                                                                                     ; 
-BridgeCollapse:                                                                                     ;  B
+BridgeCollapse:                                                                                     ; fun():  B
 LDX BowserFront_Offset        ; get enemy offset for bowser                                         ; 
 LDA Enemy_ID,X                ; check enemy object identifier for bowser                            ; 
 CMP #Bowser                   ; if not found, branch ahead,                                         ; 
@@ -10131,7 +10131,7 @@ NoBFall:  JMP BowserGfxHandler; jump to code that draws bowser                  
 PRandomRange:                                                                                       ;  B
 DATA: ByteValue(value=33), ByteValue(value=65), ByteValue(value=17), ByteValue(value=49)            ; 
                                                                                                     ; 
-RunBowser:                                                                                          ;  B
+RunBowser:                                                                                          ; fun(X):  B
 LDA Enemy_State,X             ; if d5 in enemy state is not set                                     ; 
 AND #%00100000                ; then branch elsewhere to run bowser                                 ; 
 BEQ BowserControl                                                                                   ; 
@@ -10410,7 +10410,7 @@ ExFlmeD:  RTS                 ; leave                                           
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-RunFireworks:                                                                                       ;  B
+RunFireworks:                                                                                       ; fun(X):  B
 DEC ExplosionTimerCounter,X   ; decrement explosion timing counter here                             ; 
 BNE SetupExpl                 ; if not expired, skip this part                                      ; 
 LDA #$08                                                                                            ;  B
@@ -10449,7 +10449,7 @@ DATA: ByteValue(value=0), ByteValue(value=8), ByteValue(value=0), ByteValue(valu
 StarFlagTileData:                                                                                   ;  B
 DATA: ByteValue(value=84), ByteValue(value=85), ByteValue(value=86), ByteValue(value=87)            ; 
                                                                                                     ; 
-RunStarFlagObj:                                                                                     ;  B
+RunStarFlagObj:                                                                                     ; fun():  B
 LDA #$00                      ; initialize enemy frenzy buffer                                      ; 
 STA EnemyFrenzyBuffer                                                                               ; 
 LDA StarFlagTaskControl       ; check star flag object task number here                             ; 
@@ -10463,7 +10463,7 @@ DATA: Expr(expr=AwardGameTimerPoints)                                           
 DATA: Expr(expr=RaiseFlagSetoffFWorks)                                                              ; 
 DATA: Expr(expr=DelayToAreaEnd)                                                                     ; 
                                                                                                     ; 
-GameTimerFireworks:                                                                                 ;  B
+GameTimerFireworks:                                                                                 ; fun(X):  B
 LDY #$05                      ; set default state for star flag object                              ; 
 LDA GameTimerDisplay+2        ; get game timer's last digit                                         ; 
 CMP #$01                                                                                            ; 
@@ -10481,10 +10481,10 @@ STY Enemy_State,X             ; set whatever state we have in star flag object  
 IncrementSFTask1:                                                                                   ;  B
 INC StarFlagTaskControl       ; increment star flag object task number                              ; 
                                                                                                     ; 
-StarFlagExit:                                                                                       ;  B
+StarFlagExit:                                                                                       ; fun():  B
 RTS                           ; leave                                                               ; 
                                                                                                     ;  B
-AwardGameTimerPoints:                                                                               ;  B
+AwardGameTimerPoints:                                                                               ; fun():  B
 LDA GameTimerDisplay          ; check all game timer digits for any intervals left                  ; 
 ORA GameTimerDisplay+1                                                                              ; 
 ORA GameTimerDisplay+2                                                                              ; 
@@ -10515,7 +10515,7 @@ ASL                                                                             
 ORA #%00000100                ; add four to set nybble for game timer                               ; 
 JMP UpdateNumber              ; jump to print the new score and game timer                          ; 
                                                                                                     ;  B
-RaiseFlagSetoffFWorks:                                                                              ;  B
+RaiseFlagSetoffFWorks:                                                                              ; fun(X):  B
 LDA Enemy_Y_Position,X        ; check star flag's vertical position                                 ; 
 CMP #$72                      ; against preset value                                                ; 
 BCC SetoffF                   ; if star flag higher vertically, branch to other code                ; 
@@ -10561,7 +10561,7 @@ IncrementSFTask2:                                                               
 INC StarFlagTaskControl       ; move onto next task                                                 ; 
 RTS                                                                                                 ; 
                                                                                                     ;  B
-DelayToAreaEnd:                                                                                     ;  B
+DelayToAreaEnd:                                                                                     ; fun(X):  B
 JSR DrawStarFlag              ; do sub to draw star flag                                            ; 
 LDA EnemyIntervalTimer,X      ; if interval timer set in previous task                              ; 
 BNE StarFlagExit2             ; not yet expired, branch to leave                                    ; 
@@ -10574,7 +10574,7 @@ RTS                           ; otherwise leave                                 
                               ; --------------------------------                                    ; 
                               ; $00 - used to store horizontal difference between player and piranha plant; 
                                                                                                     ; 
-MovePiranhaPlant:                                                                                   ;  B
+MovePiranhaPlant:                                                                                   ; fun(X):  B
 LDA Enemy_State,X             ; check enemy state                                                   ; 
 BNE PutinPipe                 ; if set at all, branch to leave                                      ; 
 LDA EnemyFrameTimer,X         ; check enemy's timer here                                            ;  B
@@ -10664,7 +10664,7 @@ RTS                                                                             
                               ; $01 - used to hold high byte of name table for rope                 ; 
                               ; $02 - used to hold page location of rope                            ; 
                                                                                                     ; 
-BalancePlatform:                                                                                    ;  B
+BalancePlatform:                                                                                    ; fun(X$01):  B
 LDA Enemy_Y_HighPos,X         ; check high byte of vertical position                                ; 
 CMP #$03                                                                                            ; 
 BNE DoBPl                                                                                           ; 
@@ -10893,7 +10893,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-YMovingPlatform:                                                                                    ;  B
+YMovingPlatform:                                                                                    ; fun(X):  B
 LDA Enemy_Y_Speed,X           ; if platform moving up or down, skip ahead to                        ; 
 ORA Enemy_Y_MoveForce,X       ; check on other position                                             ; 
 BNE ChkYCenterPos                                                                                   ; 
@@ -10924,7 +10924,7 @@ ExYPl:  RTS                   ; leave                                           
                               ; --------------------------------                                    ; 
                               ; $00 - used as adder to position player hotizontally                 ; 
                                                                                                     ; 
-XMovingPlatform:                                                                                    ;  B
+XMovingPlatform:                                                                                    ; fun(X):  B
 LDA #$0e                      ; load preset maximum value for secondary counter                     ; 
 JSR XMoveCntr_Platform        ; do a sub to increment counters for movement                         ; 
 JSR MoveWithXMCntrs           ; do a sub to move platform accordingly, and return value             ; 
@@ -10949,7 +10949,7 @@ ExXMP:  RTS                   ; and we are done here                            
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-DropPlatform:                                                                                       ;  B
+DropPlatform:                                                                                       ; fun(X):  B
 LDA PlatformCollisionFlag,X   ; if no collision between platform and player                         ; 
 BMI ExDPl                     ; occurred, just leave without moving anything                        ; 
 JSR MoveDropPlatform          ; otherwise do a sub to move platform down very quickly               ;  B
@@ -10959,7 +10959,7 @@ ExDPl:  RTS                   ; leave                                           
                               ; --------------------------------                                    ; 
                               ; $00 - residual value from sub                                       ; 
                                                                                                     ; 
-RightPlatform:                                                                                      ;  B
+RightPlatform:                                                                                      ; fun(AX):  B
 JSR MoveEnemyHorizontally     ; move platform with current horizontal speed, if any                 ; 
 STA $00                       ; store saved value here (residual code)                              ; 
 LDA PlatformCollisionFlag,X   ; check collision flag, if no collision between player                ; 
@@ -10971,7 +10971,7 @@ ExRPl:  RTS                   ; then leave                                      
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-MoveLargeLiftPlat:                                                                                  ;  B
+MoveLargeLiftPlat:                                                                                  ; fun(X):  B
 JSR MoveLiftPlatforms         ; execute common to all large and small lift platforms                ; 
 JMP ChkYPCollision            ; branch to position player correctly                                 ; 
                                                                                                     ;  B

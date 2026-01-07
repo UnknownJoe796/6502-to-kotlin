@@ -4,78 +4,6 @@ package com.ivieleague.decompiler6502tokotlin.smb
 
 import com.ivieleague.decompiler6502tokotlin.hand.*
 
-// Debug flag for tracing gameCoreRoutine
-private const val DEBUG_GAME_CORE = false
-// Debug flag for tracing player entrance setup
-private const val DEBUG_ENTRANCE = false
-
-// Helper function for RunEnemyObjectsCore (extracted from unreachable code in enemiesAndLoopsCore)
-// This runs the appropriate handler based on Enemy_ID
-private fun runEnemyObjectsCoreInline(
-    X: Int,
-    objectOffset: Int,
-    enemyFlag: MemoryByteArray,
-    enemyId: MemoryByteArray,
-    enemyState: MemoryByteArray,
-    enemyYHighpos: MemoryByteArray,
-    enemyYPosition: MemoryByteArray,
-    enemyXPosition: MemoryByteArray,
-    enemyPageloc: MemoryByteArray
-) {
-    //> RunEnemyObjectsCore:
-    //> ldx ObjectOffset  ;get offset for enemy object buffer
-    val offset = objectOffset
-    //> lda #$00          ;load value 0 for jump engine by default
-    var jumpIndex = 0
-    //> ldy Enemy_ID,x
-    val id = enemyId[offset]
-    //> cpy #$15          ;if enemy object < $15, use default value
-    //> bcc JmpEO
-    if (id >= 0x15) {
-        //> tya               ;otherwise subtract $14 from the value and use
-        //> sbc #$14          ;as value for jump engine
-        jumpIndex = (id - 0x14) and 0xFF
-    }
-    //> JmpEO: jsr JumpEngine
-    when (jumpIndex) {
-        0 -> runNormalEnemies()
-        1 -> runBowserFlame()
-        2 -> runFireworks()
-        3 -> noRunCode()
-        4 -> noRunCode()
-        5 -> noRunCode()
-        6 -> noRunCode()
-        7 -> runFirebarObj()
-        8 -> runFirebarObj()
-        9 -> runFirebarObj()
-        10 -> runFirebarObj()
-        11 -> runFirebarObj()
-        12 -> runFirebarObj()
-        13 -> runFirebarObj()
-        14 -> runFirebarObj()
-        15 -> noRunCode()
-        16 -> runLargePlatform()
-        17 -> runLargePlatform()
-        18 -> runLargePlatform()
-        19 -> runLargePlatform()
-        20 -> runLargePlatform()
-        21 -> runLargePlatform()
-        22 -> runLargePlatform()
-        23 -> runSmallPlatform()
-        24 -> runSmallPlatform()
-        25 -> runBowser()
-        26 -> powerUpObjHandler()
-        27 -> vineObjectHandler()
-        28 -> noRunCode()
-        29 -> runStarFlagObj()
-        30 -> jumpspringHandler()
-        31 -> noRunCode()
-        32 -> warpZoneObject()
-        33 -> runRetainerObj()
-        else -> { /* Unknown JumpEngine index */ }
-    }
-}
-
 // Decompiled Super Mario Bros. NES ROM
 // Generated from smbdism.asm
 
@@ -90,10 +18,10 @@ fun func_0() {
     var operMode by MemoryByte(OperMode)
     var ppuCtrlReg1 by MemoryByte(PPU_CTRL_REG1)
     var ppuCtrlReg2 by MemoryByte(PPU_CTRL_REG2)
-    var ppuStatus by MemoryByte(PPU_STATUS)
     var pseudoRandomBitReg by MemoryByte(PseudoRandomBitReg)
     var sndMasterctrlReg by MemoryByte(SND_MASTERCTRL_REG)
     var warmBootValidation by MemoryByte(WarmBootValidation)
+    val ppuStatus by MemoryByteIndexed(PPU_STATUS)
     val sndDeltaReg by MemoryByteIndexed(SND_DELTA_REG)
     val topScoreDisplay by MemoryByteIndexed(TopScoreDisplay)
     //> ;SMBDIS.ASM - A COMPREHENSIVE SUPER MARIO BROS. DISASSEMBLY
@@ -674,24 +602,19 @@ fun func_0() {
     do {
         //> VBlank1:     lda PPU_STATUS               ;wait two frames
         //> bpl VBlank1
-    } while ((ppuStatus and 0x80) == 0)
+    } while ((ppuStatus[0] and 0x80) == 0)
     do {
         //> VBlank2:     lda PPU_STATUS
         //> bpl VBlank2
-    } while ((ppuStatus and 0x80) == 0)
+    } while ((ppuStatus[0] and 0x80) == 0)
     //> ldy #ColdBootOffset          ;load default cold boot pointer
     //> ldx #$05                     ;this is where we check for a warm boot
     temp0 = 0x05
     temp1 = ColdBootOffset
     while ((temp0 and 0x80) == 0) {
-        do {
-            //> WBootCheck:  lda TopScoreDisplay,x        ;check each score digit in the top score
-            //> cmp #10                      ;to see if we have a valid digit
-            //> bcs ColdBoot                 ;if not, give up and proceed with cold boot
-            //> dex
-            temp0 = (temp0 - 1) and 0xFF
-            //> bpl WBootCheck
-        } while ((temp0 and 0x80) == 0)
+        //> dex
+        temp0 = (temp0 - 1) and 0xFF
+        //> bpl WBootCheck
     }
     //> lda WarmBootValidation       ;second checkpoint, check to see if
     //> cmp #$a5                     ;another location has a specific value
@@ -832,6 +755,10 @@ fun spriteShuffler() {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var areaType by MemoryByte(AreaType)
     var sprShuffleAmtOffset by MemoryByte(SprShuffleAmtOffset)
     val miscSprdataoffset by MemoryByteIndexed(Misc_SprDataOffset)
@@ -845,29 +772,32 @@ fun spriteShuffler() {
     //> ldx #$0e                    ;start at the end of OAM data offsets
     temp0 = 0x0E
     temp1 = areaType
-    while ((temp0 and 0x80) == 0) {
-        //> ldy SprShuffleAmtOffset     ;get current offset to preset value we want to add
-        temp1 = sprShuffleAmtOffset
-        //> clc
-        //> adc SprShuffleAmt,y         ;get shuffle amount, add to current sprite offset
-        //> bcc StrSprOffset            ;if not exceeded $ff, skip second add
-        temp2 = (0x28 + sprShuffleAmt[temp1]) and 0xFF
-        if (0x28 + sprShuffleAmt[temp1] > 0xFF) {
+    do {
+        //> ShuffleLoop:   lda SprDataOffset,x         ;check for offset value against
+        //> cmp $00                     ;the preset value
+        //> bcc NextSprOffset           ;if less, skip this part
+        temp2 = sprDataOffset[temp0]
+        if (sprDataOffset[temp0] >= memory[0x0].toInt()) {
+            //> ldy SprShuffleAmtOffset     ;get current offset to preset value we want to add
+            temp1 = sprShuffleAmtOffset
             //> clc
-            //> adc $00                     ;otherwise add preset value $28 to offset
+            //> adc SprShuffleAmt,y         ;get shuffle amount, add to current sprite offset
+            temp3 = temp2 + sprShuffleAmt[temp1]
+            temp2 = temp3 and 0xFF
+            //> bcc StrSprOffset            ;if not exceeded $ff, skip second add
+            if (temp3 > 0xFF) {
+                //> clc
+                //> adc $00                     ;otherwise add preset value $28 to offset
+                temp4 = temp2 + memory[0x0].toInt()
+                temp2 = temp4 and 0xFF
+            }
+            //> StrSprOffset:  sta SprDataOffset,x         ;store new offset here or old one if branched to here
+            sprDataOffset[temp0] = temp2
         }
-        //> StrSprOffset:  sta SprDataOffset,x         ;store new offset here or old one if branched to here
-        sprDataOffset[temp0] = temp2
-        do {
-            //> ShuffleLoop:   lda SprDataOffset,x         ;check for offset value against
-            temp2 = sprDataOffset[temp0]
-            //> cmp $00                     ;the preset value
-            //> bcc NextSprOffset           ;if less, skip this part
-            //> NextSprOffset: dex                         ;move backwards to next one
-            temp0 = (temp0 - 1) and 0xFF
-            //> bpl ShuffleLoop
-        } while ((temp0 and 0x80) == 0)
-    }
+        //> NextSprOffset: dex                         ;move backwards to next one
+        temp0 = (temp0 - 1) and 0xFF
+        //> bpl ShuffleLoop
+    } while ((temp0 and 0x80) == 0)
     //> ldx SprShuffleAmtOffset     ;load offset
     temp0 = sprShuffleAmtOffset
     //> inx
@@ -891,12 +821,16 @@ fun spriteShuffler() {
         miscSprdataoffset[-2 + temp0] = temp2
         //> clc                         ;add eight to the second and eight
         //> adc #$08                    ;more to the third one
+        temp5 = temp2 + 0x08
+        temp2 = temp5 and 0xFF
         //> sta Misc_SprDataOffset-1,x  ;note that due to the way X is set up,
-        miscSprdataoffset[-1 + temp0] = (temp2 + 0x08) and 0xFF
+        miscSprdataoffset[-1 + temp0] = temp2
         //> clc                         ;this code loads into the misc sprite offsets
         //> adc #$08
+        temp6 = temp2 + 0x08
+        temp2 = temp6 and 0xFF
         //> sta Misc_SprDataOffset,x
-        miscSprdataoffset[temp0] = (((temp2 + 0x08) and 0xFF) + 0x08) and 0xFF
+        miscSprdataoffset[temp0] = temp2
         //> dex
         temp0 = (temp0 - 1) and 0xFF
         //> dex
@@ -919,10 +853,10 @@ fun operModeExecutionTree() {
     //> jsr JumpEngine   ;most of what goes on starts here
     when (operMode) {
         0 -> {
-            titleScreenMode_real()
+            titleScreenMode()
         }
         1 -> {
-            gameMode_real()
+            gameMode()
         }
         2 -> {
             victoryMode()
@@ -937,437 +871,13 @@ fun operModeExecutionTree() {
     return
 }
 
-// Decompiled from TitleScreenMode
-// Dispatches to sub-tasks based on OperMode_Task
-fun titleScreenMode_real() {
-    var opermodeTask by MemoryByte(OperMode_Task)
-    when (opermodeTask) {
-        0 -> initializeGame_real()
-        1 -> screenRoutines_real()
-        2 -> primaryGameSetup_real()
-        3 -> gameMenuRoutine_real()
-    }
-}
-
-// Decompiled from GameMode (lines 5290-5297 in smbdism.asm)
-// Uses the existing gameCoreRoutine from the decompiler output
-fun gameMode_real() {
-    var opermodeTask by MemoryByte(OperMode_Task)
-    when (opermodeTask) {
-        0 -> initializeArea_real()
-        1 -> screenRoutines_real()
-        2 -> secondaryGameSetup_real()
-        else -> gameCoreRoutine()  // Task 3+ stays in GameCoreRoutine
-    }
-}
-
-// Decompiled from InitializeGame (lines 2649-2658 in smbdism.asm)
-// Falls through to InitializeArea
-fun initializeGame_real() {
-    var demoTimer by MemoryByte(DemoTimer)
-    val soundMemory by MemoryByteIndexed(SoundMemory)
-
-    // Clear memory as far as $076f
-    initializeMemory(0x6F)
-
-    // Clear sound memory
-    for (y in 0x1F downTo 0) {
-        soundMemory[y] = 0
-    }
-
-    // Set demo timer
-    demoTimer = 0x18
-
-    // Load area pointer
-    loadAreaPointer(A)
-
-    // Fall through to InitializeArea
-    initializeArea_real()
-}
-
-// Decompiled from InitializeArea (lines 2660-2714 in smbdism.asm)
-// Properly decompiled version that calls getAreaDataAddrs() to set PlayerEntranceCtrl
-fun initializeArea_real() {
-    var temp0: Int = 0
-    var temp1: Int = 0
-    var temp2: Int = 0
-    var temp3: Int = 0
-    var altEntranceControl by MemoryByte(AltEntranceControl)
-    var areaMusicQueue by MemoryByte(AreaMusicQueue)
-    var backloadingFlag by MemoryByte(BackloadingFlag)
-    var blockBufferColumnPos by MemoryByte(BlockBufferColumnPos)
-    var columnSets by MemoryByte(ColumnSets)
-    var currentntaddrHigh by MemoryByte(CurrentNTAddr_High)
-    var currentntaddrLow by MemoryByte(CurrentNTAddr_Low)
-    var currentPageLoc by MemoryByte(CurrentPageLoc)
-    var disableScreenFlag by MemoryByte(DisableScreenFlag)
-    var entrancePage by MemoryByte(EntrancePage)
-    var halfwayPage by MemoryByte(HalfwayPage)
-    var levelNumber by MemoryByte(LevelNumber)
-    var opermodeTask by MemoryByte(OperMode_Task)
-    var playerEntranceCtrl by MemoryByte(PlayerEntranceCtrl)
-    var primaryHardMode by MemoryByte(PrimaryHardMode)
-    var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
-    var secondaryHardMode by MemoryByte(SecondaryHardMode)
-    var worldNumber by MemoryByte(WorldNumber)
-    val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
-    val timers by MemoryByteIndexed(Timers)
-
-    // Clear all memory as far as $074b
-    initializeMemory(0x4B)
-
-    // Clear out memory between $0780 and $07a1
-    temp0 = 0x21
-    do {
-        timers[temp0] = 0x00
-        temp0 = (temp0 - 1) and 0xFF
-    } while ((temp0 and 0x80) == 0)
-
-    // If AltEntranceControl not set, use halfway page, if any found
-    // Otherwise use saved entry page number
-    temp1 = altEntranceControl
-    temp2 = halfwayPage
-    if (temp1 != 0) {
-        temp2 = entrancePage
-    }
-
-    // Set page locations
-    screenleftPageloc = temp2
-    currentPageLoc = temp2
-    backloadingFlag = temp2
-
-    // Get pixel coordinates for screen borders
-    getScreenPosition()
-
-    // Set name table address based on page parity
-    temp1 = 0x20
-    temp3 = temp2 and 0x01
-    temp2 = temp3
-    if (temp3 != 0) {
-        temp1 = 0x24
-    }
-    currentntaddrHigh = temp1
-    temp1 = 0x80
-    currentntaddrLow = temp1
-
-    // Store LSB of page number in high nybble of block buffer column position
-    temp2 = (temp2 shl 1) and 0xFF
-    temp2 = (temp2 shl 1) and 0xFF
-    temp2 = (temp2 shl 1) and 0xFF
-    temp2 = (temp2 shl 1) and 0xFF
-    blockBufferColumnPos = temp2
-
-    // Set area object lengths for all empty
-    areaObjectLength[0] = (areaObjectLength[0] - 1) and 0xFF
-    areaObjectLength[1] = (areaObjectLength[1] - 1) and 0xFF
-    areaObjectLength[2] = (areaObjectLength[2] - 1) and 0xFF
-
-    // Set value for renderer to update 12 column sets
-    columnSets = 0x0B
-
-    // Get enemy and level addresses and load header
-    // THIS CALL SETS PlayerEntranceCtrl FROM THE LEVEL HEADER!
-    getAreaDataAddrs()
-
-    // Hard mode logic - only set secondary hard mode for areas 5-3 and beyond
-    temp2 = primaryHardMode
-    var setSecondaryHard = (temp2 != 0)  // If primary hard mode, set secondary
-
-    if (!setSecondaryHard) {
-        temp2 = worldNumber
-        if (temp2 >= World5) {
-            if (temp2 > World5) {
-                setSecondaryHard = true  // World > 5
-            } else {
-                // World == 5, check level
-                temp2 = levelNumber
-                if (temp2 >= Level3) {
-                    setSecondaryHard = true  // World 5, level >= 3
-                }
-            }
-        }
-    }
-
-    if (setSecondaryHard) {
-        secondaryHardMode = (secondaryHardMode + 1) and 0xFF
-    }
-
-    // If halfway page set, overwrite start position from header
-    temp2 = halfwayPage
-    if (temp2 != 0) {
-        playerEntranceCtrl = 0x02
-    }
-
-    // Silence music
-    areaMusicQueue = Silence
-
-    // Disable screen output
-    disableScreenFlag = 0x01
-
-    // Increment one of the modes
-    opermodeTask = (opermodeTask + 1) and 0xFF
-}
-
-// Decompiled from ScreenRoutines (lines 1361-1380 in smbdism.asm)
-fun screenRoutines_real() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    when (screenRoutineTask) {
-        0 -> initScreen()
-        1 -> setupIntermediate()
-        2 -> writeTopStatusLine()
-        3 -> writeBottomStatusLine()
-        4 -> displayTimeUp()
-        5 -> resetSpritesAndScreenTimer()
-        6 -> displayIntermediate()
-        7 -> resetSpritesAndScreenTimer()
-        8 -> areaParserTaskControl()
-        9 -> getAreaPalette()
-        10 -> getBackgroundColor()
-        11 -> getAlternatePalette1()
-        12 -> drawTitleScreen()
-        13 -> clearBuffersDrawIcon()
-        14 -> writeTopScore()
-    }
-}
-
-// Decompiled from PrimaryGameSetup (lines 2717-2724 in smbdism.asm)
-fun primaryGameSetup_real() {
-    var fetchNewGameTimerFlag by MemoryByte(FetchNewGameTimerFlag)
-    var playerSize by MemoryByte(PlayerSize)
-    var numberOfLives by MemoryByte(NumberofLives)
-    var offscrNumberofLives by MemoryByte(OffScr_NumberofLives)
-
-    fetchNewGameTimerFlag = 1
-    playerSize = 1  // Small Mario
-    numberOfLives = 2  // 3 lives (0-indexed)
-    offscrNumberofLives = 2
-
-    // Fall through to SecondaryGameSetup
-    secondaryGameSetup_real()
-}
-
-// Decompiled from SecondaryGameSetup (lines 2725-2756 in smbdism.asm)
-fun secondaryGameSetup_real() {
-    var disableScreenFlag by MemoryByte(DisableScreenFlag)
-    var gameTimerExpiredFlag by MemoryByte(GameTimerExpiredFlag)
-    var disableIntermediate by MemoryByte(DisableIntermediate)
-    var backloadingFlag by MemoryByte(BackloadingFlag)
-    var balPlatformAlignment by MemoryByte(BalPlatformAlignment)
-    var screenLeft_PageLoc by MemoryByte(ScreenLeft_PageLoc)
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    var operModeTask by MemoryByte(OperMode_Task)
-    val vramBuffer1 by MemoryByteIndexed(VRAM_Buffer1)
-
-    disableScreenFlag = 0
-
-    // Clear VRAM buffer ($0300-$03FF)
-    for (y in 0 until 256) {
-        vramBuffer1[y] = 0
-    }
-
-    gameTimerExpiredFlag = 0
-    disableIntermediate = 0
-    backloadingFlag = 0
-    balPlatformAlignment = 0xFF
-
-    // Set screen routine to handle area parsing
-    screenRoutineTask = 0
-
-    // Increment task to move to GameMenuRoutine
-    operModeTask = operModeTask + 1
-}
-
-// Decompiled from GameMenuRoutine (lines 971-1068 in smbdism.asm)
-fun gameMenuRoutine_real() {
-    var savedJoypad1Bits by MemoryByte(SavedJoypad1Bits)
-    var savedJoypad2Bits by MemoryByte(SavedJoypad2Bits)
-    var demoTimer by MemoryByte(DemoTimer)
-    var selectTimer by MemoryByte(SelectTimer)
-    var worldSelectEnableFlag by MemoryByte(WorldSelectEnableFlag)
-    var numberOfPlayers by MemoryByte(NumberOfPlayers)
-    var operMode by MemoryByte(OperMode)
-    var operModeTask by MemoryByte(OperMode_Task)
-    var worldNumber by MemoryByte(WorldNumber)
-    var areaNumber by MemoryByte(AreaNumber)
-
-    val combined = savedJoypad1Bits or savedJoypad2Bits
-
-    // Check for Start button
-    if (combined == Start_Button || combined == (A_Button + Start_Button)) {
-        // Start game - go to ChkContinue logic
-        chkContinue()
-        return
-    }
-
-    // Check for Select button
-    if (combined == Select_Button) {
-        if (demoTimer != 0) {
-            // Reset demo timer and toggle players
-            demoTimer = 0x18
-            if (selectTimer == 0) {
-                selectTimer = 0x10
-                numberOfPlayers = numberOfPlayers xor 1
-                drawMushroomIcon()
-            }
-        } else {
-            // Demo timer expired, reset title
-            resetTitle()
-        }
-        nullJoypad()
-        return
-    }
-
-    // Check demo timer
-    if (demoTimer == 0) {
-        // Run demo
-        selectTimer = combined
-        demoEngine()
-        if (flagC) {
-            resetTitle()
-            return
-        }
-        runDemo()
-        return
-    }
-
-    // Check for B button (world select)
-    if (worldSelectEnableFlag != 0 && combined == B_Button) {
-        if (demoTimer != 0) {
-            demoTimer = 0x18
-            if (selectTimer == 0) {
-                selectTimer = 0x10
-                // Increment world selection
-                worldNumber = (worldNumber + 1) and 0x07
-                if (worldNumber > 7) worldNumber = 0
-            }
-        }
-    }
-
-    nullJoypad()
-}
-
-// Decompiled from ChkContinue (lines 1048-1068 in smbdism.asm)
-fun chkContinue() {
-    var continueWorld by MemoryByte(ContinueWorld)
-    var worldNumber by MemoryByte(WorldNumber)
-    var offscrWorldNumber by MemoryByte(OffScr_WorldNumber)
-    var areaNumber by MemoryByte(AreaNumber)
-    var offscrAreaNumber by MemoryByte(OffScr_AreaNumber)
-    var operMode by MemoryByte(OperMode)
-    var operModeTask by MemoryByte(OperMode_Task)
-
-    // Check if continuing from a saved world
-    val contWorld = continueWorld
-    worldNumber = contWorld
-    offscrWorldNumber = contWorld
-    areaNumber = 0
-    offscrAreaNumber = 0
-
-    // Transition to game mode - reset task to 0 for InitializeArea
-    operModeTask = 0
-    operMode = 1  // GameModeValue
-}
-
-// Helper stubs for missing functions
-fun resetTitle() {
-    var operModeTask by MemoryByte(OperMode_Task)
-    operModeTask = 0  // Reset to InitializeGame
-}
-
-fun nullJoypad() {
-    var savedJoypad1Bits by MemoryByte(SavedJoypad1Bits)
-    var savedJoypad2Bits by MemoryByte(SavedJoypad2Bits)
-    savedJoypad1Bits = 0
-    savedJoypad2Bits = 0
-}
-
-fun runDemo() {
-    // Demo mode - run game engine with demo input
-    gameEngine()
-}
-
-fun initScreen() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun setupIntermediate() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun writeTopStatusLine() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun writeBottomStatusLine() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun displayTimeUp() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun resetSpritesAndScreenTimer() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun displayIntermediate() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun areaParserTaskControl() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun getAreaPalette() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun getBackgroundColor() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun getAlternatePalette1() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun drawTitleScreen() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun clearBuffersDrawIcon() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    screenRoutineTask = screenRoutineTask + 1
-}
-
-fun writeTopScore() {
-    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
-    var operModeTask by MemoryByte(OperMode_Task)
-    screenRoutineTask = 0
-    operModeTask = operModeTask + 1  // Move to next OperMode task
-}
-
-fun gameEngine() {
-    // Main game engine - stub
-    gameRoutines()
-}
-
 // Decompiled from MoveAllSpritesOffscreen
 fun moveAllSpritesOffscreen() {
     //> MoveAllSpritesOffscreen:
     //> ldy #$00                ;this routine moves all sprites off the screen
     //> .db $2c                 ;BIT instruction opcode
+    // Fall-through tail call to moveSpritesOffscreen
+    moveSpritesOffscreen()
 }
 
 // Decompiled from MoveSpritesOffscreen
@@ -1393,6 +903,243 @@ fun moveSpritesOffscreen() {
     } while (temp0 != 0)
     //> rts
     return
+}
+
+// Decompiled from TitleScreenMode
+fun titleScreenMode() {
+    var opermodeTask by MemoryByte(OperMode_Task)
+    //> TitleScreenMode:
+    //> lda OperMode_Task
+    //> jsr JumpEngine
+    when (opermodeTask) {
+        0 -> {
+            initializeGame(0)
+        }
+        1 -> {
+            screenRoutines()
+        }
+        2 -> {
+            primaryGameSetup()
+        }
+        3 -> {
+            gameMenuRoutine()
+        }
+        else -> {
+            // Unknown JumpEngine index
+        }
+    }
+    return
+}
+
+// Decompiled from GameMenuRoutine
+fun gameMenuRoutine() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var continueWorld by MemoryByte(ContinueWorld)
+    var demoTimer by MemoryByte(DemoTimer)
+    var disableScreenFlag by MemoryByte(DisableScreenFlag)
+    var fetchNewGameTimerFlag by MemoryByte(FetchNewGameTimerFlag)
+    var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
+    var hidden1UpFlag by MemoryByte(Hidden1UpFlag)
+    var numberOfPlayers by MemoryByte(NumberOfPlayers)
+    var offscrHidden1upflag by MemoryByte(OffScr_Hidden1UpFlag)
+    var operMode by MemoryByte(OperMode)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var primaryHardMode by MemoryByte(PrimaryHardMode)
+    var savedJoypad1Bits by MemoryByte(SavedJoypad1Bits)
+    var savedJoypad2Bits by MemoryByte(SavedJoypad2Bits)
+    var selectTimer by MemoryByte(SelectTimer)
+    var sprite0HitDetectFlag by MemoryByte(Sprite0HitDetectFlag)
+    var worldNumber by MemoryByte(WorldNumber)
+    var worldSelectEnableFlag by MemoryByte(WorldSelectEnableFlag)
+    var worldSelectNumber by MemoryByte(WorldSelectNumber)
+    val scoreAndCoinDisplay by MemoryByteIndexed(ScoreAndCoinDisplay)
+    val vramBuffer1 by MemoryByteIndexed(VRAM_Buffer1)
+    val wSelectBufferTemplate by MemoryByteIndexed(WSelectBufferTemplate)
+    //> GameMenuRoutine:
+    //> ldy #$00
+    //> lda SavedJoypad1Bits        ;check to see if either player pressed
+    //> ora SavedJoypad2Bits        ;only the start button (either joypad)
+    temp0 = savedJoypad1Bits or savedJoypad2Bits
+    //> cmp #Start_Button
+    //> beq StartGame
+    if (temp0 - Start_Button == 0) {
+        //  goto StartGame
+        return
+    }
+    temp1 = temp0
+    temp2 = 0x00
+    if (temp0 != Start_Button) {
+        //> cmp #A_Button+Start_Button  ;check to see if A + start was pressed
+        //> bne ChkSelect               ;if not, branch to check select button
+        if (temp1 == A_Button+Start_Button) {
+        }
+    }
+    //> StartGame:    jmp ChkContinue             ;if either start or A + start, execute here
+    //> ChkSelect:    cmp #Select_Button          ;check to see if the select button was pressed
+    //> beq SelectBLogic            ;if so, branch reset demo timer
+    if (temp1 != Select_Button) {
+        //> ldx DemoTimer               ;otherwise check demo timer
+        //> bne ChkWorldSel             ;if demo timer not expired, branch to check world selection
+        temp3 = demoTimer
+        if (demoTimer == 0) {
+            //> sta SelectTimer             ;set controller bits here if running demo
+            selectTimer = temp1
+            //> jsr DemoEngine              ;run through the demo actions
+            demoEngine()
+            //> bcs ResetTitle              ;if carry flag set, demo over, thus branch
+            if (!(temp1 >= Select_Button)) {
+                //> jmp RunDemo                 ;otherwise, run game engine for demo
+            } else {
+                //> ResetTitle:   lda #$00                    ;reset game modes, disable
+                temp1 = 0x00
+                //> sta OperMode                ;sprite 0 check and disable
+                operMode = temp1
+                //> sta OperMode_Task           ;screen output
+                opermodeTask = temp1
+                //> sta Sprite0HitDetectFlag
+                sprite0HitDetectFlag = temp1
+                //> inc DisableScreenFlag
+                disableScreenFlag = (disableScreenFlag + 1) and 0xFF
+                //> rts
+                return
+            }
+        }
+        //> ChkWorldSel:  ldx WorldSelectEnableFlag   ;check to see if world selection has been enabled
+        temp3 = worldSelectEnableFlag
+        //> beq NullJoypad
+        if (temp3 != 0) {
+            //> cmp #B_Button               ;if so, check to see if the B button was pressed
+            //> bne NullJoypad
+            if (temp1 == B_Button) {
+                //> iny                         ;if so, increment Y and execute same code as select
+                temp2 = (temp2 + 1) and 0xFF
+            }
+        }
+    }
+    //> SelectBLogic: lda DemoTimer               ;if select or B pressed, check demo timer one last time
+    temp1 = demoTimer
+    //> beq ResetTitle              ;if demo timer expired, branch to reset title screen mode
+    if (temp1 != 0) {
+        //> lda #$18                    ;otherwise reset demo timer
+        temp1 = 0x18
+        //> sta DemoTimer
+        demoTimer = temp1
+        //> lda SelectTimer             ;check select/B button timer
+        temp1 = selectTimer
+        //> bne NullJoypad              ;if not expired, branch
+        if (temp1 == 0) {
+            //> lda #$10                    ;otherwise reset select button timer
+            temp1 = 0x10
+            //> sta SelectTimer
+            selectTimer = temp1
+            //> cpy #$01                    ;was the B button pressed earlier?  if so, branch
+            //> beq IncWorldSel             ;note this will not be run if world selection is disabled
+            if (temp2 != 0x01) {
+                //> lda NumberOfPlayers         ;if no, must have been the select button, therefore
+                temp1 = numberOfPlayers
+                //> eor #%00000001              ;change number of players and draw icon accordingly
+                temp4 = temp1 xor 0x01
+                //> sta NumberOfPlayers
+                numberOfPlayers = temp4
+                //> jsr DrawMushroomIcon
+                drawMushroomIcon()
+                //> jmp NullJoypad
+            } else {
+                //> IncWorldSel:  ldx WorldSelectNumber       ;increment world select number
+                temp3 = worldSelectNumber
+                //> inx
+                temp3 = (temp3 + 1) and 0xFF
+                //> txa
+                //> and #%00000111              ;mask out higher bits
+                temp5 = temp3 and 0x07
+                //> sta WorldSelectNumber       ;store as current world select number
+                worldSelectNumber = temp5
+                //> jsr GoContinue
+                goContinue(temp5)
+                do {
+                    //> UpdateShroom: lda WSelectBufferTemplate,x ;write template for world select in vram buffer
+                    temp1 = wSelectBufferTemplate[temp3]
+                    //> sta VRAM_Buffer1-1,x        ;do this until all bytes are written
+                    vramBuffer1[-1 + temp3] = temp1
+                    //> inx
+                    temp3 = (temp3 + 1) and 0xFF
+                    //> cpx #$06
+                    //> bmi UpdateShroom
+                } while ((temp3 and 0x80) != 0)
+                //> ldy WorldNumber             ;get world number from variable and increment for
+                temp2 = worldNumber
+                //> iny                         ;proper display, and put in blank byte before
+                temp2 = (temp2 + 1) and 0xFF
+                //> sty VRAM_Buffer1+3          ;null terminator
+                vramBuffer1[3] = temp2
+            }
+        }
+        //> NullJoypad:   lda #$00                    ;clear joypad bits for player 1
+        temp1 = 0x00
+        //> sta SavedJoypad1Bits
+        savedJoypad1Bits = temp1
+        //> RunDemo:      jsr GameCoreRoutine         ;run game engine
+        gameCoreRoutine()
+        //> lda GameEngineSubroutine    ;check to see if we're running lose life routine
+        temp1 = gameEngineSubroutine
+        //> cmp #$06
+        //> bne ExitMenu                ;if not, do not do all the resetting below
+        if (temp1 == 0x06) {
+        } else {
+            //> ExitMenu:     rts
+            return
+        }
+    }
+    do {
+        //> ChkContinue:  ldy DemoTimer               ;if timer for demo has expired, reset modes
+        temp2 = demoTimer
+        //> beq ResetTitle
+    } while (temp2 == 0)
+    //> asl                         ;check to see if A button was also pushed
+    temp1 = (temp1 shl 1) and 0xFF
+    //> bcc StartWorld1             ;if not, don't load continue function's world number
+    if ((temp1 and 0x80) != 0) {
+        //> lda ContinueWorld           ;load previously saved world number for secret
+        temp1 = continueWorld
+        //> jsr GoContinue              ;continue function when pressing A + start
+        goContinue(temp1)
+    }
+    //> StartWorld1:  jsr LoadAreaPointer
+    loadAreaPointer(temp1)
+    //> inc Hidden1UpFlag           ;set 1-up box flag for both players
+    hidden1UpFlag = (hidden1UpFlag + 1) and 0xFF
+    //> inc OffScr_Hidden1UpFlag
+    offscrHidden1upflag = (offscrHidden1upflag + 1) and 0xFF
+    //> inc FetchNewGameTimerFlag   ;set fetch new game timer flag
+    fetchNewGameTimerFlag = (fetchNewGameTimerFlag + 1) and 0xFF
+    //> inc OperMode                ;set next game mode
+    operMode = (operMode + 1) and 0xFF
+    //> lda WorldSelectEnableFlag   ;if world select flag is on, then primary
+    temp1 = worldSelectEnableFlag
+    //> sta PrimaryHardMode         ;hard mode must be on as well
+    primaryHardMode = temp1
+    //> lda #$00
+    temp1 = 0x00
+    //> sta OperMode_Task           ;set game mode here, and clear demo timer
+    opermodeTask = temp1
+    //> sta DemoTimer
+    demoTimer = temp1
+    //> ldx #$17
+    temp3 = 0x17
+    //> lda #$00
+    temp1 = 0x00
+    do {
+        //> InitScores:   sta ScoreAndCoinDisplay,x   ;clear player scores and coin displays
+        scoreAndCoinDisplay[temp3] = temp1
+        //> dex
+        temp3 = (temp3 - 1) and 0xFF
+        //> bpl InitScores
+    } while ((temp3 and 0x80) == 0)
 }
 
 // Decompiled from GoContinue
@@ -1490,6 +1237,33 @@ fun demoEngine() {
     //> clc                    ;clear carry if demo still going
 }
 
+// Decompiled from VictoryMode
+fun victoryMode() {
+    var temp0: Int = 0
+    var objectOffset by MemoryByte(ObjectOffset)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    //> VictoryMode:
+    //> jsr VictoryModeSubroutines  ;run victory mode subroutines
+    victoryModeSubroutines()
+    //> lda OperMode_Task           ;get current task of victory mode
+    //> beq AutoPlayer              ;if on bridge collapse, skip enemy processing
+    if (opermodeTask == 0) {
+        //  goto AutoPlayer
+        return
+    }
+    temp0 = opermodeTask
+    if (opermodeTask != 0) {
+        //> ldx #$00
+        //> stx ObjectOffset            ;otherwise reset enemy object offset
+        objectOffset = 0x00
+        //> jsr EnemiesAndLoopsCore     ;and run enemy code
+        enemiesAndLoopsCore(0x00)
+    }
+    //> AutoPlayer: jsr RelativePlayerPosition  ;get player's relative coordinates
+    relativePlayerPosition()
+    //> jmp PlayerGfxHandler        ;draw the player, then leave
+}
+
 // Decompiled from VictoryModeSubroutines
 fun victoryModeSubroutines() {
     var opermodeTask by MemoryByte(OperMode_Task)
@@ -1519,10 +1293,466 @@ fun victoryModeSubroutines() {
     return
 }
 
-// Decompiled from FloateyNumbersRoutine
-fun floateyNumbersRoutine(X: Int) {
+// Decompiled from SetupVictoryMode
+fun setupVictoryMode() {
+    var destinationPageLoc by MemoryByte(DestinationPageLoc)
+    var eventMusicQueue by MemoryByte(EventMusicQueue)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var screenrightPageloc by MemoryByte(ScreenRight_PageLoc)
+    //> SetupVictoryMode:
+    //> ldx ScreenRight_PageLoc  ;get page location of right side of screen
+    //> inx                      ;increment to next page
+    screenrightPageloc = (screenrightPageloc + 1) and 0xFF
+    //> stx DestinationPageLoc   ;store here
+    destinationPageLoc = screenrightPageloc
+    //> lda #EndOfCastleMusic
+    //> sta EventMusicQueue      ;play win castle music
+    eventMusicQueue = EndOfCastleMusic
+    //> jmp IncModeTask_B        ;jump to set next major task in victory mode
+    //> IncModeTask_B: inc OperMode_Task  ;move onto next mode
+    opermodeTask = (opermodeTask + 1) and 0xFF
+    //> rts
+    return
+}
+
+// Decompiled from PlayerVictoryWalk
+fun playerVictoryWalk() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var destinationPageLoc by MemoryByte(DestinationPageLoc)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var playerPageloc by MemoryByte(Player_PageLoc)
+    var playerXPosition by MemoryByte(Player_X_Position)
+    var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
+    var scrollFractional by MemoryByte(ScrollFractional)
+    var victoryWalkControl by MemoryByte(VictoryWalkControl)
+    //> PlayerVictoryWalk:
+    //> ldy #$00                ;set value here to not walk player by default
+    //> sty VictoryWalkControl
+    victoryWalkControl = 0x00
+    //> lda Player_PageLoc      ;get player's page location
+    //> cmp DestinationPageLoc  ;compare with destination page location
+    //> bne PerformWalk         ;if page locations don't match, branch
+    temp0 = playerPageloc
+    temp1 = 0x00
+    if (playerPageloc == destinationPageLoc) {
+        //> lda Player_X_Position   ;otherwise get player's horizontal position
+        temp0 = playerXPosition
+        //> cmp #$60                ;compare with preset horizontal position
+        //> bcs DontWalk            ;if still on other page, branch ahead
+        if (!(temp0 >= 0x60)) {
+        }
+    }
+    //> PerformWalk: inc VictoryWalkControl  ;otherwise increment value and Y
+    victoryWalkControl = (victoryWalkControl + 1) and 0xFF
+    //> iny                     ;note Y will be used to walk the player
+    temp1 = (temp1 + 1) and 0xFF
+    //> DontWalk:    tya                     ;put contents of Y in A and
+    //> jsr AutoControlPlayer   ;use A to move player to the right or not
+    autoControlPlayer(temp1)
+    //> lda ScreenLeft_PageLoc  ;check page location of left side of screen
+    temp0 = screenleftPageloc
+    //> cmp DestinationPageLoc  ;against set value here
+    //> beq ExitVWalk           ;branch if equal to change modes if necessary
+    if (temp0 != destinationPageLoc) {
+        //> lda ScrollFractional
+        temp0 = scrollFractional
+        //> clc                     ;do fixed point math on fractional part of scroll
+        //> adc #$80
+        temp2 = temp0 + 0x80
+        temp0 = temp2 and 0xFF
+        //> sta ScrollFractional    ;save fractional movement amount
+        scrollFractional = temp0
+        //> lda #$01                ;set 1 pixel per frame
+        temp0 = 0x01
+        //> adc #$00                ;add carry from previous addition
+        temp3 = temp0 + (if (temp2 > 0xFF) 1 else 0)
+        temp0 = temp3 and 0xFF
+        //> tay                     ;use as scroll amount
+        //> jsr ScrollScreen        ;do sub to scroll the screen
+        scrollScreen(temp0)
+        //> jsr UpdScrollVar        ;do another sub to update screen and scroll variables
+        updScrollVar()
+        //> inc VictoryWalkControl  ;increment value to stay in this routine
+        victoryWalkControl = (victoryWalkControl + 1) and 0xFF
+    }
+    //> ExitVWalk:   lda VictoryWalkControl  ;load value set here
+    temp0 = victoryWalkControl
+    //> beq IncModeTask_A       ;if zero, branch to change modes
+    if (temp0 == 0) {
+        //  goto IncModeTask_A
+        return
+    }
+    if (temp0 != 0) {
+        //> rts                     ;otherwise leave
+        return
+    } else {
+        //> IncModeTask_A: inc OperMode_Task             ;move onto next task in mode
+        opermodeTask = (opermodeTask + 1) and 0xFF
+    }
+    //> ExitMsgs:      rts                           ;leave
+    return
+}
+
+// Decompiled from PrintVictoryMessages
+fun printVictoryMessages() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var currentPlayer by MemoryByte(CurrentPlayer)
+    var eventMusicQueue by MemoryByte(EventMusicQueue)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var primaryMsgCounter by MemoryByte(PrimaryMsgCounter)
+    var secondaryMsgCounter by MemoryByte(SecondaryMsgCounter)
+    var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
+    var worldEndTimer by MemoryByte(WorldEndTimer)
+    var worldNumber by MemoryByte(WorldNumber)
+    //> PrintVictoryMessages:
+    //> lda SecondaryMsgCounter   ;load secondary message counter
+    //> bne IncMsgCounter         ;if set, branch to increment message counters
+    temp0 = secondaryMsgCounter
+    if (secondaryMsgCounter == 0) {
+        //> lda PrimaryMsgCounter     ;otherwise load primary message counter
+        temp0 = primaryMsgCounter
+        //> beq ThankPlayer           ;if set to zero, branch to print first message
+        if (temp0 != 0) {
+            //> cmp #$09                  ;if at 9 or above, branch elsewhere (this comparison
+            //> bcs IncMsgCounter         ;is residual code, counter never reaches 9)
+            if (!(temp0 >= 0x09)) {
+                //> ldy WorldNumber           ;check world number
+                //> cpy #World8
+                //> bne MRetainerMsg          ;if not at world 8, skip to next part
+                temp1 = worldNumber
+                if (worldNumber == World8) {
+                    //> cmp #$03                  ;check primary message counter again
+                    //> bcc IncMsgCounter         ;if not at 3 yet (world 8 only), branch to increment
+                    if (temp0 >= 0x03) {
+                        //> sbc #$01                  ;otherwise subtract one
+                        temp2 = temp0 - 0x01 - (if (temp0 >= 0x03) 0 else 1)
+                        temp0 = temp2 and 0xFF
+                        //> jmp ThankPlayer           ;and skip to next part
+                    }
+                } else {
+                    //> MRetainerMsg:  cmp #$02                  ;check primary message counter
+                    //> bcc IncMsgCounter         ;if not at 2 yet (world 1-7 only), branch
+                    if (temp0 >= 0x02) {
+                    }
+                }
+            }
+        }
+        //> ThankPlayer:   tay                       ;put primary message counter into Y
+        //> bne SecondPartMsg         ;if counter nonzero, skip this part, do not print first message
+        temp1 = temp0
+        if (temp0 == 0) {
+            //> lda CurrentPlayer         ;otherwise get player currently on the screen
+            temp0 = currentPlayer
+            //> beq EvalForMusic          ;if mario, branch
+            if (temp0 != 0) {
+                //> iny                       ;otherwise increment Y once for luigi and
+                temp1 = (temp1 + 1) and 0xFF
+                //> bne EvalForMusic          ;do an unconditional branch to the same place
+                if (temp1 == 0) {
+                }
+            }
+        }
+        //> SecondPartMsg: iny                       ;increment Y to do world 8's message
+        temp1 = (temp1 + 1) and 0xFF
+        //> lda WorldNumber
+        temp0 = worldNumber
+        //> cmp #World8               ;check world number
+        //> beq EvalForMusic          ;if at world 8, branch to next part
+        if (temp0 != World8) {
+            //> dey                       ;otherwise decrement Y for world 1-7's message
+            temp1 = (temp1 - 1) and 0xFF
+            //> cpy #$04                  ;if counter at 4 (world 1-7 only)
+            //> bcs SetEndTimer           ;branch to set victory end timer
+            if (!(temp1 >= 0x04)) {
+                //> cpy #$03                  ;if counter at 3 (world 1-7 only)
+                //> bcs IncMsgCounter         ;branch to keep counting
+                if (!(temp1 >= 0x03)) {
+                }
+            }
+        }
+        //> EvalForMusic:  cpy #$03                  ;if counter not yet at 3 (world 8 only), branch
+        //> bne PrintMsg              ;to print message only (note world 1-7 will only
+        if (temp1 == 0x03) {
+            //> lda #VictoryMusic         ;reach this code if counter = 0, and will always branch)
+            temp0 = VictoryMusic
+            //> sta EventMusicQueue       ;otherwise load victory music first (world 8 only)
+            eventMusicQueue = temp0
+        }
+        //> PrintMsg:      tya                       ;put primary message counter in A
+        //> clc                       ;add $0c or 12 to counter thus giving an appropriate value,
+        //> adc #$0c                  ;($0c-$0d = first), ($0e = world 1-7's), ($0f-$12 = world 8's)
+        temp3 = temp1 + 0x0C
+        temp0 = temp3 and 0xFF
+        //> sta VRAM_Buffer_AddrCtrl  ;write message counter to vram address controller
+        vramBufferAddrctrl = temp0
+    }
+    //> IncMsgCounter: lda SecondaryMsgCounter
+    temp0 = secondaryMsgCounter
+    //> clc
+    //> adc #$04                      ;add four to secondary message counter
+    temp4 = temp0 + 0x04
+    temp0 = temp4 and 0xFF
+    //> sta SecondaryMsgCounter
+    secondaryMsgCounter = temp0
+    //> lda PrimaryMsgCounter
+    temp0 = primaryMsgCounter
+    //> adc #$00                      ;add carry to primary message counter
+    temp5 = temp0 + (if (temp4 > 0xFF) 1 else 0)
+    temp0 = temp5 and 0xFF
+    //> sta PrimaryMsgCounter
+    primaryMsgCounter = temp0
+    //> cmp #$07                      ;check primary counter one more time
+    //> SetEndTimer:   bcc ExitMsgs                  ;if not reached value yet, branch to leave
+    if (temp0 >= 0x07) {
+        //> lda #$06
+        temp0 = 0x06
+        //> sta WorldEndTimer             ;otherwise set world end timer
+        worldEndTimer = temp0
+        //> IncModeTask_A: inc OperMode_Task             ;move onto next task in mode
+        opermodeTask = (opermodeTask + 1) and 0xFF
+    }
+    //> ExitMsgs:      rts                           ;leave
+    return
+}
+
+// Decompiled from PlayerEndWorld
+fun playerEndWorld() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var areaNumber by MemoryByte(AreaNumber)
+    var fetchNewGameTimerFlag by MemoryByte(FetchNewGameTimerFlag)
+    var levelNumber by MemoryByte(LevelNumber)
+    var operMode by MemoryByte(OperMode)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var worldEndTimer by MemoryByte(WorldEndTimer)
+    var worldNumber by MemoryByte(WorldNumber)
+    //> PlayerEndWorld:
+    //> lda WorldEndTimer          ;check to see if world end timer expired
+    //> bne EndExitOne             ;branch to leave if not
+    temp0 = worldEndTimer
+    if (worldEndTimer == 0) {
+        //> ldy WorldNumber            ;check world number
+        //> cpy #World8                ;if on world 8, player is done with game,
+        //> bcs EndChkBButton          ;thus branch to read controller
+        temp1 = worldNumber
+        if (!(worldNumber >= World8)) {
+            //> lda #$00
+            temp0 = 0x00
+            //> sta AreaNumber             ;otherwise initialize area number used as offset
+            areaNumber = temp0
+            //> sta LevelNumber            ;and level number control to start at area 1
+            levelNumber = temp0
+            //> sta OperMode_Task          ;initialize secondary mode of operation
+            opermodeTask = temp0
+            //> inc WorldNumber            ;increment world number to move onto the next world
+            worldNumber = (worldNumber + 1) and 0xFF
+            //> jsr LoadAreaPointer        ;get area address offset for the next area
+            loadAreaPointer(temp0)
+            //> inc FetchNewGameTimerFlag  ;set flag to load game timer from header
+            fetchNewGameTimerFlag = (fetchNewGameTimerFlag + 1) and 0xFF
+            //> lda #GameModeValue
+            temp0 = GameModeValue
+            //> sta OperMode               ;set mode of operation to game mode
+            operMode = temp0
+        }
+    }
     //> EndExitOne:    rts                        ;and leave
     return
+}
+
+// Decompiled from FloateyNumbersRoutine
+fun floateyNumbersRoutine(X: Int) {
+    val altSprdataoffset by MemoryByteIndexed(Alt_SprDataOffset)
+    val digitModifier by MemoryByteIndexed(DigitModifier)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemySprdataoffset by MemoryByteIndexed(Enemy_SprDataOffset)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val floateyNumTileData by MemoryByteIndexed(FloateyNumTileData)
+    val floateynumControl by MemoryByteIndexed(FloateyNum_Control)
+    val floateynumTimer by MemoryByteIndexed(FloateyNum_Timer)
+    val floateynumXPos by MemoryByteIndexed(FloateyNum_X_Pos)
+    val floateynumYPos by MemoryByteIndexed(FloateyNum_Y_Pos)
+    val scoreUpdateData by MemoryByteIndexed(ScoreUpdateData)
+    val spriteAttributes by MemoryByteIndexed(Sprite_Attributes)
+    val spriteTilenumber by MemoryByteIndexed(Sprite_Tilenumber)
+    val spriteXPosition by MemoryByteIndexed(Sprite_X_Position)
+    //> EndExitOne:    rts                        ;and leave
+    return
+}
+
+// Decompiled from ScreenRoutines
+fun screenRoutines() {
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    //> ScreenRoutines:
+    //> lda ScreenRoutineTask        ;run one of the following subroutines
+    //> jsr JumpEngine
+    when (screenRoutineTask) {
+        0 -> {
+            initScreen()
+        }
+        1 -> {
+            setupIntermediate()
+        }
+        2 -> {
+            writeTopStatusLine()
+        }
+        3 -> {
+            writeBottomStatusLine()
+        }
+        4 -> {
+            displayTimeUp()
+        }
+        5 -> {
+            resetSpritesAndScreenTimer()
+        }
+        6 -> {
+            displayIntermediate()
+        }
+        7 -> {
+            resetSpritesAndScreenTimer()
+        }
+        8 -> {
+            areaParserTaskControl()
+        }
+        9 -> {
+            getAreaPalette()
+        }
+        10 -> {
+            getBackgroundColor()
+        }
+        11 -> {
+            getAlternatePalette1()
+        }
+        12 -> {
+            drawTitleScreen()
+        }
+        13 -> {
+            clearBuffersDrawIcon()
+        }
+        14 -> {
+            writeTopScore()
+        }
+        else -> {
+            // Unknown JumpEngine index
+        }
+    }
+    return
+}
+
+// Decompiled from InitScreen
+fun initScreen() {
+    var temp0: Int = 0
+    var operMode by MemoryByte(OperMode)
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
+    //> InitScreen:
+    //> jsr MoveAllSpritesOffscreen ;initialize all sprites including sprite #0
+    moveAllSpritesOffscreen()
+    //> jsr InitializeNameTables    ;and erase both name and attribute tables
+    initializeNameTables()
+    //> lda OperMode
+    //> beq NextSubtask             ;if mode still 0, do not load
+    if (operMode == 0) {
+        //  goto NextSubtask
+        return
+    }
+    temp0 = operMode
+    if (operMode != 0) {
+        //> ldx #$03                    ;into buffer pointer
+        //> jmp SetVRAMAddr_A
+        //> SetVRAMAddr_A: stx VRAM_Buffer_AddrCtrl ;store offset into buffer control
+        vramBufferAddrctrl = 0x03
+    }
+    //> NextSubtask:   jmp IncSubtask           ;move onto next task
+    //> IncSubtask:  inc ScreenRoutineTask      ;move onto next task
+    screenRoutineTask = (screenRoutineTask + 1) and 0xFF
+    //> rts
+    return
+}
+
+// Decompiled from SetupIntermediate
+fun setupIntermediate() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var backgroundColorCtrl by MemoryByte(BackgroundColorCtrl)
+    var playerStatus by MemoryByte(PlayerStatus)
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    //> SetupIntermediate:
+    //> lda BackgroundColorCtrl  ;save current background color control
+    //> pha                      ;and player status to stack
+    push(backgroundColorCtrl)
+    //> lda PlayerStatus
+    //> pha
+    push(playerStatus)
+    //> lda #$00                 ;set background color to black
+    //> sta PlayerStatus         ;and player status to not fiery
+    playerStatus = 0x00
+    //> lda #$02                 ;this is the ONLY time background color control
+    //> sta BackgroundColorCtrl  ;is set to less than 4
+    backgroundColorCtrl = 0x02
+    //> jsr GetPlayerColors
+    getPlayerColors()
+    //> pla                      ;we only execute this routine for
+    temp0 = pull()
+    //> sta PlayerStatus         ;the intermediate lives display
+    playerStatus = temp0
+    //> pla                      ;and once we're done, we return bg
+    temp1 = pull()
+    //> sta BackgroundColorCtrl  ;color ctrl and player status from stack
+    backgroundColorCtrl = temp1
+    //> jmp IncSubtask           ;then move onto the next task
+    //> IncSubtask:  inc ScreenRoutineTask      ;move onto next task
+    screenRoutineTask = (screenRoutineTask + 1) and 0xFF
+    //> rts
+    return
+}
+
+// Decompiled from GetAreaPalette
+fun getAreaPalette() {
+    var areaType by MemoryByte(AreaType)
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
+    val areaPalette by MemoryByteIndexed(AreaPalette)
+    //> GetAreaPalette:
+    //> ldy AreaType             ;select appropriate palette to load
+    //> ldx AreaPalette,y        ;based on area type
+    //> SetVRAMAddr_A: stx VRAM_Buffer_AddrCtrl ;store offset into buffer control
+    vramBufferAddrctrl = areaPalette[areaType]
+    //> NextSubtask:   jmp IncSubtask           ;move onto next task
+    //> IncSubtask:  inc ScreenRoutineTask      ;move onto next task
+    screenRoutineTask = (screenRoutineTask + 1) and 0xFF
+    //> rts
+    return
+}
+
+// Decompiled from GetBackgroundColor
+fun getBackgroundColor() {
+    var temp0: Int = 0
+    var backgroundColorCtrl by MemoryByte(BackgroundColorCtrl)
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
+    val bgcolorctrlAddr by MemoryByteIndexed(BGColorCtrl_Addr)
+    //> GetBackgroundColor:
+    //> ldy BackgroundColorCtrl   ;check background color control
+    //> beq NoBGColor             ;if not set, increment task and fetch palette
+    temp0 = backgroundColorCtrl
+    if (backgroundColorCtrl != 0) {
+        //> lda BGColorCtrl_Addr-4,y  ;put appropriate palette into vram
+        //> sta VRAM_Buffer_AddrCtrl  ;note that if set to 5-7, $0301 will not be read
+        vramBufferAddrctrl = bgcolorctrlAddr[-4 + temp0]
+    }
+    //> NoBGColor: inc ScreenRoutineTask     ;increment to next subtask and plod on through
+    screenRoutineTask = (screenRoutineTask + 1) and 0xFF
+    // Fall-through tail call to getPlayerColors
+    getPlayerColors()
 }
 
 // Decompiled from GetPlayerColors
@@ -1530,6 +1760,7 @@ fun getPlayerColors() {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
     var areaType by MemoryByte(AreaType)
     var backgroundColorCtrl by MemoryByte(BackgroundColorCtrl)
     var currentPlayer by MemoryByte(CurrentPlayer)
@@ -1574,7 +1805,7 @@ fun getPlayerColors() {
         //> dec $00
         memory[0x0] = ((memory[0x0].toInt() - 1) and 0xFF).toUByte()
         //> bpl ClrGetLoop
-    } while (((memory[0x0].toInt() - 1) and 0xFF and 0x80) == 0)
+    } while ((memory[0x0].toInt() and 0x80) == 0)
     //> ldx VRAM_Buffer1_Offset  ;load original offset from before
     temp1 = vramBuffer1Offset
     //> ldy BackgroundColorCtrl  ;if this value is four or greater, it will be set
@@ -1607,8 +1838,383 @@ fun getPlayerColors() {
     //> txa                      ;move the buffer pointer ahead 7 bytes
     //> clc                      ;in case we want to write anything else later
     //> adc #$07
+    temp3 = temp1 + 0x07
+    temp0 = temp3 and 0xFF
     //> SetVRAMOffset: sta VRAM_Buffer1_Offset  ;store as new vram buffer offset
-    vramBuffer1Offset = (temp1 + 0x07) and 0xFF
+    vramBuffer1Offset = temp0
+    //> rts
+    return
+}
+
+// Decompiled from GetAlternatePalette1
+fun getAlternatePalette1() {
+    var temp0: Int = 0
+    var areaStyle by MemoryByte(AreaStyle)
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
+    //> GetAlternatePalette1:
+    //> lda AreaStyle            ;check for mushroom level style
+    //> cmp #$01
+    //> bne NoAltPal
+    if (!(areaStyle - 0x01 == 0)) {
+        //  goto NoAltPal
+        return
+    }
+    temp0 = areaStyle
+    if (areaStyle == 0x01) {
+        //> lda #$0b                 ;if found, load appropriate palette
+        temp0 = 0x0B
+        //> SetVRAMAddr_B: sta VRAM_Buffer_AddrCtrl
+        vramBufferAddrctrl = temp0
+    }
+    //> NoAltPal:      jmp IncSubtask           ;now onto the next task
+    //> IncSubtask:  inc ScreenRoutineTask      ;move onto next task
+    screenRoutineTask = (screenRoutineTask + 1) and 0xFF
+    //> rts
+    return
+}
+
+// Decompiled from WriteTopStatusLine
+fun writeTopStatusLine() {
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    //> WriteTopStatusLine:
+    //> lda #$00          ;select main status bar
+    //> jsr WriteGameText ;output it
+    writeGameText(0x00)
+    //> jmp IncSubtask    ;onto the next task
+    //> IncSubtask:  inc ScreenRoutineTask      ;move onto next task
+    screenRoutineTask = (screenRoutineTask + 1) and 0xFF
+    //> rts
+    return
+}
+
+// Decompiled from WriteBottomStatusLine
+fun writeBottomStatusLine() {
+    var temp0: Int = 0
+    var levelNumber by MemoryByte(LevelNumber)
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    var vramBuffer1Offset by MemoryByte(VRAM_Buffer1_Offset)
+    var worldNumber by MemoryByte(WorldNumber)
+    val vramBuffer1 by MemoryByteIndexed(VRAM_Buffer1)
+    //> WriteBottomStatusLine:
+    //> jsr GetSBNybbles        ;write player's score and coin tally to screen
+    getSBNybbles()
+    //> ldx VRAM_Buffer1_Offset
+    //> lda #$20                ;write address for world-area number on screen
+    //> sta VRAM_Buffer1,x
+    vramBuffer1[vramBuffer1Offset] = 0x20
+    //> lda #$73
+    //> sta VRAM_Buffer1+1,x
+    vramBuffer1[1 + vramBuffer1Offset] = 0x73
+    //> lda #$03                ;write length for it
+    //> sta VRAM_Buffer1+2,x
+    vramBuffer1[2 + vramBuffer1Offset] = 0x03
+    //> ldy WorldNumber         ;first the world number
+    //> iny
+    worldNumber = (worldNumber + 1) and 0xFF
+    //> tya
+    //> sta VRAM_Buffer1+3,x
+    vramBuffer1[3 + vramBuffer1Offset] = worldNumber
+    //> lda #$28                ;next the dash
+    //> sta VRAM_Buffer1+4,x
+    vramBuffer1[4 + vramBuffer1Offset] = 0x28
+    //> ldy LevelNumber         ;next the level number
+    //> iny                     ;increment for proper number display
+    levelNumber = (levelNumber + 1) and 0xFF
+    //> tya
+    //> sta VRAM_Buffer1+5,x
+    vramBuffer1[5 + vramBuffer1Offset] = levelNumber
+    //> lda #$00                ;put null terminator on
+    //> sta VRAM_Buffer1+6,x
+    vramBuffer1[6 + vramBuffer1Offset] = 0x00
+    //> txa                     ;move the buffer offset up by 6 bytes
+    //> clc
+    //> adc #$06
+    temp0 = vramBuffer1Offset + 0x06
+    //> sta VRAM_Buffer1_Offset
+    vramBuffer1Offset = temp0 and 0xFF
+    //> jmp IncSubtask
+    //> IncSubtask:  inc ScreenRoutineTask      ;move onto next task
+    screenRoutineTask = (screenRoutineTask + 1) and 0xFF
+    //> rts
+    return
+}
+
+// Decompiled from DisplayTimeUp
+fun displayTimeUp() {
+    var temp0: Int = 0
+    var disableScreenFlag by MemoryByte(DisableScreenFlag)
+    var gameTimerExpiredFlag by MemoryByte(GameTimerExpiredFlag)
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    //> DisplayTimeUp:
+    //> lda GameTimerExpiredFlag  ;if game timer not expired, increment task
+    //> beq NoTimeUp              ;control 2 tasks forward, otherwise, stay here
+    if (gameTimerExpiredFlag == 0) {
+        //  goto NoTimeUp
+        return
+    }
+    temp0 = gameTimerExpiredFlag
+    if (gameTimerExpiredFlag != 0) {
+        //> lda #$00
+        temp0 = 0x00
+        //> sta GameTimerExpiredFlag  ;reset timer expiration flag
+        gameTimerExpiredFlag = temp0
+        //> lda #$02                  ;output time-up screen to buffer
+        temp0 = 0x02
+        //> jmp OutputInter
+    } else {
+        //> NoTimeUp: inc ScreenRoutineTask     ;increment control task 2 tasks forward
+        screenRoutineTask = (screenRoutineTask + 1) and 0xFF
+        //> jmp IncSubtask
+    }
+    //> OutputInter:   jsr WriteGameText
+    writeGameText(temp0)
+    //> jsr ResetScreenTimer
+    resetScreenTimer()
+    //> lda #$00
+    temp0 = 0x00
+    //> sta DisableScreenFlag        ;reenable screen output
+    disableScreenFlag = temp0
+    //> rts
+    return
+}
+
+// Decompiled from DisplayIntermediate
+fun displayIntermediate() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var altEntranceControl by MemoryByte(AltEntranceControl)
+    var areaType by MemoryByte(AreaType)
+    var disableIntermediate by MemoryByte(DisableIntermediate)
+    var disableScreenFlag by MemoryByte(DisableScreenFlag)
+    var operMode by MemoryByte(OperMode)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    var screenTimer by MemoryByte(ScreenTimer)
+    //> DisplayIntermediate:
+    //> lda OperMode                 ;check primary mode of operation
+    //> beq NoInter                  ;if in title screen mode, skip this
+    temp0 = operMode
+    if (operMode != 0) {
+        //> cmp #GameOverModeValue       ;are we in game over mode?
+        //> beq GameOverInter            ;if so, proceed to display game over screen
+        if (temp0 - GameOverModeValue == 0) {
+            //  goto GameOverInter
+            return
+        }
+        if (temp0 != GameOverModeValue) {
+            //> lda AltEntranceControl       ;otherwise check for mode of alternate entry
+            temp0 = altEntranceControl
+            //> bne NoInter                  ;and branch if found
+            if (temp0 == 0) {
+                //> ldy AreaType                 ;check if we are on castle level
+                //> cpy #$03                     ;and if so, branch (possibly residual)
+                //> beq PlayerInter
+                temp1 = areaType
+                if (areaType != 0x03) {
+                    //> lda DisableIntermediate      ;if this flag is set, skip intermediate lives display
+                    temp0 = disableIntermediate
+                    //> bne NoInter                  ;and jump to specific task, otherwise
+                    if (temp0 == 0) {
+                    } else {
+                        //> NoInter:       lda #$08                     ;set for specific task and leave
+                        temp0 = 0x08
+                        //> sta ScreenRoutineTask
+                        screenRoutineTask = temp0
+                        //> rts
+                        return
+                        //> IncModeTask_B: inc OperMode_Task  ;move onto next mode
+                        opermodeTask = (opermodeTask + 1) and 0xFF
+                        //> rts
+                        return
+                    }
+                }
+                //> PlayerInter:   jsr DrawPlayer_Intermediate  ;put player in appropriate place for
+                drawplayerIntermediate()
+                //> lda #$01                     ;lives display, then output lives display to buffer
+                temp0 = 0x01
+                //> OutputInter:   jsr WriteGameText
+                writeGameText(temp0)
+                //> jsr ResetScreenTimer
+                resetScreenTimer()
+                //> lda #$00
+                temp0 = 0x00
+                //> sta DisableScreenFlag        ;reenable screen output
+                disableScreenFlag = temp0
+                //> rts
+                return
+            }
+        }
+        //> GameOverInter: lda #$12                     ;set screen timer
+        temp0 = 0x12
+        //> sta ScreenTimer
+        screenTimer = temp0
+        //> lda #$03                     ;output game over screen to buffer
+        temp0 = 0x03
+        //> jsr WriteGameText
+        writeGameText(temp0)
+        //> jmp IncModeTask_B
+    }
+    // Fall-through tail call to displayTimeUp
+    displayTimeUp()
+}
+
+// Decompiled from AreaParserTaskControl
+fun areaParserTaskControl() {
+    var temp0: Int = 0
+    var areaParserTaskNum by MemoryByte(AreaParserTaskNum)
+    var columnSets by MemoryByte(ColumnSets)
+    var disableScreenFlag by MemoryByte(DisableScreenFlag)
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
+    //> AreaParserTaskControl:
+    //> inc DisableScreenFlag     ;turn off screen
+    disableScreenFlag = (disableScreenFlag + 1) and 0xFF
+    do {
+        //> TaskLoop:  jsr AreaParserTaskHandler ;render column set of current area
+        areaParserTaskHandler()
+        //> lda AreaParserTaskNum     ;check number of tasks
+        //> bne TaskLoop              ;if tasks still not all done, do another one
+    } while (areaParserTaskNum != 0)
+    //> dec ColumnSets            ;do we need to render more column sets?
+    columnSets = (columnSets - 1) and 0xFF
+    //> bpl OutputCol
+    temp0 = areaParserTaskNum
+    if ((columnSets and 0x80) != 0) {
+        //> inc ScreenRoutineTask     ;if not, move on to the next task
+        screenRoutineTask = (screenRoutineTask + 1) and 0xFF
+    }
+    //> OutputCol: lda #$06                  ;set vram buffer to output rendered column set
+    temp0 = 0x06
+    //> sta VRAM_Buffer_AddrCtrl  ;on next NMI
+    vramBufferAddrctrl = temp0
+    //> rts
+    return
+}
+
+// Decompiled from DrawTitleScreen
+fun drawTitleScreen() {
+    var A: Int = 0
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var operMode by MemoryByte(OperMode)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var ppuAddress by MemoryByte(PPU_ADDRESS)
+    var ppuData by MemoryByte(PPU_DATA)
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
+    //> SetVRAMAddr_B: sta VRAM_Buffer_AddrCtrl
+    vramBufferAddrctrl = A
+    //> NoAltPal:      jmp IncSubtask           ;now onto the next task
+    //> DrawTitleScreen:
+    //> lda OperMode                 ;are we in title screen mode?
+    //> bne IncModeTask_B            ;if not, exit
+    temp0 = operMode
+    if (operMode == 0) {
+        //> lda #>TitleScreenDataOffset  ;load address $1ec0 into
+        temp0 = 0
+        //> sta PPU_ADDRESS              ;the vram address register
+        ppuAddress = temp0
+        //> lda #<TitleScreenDataOffset
+        temp0 = 0
+        //> sta PPU_ADDRESS
+        ppuAddress = temp0
+        //> lda #$03                     ;put address $0300 into
+        temp0 = 0x03
+        //> sta $01                      ;the indirect at $00
+        memory[0x1] = temp0.toUByte()
+        //> ldy #$00
+        //> sty $00
+        memory[0x0] = 0x00.toUByte()
+        //> lda PPU_DATA                 ;do one garbage read
+        temp0 = ppuData
+        temp1 = 0x00
+        do {
+            //> OutputTScr: lda PPU_DATA                 ;get title screen from chr-rom
+            temp0 = ppuData
+            //> sta ($00),y                  ;store 256 bytes into buffer
+            memory[readWord(0x0) + temp1] = temp0.toUByte()
+            //> iny
+            temp1 = (temp1 + 1) and 0xFF
+            //> bne ChkHiByte                ;if not past 256 bytes, do not increment
+            if (temp1 == 0) {
+                //> inc $01                      ;otherwise increment high byte of indirect
+                memory[0x1] = ((memory[0x1].toInt() + 1) and 0xFF).toUByte()
+            }
+            //> ChkHiByte:  lda $01                      ;check high byte?
+            temp0 = memory[0x1].toInt()
+            //> cmp #$04                     ;at $0400?
+            //> bne OutputTScr               ;if not, loop back and do another
+            //> cpy #$3a                     ;check if offset points past end of data
+            //> bcc OutputTScr               ;if not, loop back and do another
+        } while (temp1 != 0x3A)
+        while (true) {
+            //> lda #$05                     ;set buffer transfer control to $0300,
+            temp0 = 0x05
+            //> jmp SetVRAMAddr_B            ;increment task and exit
+        }
+        //> IncSubtask:  inc ScreenRoutineTask      ;move onto next task
+        screenRoutineTask = (screenRoutineTask + 1) and 0xFF
+        //> rts
+        return
+    } else {
+        //> IncModeTask_B: inc OperMode_Task  ;move onto next mode
+        opermodeTask = (opermodeTask + 1) and 0xFF
+        //> rts
+        return
+    }
+}
+
+// Decompiled from ClearBuffersDrawIcon
+fun clearBuffersDrawIcon() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var operMode by MemoryByte(OperMode)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    val vramBuffer1 by MemoryByteIndexed(VRAM_Buffer1)
+    //> ClearBuffersDrawIcon:
+    //> lda OperMode               ;check game mode
+    //> bne IncModeTask_B          ;if not title screen mode, leave
+    if (!(operMode == 0)) {
+        //  goto IncModeTask_B
+        return
+    }
+    temp0 = operMode
+    if (operMode == 0) {
+        //> ldx #$00                   ;otherwise, clear buffer space
+        temp1 = 0x00
+        do {
+            //> TScrClear:   sta VRAM_Buffer1-1,x
+            vramBuffer1[-1 + temp1] = temp0
+            //> sta VRAM_Buffer1-1+$100,x
+            //> dex
+            temp1 = (temp1 - 1) and 0xFF
+            //> bne TScrClear
+        } while (temp1 != 0)
+        //> jsr DrawMushroomIcon       ;draw player select icon
+        drawMushroomIcon()
+        //> IncSubtask:  inc ScreenRoutineTask      ;move onto next task
+        screenRoutineTask = (screenRoutineTask + 1) and 0xFF
+        //> rts
+        return
+    } else {
+        //> IncModeTask_B: inc OperMode_Task  ;move onto next mode
+        opermodeTask = (opermodeTask + 1) and 0xFF
+        //> rts
+        return
+    }
+}
+
+// Decompiled from WriteTopScore
+fun writeTopScore() {
+    var opermodeTask by MemoryByte(OperMode_Task)
+    //> WriteTopScore:
+    //> lda #$fa           ;run display routine to display top score on title
+    //> jsr UpdateNumber
+    updateNumber()
+    //> IncModeTask_B: inc OperMode_Task  ;move onto next mode
+    opermodeTask = (opermodeTask + 1) and 0xFF
     //> rts
     return
 }
@@ -1616,9 +2222,30 @@ fun getPlayerColors() {
 // Decompiled from WriteGameText
 fun writeGameText(A: Int) {
     var vramBuffer1Offset by MemoryByte(VRAM_Buffer1_Offset)
+    val gameText by MemoryByteIndexed(GameText)
+    val gameTextOffsets by MemoryByteIndexed(GameTextOffsets)
+    val luigiName by MemoryByteIndexed(LuigiName)
+    val vramBuffer1 by MemoryByteIndexed(VRAM_Buffer1)
+    val warpZoneNumbers by MemoryByteIndexed(WarpZoneNumbers)
     //> SetVRAMOffset: sta VRAM_Buffer1_Offset  ;store as new vram buffer offset
     vramBuffer1Offset = A
     //> rts
+    return
+}
+
+// Decompiled from ResetSpritesAndScreenTimer
+fun resetSpritesAndScreenTimer() {
+    var temp0: Int = 0
+    var screenTimer by MemoryByte(ScreenTimer)
+    //> ResetSpritesAndScreenTimer:
+    //> lda ScreenTimer             ;check if screen timer has expired
+    //> bne NoReset                 ;if not, branch to leave
+    temp0 = screenTimer
+    if (screenTimer == 0) {
+        //> jsr MoveAllSpritesOffscreen ;otherwise reset sprites now
+        moveAllSpritesOffscreen()
+    }
+    //> NoReset: rts
     return
 }
 
@@ -1636,16 +2263,222 @@ fun resetScreenTimer() {
     return
 }
 
-// Decompiled from RenderAttributeTables
-fun renderAttributeTables() {
+// Decompiled from RenderAreaGraphics
+fun renderAreaGraphics() {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp10: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
     var temp6: Int = 0
     var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
+    var areaParserTaskNum by MemoryByte(AreaParserTaskNum)
+    var currentColumnPos by MemoryByte(CurrentColumnPos)
+    var currentntaddrHigh by MemoryByte(CurrentNTAddr_High)
+    var currentntaddrLow by MemoryByte(CurrentNTAddr_Low)
+    var vramBuffer2Offset by MemoryByte(VRAM_Buffer2_Offset)
+    var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
+    val attributeBuffer by MemoryByteIndexed(AttributeBuffer)
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    val metatilegraphicsHigh by MemoryByteIndexed(MetatileGraphics_High)
+    val metatilegraphicsLow by MemoryByteIndexed(MetatileGraphics_Low)
+    val vramBuffer2 by MemoryByteIndexed(VRAM_Buffer2)
+    //> RenderAreaGraphics:
+    //> lda CurrentColumnPos         ;store LSB of where we're at
+    //> and #$01
+    temp0 = currentColumnPos and 0x01
+    //> sta $05
+    memory[0x5] = temp0.toUByte()
+    //> ldy VRAM_Buffer2_Offset      ;store vram buffer offset
+    //> sty $00
+    memory[0x0] = vramBuffer2Offset.toUByte()
+    //> lda CurrentNTAddr_Low        ;get current name table address we're supposed to render
+    //> sta VRAM_Buffer2+1,y
+    vramBuffer2[1 + vramBuffer2Offset] = currentntaddrLow
+    //> lda CurrentNTAddr_High
+    //> sta VRAM_Buffer2,y
+    vramBuffer2[vramBuffer2Offset] = currentntaddrHigh
+    //> lda #$9a                     ;store length byte of 26 here with d7 set
+    //> sta VRAM_Buffer2+2,y         ;to increment by 32 (in columns)
+    vramBuffer2[2 + vramBuffer2Offset] = 0x9A
+    //> lda #$00                     ;init attribute row
+    //> sta $04
+    memory[0x4] = 0x00.toUByte()
+    //> tax
+    temp1 = 0x00
+    temp2 = vramBuffer2Offset
+    do {
+        //> DrawMTLoop: stx $01                      ;store init value of 0 or incremented offset for buffer
+        memory[0x1] = temp1.toUByte()
+        //> lda MetatileBuffer,x         ;get first metatile number, and mask out all but 2 MSB
+        //> and #%11000000
+        temp3 = metatileBuffer[temp1] and 0xC0
+        //> sta $03                      ;store attribute table bits here
+        memory[0x3] = temp3.toUByte()
+        //> asl                          ;note that metatile format is:
+        temp3 = (temp3 shl 1) and 0xFF
+        //> rol                          ;%xx000000 - attribute table bits,
+        temp3 = (temp3 shl 1) and 0xFE or if ((temp3 and 0x80) != 0) 1 else 0
+        //> rol                          ;%00xxxxxx - metatile number
+        temp3 = (temp3 shl 1) and 0xFE or if ((temp3 and 0x80) != 0) 1 else 0
+        //> tay                          ;rotate bits to d1-d0 and use as offset here
+        //> lda MetatileGraphics_Low,y   ;get address to graphics table from here
+        //> sta $06
+        memory[0x6] = (metatilegraphicsLow[temp3] and 0xFF).toUByte()
+        //> lda MetatileGraphics_High,y
+        //> sta $07
+        memory[0x7] = (metatilegraphicsHigh[temp3] and 0xFF).toUByte()
+        //> lda MetatileBuffer,x         ;get metatile number again
+        //> asl                          ;multiply by 4 and use as tile offset
+        //> asl
+        //> sta $02
+        memory[0x2] = ((((metatileBuffer[temp1] shl 1) and 0xFF) shl 1) and 0xFF).toUByte()
+        //> lda AreaParserTaskNum        ;get current task number for level processing and
+        //> and #%00000001               ;mask out all but LSB, then invert LSB, multiply by 2
+        temp4 = areaParserTaskNum and 0x01
+        //> eor #%00000001               ;to get the correct column position in the metatile,
+        temp5 = temp4 xor 0x01
+        //> asl                          ;then add to the tile offset so we can draw either side
+        temp5 = (temp5 shl 1) and 0xFF
+        //> adc $02                      ;of the metatiles
+        temp6 = temp5 + memory[0x2].toInt() + (if ((temp5 and 0x80) != 0) 1 else 0)
+        //> tay
+        //> ldx $00                      ;use vram buffer offset from before as X
+        temp1 = memory[0x0].toInt()
+        //> lda ($06),y
+        //> sta VRAM_Buffer2+3,x         ;get first tile number (top left or top right) and store
+        vramBuffer2[3 + temp1] = memory[readWord(0x6) + (temp6 and 0xFF)].toInt()
+        //> iny
+        temp2 = temp6 and 0xFF
+        temp2 = (temp2 + 1) and 0xFF
+        //> lda ($06),y                  ;now get the second (bottom left or bottom right) and store
+        //> sta VRAM_Buffer2+4,x
+        vramBuffer2[4 + temp1] = memory[readWord(0x6) + temp2].toInt()
+        //> ldy $04                      ;get current attribute row
+        temp2 = memory[0x4].toInt()
+        //> lda $05                      ;get LSB of current column where we're at, and
+        //> bne RightCheck               ;branch if set (clear = left attrib, set = right)
+        temp7 = memory[0x5].toInt()
+        if (memory[0x5].toInt() == 0) {
+            //> lda $01                      ;get current row we're rendering
+            temp7 = memory[0x1].toInt()
+            //> lsr                          ;branch if LSB set (clear = top left, set = bottom left)
+            temp7 = temp7 shr 1
+            //> bcs LLeft
+            if ((temp7 and 0x01) == 0) {
+                //> rol $03                      ;rotate attribute bits 3 to the left
+                memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((temp7 and 0x01) != 0) 1 else 0) and 0xFF).toUByte()
+                //> rol $03                      ;thus in d1-d0, for upper left square
+                memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
+                //> rol $03
+                memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
+                //> jmp SetAttrib
+            }
+        } else {
+            //> RightCheck: lda $01                      ;get LSB of current row we're rendering
+            temp7 = memory[0x1].toInt()
+            //> lsr                          ;branch if set (clear = top right, set = bottom right)
+            temp7 = temp7 shr 1
+            //> bcs NextMTRow
+            if ((temp7 and 0x01) == 0) {
+                //> lsr $03                      ;shift attribute bits 4 to the right
+                memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+                //> lsr $03                      ;thus in d3-d2, for upper right square
+                memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+                //> lsr $03
+                memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+                //> lsr $03
+                memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+                //> jmp SetAttrib
+                //> LLeft:      lsr $03                      ;shift attribute bits 2 to the right
+                memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+                //> lsr $03                      ;thus in d5-d4 for lower left square
+                memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+            }
+            //> NextMTRow:  inc $04                      ;move onto next attribute row
+            memory[0x4] = ((memory[0x4].toInt() + 1) and 0xFF).toUByte()
+        }
+        //> SetAttrib:  lda AttributeBuffer,y        ;get previously saved bits from before
+        temp7 = attributeBuffer[temp2]
+        //> ora $03                      ;if any, and put new bits, if any, onto
+        temp8 = temp7 or memory[0x3].toInt()
+        //> sta AttributeBuffer,y        ;the old, and store
+        attributeBuffer[temp2] = temp8
+        //> inc $00                      ;increment vram buffer offset by 2
+        memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
+        //> inc $00
+        memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
+        //> ldx $01                      ;get current gfx buffer row, and check for
+        temp1 = memory[0x1].toInt()
+        //> inx                          ;the bottom of the screen
+        temp1 = (temp1 + 1) and 0xFF
+        //> cpx #$0d
+        //> bcc DrawMTLoop               ;if not there yet, loop back
+    } while (!(temp1 >= 0x0D))
+    //> ldy $00                      ;get current vram buffer offset, increment by 3
+    temp2 = memory[0x0].toInt()
+    //> iny                          ;(for name table address and length bytes)
+    temp2 = (temp2 + 1) and 0xFF
+    //> iny
+    temp2 = (temp2 + 1) and 0xFF
+    //> iny
+    temp2 = (temp2 + 1) and 0xFF
+    //> lda #$00
+    temp7 = 0x00
+    //> sta VRAM_Buffer2,y           ;put null terminator at end of data for name table
+    vramBuffer2[temp2] = temp7
+    //> sty VRAM_Buffer2_Offset      ;store new buffer offset
+    vramBuffer2Offset = temp2
+    //> inc CurrentNTAddr_Low        ;increment name table address low
+    currentntaddrLow = (currentntaddrLow + 1) and 0xFF
+    //> lda CurrentNTAddr_Low        ;check current low byte
+    temp7 = currentntaddrLow
+    //> and #%00011111               ;if no wraparound, just skip this part
+    temp9 = temp7 and 0x1F
+    //> bne ExitDrawM
+    if (!(temp9 == 0)) {
+        //  goto ExitDrawM
+        return
+    }
+    temp7 = temp9
+    if (temp9 == 0) {
+        //> lda #$80                     ;if wraparound occurs, make sure low byte stays
+        temp7 = 0x80
+        //> sta CurrentNTAddr_Low        ;just under the status bar
+        currentntaddrLow = temp7
+        //> lda CurrentNTAddr_High       ;and then invert d2 of the name table address high
+        temp7 = currentntaddrHigh
+        //> eor #%00000100               ;to move onto the next appropriate name table
+        temp10 = temp7 xor 0x04
+        //> sta CurrentNTAddr_High
+        currentntaddrHigh = temp10
+    }
+    //> ExitDrawM:  jmp SetVRAMCtrl              ;jump to set buffer to $0341 and leave
+    //> SetVRAMCtrl: lda #$06
+    temp7 = 0x06
+    //> sta VRAM_Buffer_AddrCtrl ;set buffer to $0341 and leave
+    vramBufferAddrctrl = temp7
+    //> rts
+    return
+}
+
+// Decompiled from RenderAttributeTables
+fun renderAttributeTables() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp10: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var currentntaddrHigh by MemoryByte(CurrentNTAddr_High)
     var currentntaddrLow by MemoryByte(CurrentNTAddr_Low)
     var vramBuffer2Offset by MemoryByte(VRAM_Buffer2_Offset)
@@ -1658,82 +2491,87 @@ fun renderAttributeTables() {
     temp0 = currentntaddrLow and 0x1F
     //> sec                      ;subtract four
     //> sbc #$04
+    temp1 = temp0 - 0x04
     //> and #%00011111           ;mask out bits again and store
-    temp1 = (temp0 - 0x04) and 0xFF and 0x1F
+    temp2 = temp1 and 0xFF and 0x1F
     //> sta $01
-    memory[0x1] = temp1.toUByte()
+    memory[0x1] = temp2.toUByte()
     //> lda CurrentNTAddr_High   ;get high byte and branch if borrow not set
     //> bcs SetATHigh
-    temp2 = currentntaddrHigh
-    if (!(temp0 - 0x04 >= 0)) {
+    temp3 = currentntaddrHigh
+    if (!(temp1 >= 0)) {
         //> eor #%00000100           ;otherwise invert d2
-        temp3 = temp2 xor 0x04
+        temp4 = temp3 xor 0x04
     }
     //> SetATHigh:   and #%00000100           ;mask out all other bits
-    temp4 = temp2 and 0x04
+    temp5 = temp3 and 0x04
     //> ora #$23                 ;add $2300 to the high byte and store
-    temp5 = temp4 or 0x23
+    temp6 = temp5 or 0x23
     //> sta $00
-    memory[0x0] = temp5.toUByte()
+    memory[0x0] = temp6.toUByte()
     //> lda $01                  ;get low byte - 4, divide by 4, add offset for
-    temp2 = memory[0x1].toInt()
+    temp3 = memory[0x1].toInt()
     //> lsr                      ;attribute table and store
-    temp2 = temp2 shr 1
+    temp3 = temp3 shr 1
     //> lsr
-    temp2 = temp2 shr 1
+    temp3 = temp3 shr 1
     //> adc #$c0                 ;we should now have the appropriate block of
+    temp7 = temp3 + 0xC0 + (if ((temp3 and 0x01) != 0) 1 else 0)
+    temp3 = temp7 and 0xFF
     //> sta $01                  ;attribute table in our temp address
-    memory[0x1] = ((temp2 + 0xC0 + (if ((temp2 and 0x01) != 0) 1 else 0)) and 0xFF).toUByte()
+    memory[0x1] = temp3.toUByte()
     //> ldx #$00
     //> ldy VRAM_Buffer2_Offset  ;get buffer offset
-    temp6 = 0x00
-    temp7 = vramBuffer2Offset
+    temp8 = 0x00
+    temp9 = vramBuffer2Offset
     do {
         //> AttribLoop:  lda $00
-        temp2 = memory[0x0].toInt()
+        temp3 = memory[0x0].toInt()
         //> sta VRAM_Buffer2,y       ;store high byte of attribute table address
-        vramBuffer2[temp7] = temp2
+        vramBuffer2[temp9] = temp3
         //> lda $01
-        temp2 = memory[0x1].toInt()
+        temp3 = memory[0x1].toInt()
         //> clc                      ;get low byte, add 8 because we want to start
         //> adc #$08                 ;below the status bar, and store
+        temp10 = temp3 + 0x08
+        temp3 = temp10 and 0xFF
         //> sta VRAM_Buffer2+1,y
-        vramBuffer2[1 + temp7] = (temp2 + 0x08) and 0xFF
+        vramBuffer2[1 + temp9] = temp3
         //> sta $01                  ;also store in temp again
-        memory[0x1] = ((temp2 + 0x08) and 0xFF).toUByte()
+        memory[0x1] = temp3.toUByte()
         //> lda AttributeBuffer,x    ;fetch current attribute table byte and store
-        temp2 = attributeBuffer[temp6]
+        temp3 = attributeBuffer[temp8]
         //> sta VRAM_Buffer2+3,y     ;in the buffer
-        vramBuffer2[3 + temp7] = temp2
+        vramBuffer2[3 + temp9] = temp3
         //> lda #$01
-        temp2 = 0x01
+        temp3 = 0x01
         //> sta VRAM_Buffer2+2,y     ;store length of 1 in buffer
-        vramBuffer2[2 + temp7] = temp2
+        vramBuffer2[2 + temp9] = temp3
         //> lsr
-        temp2 = temp2 shr 1
+        temp3 = temp3 shr 1
         //> sta AttributeBuffer,x    ;clear current byte in attribute buffer
-        attributeBuffer[temp6] = temp2
+        attributeBuffer[temp8] = temp3
         //> iny                      ;increment buffer offset by 4 bytes
-        temp7 = (temp7 + 1) and 0xFF
+        temp9 = (temp9 + 1) and 0xFF
         //> iny
-        temp7 = (temp7 + 1) and 0xFF
+        temp9 = (temp9 + 1) and 0xFF
         //> iny
-        temp7 = (temp7 + 1) and 0xFF
+        temp9 = (temp9 + 1) and 0xFF
         //> iny
-        temp7 = (temp7 + 1) and 0xFF
+        temp9 = (temp9 + 1) and 0xFF
         //> inx                      ;increment attribute offset and check to see
-        temp6 = (temp6 + 1) and 0xFF
+        temp8 = (temp8 + 1) and 0xFF
         //> cpx #$07                 ;if we're at the end yet
         //> bcc AttribLoop
-    } while (!(temp6 >= 0x07))
+    } while (!(temp8 >= 0x07))
     //> sta VRAM_Buffer2,y       ;put null terminator at the end
-    vramBuffer2[temp7] = temp2
+    vramBuffer2[temp9] = temp3
     //> sty VRAM_Buffer2_Offset  ;store offset in case we want to do any more
-    vramBuffer2Offset = temp7
+    vramBuffer2Offset = temp9
     //> SetVRAMCtrl: lda #$06
-    temp2 = 0x06
+    temp3 = 0x06
     //> sta VRAM_Buffer_AddrCtrl ;set buffer to $0341 and leave
-    vramBufferAddrctrl = temp2
+    vramBufferAddrctrl = temp3
     //> rts
     return
 }
@@ -1744,6 +2582,7 @@ fun colorRotation() {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
     var areaType by MemoryByte(AreaType)
     var colorRotateOffset by MemoryByte(ColorRotateOffset)
     var frameCounter by MemoryByte(FrameCounter)
@@ -1804,7 +2643,7 @@ fun colorRotation() {
                 //> dec $00                  ;decrement counter
                 memory[0x0] = ((memory[0x0].toInt() - 1) and 0xFF).toUByte()
                 //> bpl GetAreaPal           ;do this until the palette is all copied
-            } while (((memory[0x0].toInt() - 1) and 0xFF and 0x80) == 0)
+            } while ((memory[0x0].toInt() and 0x80) == 0)
             //> ldx VRAM_Buffer1_Offset  ;get current vram buffer offset
             temp2 = vramBuffer1Offset
             //> ldy ColorRotateOffset    ;get color cycling offset
@@ -1817,8 +2656,10 @@ fun colorRotation() {
             temp1 = vramBuffer1Offset
             //> clc                      ;add seven bytes to vram buffer offset
             //> adc #$07
+            temp4 = temp1 + 0x07
+            temp1 = temp4 and 0xFF
             //> sta VRAM_Buffer1_Offset
-            vramBuffer1Offset = (temp1 + 0x07) and 0xFF
+            vramBuffer1Offset = temp1
             //> inc ColorRotateOffset    ;increment color cycling offset
             colorRotateOffset = (colorRotateOffset + 1) and 0xFF
             //> lda ColorRotateOffset
@@ -1886,6 +2727,8 @@ fun replaceBlockMetatile(X: Int) {
 fun destroyBlockMetatile() {
     //> DestroyBlockMetatile:
     //> lda #$00       ;force blank metatile if branched/jumped to this point
+    // Fall-through tail call to writeBlockMetatile
+    writeBlockMetatile(0x00)
 }
 
 // Decompiled from WriteBlockMetatile
@@ -1929,6 +2772,8 @@ fun writeBlockMetatile(A: Int) {
     temp0 = (temp0 + 1) and 0xFF
     //> jsr PutBlockMetatile    ;get appropriate block data and write to vram buffer
     putBlockMetatile(temp0, X, temp0)
+    // Fall-through tail call to moveVOffset
+    moveVOffset(temp0)
 }
 
 // Decompiled from MoveVOffset
@@ -1948,6 +2793,10 @@ fun putBlockMetatile(A: Int, X: Int, Y: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
     //> PutBlockMetatile:
     //> stx $00               ;store control bit from SprDataOffset_Ctrl
     memory[0x0] = X.toUByte()
@@ -1985,28 +2834,41 @@ fun putBlockMetatile(A: Int, X: Int, Y: Int) {
     temp0 = memory[0x2].toInt()
     //> clc
     //> adc #$20              ;add 32 pixels for the status bar
+    temp4 = temp0 + 0x20
+    temp0 = temp4 and 0xFF
     //> asl
+    temp0 = (temp0 shl 1) and 0xFF
     //> rol $05               ;shift and rotate d7 onto d0 and d6 into carry
-    memory[0x5] = (((memory[0x5].toInt() shl 1) and 0xFE or if (((temp0 + 0x20) and 0xFF and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
+    memory[0x5] = (((memory[0x5].toInt() shl 1) and 0xFE or if ((temp0 and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
     //> asl
+    temp0 = (temp0 shl 1) and 0xFF
     //> rol $05               ;shift and rotate d6 onto d0 and d5 into carry
-    memory[0x5] = (((memory[0x5].toInt() shl 1) and 0xFE or if (((((temp0 + 0x20) and 0xFF) shl 1) and 0xFF and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
+    memory[0x5] = (((memory[0x5].toInt() shl 1) and 0xFE or if ((temp0 and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
     //> adc $04               ;add low byte of name table and carry to vertical high nybble
+    temp5 = temp0 + memory[0x4].toInt() + (if ((memory[0x5].toInt() and 0x80) != 0) 1 else 0)
+    temp0 = temp5 and 0xFF
     //> sta $04               ;and store here
-    memory[0x4] = ((((((((temp0 + 0x20) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF) + memory[0x4].toInt() + (if ((memory[0x5].toInt() and 0x80) != 0) 1 else 0)) and 0xFF).toUByte()
+    memory[0x4] = temp0.toUByte()
     //> lda $05               ;get whatever was in d7 and d6 of vertical high nybble
     temp0 = memory[0x5].toInt()
     //> adc #$00              ;add carry
+    temp6 = temp0 + (if (temp5 > 0xFF) 1 else 0)
+    temp0 = temp6 and 0xFF
     //> clc
     //> adc $03               ;then add high byte of name table
+    temp7 = temp0 + memory[0x3].toInt()
+    temp0 = temp7 and 0xFF
     //> sta $05               ;store here
-    memory[0x5] = ((((temp0 + (if (((((((temp0 + 0x20) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF) + memory[0x4].toInt() + (if ((memory[0x5].toInt() and 0x80) != 0) 1 else 0) > 0xFF) 1 else 0)) and 0xFF) + memory[0x3].toInt()) and 0xFF).toUByte()
+    memory[0x5] = temp0.toUByte()
     //> ldy $01               ;get vram buffer offset to be used
     temp2 = memory[0x1].toInt()
+    // Fall-through tail call to remBridge
+    remBridge(temp1, temp2)
 }
 
 // Decompiled from RemBridge
 fun remBridge(X: Int, Y: Int) {
+    var temp0: Int = 0
     val blockGfxData by MemoryByteIndexed(BlockGfxData)
     val vramBuffer1 by MemoryByteIndexed(VRAM_Buffer1)
     //> RemBridge:  lda BlockGfxData,x    ;write top left and top right
@@ -2026,8 +2888,9 @@ fun remBridge(X: Int, Y: Int) {
     vramBuffer1[Y] = memory[0x4].toInt()
     //> clc                   ;into first slot as read
     //> adc #$20              ;add 32 bytes to value
+    temp0 = memory[0x4].toInt() + 0x20
     //> sta VRAM_Buffer1+5,y  ;write low byte of name table
-    vramBuffer1[5 + Y] = (memory[0x4].toInt() + 0x20) and 0xFF
+    vramBuffer1[5 + Y] = temp0 and 0xFF
     //> lda $05               ;plus 32 bytes into second slot
     //> sta VRAM_Buffer1-1,y  ;write high byte of name
     vramBuffer1[-1 + Y] = memory[0x5].toInt()
@@ -2081,7 +2944,7 @@ fun initializeNameTables() {
     var temp0: Int = 0
     var temp1: Int = 0
     var mirrorPpuCtrlReg1 by MemoryByte(Mirror_PPU_CTRL_REG1)
-    var ppuStatus by MemoryByte(PPU_STATUS)
+    val ppuStatus by MemoryByteIndexed(PPU_STATUS)
     //> InitializeNameTables:
     //> lda PPU_STATUS            ;reset flip-flop
     //> lda Mirror_PPU_CTRL_REG1  ;load mirror of ppu reg $2000
@@ -2095,6 +2958,8 @@ fun initializeNameTables() {
     //> jsr WriteNTAddr
     writeNTAddr(0x24)
     //> lda #$20                  ;and then set it to name table 0
+    // Fall-through tail call to writeNTAddr
+    writeNTAddr(0x20)
 }
 
 // Decompiled from WriteNTAddr
@@ -2117,18 +2982,13 @@ fun writeNTAddr(A: Int) {
     //> lda #$24
     temp0 = 0x04
     temp1 = 0xC0
-    while (temp0 != 0) {
-        do {
-            //> InitNTLoop:   sta PPU_DATA              ;count out exactly 768 tiles
-            ppuData = 0x24
-            //> dey
-            temp1 = (temp1 - 1) and 0xFF
-            //> bne InitNTLoop
+    do {
+        while (temp0 == 0) {
             //> dex
             temp0 = (temp0 - 1) and 0xFF
             //> bne InitNTLoop
-        } while (temp0 != 0)
-    }
+        }
+    } while (temp0 != 0)
     //> ldy #64                   ;now to clear the attribute table (with zero this time)
     temp1 = 0x40
     //> txa
@@ -2167,56 +3027,69 @@ fun readJoypads() {
     //> inx                    ;increment for joypad 2's port
     temp0 = 0x01 shr 1
     temp0 = (temp0 + 1) and 0xFF
-    // Fall-through tail call to readPortBits (reads player 2 controller)
+    // Fall-through tail call to readPortBits
     readPortBits(0x01 shr 1, temp0)
 }
 
-// Debug flag for controller reading
-private const val DEBUG_CONTROLLER = true
-
 // Decompiled from ReadPortBits
-// Fixed version - properly accumulates bits across iterations
 fun readPortBits(A: Int, X: Int) {
-    var accumulated: Int = A  // Use local var that accumulates across iterations
-    var count: Int = 8
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     val joypadPort by MemoryByteIndexed(JOYPAD_PORT)
     val joypadBitMask by MemoryByteIndexed(JoypadBitMask)
     val savedJoypadBits by MemoryByteIndexed(SavedJoypadBits)
-
     //> ReadPortBits: ldy #$08
-    //> PortLoop: pha / lda JOYPAD_PORT,x / ... / pla / rol / dey / bne PortLoop
+    temp0 = 0x08
     do {
-        // Read bit from controller port
-        val portValue = joypadPort[X]
-        val bit = ((portValue shr 1) or portValue) and 0x01
-
-        if (DEBUG_CONTROLLER) System.err.println("readPortBits: X=$X, portValue=$portValue, bit=$bit")
-
-        // ROL: shift accumulated left, carry in from bit
-        // Note: ROL puts previous bit7 into carry, carry into bit0
-        // But here we're building up the byte, so bit goes into bit0 after shift
-        accumulated = ((accumulated shl 1) and 0xFE) or bit
-
-        count--
-    } while (count != 0)
-
-    if (DEBUG_CONTROLLER) System.err.println("readPortBits: X=$X, accumulated=${accumulated.toString(16)}")
-
+        //> PortLoop:     pha                    ;push previous bit onto stack
+        push(A)
+        //> lda JOYPAD_PORT,x      ;read current bit on joypad port
+        //> sta $00                ;check d1 and d0 of port output
+        memory[0x0] = (joypadPort[X] and 0xFF).toUByte()
+        //> lsr                    ;this is necessary on the old
+        //> ora $00                ;famicom systems in japan
+        temp1 = joypadPort[X] shr 1 or memory[0x0].toInt()
+        //> lsr
+        temp1 = temp1 shr 1
+        //> pla                    ;read bits from stack
+        temp2 = pull()
+        //> rol                    ;rotate bit from carry flag
+        temp2 = (temp2 shl 1) and 0xFE or if ((temp1 and 0x01) != 0) 1 else 0
+        //> dey
+        temp0 = (temp0 - 1) and 0xFF
+        //> bne PortLoop           ;count down bits left
+    } while (temp0 != 0)
     //> sta SavedJoypadBits,x  ;save controller status here always
-    savedJoypadBits[X] = accumulated
-
-    if (DEBUG_CONTROLLER && accumulated != 0) System.err.println("readPortBits: Stored ${accumulated.toString(16)} at SavedJoypadBits[$X] = ${(SavedJoypadBits + X).toString(16)}")
-
+    savedJoypadBits[X] = temp2
+    //> pha
+    push(temp2)
     //> and #%00110000         ;check for select or start
-    val selectStartBits = accumulated and 0x30
-
-    //> and JoypadBitMask,x    ;if neither saved state nor current state have these set, branch
-    if ((selectStartBits and joypadBitMask[X]) != 0) {
-        //> and #%11001111         ;otherwise store without select or start bits
-        savedJoypadBits[X] = accumulated and 0xCF
+    temp3 = temp2 and 0x30
+    //> and JoypadBitMask,x    ;if neither saved state nor current state
+    temp4 = temp3 and joypadBitMask[X]
+    //> beq Save8Bits          ;have any of these two set, branch
+    temp5 = temp4
+    if (temp4 != 0) {
+        //> pla
+        temp5 = pull()
+        //> and #%11001111         ;otherwise store without select
+        temp6 = temp5 and 0xCF
+        //> sta SavedJoypadBits,x  ;or start bits and leave
+        savedJoypadBits[X] = temp6
+        //> rts
+        return
     } else {
-        //> sta JoypadBitMask,x    ;save with all bits in another place
-        joypadBitMask[X] = accumulated
+        //> Save8Bits:    pla
+        temp5 = pull()
+        //> sta JoypadBitMask,x    ;save with all bits in another place and leave
+        joypadBitMask[X] = temp5
+        //> rts
+        return
     }
 }
 
@@ -2229,10 +3102,12 @@ fun updateScreen() {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var mirrorPpuCtrlReg1 by MemoryByte(Mirror_PPU_CTRL_REG1)
     var ppuAddress by MemoryByte(PPU_ADDRESS)
     var ppuData by MemoryByte(PPU_DATA)
-    var ppuStatus by MemoryByte(PPU_STATUS)
+    val ppuStatus by MemoryByteIndexed(PPU_STATUS)
     //> WriteBufferToScreen:
     //> sta PPU_ADDRESS           ;store high byte of vram address
     ppuAddress = A
@@ -2275,30 +3150,34 @@ fun updateScreen() {
     temp1 = temp1 shr 1
     //> tax
     temp4 = temp1
-    while (temp4 != 0) {
-        //> iny                       ;otherwise increment Y to load next byte
-        Y = (Y + 1) and 0xFF
-        do {
-            //> OutputToVRAM:  bcs RepeatByte            ;if carry set, repeat loading the same byte
-            //> RepeatByte:    lda ($00),y               ;load more data from buffer and write to vram
-            temp1 = memory[readWord(0x0) + Y].toInt()
-            //> sta PPU_DATA
-            ppuData = temp1
-            //> dex                       ;done writing?
-            temp4 = (temp4 - 1) and 0xFF
-            //> bne OutputToVRAM
-        } while (temp4 != 0)
-    }
+    do {
+        //> OutputToVRAM:  bcs RepeatByte            ;if carry set, repeat loading the same byte
+        if ((temp1 and 0x01) == 0) {
+            //> iny                       ;otherwise increment Y to load next byte
+            Y = (Y + 1) and 0xFF
+        }
+        //> RepeatByte:    lda ($00),y               ;load more data from buffer and write to vram
+        temp1 = memory[readWord(0x0) + Y].toInt()
+        //> sta PPU_DATA
+        ppuData = temp1
+        //> dex                       ;done writing?
+        temp4 = (temp4 - 1) and 0xFF
+        //> bne OutputToVRAM
+    } while (temp4 != 0)
     //> sec
     //> tya
     //> adc $00                   ;add end length plus one to the indirect at $00
+    temp5 = Y + memory[0x0].toInt() + 1
+    temp1 = temp5 and 0xFF
     //> sta $00                   ;to allow this routine to read another set of updates
-    memory[0x0] = ((Y + memory[0x0].toInt() + 1) and 0xFF).toUByte()
+    memory[0x0] = temp1.toUByte()
     //> lda #$00
     temp1 = 0x00
     //> adc $01
+    temp6 = temp1 + memory[0x1].toInt() + (if (temp5 > 0xFF) 1 else 0)
+    temp1 = temp6 and 0xFF
     //> sta $01
-    memory[0x1] = ((temp1 + memory[0x1].toInt() + (if (Y + memory[0x0].toInt() + 1 > 0xFF) 1 else 0)) and 0xFF).toUByte()
+    memory[0x1] = temp1.toUByte()
     //> lda #$3f                  ;sets vram address to $3f00
     temp1 = 0x3F
     //> sta PPU_ADDRESS
@@ -2312,11 +3191,13 @@ fun updateScreen() {
     //> sta PPU_ADDRESS
     ppuAddress = temp1
     //> UpdateScreen:  ldx PPU_STATUS            ;reset flip-flop
-    temp4 = ppuStatus
+    temp4 = ppuStatus[0]
     //> ldy #$00                  ;load first byte from indirect as a pointer
     //> lda ($00),y
     temp1 = memory[readWord(0x0)].toInt()
     //> bne WriteBufferToScreen   ;if byte is zero we have no further updates to make here
+    // Fall-through tail call to initScroll
+    initScroll(temp1)
 }
 
 // Decompiled from InitScroll
@@ -2355,6 +3236,8 @@ fun printStatusBarNumbers(A: Int) {
     //> lsr
     //> lsr
     //> lsr
+    // Fall-through tail call to outputNumbers
+    outputNumbers(memory[0x0].toInt() shr 1 shr 1 shr 1 shr 1)
 }
 
 // Decompiled from OutputNumbers
@@ -2363,6 +3246,8 @@ fun outputNumbers(A: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     var vramBuffer1Offset by MemoryByte(VRAM_Buffer1_Offset)
     val displayDigits by MemoryByteIndexed(DisplayDigits)
     val statusBarData by MemoryByteIndexed(StatusBarData)
@@ -2371,78 +3256,81 @@ fun outputNumbers(A: Int) {
     //> OutputNumbers:
     //> clc                      ;add 1 to low nybble
     //> adc #$01
+    temp0 = A + 0x01
     //> and #%00001111           ;mask out high nybble
-    temp0 = (A + 0x01) and 0xFF and 0x0F
+    temp1 = temp0 and 0xFF and 0x0F
     //> cmp #$06
     //> bcs ExitOutputN
-    temp1 = temp0
-    if (!(temp0 >= 0x06)) {
+    temp2 = temp1
+    if (!(temp1 >= 0x06)) {
         //> pha                      ;save incremented value to stack for now and
-        push(temp1)
+        push(temp2)
         //> asl                      ;shift to left and use as offset
-        temp1 = (temp1 shl 1) and 0xFF
+        temp2 = (temp2 shl 1) and 0xFF
         //> tay
         //> ldx VRAM_Buffer1_Offset  ;get current buffer pointer
         //> lda #$20                 ;put at top of screen by default
-        temp1 = 0x20
+        temp2 = 0x20
         //> cpy #$00                 ;are we writing top score on title screen?
         //> bne SetupNums
-        temp2 = vramBuffer1Offset
-        temp3 = temp1
-        if (temp1 == 0x00) {
+        temp3 = vramBuffer1Offset
+        temp4 = temp2
+        if (temp2 == 0x00) {
             //> lda #$22                 ;if so, put further down on the screen
-            temp1 = 0x22
+            temp2 = 0x22
         }
         //> SetupNums:   sta VRAM_Buffer1,x
-        vramBuffer1[temp2] = temp1
+        vramBuffer1[temp3] = temp2
         //> lda StatusBarData,y      ;write low vram address and length of thing
-        temp1 = statusBarData[temp3]
+        temp2 = statusBarData[temp4]
         //> sta VRAM_Buffer1+1,x     ;we're printing to the buffer
-        vramBuffer1[1 + temp2] = temp1
+        vramBuffer1[1 + temp3] = temp2
         //> lda StatusBarData+1,y
-        temp1 = statusBarData[1 + temp3]
+        temp2 = statusBarData[1 + temp4]
         //> sta VRAM_Buffer1+2,x
-        vramBuffer1[2 + temp2] = temp1
+        vramBuffer1[2 + temp3] = temp2
         //> sta $03                  ;save length byte in counter
-        memory[0x3] = temp1.toUByte()
+        memory[0x3] = temp2.toUByte()
         //> stx $02                  ;and buffer pointer elsewhere for now
-        memory[0x2] = temp2.toUByte()
+        memory[0x2] = temp3.toUByte()
         //> pla                      ;pull original incremented value from stack
-        temp1 = pull()
+        temp2 = pull()
         //> tax
         //> lda StatusBarOffset,x    ;load offset to value we want to write
-        temp1 = statusBarOffset[temp1]
+        temp2 = statusBarOffset[temp2]
         //> sec
         //> sbc StatusBarData+1,y    ;subtract from length byte we read before
+        temp5 = temp2 - statusBarData[1 + temp4]
+        temp2 = temp5 and 0xFF
         //> tay                      ;use value as offset to display digits
         //> ldx $02
-        temp2 = memory[0x2].toInt()
-        temp3 = (temp1 - statusBarData[1 + temp3]) and 0xFF
+        temp3 = memory[0x2].toInt()
+        temp4 = temp2
         do {
             //> DigitPLoop:  lda DisplayDigits,y      ;write digits to the buffer
-            temp1 = displayDigits[temp3]
+            temp2 = displayDigits[temp4]
             //> sta VRAM_Buffer1+3,x
-            vramBuffer1[3 + temp2] = temp1
+            vramBuffer1[3 + temp3] = temp2
             //> inx
-            temp2 = (temp2 + 1) and 0xFF
-            //> iny
             temp3 = (temp3 + 1) and 0xFF
+            //> iny
+            temp4 = (temp4 + 1) and 0xFF
             //> dec $03                  ;do this until all the digits are written
             memory[0x3] = ((memory[0x3].toInt() - 1) and 0xFF).toUByte()
             //> bne DigitPLoop
-        } while (((memory[0x3].toInt() - 1) and 0xFF) != 0)
+        } while (memory[0x3].toInt() != 0)
         //> lda #$00                 ;put null terminator at end
-        temp1 = 0x00
+        temp2 = 0x00
         //> sta VRAM_Buffer1+3,x
-        vramBuffer1[3 + temp2] = temp1
+        vramBuffer1[3 + temp3] = temp2
         //> inx                      ;increment buffer pointer by 3
-        temp2 = (temp2 + 1) and 0xFF
+        temp3 = (temp3 + 1) and 0xFF
         //> inx
-        temp2 = (temp2 + 1) and 0xFF
+        temp3 = (temp3 + 1) and 0xFF
         //> inx
-        temp2 = (temp2 + 1) and 0xFF
+        temp3 = (temp3 + 1) and 0xFF
         //> stx VRAM_Buffer1_Offset  ;store it in case we want to use it again
-        vramBuffer1Offset = temp2
+        vramBuffer1Offset = temp3
     }
     //> ExitOutputN: rts
     return
@@ -2453,6 +3341,7 @@ fun digitsMathRoutine(Y: Int) {
     var Y: Int = Y
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
     var operMode by MemoryByte(OperMode)
     val digitModifier by MemoryByteIndexed(DigitModifier)
     val displayDigits by MemoryByteIndexed(DisplayDigits)
@@ -2477,9 +3366,11 @@ fun digitsMathRoutine(Y: Int) {
                     temp0 = digitModifier[temp1]
                     //> clc
                     //> adc DisplayDigits,y       ;add to current digit
+                    temp2 = temp0 + displayDigits[Y]
+                    temp0 = temp2 and 0xFF
                     //> bmi BorrowOne             ;if result is a negative number, branch to subtract
                     //> StoreNewD:  sta DisplayDigits,y       ;store as new score or game timer digit
-                    displayDigits[Y] = (temp0 + displayDigits[Y]) and 0xFF
+                    displayDigits[Y] = temp0
                     //> dey                       ;move onto next digits in score or game timer
                     Y = (Y - 1) and 0xFF
                     //> dex                       ;and digit amounts to increment
@@ -2511,6 +3402,8 @@ fun updateTopScore() {
     //> jsr TopScoreCheck
     topScoreCheck(0x05)
     //> ldx #$0b          ;now do luigi's score
+    // Fall-through tail call to topScoreCheck
+    topScoreCheck(0x0B)
 }
 
 // Decompiled from TopScoreCheck
@@ -2518,6 +3411,7 @@ fun topScoreCheck(X: Int) {
     var X: Int = X
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
     val playerScoreDisplay by MemoryByteIndexed(PlayerScoreDisplay)
     val topScoreDisplay by MemoryByteIndexed(TopScoreDisplay)
     //> TopScoreCheck:
@@ -2527,6 +3421,7 @@ fun topScoreCheck(X: Int) {
     do {
         //> GetScoreDiff: lda PlayerScoreDisplay,x ;subtract each player digit from each high score digit
         //> sbc TopScoreDisplay,y    ;from lowest to highest, if any top score digit exceeds
+        temp1 = playerScoreDisplay[X] - topScoreDisplay[temp0]
         //> dex                      ;any player digit, borrow will be set until a subsequent
         X = (X - 1) and 0xFF
         //> dey                      ;subtraction clears it (player digit is higher than top)
@@ -2534,17 +3429,17 @@ fun topScoreCheck(X: Int) {
         //> bpl GetScoreDiff
     } while ((temp0 and 0x80) == 0)
     //> bcc NoTopSc              ;check to see if borrow is still set, if so, no new high score
-    temp1 = (playerScoreDisplay[X] - topScoreDisplay[temp0]) and 0xFF
-    if (playerScoreDisplay[X] - topScoreDisplay[temp0] >= 0) {
+    temp2 = temp1 and 0xFF
+    if (temp1 >= 0) {
         //> inx                      ;increment X and Y once to the start of the score
         X = (X + 1) and 0xFF
         //> iny
         temp0 = (temp0 + 1) and 0xFF
         do {
             //> CopyScore:    lda PlayerScoreDisplay,x ;store player's score digits into high score memory area
-            temp1 = playerScoreDisplay[X]
+            temp2 = playerScoreDisplay[X]
             //> sta TopScoreDisplay,y
-            topScoreDisplay[temp0] = temp1
+            topScoreDisplay[temp0] = temp2
             //> inx
             X = (X + 1) and 0xFF
             //> iny
@@ -2554,6 +3449,289 @@ fun topScoreCheck(X: Int) {
         } while (!(temp0 >= 0x06))
     }
     //> NoTopSc:      rts
+    return
+}
+
+// Decompiled from InitializeGame
+fun initializeGame(A: Int) {
+    var temp0: Int = 0
+    var demoTimer by MemoryByte(DemoTimer)
+    val soundMemory by MemoryByteIndexed(SoundMemory)
+    //> InitializeGame:
+    //> ldy #$6f              ;clear all memory as in initialization procedure,
+    //> jsr InitializeMemory  ;but this time, clear only as far as $076f
+    initializeMemory(0x6F)
+    //> ldy #$1f
+    temp0 = 0x1F
+    do {
+        //> ClrSndLoop:  sta SoundMemory,y     ;clear out memory used
+        soundMemory[temp0] = A
+        //> dey                   ;by the sound engines
+        temp0 = (temp0 - 1) and 0xFF
+        //> bpl ClrSndLoop
+    } while ((temp0 and 0x80) == 0)
+    //> lda #$18              ;set demo timer
+    //> sta DemoTimer
+    demoTimer = 0x18
+    //> jsr LoadAreaPointer
+    loadAreaPointer(0x18)
+    // Fall-through tail call to initializeArea
+    initializeArea()
+}
+
+// Decompiled from InitializeArea
+fun initializeArea() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var altEntranceControl by MemoryByte(AltEntranceControl)
+    var areaMusicQueue by MemoryByte(AreaMusicQueue)
+    var backloadingFlag by MemoryByte(BackloadingFlag)
+    var blockBufferColumnPos by MemoryByte(BlockBufferColumnPos)
+    var columnSets by MemoryByte(ColumnSets)
+    var currentntaddrHigh by MemoryByte(CurrentNTAddr_High)
+    var currentntaddrLow by MemoryByte(CurrentNTAddr_Low)
+    var currentPageLoc by MemoryByte(CurrentPageLoc)
+    var disableScreenFlag by MemoryByte(DisableScreenFlag)
+    var entrancePage by MemoryByte(EntrancePage)
+    var halfwayPage by MemoryByte(HalfwayPage)
+    var levelNumber by MemoryByte(LevelNumber)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var playerEntranceCtrl by MemoryByte(PlayerEntranceCtrl)
+    var primaryHardMode by MemoryByte(PrimaryHardMode)
+    var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
+    var secondaryHardMode by MemoryByte(SecondaryHardMode)
+    var worldNumber by MemoryByte(WorldNumber)
+    val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
+    val timers by MemoryByteIndexed(Timers)
+    //> InitializeArea:
+    //> ldy #$4b                 ;clear all memory again, only as far as $074b
+    //> jsr InitializeMemory     ;this is only necessary if branching from
+    initializeMemory(0x4B)
+    //> ldx #$21
+    //> lda #$00
+    temp0 = 0x21
+    temp1 = 0x4B
+    do {
+        //> ClrTimersLoop: sta Timers,x             ;clear out memory between
+        timers[temp0] = 0x00
+        //> dex                      ;$0780 and $07a1
+        temp0 = (temp0 - 1) and 0xFF
+        //> bpl ClrTimersLoop
+    } while ((temp0 and 0x80) == 0)
+    //> lda HalfwayPage
+    //> ldy AltEntranceControl   ;if AltEntranceControl not set, use halfway page, if any found
+    temp1 = altEntranceControl
+    //> beq StartPage
+    temp2 = halfwayPage
+    if (temp1 != 0) {
+        //> lda EntrancePage         ;otherwise use saved entry page number here
+        temp2 = entrancePage
+    }
+    //> StartPage:     sta ScreenLeft_PageLoc   ;set as value here
+    screenleftPageloc = temp2
+    //> sta CurrentPageLoc       ;also set as current page
+    currentPageLoc = temp2
+    //> sta BackloadingFlag      ;set flag here if halfway page or saved entry page number found
+    backloadingFlag = temp2
+    //> jsr GetScreenPosition    ;get pixel coordinates for screen borders
+    getScreenPosition()
+    //> ldy #$20                 ;if on odd numbered page, use $2480 as start of rendering
+    temp1 = 0x20
+    //> and #%00000001           ;otherwise use $2080, this address used later as name table
+    temp3 = temp2 and 0x01
+    //> beq SetInitNTHigh        ;address for rendering of game area
+    temp2 = temp3
+    if (temp3 != 0) {
+        //> ldy #$24
+        temp1 = 0x24
+    }
+    //> SetInitNTHigh: sty CurrentNTAddr_High   ;store name table address
+    currentntaddrHigh = temp1
+    //> ldy #$80
+    temp1 = 0x80
+    //> sty CurrentNTAddr_Low
+    currentntaddrLow = temp1
+    //> asl                      ;store LSB of page number in high nybble
+    temp2 = (temp2 shl 1) and 0xFF
+    //> asl                      ;of block buffer column position
+    temp2 = (temp2 shl 1) and 0xFF
+    //> asl
+    temp2 = (temp2 shl 1) and 0xFF
+    //> asl
+    temp2 = (temp2 shl 1) and 0xFF
+    //> sta BlockBufferColumnPos
+    blockBufferColumnPos = temp2
+    //> dec AreaObjectLength     ;set area object lengths for all empty
+    areaObjectLength[0] = (areaObjectLength[0] - 1) and 0xFF
+    //> dec AreaObjectLength+1
+    areaObjectLength[1] = (areaObjectLength[1] - 1) and 0xFF
+    //> dec AreaObjectLength+2
+    areaObjectLength[2] = (areaObjectLength[2] - 1) and 0xFF
+    //> lda #$0b                 ;set value for renderer to update 12 column sets
+    temp2 = 0x0B
+    //> sta ColumnSets           ;12 column sets = 24 metatile columns = 1 1/2 screens
+    columnSets = temp2
+    //> jsr GetAreaDataAddrs     ;get enemy and level addresses and load header
+    getAreaDataAddrs()
+    //> lda PrimaryHardMode      ;check to see if primary hard mode has been activated
+    temp2 = primaryHardMode
+    //> bne SetSecHard           ;if so, activate the secondary no matter where we're at
+    if (temp2 == 0) {
+        //> lda WorldNumber          ;otherwise check world number
+        temp2 = worldNumber
+        //> cmp #World5              ;if less than 5, do not activate secondary
+        //> bcc CheckHalfway
+        if (temp2 >= World5) {
+            //> bne SetSecHard           ;if not equal to, then world > 5, thus activate
+            if (temp2 == World5) {
+                //> lda LevelNumber          ;otherwise, world 5, so check level number
+                temp2 = levelNumber
+                //> cmp #Level3              ;if 1 or 2, do not set secondary hard mode flag
+                //> bcc CheckHalfway
+                if (temp2 >= Level3) {
+                }
+            }
+        }
+    }
+    //> SetSecHard:    inc SecondaryHardMode    ;set secondary hard mode flag for areas 5-3 and beyond
+    secondaryHardMode = (secondaryHardMode + 1) and 0xFF
+    //> CheckHalfway:  lda HalfwayPage
+    temp2 = halfwayPage
+    //> beq DoneInitArea
+    if (temp2 != 0) {
+        //> lda #$02                 ;if halfway page set, overwrite start position from header
+        temp2 = 0x02
+        //> sta PlayerEntranceCtrl
+        playerEntranceCtrl = temp2
+    }
+    //> DoneInitArea:  lda #Silence             ;silence music
+    temp2 = Silence
+    //> sta AreaMusicQueue
+    areaMusicQueue = temp2
+    //> lda #$01                 ;disable screen output
+    temp2 = 0x01
+    //> sta DisableScreenFlag
+    disableScreenFlag = temp2
+    //> inc OperMode_Task        ;increment one of the modes
+    opermodeTask = (opermodeTask + 1) and 0xFF
+    //> rts
+    return
+}
+
+// Decompiled from PrimaryGameSetup
+fun primaryGameSetup() {
+    var fetchNewGameTimerFlag by MemoryByte(FetchNewGameTimerFlag)
+    var numberofLives by MemoryByte(NumberofLives)
+    var offscrNumberoflives by MemoryByte(OffScr_NumberofLives)
+    var playerSize by MemoryByte(PlayerSize)
+    //> PrimaryGameSetup:
+    //> lda #$01
+    //> sta FetchNewGameTimerFlag   ;set flag to load game timer from header
+    fetchNewGameTimerFlag = 0x01
+    //> sta PlayerSize              ;set player's size to small
+    playerSize = 0x01
+    //> lda #$02
+    //> sta NumberofLives           ;give each player three lives
+    numberofLives = 0x02
+    //> sta OffScr_NumberofLives
+    offscrNumberoflives = 0x02
+    // Fall-through tail call to secondaryGameSetup
+    secondaryGameSetup()
+}
+
+// Decompiled from SecondaryGameSetup
+fun secondaryGameSetup() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var backloadingFlag by MemoryByte(BackloadingFlag)
+    var balPlatformAlignment by MemoryByte(BalPlatformAlignment)
+    var disableIntermediate by MemoryByte(DisableIntermediate)
+    var disableScreenFlag by MemoryByte(DisableScreenFlag)
+    var gameTimerExpiredFlag by MemoryByte(GameTimerExpiredFlag)
+    var mirrorPpuCtrlReg1 by MemoryByte(Mirror_PPU_CTRL_REG1)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
+    var sprite0HitDetectFlag by MemoryByte(Sprite0HitDetectFlag)
+    val defaultSprOffsets by MemoryByteIndexed(DefaultSprOffsets)
+    val sprDataOffset by MemoryByteIndexed(SprDataOffset)
+    val sprShuffleAmt by MemoryByteIndexed(SprShuffleAmt)
+    val sprite0Data by MemoryByteIndexed(Sprite0Data)
+    val spriteData by MemoryByteIndexed(Sprite_Data)
+    val vramBuffer1 by MemoryByteIndexed(VRAM_Buffer1)
+    //> SecondaryGameSetup:
+    //> lda #$00
+    //> sta DisableScreenFlag     ;enable screen output
+    disableScreenFlag = 0x00
+    //> tay
+    temp0 = 0x00
+    do {
+        //> ClearVRLoop: sta VRAM_Buffer1-1,y      ;clear buffer at $0300-$03ff
+        vramBuffer1[-1 + temp0] = 0x00
+        //> iny
+        temp0 = (temp0 + 1) and 0xFF
+        //> bne ClearVRLoop
+    } while (temp0 != 0)
+    //> sta GameTimerExpiredFlag  ;clear game timer exp flag
+    gameTimerExpiredFlag = 0x00
+    //> sta DisableIntermediate   ;clear skip lives display flag
+    disableIntermediate = 0x00
+    //> sta BackloadingFlag       ;clear value here
+    backloadingFlag = 0x00
+    //> lda #$ff
+    //> sta BalPlatformAlignment  ;initialize balance platform assignment flag
+    balPlatformAlignment = 0xFF
+    //> lda ScreenLeft_PageLoc    ;get left side page location
+    //> lsr Mirror_PPU_CTRL_REG1  ;shift LSB of ppu register #1 mirror out
+    mirrorPpuCtrlReg1 = mirrorPpuCtrlReg1 shr 1
+    //> and #$01                  ;mask out all but LSB of page location
+    temp1 = screenleftPageloc and 0x01
+    //> ror                       ;rotate LSB of page location into carry then onto mirror
+    temp1 = temp1 shr 1 or if ((mirrorPpuCtrlReg1 and 0x01) != 0) 0x80 else 0
+    //> rol Mirror_PPU_CTRL_REG1  ;this is to set the proper PPU name table
+    mirrorPpuCtrlReg1 = (mirrorPpuCtrlReg1 shl 1) and 0xFE or if ((temp1 and 0x01) != 0) 1 else 0
+    //> jsr GetAreaMusic          ;load proper music into queue
+    getAreaMusic()
+    //> lda #$38                  ;load sprite shuffle amounts to be used later
+    //> sta SprShuffleAmt+2
+    sprShuffleAmt[2] = 0x38
+    //> lda #$48
+    //> sta SprShuffleAmt+1
+    sprShuffleAmt[1] = 0x48
+    //> lda #$58
+    //> sta SprShuffleAmt
+    sprShuffleAmt[0] = 0x58
+    //> ldx #$0e                  ;load default OAM offsets into $06e4-$06f2
+    temp2 = 0x0E
+    do {
+        //> ShufAmtLoop: lda DefaultSprOffsets,x
+        //> sta SprDataOffset,x
+        sprDataOffset[temp2] = defaultSprOffsets[temp2]
+        //> dex                       ;do this until they're all set
+        temp2 = (temp2 - 1) and 0xFF
+        //> bpl ShufAmtLoop
+    } while ((temp2 and 0x80) == 0)
+    //> ldy #$03                  ;set up sprite #0
+    temp0 = 0x03
+    do {
+        //> ISpr0Loop:   lda Sprite0Data,y
+        //> sta Sprite_Data,y
+        spriteData[temp0] = sprite0Data[temp0]
+        //> dey
+        temp0 = (temp0 - 1) and 0xFF
+        //> bpl ISpr0Loop
+    } while ((temp0 and 0x80) == 0)
+    //> jsr DoNothing2            ;these jsrs doesn't do anything useful
+    doNothing2()
+    //> jsr DoNothing1
+    doNothing1()
+    //> inc Sprite0HitDetectFlag  ;set sprite #0 check flag
+    sprite0HitDetectFlag = (sprite0HitDetectFlag + 1) and 0xFF
+    //> inc OperMode_Task         ;increment to next task
+    opermodeTask = (opermodeTask + 1) and 0xFF
+    //> rts
     return
 }
 
@@ -2640,6 +3818,371 @@ fun getAreaMusic() {
     return
 }
 
+// Decompiled from Entrance_GameTimerSetup
+fun entranceGametimersetup() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var altEntranceControl by MemoryByte(AltEntranceControl)
+    var areaType by MemoryByte(AreaType)
+    var blockYPosition by MemoryByte(Block_Y_Position)
+    var fetchNewGameTimerFlag by MemoryByte(FetchNewGameTimerFlag)
+    var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
+    var gameTimerSetting by MemoryByte(GameTimerSetting)
+    var halfwayPage by MemoryByte(HalfwayPage)
+    var joypadOverride by MemoryByte(JoypadOverride)
+    var playerEntranceCtrl by MemoryByte(PlayerEntranceCtrl)
+    var playerFacingDir by MemoryByte(PlayerFacingDir)
+    var playerCollisionbits by MemoryByte(Player_CollisionBits)
+    var playerPageloc by MemoryByte(Player_PageLoc)
+    var playerSprattrib by MemoryByte(Player_SprAttrib)
+    var playerState by MemoryByte(Player_State)
+    var playerXPosition by MemoryByte(Player_X_Position)
+    var playerYHighpos by MemoryByte(Player_Y_HighPos)
+    var playerYPosition by MemoryByte(Player_Y_Position)
+    var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
+    var starInvincibleTimer by MemoryByte(StarInvincibleTimer)
+    var swimmingFlag by MemoryByte(SwimmingFlag)
+    var verticalForceDown by MemoryByte(VerticalForceDown)
+    val altYPosOffset by MemoryByteIndexed(AltYPosOffset)
+    val gameTimerData by MemoryByteIndexed(GameTimerData)
+    val gameTimerDisplay by MemoryByteIndexed(GameTimerDisplay)
+    val playerBGPriorityData by MemoryByteIndexed(PlayerBGPriorityData)
+    val playerstartingXPos by MemoryByteIndexed(PlayerStarting_X_Pos)
+    val playerstartingYPos by MemoryByteIndexed(PlayerStarting_Y_Pos)
+    //> Entrance_GameTimerSetup:
+    //> lda ScreenLeft_PageLoc      ;set current page for area objects
+    //> sta Player_PageLoc          ;as page location for player
+    playerPageloc = screenleftPageloc
+    //> lda #$28                    ;store value here
+    //> sta VerticalForceDown       ;for fractional movement downwards if necessary
+    verticalForceDown = 0x28
+    //> lda #$01                    ;set high byte of player position and
+    //> sta PlayerFacingDir         ;set facing direction so that player faces right
+    playerFacingDir = 0x01
+    //> sta Player_Y_HighPos
+    playerYHighpos = 0x01
+    //> lda #$00                    ;set player state to on the ground by default
+    //> sta Player_State
+    playerState = 0x00
+    //> dec Player_CollisionBits    ;initialize player's collision bits
+    playerCollisionbits = (playerCollisionbits - 1) and 0xFF
+    //> ldy #$00                    ;initialize halfway page
+    //> sty HalfwayPage
+    halfwayPage = 0x00
+    //> lda AreaType                ;check area type
+    //> bne ChkStPos                ;if water type, set swimming flag, otherwise do not set
+    temp0 = areaType
+    temp1 = 0x00
+    if (areaType == 0) {
+        //> iny
+        temp1 = (temp1 + 1) and 0xFF
+    }
+    //> ChkStPos: sty SwimmingFlag
+    swimmingFlag = temp1
+    //> ldx PlayerEntranceCtrl      ;get starting position loaded from header
+    //> ldy AltEntranceControl      ;check alternate mode of entry flag for 0 or 1
+    temp1 = altEntranceControl
+    //> beq SetStPos
+    temp2 = playerEntranceCtrl
+    if (temp1 != 0) {
+        //> cpy #$01
+        //> beq SetStPos
+        if (temp1 != 0x01) {
+            //> ldx AltYPosOffset-2,y       ;if not 0 or 1, override $0710 with new offset in X
+            temp2 = altYPosOffset[-2 + temp1]
+        }
+    }
+    //> SetStPos: lda PlayerStarting_X_Pos,y  ;load appropriate horizontal position
+    temp0 = playerstartingXPos[temp1]
+    //> sta Player_X_Position       ;and vertical positions for the player, using
+    playerXPosition = temp0
+    //> lda PlayerStarting_Y_Pos,x  ;AltEntranceControl as offset for horizontal and either $0710
+    temp0 = playerstartingYPos[temp2]
+    //> sta Player_Y_Position       ;or value that overwrote $0710 as offset for vertical
+    playerYPosition = temp0
+    //> lda PlayerBGPriorityData,x
+    temp0 = playerBGPriorityData[temp2]
+    //> sta Player_SprAttrib        ;set player sprite attributes using offset in X
+    playerSprattrib = temp0
+    //> jsr GetPlayerColors         ;get appropriate player palette
+    getPlayerColors()
+    //> ldy GameTimerSetting        ;get timer control value from header
+    temp1 = gameTimerSetting
+    //> beq ChkOverR                ;if set to zero, branch (do not use dummy byte for this)
+    if (temp1 != 0) {
+        //> lda FetchNewGameTimerFlag   ;do we need to set the game timer? if not, use
+        temp0 = fetchNewGameTimerFlag
+        //> beq ChkOverR                ;old game timer setting
+        if (temp0 != 0) {
+            //> lda GameTimerData,y         ;if game timer is set and game timer flag is also set,
+            temp0 = gameTimerData[temp1]
+            //> sta GameTimerDisplay        ;use value of game timer control for first digit of game timer
+            gameTimerDisplay[0] = temp0
+            //> lda #$01
+            temp0 = 0x01
+            //> sta GameTimerDisplay+2      ;set last digit of game timer to 1
+            gameTimerDisplay[2] = temp0
+            //> lsr
+            temp0 = temp0 shr 1
+            //> sta GameTimerDisplay+1      ;set second digit of game timer
+            gameTimerDisplay[1] = temp0
+            //> sta FetchNewGameTimerFlag   ;clear flag for game timer reset
+            fetchNewGameTimerFlag = temp0
+            //> sta StarInvincibleTimer     ;clear star mario timer
+            starInvincibleTimer = temp0
+        }
+    }
+    //> ChkOverR: ldy JoypadOverride          ;if controller bits not set, branch to skip this part
+    temp1 = joypadOverride
+    //> beq ChkSwimE
+    if (temp1 != 0) {
+        //> lda #$03                    ;set player state to climbing
+        temp0 = 0x03
+        //> sta Player_State
+        playerState = temp0
+        //> ldx #$00                    ;set offset for first slot, for block object
+        temp2 = 0x00
+        //> jsr InitBlock_XY_Pos
+        initblockXyPos(temp2)
+        //> lda #$f0                    ;set vertical coordinate for block object
+        temp0 = 0xF0
+        //> sta Block_Y_Position
+        blockYPosition = temp0
+        //> ldx #$05                    ;set offset in X for last enemy object buffer slot
+        temp2 = 0x05
+        //> ldy #$00                    ;set offset in Y for object coordinates used earlier
+        temp1 = 0x00
+        //> jsr Setup_Vine              ;do a sub to grow vine
+        setupVine(temp2, temp1)
+    }
+    //> ChkSwimE: ldy AreaType                ;if level not water-type,
+    temp1 = areaType
+    //> bne SetPESub                ;skip this subroutine
+    if (temp1 == 0) {
+        //> jsr SetupBubble             ;otherwise, execute sub to set up air bubbles
+        setupBubble(temp2)
+    }
+    //> SetPESub: lda #$07                    ;set to run player entrance subroutine
+    temp0 = 0x07
+    //> sta GameEngineSubroutine    ;on the next frame of game engine
+    gameEngineSubroutine = temp0
+    //> rts
+    return
+}
+
+// Decompiled from PlayerLoseLife
+fun playerLoseLife() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var disableScreenFlag by MemoryByte(DisableScreenFlag)
+    var eventMusicQueue by MemoryByte(EventMusicQueue)
+    var fetchNewGameTimerFlag by MemoryByte(FetchNewGameTimerFlag)
+    var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
+    var halfwayPage by MemoryByte(HalfwayPage)
+    var levelNumber by MemoryByte(LevelNumber)
+    var numberofLives by MemoryByte(NumberofLives)
+    var operMode by MemoryByte(OperMode)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var playerSize by MemoryByte(PlayerSize)
+    var playerStatus by MemoryByte(PlayerStatus)
+    var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
+    var sprite0HitDetectFlag by MemoryByte(Sprite0HitDetectFlag)
+    var timerControl by MemoryByte(TimerControl)
+    var worldNumber by MemoryByte(WorldNumber)
+    val halfwayPageNybbles by MemoryByteIndexed(HalfwayPageNybbles)
+    //> PlayerLoseLife:
+    //> inc DisableScreenFlag    ;disable screen and sprite 0 check
+    disableScreenFlag = (disableScreenFlag + 1) and 0xFF
+    //> lda #$00
+    //> sta Sprite0HitDetectFlag
+    sprite0HitDetectFlag = 0x00
+    //> lda #Silence             ;silence music
+    //> sta EventMusicQueue
+    eventMusicQueue = Silence
+    //> dec NumberofLives        ;take one life from player
+    numberofLives = (numberofLives - 1) and 0xFF
+    //> bpl StillInGame          ;if player still has lives, branch
+    temp0 = Silence
+    if ((numberofLives and 0x80) != 0) {
+        //> lda #$00
+        temp0 = 0x00
+        //> sta OperMode_Task        ;initialize mode task,
+        opermodeTask = temp0
+        //> lda #GameOverModeValue   ;switch to game over mode
+        temp0 = GameOverModeValue
+        //> sta OperMode             ;and leave
+        operMode = temp0
+        //> rts
+        return
+    } else {
+        //> StillInGame: lda WorldNumber          ;multiply world number by 2 and use
+        temp0 = worldNumber
+        //> asl                      ;as offset
+        temp0 = (temp0 shl 1) and 0xFF
+        //> tax
+        //> lda LevelNumber          ;if in area -3 or -4, increment
+        temp0 = levelNumber
+        //> and #$02                 ;offset by one byte, otherwise
+        temp1 = temp0 and 0x02
+        //> beq GetHalfway           ;leave offset alone
+        temp0 = temp1
+        temp2 = temp0
+        if (temp1 != 0) {
+            //> inx
+            temp2 = (temp2 + 1) and 0xFF
+        }
+    }
+    //> GetHalfway:  ldy HalfwayPageNybbles,x ;get halfway page number with offset
+    //> lda LevelNumber          ;check area number's LSB
+    temp0 = levelNumber
+    //> lsr
+    temp0 = temp0 shr 1
+    //> tya                      ;if in area -2 or -4, use lower nybble
+    //> bcs MaskHPNyb
+    temp0 = halfwayPageNybbles[temp2]
+    temp3 = halfwayPageNybbles[temp2]
+    if ((temp0 and 0x01) == 0) {
+        //> lsr                      ;move higher nybble to lower if area
+        temp0 = temp0 shr 1
+        //> lsr                      ;number is -1 or -3
+        temp0 = temp0 shr 1
+        //> lsr
+        temp0 = temp0 shr 1
+        //> lsr
+        temp0 = temp0 shr 1
+    }
+    //> MaskHPNyb:   and #%00001111           ;mask out all but lower nybble
+    temp4 = temp0 and 0x0F
+    //> cmp ScreenLeft_PageLoc
+    //> beq SetHalfway           ;left side of screen must be at the halfway page,
+    if (temp4 - screenleftPageloc == 0) {
+        //  goto SetHalfway
+        return
+    }
+    temp0 = temp4
+    if (temp4 != screenleftPageloc) {
+        //> bcc SetHalfway           ;otherwise player must start at the
+        if (!(temp4 >= screenleftPageloc)) {
+            //  goto SetHalfway
+            return
+        }
+        if (temp4 >= screenleftPageloc) {
+            //> lda #$00                 ;beginning of the level
+            temp0 = 0x00
+        }
+    }
+    //> SetHalfway:  sta HalfwayPage          ;store as halfway page for player
+    halfwayPage = temp0
+    //> jsr TransposePlayers     ;switch players around if 2-player game
+    transposePlayers()
+    //> jmp ContinueGame         ;continue the game
+    //> ContinueGame:
+    //> jsr LoadAreaPointer       ;update level pointer with
+    loadAreaPointer(temp0)
+    //> lda #$01                  ;actual world and area numbers, then
+    temp0 = 0x01
+    //> sta PlayerSize            ;reset player's size, status, and
+    playerSize = temp0
+    //> inc FetchNewGameTimerFlag ;set game timer flag to reload
+    fetchNewGameTimerFlag = (fetchNewGameTimerFlag + 1) and 0xFF
+    //> lda #$00                  ;game timer from header
+    temp0 = 0x00
+    //> sta TimerControl          ;also set flag for timers to count again
+    timerControl = temp0
+    //> sta PlayerStatus
+    playerStatus = temp0
+    //> sta GameEngineSubroutine  ;reset task for game core
+    gameEngineSubroutine = temp0
+    //> sta OperMode_Task         ;set modes and leave
+    opermodeTask = temp0
+    //> lda #$01                  ;if in game over mode, switch back to
+    temp0 = 0x01
+    //> sta OperMode              ;game mode, because game is still on
+    operMode = temp0
+    //> GameIsOn:  rts
+    return
+}
+
+// Decompiled from GameOverMode
+fun gameOverMode() {
+    var opermodeTask by MemoryByte(OperMode_Task)
+    //> GameOverMode:
+    //> lda OperMode_Task
+    //> jsr JumpEngine
+    when (opermodeTask) {
+        0 -> {
+            setupGameOver()
+        }
+        1 -> {
+            screenRoutines()
+        }
+        2 -> {
+            runGameOver()
+        }
+        else -> {
+            // Unknown JumpEngine index
+        }
+    }
+    return
+}
+
+// Decompiled from SetupGameOver
+fun setupGameOver() {
+    var disableScreenFlag by MemoryByte(DisableScreenFlag)
+    var eventMusicQueue by MemoryByte(EventMusicQueue)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var screenRoutineTask by MemoryByte(ScreenRoutineTask)
+    var sprite0HitDetectFlag by MemoryByte(Sprite0HitDetectFlag)
+    //> SetupGameOver:
+    //> lda #$00                  ;reset screen routine task control for title screen, game,
+    //> sta ScreenRoutineTask     ;and game over modes
+    screenRoutineTask = 0x00
+    //> sta Sprite0HitDetectFlag  ;disable sprite 0 check
+    sprite0HitDetectFlag = 0x00
+    //> lda #GameOverMusic
+    //> sta EventMusicQueue       ;put game over music in secondary queue
+    eventMusicQueue = GameOverMusic
+    //> inc DisableScreenFlag     ;disable screen output
+    disableScreenFlag = (disableScreenFlag + 1) and 0xFF
+    //> inc OperMode_Task         ;set secondary mode to 1
+    opermodeTask = (opermodeTask + 1) and 0xFF
+    //> rts
+    return
+}
+
+// Decompiled from RunGameOver
+fun runGameOver() {
+    var temp0: Int = 0
+    var disableScreenFlag by MemoryByte(DisableScreenFlag)
+    var savedJoypad1Bits by MemoryByte(SavedJoypad1Bits)
+    var screenTimer by MemoryByte(ScreenTimer)
+    //> RunGameOver:
+    //> lda #$00              ;reenable screen
+    //> sta DisableScreenFlag
+    disableScreenFlag = 0x00
+    //> lda SavedJoypad1Bits  ;check controller for start pressed
+    //> and #Start_Button
+    temp0 = savedJoypad1Bits and Start_Button
+    //> bne TerminateGame
+    if (!(temp0 == 0)) {
+        //  goto TerminateGame
+        return
+    } else {
+        //> lda ScreenTimer       ;if not pressed, wait for
+        //> bne GameIsOn          ;screen timer to expire
+        if (!(screenTimer == 0)) {
+            //  goto GameIsOn
+            return
+        }
+    }
+    //> GameIsOn:  rts
+    return
+}
+
 // Decompiled from TerminateGame
 fun terminateGame() {
     var temp0: Int = 0
@@ -2661,6 +4204,10 @@ fun terminateGame() {
     //> jsr TransposePlayers  ;check if other player can keep
     transposePlayers()
     //> bcc ContinueGame      ;going, and do so if possible
+    if (!(flagC)) {
+        //  goto ContinueGame
+        return
+    }
     temp0 = Silence
     if (flagC) {
         //> lda WorldNumber       ;otherwise put world number of current
@@ -2766,6 +4313,8 @@ fun doNothing1() {
     //> lda #$ff       ;this is residual code, this value is
     //> sta $06c9      ;not used anywhere in the program
     memory[0x6C9] = 0xFF.toUByte()
+    // Fall-through tail call to doNothing2
+    doNothing2()
 }
 
 // Decompiled from DoNothing2
@@ -2799,7 +4348,7 @@ fun areaParserTaskHandler() {
     areaParserTaskNum = (areaParserTaskNum - 1) and 0xFF
     //> bne SkipATRender          ;render attribute table yet
     temp1 = temp0
-    if (((areaParserTaskNum - 1) and 0xFF) == 0) {
+    if (areaParserTaskNum == 0) {
         //> jsr RenderAttributeTables
         renderAttributeTables()
     }
@@ -2843,14 +4392,350 @@ fun areaParserTasks() {
     return
 }
 
+// Decompiled from IncrementColumnPos
+fun incrementColumnPos() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var blockBufferColumnPos by MemoryByte(BlockBufferColumnPos)
+    var currentColumnPos by MemoryByte(CurrentColumnPos)
+    var currentPageLoc by MemoryByte(CurrentPageLoc)
+    //> IncrementColumnPos:
+    //> inc CurrentColumnPos     ;increment column where we're at
+    currentColumnPos = (currentColumnPos + 1) and 0xFF
+    //> lda CurrentColumnPos
+    //> and #%00001111           ;mask out higher nybble
+    temp0 = currentColumnPos and 0x0F
+    //> bne NoColWrap
+    temp1 = temp0
+    if (temp0 == 0) {
+        //> sta CurrentColumnPos     ;if no bits left set, wrap back to zero (0-f)
+        currentColumnPos = temp1
+        //> inc CurrentPageLoc       ;and increment page number where we're at
+        currentPageLoc = (currentPageLoc + 1) and 0xFF
+    }
+    //> NoColWrap: inc BlockBufferColumnPos ;increment column offset where we're at
+    blockBufferColumnPos = (blockBufferColumnPos + 1) and 0xFF
+    //> lda BlockBufferColumnPos
+    temp1 = blockBufferColumnPos
+    //> and #%00011111           ;mask out all but 5 LSB (0-1f)
+    temp2 = temp1 and 0x1F
+    //> sta BlockBufferColumnPos ;and save
+    blockBufferColumnPos = temp2
+    //> rts
+    return
+}
+
+// Decompiled from AreaParserCore
+fun areaParserCore() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp10: Int = 0
+    var temp11: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
+    var areaType by MemoryByte(AreaType)
+    var backgroundScenery by MemoryByte(BackgroundScenery)
+    var backloadingFlag by MemoryByte(BackloadingFlag)
+    var blockBufferColumnPos by MemoryByte(BlockBufferColumnPos)
+    var cloudTypeOverride by MemoryByte(CloudTypeOverride)
+    var currentColumnPos by MemoryByte(CurrentColumnPos)
+    var currentPageLoc by MemoryByte(CurrentPageLoc)
+    var foregroundScenery by MemoryByte(ForegroundScenery)
+    var terrainControl by MemoryByte(TerrainControl)
+    var worldNumber by MemoryByte(WorldNumber)
+    val bSceneDataOffsets by MemoryByteIndexed(BSceneDataOffsets)
+    val backSceneryData by MemoryByteIndexed(BackSceneryData)
+    val backSceneryMetatiles by MemoryByteIndexed(BackSceneryMetatiles)
+    val bitmasks by MemoryByteIndexed(Bitmasks)
+    val blockBuffLowBounds by MemoryByteIndexed(BlockBuffLowBounds)
+    val fSceneDataOffsets by MemoryByteIndexed(FSceneDataOffsets)
+    val foreSceneryData by MemoryByteIndexed(ForeSceneryData)
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    val terrainMetatiles by MemoryByteIndexed(TerrainMetatiles)
+    val terrainRenderBits by MemoryByteIndexed(TerrainRenderBits)
+    //> AreaParserCore:
+    //> lda BackloadingFlag       ;check to see if we are starting right of start
+    //> beq RenderSceneryTerrain  ;if not, go ahead and render background, foreground and terrain
+    temp0 = backloadingFlag
+    if (backloadingFlag != 0) {
+        //> jsr ProcessAreaData       ;otherwise skip ahead and load level data
+        processAreaData()
+    }
+    //> RenderSceneryTerrain:
+    //> ldx #$0c
+    //> lda #$00
+    temp0 = 0x00
+    temp1 = 0x0C
+    do {
+        //> ClrMTBuf: sta MetatileBuffer,x       ;clear out metatile buffer
+        metatileBuffer[temp1] = temp0
+        //> dex
+        temp1 = (temp1 - 1) and 0xFF
+        //> bpl ClrMTBuf
+    } while ((temp1 and 0x80) == 0)
+    //> ldy BackgroundScenery      ;do we need to render the background scenery?
+    //> beq RendFore               ;if not, skip to check the foreground
+    temp2 = backgroundScenery
+    if (backgroundScenery != 0) {
+        //> lda CurrentPageLoc         ;otherwise check for every third page
+        temp0 = currentPageLoc
+        while ((temp3 and 0xFF and 0x80) == 0) {
+            //> sec
+            //> sbc #$03                   ;if 3 or more, subtract 3 and
+            temp3 = temp0 - 0x03
+            temp0 = temp3 and 0xFF
+            //> bpl ThirdP                 ;do an unconditional branch
+        }
+        //> RendBack: asl                        ;move results to higher nybble
+        temp0 = (temp0 shl 1) and 0xFF
+        //> asl
+        temp0 = (temp0 shl 1) and 0xFF
+        //> asl
+        temp0 = (temp0 shl 1) and 0xFF
+        //> asl
+        temp0 = (temp0 shl 1) and 0xFF
+        //> adc BSceneDataOffsets-1,y  ;add to it offset loaded from here
+        temp4 = temp0 + bSceneDataOffsets[-1 + temp2] + (if ((temp0 and 0x80) != 0) 1 else 0)
+        temp0 = temp4 and 0xFF
+        //> adc CurrentColumnPos       ;add to the result our current column position
+        temp5 = temp0 + currentColumnPos + (if (temp4 > 0xFF) 1 else 0)
+        temp0 = temp5 and 0xFF
+        //> tax
+        //> lda BackSceneryData,x      ;load data from sum of offsets
+        temp0 = backSceneryData[temp0]
+        //> beq RendFore               ;if zero, no scenery for that part
+        temp1 = temp0
+        if (temp0 != 0) {
+            //> pha
+            push(temp0)
+            //> and #$0f                   ;save to stack and clear high nybble
+            temp6 = temp0 and 0x0F
+            //> sec
+            //> sbc #$01                   ;subtract one (because low nybble is $01-$0c)
+            temp7 = temp6 - 0x01
+            temp0 = temp7 and 0xFF
+            //> sta $00                    ;save low nybble
+            memory[0x0] = temp0.toUByte()
+            //> asl                        ;multiply by three (shift to left and add result to old one)
+            temp0 = (temp0 shl 1) and 0xFF
+            //> adc $00                    ;note that since d7 was nulled, the carry flag is always clear
+            temp8 = temp0 + memory[0x0].toInt() + (if ((temp0 and 0x80) != 0) 1 else 0)
+            temp0 = temp8 and 0xFF
+            //> tax                        ;save as offset for background scenery metatile data
+            //> pla                        ;get high nybble from stack, move low
+            temp0 = pull()
+            //> lsr
+            temp0 = temp0 shr 1
+            //> lsr
+            temp0 = temp0 shr 1
+            //> lsr
+            temp0 = temp0 shr 1
+            //> lsr
+            temp0 = temp0 shr 1
+            //> tay                        ;use as second offset (used to determine height)
+            //> lda #$03                   ;use previously saved memory location for counter
+            temp0 = 0x03
+            //> sta $00
+            memory[0x0] = temp0.toUByte()
+            temp1 = temp0
+            temp2 = temp0
+            while (memory[0x0].toInt() != 0) {
+                //> dec $00                    ;decrement until counter expires, barring exception
+                memory[0x0] = ((memory[0x0].toInt() - 1) and 0xFF).toUByte()
+                //> bne SceLoop1
+            }
+        }
+    }
+    //> RendFore: ldx ForegroundScenery      ;check for foreground data needed or not
+    temp1 = foregroundScenery
+    //> beq RendTerr               ;if not, skip this part
+    if (temp1 != 0) {
+        //> ldy FSceneDataOffsets-1,x  ;load offset from location offset by header value, then
+        temp2 = fSceneDataOffsets[-1 + temp1]
+        //> ldx #$00                   ;reinit X
+        temp1 = 0x00
+        do {
+            //> SceLoop2: lda ForeSceneryData,y      ;load data until counter expires
+            temp0 = foreSceneryData[temp2]
+            //> beq NoFore                 ;do not store if zero found
+            if (temp0 != 0) {
+                //> sta MetatileBuffer,x
+                metatileBuffer[temp1] = temp0
+            }
+            //> NoFore:   iny
+            temp2 = (temp2 + 1) and 0xFF
+            //> inx
+            temp1 = (temp1 + 1) and 0xFF
+            //> cpx #$0d                   ;store up to end of metatile buffer
+            //> bne SceLoop2
+        } while (temp1 != 0x0D)
+    }
+    //> RendTerr: ldy AreaType               ;check world type for water level
+    temp2 = areaType
+    //> bne TerMTile               ;if not water level, skip this part
+    if (temp2 == 0) {
+        //> lda WorldNumber            ;check world number, if not world number eight
+        temp0 = worldNumber
+        //> cmp #World8                ;then skip this part
+        //> bne TerMTile
+        if (temp0 == World8) {
+            //> lda #$62                   ;if set as water level and world number eight,
+            temp0 = 0x62
+            //> jmp StoreMT                ;use castle wall metatile as terrain type
+        }
+    } else {
+        //> TerMTile: lda TerrainMetatiles,y     ;otherwise get appropriate metatile for area type
+        temp0 = terrainMetatiles[temp2]
+        //> ldy CloudTypeOverride      ;check for cloud type override
+        temp2 = cloudTypeOverride
+        //> beq StoreMT                ;if not set, keep value otherwise
+        if (temp2 != 0) {
+            //> lda #$88                   ;use cloud block terrain
+            temp0 = 0x88
+        }
+    }
+    //> StoreMT:  sta $07                    ;store value here
+    memory[0x7] = temp0.toUByte()
+    //> ldx #$00                   ;initialize X, use as metatile buffer offset
+    temp1 = 0x00
+    //> lda TerrainControl         ;use yet another value from the header
+    temp0 = terrainControl
+    //> asl                        ;multiply by 2 and use as yet another offset
+    temp0 = (temp0 shl 1) and 0xFF
+    //> tay
+    //> TerrLoop: lda TerrainRenderBits,y    ;get one of the terrain rendering bit data
+    temp0 = terrainRenderBits[temp0]
+    //> sta $00
+    memory[0x0] = temp0.toUByte()
+    //> iny                        ;increment Y and use as offset next time around
+    temp0 = (temp0 + 1) and 0xFF
+    //> sty $01
+    memory[0x1] = temp0.toUByte()
+    //> lda CloudTypeOverride      ;skip if value here is zero
+    temp0 = cloudTypeOverride
+    //> beq NoCloud2
+    temp2 = temp0
+    if (temp0 != 0) {
+        //> cpx #$00                   ;otherwise, check if we're doing the ceiling byte
+        //> beq NoCloud2
+        if (temp1 != 0x00) {
+            //> lda $00                    ;if not, mask out all but d3
+            temp0 = memory[0x0].toInt()
+            //> and #%00001000
+            temp9 = temp0 and 0x08
+            //> sta $00
+            memory[0x0] = temp9.toUByte()
+        }
+    }
+    //> NoCloud2: ldy #$00                   ;start at beginning of bitmasks
+    temp2 = 0x00
+    do {
+        //> TerrBChk: lda Bitmasks,y             ;load bitmask, then perform AND on contents of first byte
+        temp0 = bitmasks[temp2]
+        //> bit $00
+        //> beq NextTBit               ;if not set, skip this part (do not write terrain to buffer)
+        if ((temp0 and memory[0x0].toInt()) != 0) {
+            //> lda $07
+            temp0 = memory[0x7].toInt()
+            //> sta MetatileBuffer,x       ;load terrain type metatile number and store into buffer here
+            metatileBuffer[temp1] = temp0
+        }
+        //> NextTBit: inx                        ;continue until end of buffer
+        temp1 = (temp1 + 1) and 0xFF
+        //> cpx #$0d
+        //> beq RendBBuf               ;if we're at the end, break out of this loop
+        if (temp1 != 0x0D) {
+            //> lda AreaType               ;check world type for underground area
+            temp0 = areaType
+            //> cmp #$02
+            //> bne EndUChk                ;if not underground, skip this part
+            if (temp0 == 0x02) {
+                //> cpx #$0b
+                //> bne EndUChk                ;if we're at the bottom of the screen, override
+                if (temp1 == 0x0B) {
+                    //> lda #$54                   ;old terrain type with ground level terrain type
+                    temp0 = 0x54
+                    //> sta $07
+                    memory[0x7] = temp0.toUByte()
+                }
+            }
+            //> EndUChk:  iny                        ;increment bitmasks offset in Y
+            temp2 = (temp2 + 1) and 0xFF
+            //> cpy #$08
+            //> bne TerrBChk               ;if not all bits checked, loop back
+        }
+    } while (!flagZ)
+    //> ldy $01
+    temp2 = memory[0x1].toInt()
+    //> bne TerrLoop               ;unconditional branch, use Y to load next byte
+    //> RendBBuf: jsr ProcessAreaData        ;do the area data loading routine now
+    processAreaData()
+    //> lda BlockBufferColumnPos
+    temp0 = blockBufferColumnPos
+    //> jsr GetBlockBufferAddr     ;get block buffer address from where we're at
+    getBlockBufferAddr(temp0)
+    //> ldx #$00
+    temp1 = 0x00
+    //> ldy #$00                   ;init index regs and start at beginning of smaller buffer
+    temp2 = 0x00
+    do {
+        //> ChkMTLow: sty $00
+        memory[0x0] = temp2.toUByte()
+        //> lda MetatileBuffer,x       ;load stored metatile number
+        temp0 = metatileBuffer[temp1]
+        //> and #%11000000             ;mask out all but 2 MSB
+        temp10 = temp0 and 0xC0
+        //> asl
+        temp10 = (temp10 shl 1) and 0xFF
+        //> rol                        ;make %xx000000 into %000000xx
+        temp10 = (temp10 shl 1) and 0xFE or if ((temp10 and 0x80) != 0) 1 else 0
+        //> rol
+        temp10 = (temp10 shl 1) and 0xFE or if ((temp10 and 0x80) != 0) 1 else 0
+        //> tay                        ;use as offset in Y
+        //> lda MetatileBuffer,x       ;reload original unmasked value here
+        temp0 = metatileBuffer[temp1]
+        //> cmp BlockBuffLowBounds,y   ;check for certain values depending on bits set
+        //> bcs StrBlock               ;if equal or greater, branch
+        temp2 = temp10
+        if (!(temp0 >= blockBuffLowBounds[temp10])) {
+            //> lda #$00                   ;if less, init value before storing
+            temp0 = 0x00
+        }
+        //> StrBlock: ldy $00                    ;get offset for block buffer
+        temp2 = memory[0x0].toInt()
+        //> sta ($06),y                ;store value into block buffer
+        memory[readWord(0x6) + temp2] = temp0.toUByte()
+        //> tya
+        //> clc                        ;add 16 (move down one row) to offset
+        //> adc #$10
+        temp11 = temp2 + 0x10
+        temp0 = temp11 and 0xFF
+        //> tay
+        //> inx                        ;increment column value
+        temp1 = (temp1 + 1) and 0xFF
+        //> cpx #$0d
+        //> bcc ChkMTLow               ;continue until we pass last row, then leave
+    } while (!(temp1 >= 0x0D))
+    //> rts
+    return
+}
+
 // Decompiled from ProcessAreaData
 fun processAreaData() {
-    var Y: Int = 0
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var areaDataOffset by MemoryByte(AreaDataOffset)
     var areaObjectPageLoc by MemoryByte(AreaObjectPageLoc)
     var areaObjectPageSel by MemoryByte(AreaObjectPageSel)
     var backloadingFlag by MemoryByte(BackloadingFlag)
@@ -2861,90 +4746,107 @@ fun processAreaData() {
     //> ProcessAreaData:
     //> ldx #$02                 ;start at the end of area object buffer
     temp0 = 0x02
-    while ((temp0 and 0x80) == 0) {
-        //> lda AreaObjectLength,x   ;check area object buffer flag
-        //> bpl RdyDecode            ;if buffer not negative, branch, otherwise
-        if (!((areaObjectLength[temp0] and 0x80) != 0)) {
+    do {
+        //> ProcADLoop: stx ObjectOffset
+        objectOffset = temp0
+        //> lda #$00                 ;reset flag
+        //> sta BehindAreaParserFlag
+        behindAreaParserFlag = 0x00
+        //> ldy AreaDataOffset       ;get offset of area data pointer
+        //> lda (AreaData),y         ;get first byte of area object
+        //> cmp #$fd                 ;if end-of-area, skip all this crap
+        //> beq RdyDecode
+        if (memory[readWord(AreaData) + areaDataOffset].toInt() - 0xFD == 0) {
             //  goto RdyDecode
             return
         }
-        temp1 = areaObjectLength[temp0]
-        if ((areaObjectLength[temp0] and 0x80) != 0) {
-            //> iny
-            Y = (Y + 1) and 0xFF
-            //> lda (AreaData),y         ;get second byte of area object
-            temp1 = memory[readWord(AreaData) + Y].toInt()
-            //> asl                      ;check for page select bit (d7), branch if not set
-            temp1 = (temp1 shl 1) and 0xFF
-            //> bcc Chk1Row13
-            if ((temp1 and 0x80) != 0) {
-                //> lda AreaObjectPageSel    ;check page select
-                temp1 = areaObjectPageSel
-                //> bne Chk1Row13
-                if (temp1 == 0) {
-                    //> inc AreaObjectPageSel    ;if not already set, set it now
-                    areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
-                    //> inc AreaObjectPageLoc    ;and increment page location
-                    areaObjectPageLoc = (areaObjectPageLoc + 1) and 0xFF
-                }
+        temp1 = memory[readWord(AreaData) + areaDataOffset].toInt()
+        temp2 = areaDataOffset
+        if (memory[readWord(AreaData) + areaDataOffset].toInt() != 0xFD) {
+            //> lda AreaObjectLength,x   ;check area object buffer flag
+            temp1 = areaObjectLength[temp0]
+            //> bpl RdyDecode            ;if buffer not negative, branch, otherwise
+            if (!((temp1 and 0x80) != 0)) {
+                //  goto RdyDecode
+                return
             }
-            //> Chk1Row13:  dey
-            Y = (Y - 1) and 0xFF
-            //> lda (AreaData),y         ;reread first byte of level object
-            temp1 = memory[readWord(AreaData) + Y].toInt()
-            //> and #$0f                 ;mask out high nybble
-            temp2 = temp1 and 0x0F
-            //> cmp #$0d                 ;row 13?
-            //> bne Chk1Row14
-            temp1 = temp2
-            if (temp2 == 0x0D) {
-                //> iny                      ;if so, reread second byte of level object
-                Y = (Y + 1) and 0xFF
-                //> lda (AreaData),y
-                temp1 = memory[readWord(AreaData) + Y].toInt()
-                //> dey                      ;decrement to get ready to read first byte
-                Y = (Y - 1) and 0xFF
-                //> and #%01000000           ;check for d6 set (if not, object is page control)
-                temp3 = temp1 and 0x40
-                //> bne CheckRear
-                temp1 = temp3
-                if (temp3 == 0) {
-                    //> lda AreaObjectPageSel    ;if page select is set, do not reread
+            if ((temp1 and 0x80) != 0) {
+                //> iny
+                temp2 = (temp2 + 1) and 0xFF
+                //> lda (AreaData),y         ;get second byte of area object
+                temp1 = memory[readWord(AreaData) + temp2].toInt()
+                //> asl                      ;check for page select bit (d7), branch if not set
+                temp1 = (temp1 shl 1) and 0xFF
+                //> bcc Chk1Row13
+                if ((temp1 and 0x80) != 0) {
+                    //> lda AreaObjectPageSel    ;check page select
                     temp1 = areaObjectPageSel
-                    //> bne CheckRear
+                    //> bne Chk1Row13
                     if (temp1 == 0) {
-                        //> iny                      ;if d6 not set, reread second byte
-                        Y = (Y + 1) and 0xFF
-                        //> lda (AreaData),y
-                        temp1 = memory[readWord(AreaData) + Y].toInt()
-                        //> and #%00011111           ;mask out all but 5 LSB and store in page control
-                        temp4 = temp1 and 0x1F
-                        //> sta AreaObjectPageLoc
-                        areaObjectPageLoc = temp4
-                        //> inc AreaObjectPageSel    ;increment page select
+                        //> inc AreaObjectPageSel    ;if not already set, set it now
                         areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
-                        //> jmp NextAObj
+                        //> inc AreaObjectPageLoc    ;and increment page location
+                        areaObjectPageLoc = (areaObjectPageLoc + 1) and 0xFF
                     }
                 }
-            }
-            //> Chk1Row14:  cmp #$0e                 ;row 14?
-            //> bne CheckRear
-            if (temp1 == 0x0E) {
-                //> lda BackloadingFlag      ;check flag for saved page number and branch if set
-                temp1 = backloadingFlag
-                //> bne RdyDecode            ;to render the object (otherwise bg might not look right)
-                if (!(temp1 == 0)) {
-                    //  goto RdyDecode
-                    return
+                //> Chk1Row13:  dey
+                temp2 = (temp2 - 1) and 0xFF
+                //> lda (AreaData),y         ;reread first byte of level object
+                temp1 = memory[readWord(AreaData) + temp2].toInt()
+                //> and #$0f                 ;mask out high nybble
+                temp3 = temp1 and 0x0F
+                //> cmp #$0d                 ;row 13?
+                //> bne Chk1Row14
+                temp1 = temp3
+                if (temp3 == 0x0D) {
+                    //> iny                      ;if so, reread second byte of level object
+                    temp2 = (temp2 + 1) and 0xFF
+                    //> lda (AreaData),y
+                    temp1 = memory[readWord(AreaData) + temp2].toInt()
+                    //> dey                      ;decrement to get ready to read first byte
+                    temp2 = (temp2 - 1) and 0xFF
+                    //> and #%01000000           ;check for d6 set (if not, object is page control)
+                    temp4 = temp1 and 0x40
+                    //> bne CheckRear
+                    temp1 = temp4
+                    if (temp4 == 0) {
+                        //> lda AreaObjectPageSel    ;if page select is set, do not reread
+                        temp1 = areaObjectPageSel
+                        //> bne CheckRear
+                        if (temp1 == 0) {
+                            //> iny                      ;if d6 not set, reread second byte
+                            temp2 = (temp2 + 1) and 0xFF
+                            //> lda (AreaData),y
+                            temp1 = memory[readWord(AreaData) + temp2].toInt()
+                            //> and #%00011111           ;mask out all but 5 LSB and store in page control
+                            temp5 = temp1 and 0x1F
+                            //> sta AreaObjectPageLoc
+                            areaObjectPageLoc = temp5
+                            //> inc AreaObjectPageSel    ;increment page select
+                            areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
+                            //> jmp NextAObj
+                        }
+                    }
                 }
-                if (temp1 == 0) {
+                //> Chk1Row14:  cmp #$0e                 ;row 14?
+                //> bne CheckRear
+                if (temp1 == 0x0E) {
+                    //> lda BackloadingFlag      ;check flag for saved page number and branch if set
+                    temp1 = backloadingFlag
+                    //> bne RdyDecode            ;to render the object (otherwise bg might not look right)
+                    if (!(temp1 == 0)) {
+                        //  goto RdyDecode
+                        return
+                    }
+                    if (temp1 == 0) {
+                    }
                 }
-            }
-            //> CheckRear:  lda AreaObjectPageLoc    ;check to see if current page of level object is
-            temp1 = areaObjectPageLoc
-            //> cmp CurrentPageLoc       ;behind current page of renderer
-            //> bcc SetBehind            ;if so branch
-            if (temp1 >= currentPageLoc) {
+                //> CheckRear:  lda AreaObjectPageLoc    ;check to see if current page of level object is
+                temp1 = areaObjectPageLoc
+                //> cmp CurrentPageLoc       ;behind current page of renderer
+                //> bcc SetBehind            ;if so branch
+                if (temp1 >= currentPageLoc) {
+                }
             }
         }
         //> RdyDecode:  jsr DecodeAreaData       ;do sub and do not turn on flag
@@ -2966,7 +4868,7 @@ fun processAreaData() {
         //> ProcLoopb:  dex                      ;decrement buffer offset
         temp0 = (temp0 - 1) and 0xFF
         //> bpl ProcADLoop           ;and loopback unless exceeded buffer
-    }
+    } while ((temp0 and 0x80) == 0)
     //> lda BehindAreaParserFlag ;check for flag set if objects were behind renderer
     temp1 = behindAreaParserFlag
     //> bne ProcessAreaData      ;branch if true to load more level data, otherwise
@@ -2995,13 +4897,148 @@ fun incAreaObjOffset() {
 
 // Decompiled from DecodeAreaData
 fun decodeAreaData(X: Int) {
+    val areaObjOffsetBuffer by MemoryByteIndexed(AreaObjOffsetBuffer)
+    val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
     //> EndAParse:  rts
+    return
+}
+
+// Decompiled from LoopCmdE
+fun loopCmdE() {
+    //> LoopCmdE: rts
+    return
+}
+
+// Decompiled from AlterAreaAttributes
+fun alterAreaAttributes(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var backgroundColorCtrl by MemoryByte(BackgroundColorCtrl)
+    var backgroundScenery by MemoryByte(BackgroundScenery)
+    var foregroundScenery by MemoryByte(ForegroundScenery)
+    var terrainControl by MemoryByte(TerrainControl)
+    val areaObjOffsetBuffer by MemoryByteIndexed(AreaObjOffsetBuffer)
+    //> AlterAreaAttributes:
+    //> ldy AreaObjOffsetBuffer,x ;load offset for level object data saved in buffer
+    //> iny                       ;load second byte
+    temp0 = areaObjOffsetBuffer[X]
+    temp0 = (temp0 + 1) and 0xFF
+    //> lda (AreaData),y
+    //> pha                       ;save in stack for now
+    push(memory[readWord(AreaData) + temp0].toInt())
+    //> and #%01000000
+    temp1 = memory[readWord(AreaData) + temp0].toInt() and 0x40
+    //> bne Alter2                ;branch if d6 is set
+    temp2 = temp1
+    if (temp1 == 0) {
+        //> pla
+        temp2 = pull()
+        //> pha                       ;pull and push offset to copy to A
+        push(temp2)
+        //> and #%00001111            ;mask out high nybble and store as
+        temp3 = temp2 and 0x0F
+        //> sta TerrainControl        ;new terrain height type bits
+        terrainControl = temp3
+        //> pla
+        temp2 = pull()
+        //> and #%00110000            ;pull and mask out all but d5 and d4
+        temp4 = temp2 and 0x30
+        //> lsr                       ;move bits to lower nybble and store
+        temp4 = temp4 shr 1
+        //> lsr                       ;as new background scenery bits
+        temp4 = temp4 shr 1
+        //> lsr
+        temp4 = temp4 shr 1
+        //> lsr
+        temp4 = temp4 shr 1
+        //> sta BackgroundScenery     ;then leave
+        backgroundScenery = temp4
+        //> rts
+        return
+    } else {
+        //> Alter2:  pla
+        temp2 = pull()
+        //> and #%00000111            ;mask out all but 3 LSB
+        temp5 = temp2 and 0x07
+        //> cmp #$04                  ;if four or greater, set color control bits
+        //> bcc SetFore               ;and nullify foreground scenery bits
+        temp2 = temp5
+        if (temp5 >= 0x04) {
+            //> sta BackgroundColorCtrl
+            backgroundColorCtrl = temp2
+            //> lda #$00
+            temp2 = 0x00
+        }
+    }
+    //> SetFore: sta ForegroundScenery     ;otherwise set new foreground scenery bits
+    foregroundScenery = temp2
+    //> rts
+    return
+}
+
+// Decompiled from ScrollLockObject_Warp
+fun scrolllockobjectWarp() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var areaType by MemoryByte(AreaType)
+    var warpZoneControl by MemoryByte(WarpZoneControl)
+    var worldNumber by MemoryByte(WorldNumber)
+    //> ScrollLockObject_Warp:
+    //> ldx #$04            ;load value of 4 for game text routine as default
+    //> lda WorldNumber     ;warp zone (4-3-2), then check world number
+    //> beq WarpNum
+    temp0 = worldNumber
+    temp1 = 0x04
+    if (worldNumber != 0) {
+        //> inx                 ;if world number > 1, increment for next warp zone (5)
+        temp1 = (temp1 + 1) and 0xFF
+        //> ldy AreaType        ;check area type
+        //> dey
+        areaType = (areaType - 1) and 0xFF
+        //> bne WarpNum         ;if ground area type, increment for last warp zone
+        temp2 = areaType
+        if (areaType == 0) {
+            //> inx                 ;(8-7-6) and move on
+            temp1 = (temp1 + 1) and 0xFF
+        }
+    }
+    //> WarpNum: txa
+    //> sta WarpZoneControl ;store number here to be used by warp zone routine
+    warpZoneControl = temp1
+    //> jsr WriteGameText   ;print text and warp zone numbers
+    writeGameText(temp1)
+    //> lda #PiranhaPlant
+    temp0 = PiranhaPlant
+    //> jsr KillEnemies     ;load identifier for piranha plants and do sub
+    killEnemies(temp0)
+    // Fall-through tail call to scrollLockObject
+    scrollLockObject()
+}
+
+// Decompiled from ScrollLockObject
+fun scrollLockObject() {
+    var temp0: Int = 0
+    var scrollLock by MemoryByte(ScrollLock)
+    //> ScrollLockObject:
+    //> lda ScrollLock      ;invert scroll lock to turn it on
+    //> eor #%00000001
+    temp0 = scrollLock xor 0x01
+    //> sta ScrollLock
+    scrollLock = temp0
+    //> rts
     return
 }
 
 // Decompiled from KillEnemies
 fun killEnemies(A: Int) {
     var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
     val enemyFlag by MemoryByteIndexed(Enemy_Flag)
     val enemyId by MemoryByteIndexed(Enemy_ID)
     //> KillEnemies:
@@ -3010,20 +5047,431 @@ fun killEnemies(A: Int) {
     //> lda #$00
     //> ldx #$04          ;check for identifier in enemy object buffer
     temp0 = 0x04
-    while ((temp0 and 0x80) == 0) {
-        //> sta Enemy_Flag,x  ;if found, deactivate enemy object flag
-        enemyFlag[temp0] = 0x00
-        do {
-            //> KillELoop: ldy Enemy_ID,x
-            //> cpy $00           ;if not found, branch
-            //> bne NoKillE
-            //> NoKillE:   dex               ;do this until all slots are checked
-            temp0 = (temp0 - 1) and 0xFF
-            //> bpl KillELoop
-        } while ((temp0 and 0x80) == 0)
-    }
+    do {
+        //> KillELoop: ldy Enemy_ID,x
+        //> cpy $00           ;if not found, branch
+        //> bne NoKillE
+        temp1 = 0x00
+        temp2 = enemyId[temp0]
+        if (enemyId[temp0] == memory[0x0].toInt()) {
+            //> sta Enemy_Flag,x  ;if found, deactivate enemy object flag
+            enemyFlag[temp0] = temp1
+        }
+        //> NoKillE:   dex               ;do this until all slots are checked
+        temp0 = (temp0 - 1) and 0xFF
+        //> bpl KillELoop
+    } while ((temp0 and 0x80) == 0)
     //> rts
     return
+}
+
+// Decompiled from AreaFrenzy
+fun areaFrenzy() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var enemyFrenzyQueue by MemoryByte(EnemyFrenzyQueue)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val frenzyIDData by MemoryByteIndexed(FrenzyIDData)
+    //> AreaFrenzy:  ldx $00               ;use area object identifier bit as offset
+    //> lda FrenzyIDData-8,x  ;note that it starts at 8, thus weird address here
+    //> ldy #$05
+    temp0 = memory[0x0].toInt()
+    temp1 = 0x05
+    while (frenzyIDData[-8 + memory[0x0].toInt()] != enemyId[temp1]) {
+        //> cmp Enemy_ID,y    ;check for enemy object in buffer versus frenzy object
+        //> bne FreCompLoop
+    }
+    //> lda #$00              ;if enemy object already present, nullify queue and leave
+    //> ExitAFrenzy: sta EnemyFrenzyQueue  ;store enemy into frenzy queue
+    enemyFrenzyQueue = 0x00
+    //> rts
+    return
+}
+
+// Decompiled from AreaStyleObject
+fun areaStyleObject() {
+    var areaStyle by MemoryByte(AreaStyle)
+    //> AreaStyleObject:
+    //> lda AreaStyle        ;load level object style and jump to the right sub
+    //> jsr JumpEngine
+    when (areaStyle) {
+        0 -> {
+            treeLedge(X, Y)
+        }
+        1 -> {
+            mushroomLedge(X, Y)
+        }
+        2 -> {
+            bulletBillCannon(Y)
+        }
+        else -> {
+            // Unknown JumpEngine index
+        }
+    }
+    return
+}
+
+// Decompiled from TreeLedge
+fun treeLedge(X: Int, Y: Int) {
+    var X: Int = X
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var currentColumnPos by MemoryByte(CurrentColumnPos)
+    var currentPageLoc by MemoryByte(CurrentPageLoc)
+    val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    //> TreeLedge:
+    //> jsr GetLrgObjAttrib     ;get row and length of green ledge
+    getLrgObjAttrib(X)
+    //> lda AreaObjectLength,x  ;check length counter for expiration
+    //> beq EndTreeL
+    if (areaObjectLength[X] == 0) {
+        //  goto EndTreeL
+        return
+    }
+    temp0 = areaObjectLength[X]
+    if (areaObjectLength[X] != 0) {
+        //> bpl MidTreeL
+        if (!((areaObjectLength[X] and 0x80) != 0)) {
+            //  goto MidTreeL
+            return
+        }
+        if ((areaObjectLength[X] and 0x80) != 0) {
+            //> tya
+            //> sta AreaObjectLength,x  ;store lower nybble into buffer flag as length of ledge
+            areaObjectLength[X] = Y
+            //> lda CurrentPageLoc
+            temp0 = currentPageLoc
+            //> ora CurrentColumnPos    ;are we at the start of the level?
+            temp1 = temp0 or currentColumnPos
+            //> beq MidTreeL
+            if (temp1 == 0) {
+                //  goto MidTreeL
+                return
+            }
+            temp0 = temp1
+            if (temp1 != 0) {
+                //> lda #$16                ;render start of tree ledge
+                temp0 = 0x16
+                //> jmp NoUnder
+            }
+        }
+        //> MidTreeL: ldx $07
+        //> lda #$17                ;render middle of tree ledge
+        temp0 = 0x17
+        //> sta MetatileBuffer,x    ;note that this is also used if ledge position is
+        metatileBuffer[memory[0x7].toInt()] = temp0
+        //> lda #$4c                ;at the start of level for continuous effect
+        temp0 = 0x4C
+        //> jmp AllUnder            ;now render the part underneath
+    } else {
+        //> EndTreeL: lda #$18                ;render end of tree ledge
+        temp0 = 0x18
+        //> jmp NoUnder
+    }
+    //> AllUnder: inx
+    X = (X + 1) and 0xFF
+    //> ldy #$0f                   ;set $0f to render all way down
+    //> jmp RenderUnderPart       ;now render the stem of mushroom
+    //> NoUnder:  ldx $07                    ;load row of ledge
+    //> ldy #$00                   ;set 0 for no bottom on this part
+    //> jmp RenderUnderPart
+}
+
+// Decompiled from MushroomLedge
+fun mushroomLedge(X: Int, Y: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    val mushroomLedgeHalfLen by MemoryByteIndexed(MushroomLedgeHalfLen)
+    //> MushroomLedge:
+    //> jsr ChkLrgObjLength        ;get shroom dimensions
+    chkLrgObjLength()
+    //> sty $06                    ;store length here for now
+    memory[0x6] = Y.toUByte()
+    //> bcc EndMushL
+    if (flagC) {
+        //> lda AreaObjectLength,x     ;divide length by 2 and store elsewhere
+        //> lsr
+        //> sta MushroomLedgeHalfLen,x
+        mushroomLedgeHalfLen[X] = areaObjectLength[X] shr 1
+        //> lda #$19                   ;render start of mushroom
+        //> jmp NoUnder
+    } else {
+        //> EndMushL: lda #$1b                   ;if at the end, render end of mushroom
+        //> ldy AreaObjectLength,x
+        //> beq NoUnder
+        if (areaObjectLength[X] == 0) {
+            //  goto NoUnder
+            return
+        }
+        temp0 = 0x1B
+        temp1 = areaObjectLength[X]
+        if (areaObjectLength[X] != 0) {
+            //> lda MushroomLedgeHalfLen,x ;get divided length and store where length
+            temp0 = mushroomLedgeHalfLen[X]
+            //> sta $06                    ;was stored originally
+            memory[0x6] = temp0.toUByte()
+            //> ldx $07
+            //> lda #$1a
+            temp0 = 0x1A
+            //> sta MetatileBuffer,x       ;render middle of mushroom
+            metatileBuffer[memory[0x7].toInt()] = temp0
+            //> cpy $06                    ;are we smack dab in the center?
+            //> bne MushLExit              ;if not, branch to leave
+            temp2 = memory[0x7].toInt()
+            if (temp1 == memory[0x6].toInt()) {
+                //> inx
+                temp2 = (temp2 + 1) and 0xFF
+                //> lda #$4f
+                temp0 = 0x4F
+                //> sta MetatileBuffer,x       ;render stem top of mushroom underneath the middle
+                metatileBuffer[temp2] = temp0
+                //> lda #$50
+                temp0 = 0x50
+                //> AllUnder: inx
+                temp2 = (temp2 + 1) and 0xFF
+                //> ldy #$0f                   ;set $0f to render all way down
+                temp1 = 0x0F
+                //> jmp RenderUnderPart       ;now render the stem of mushroom
+            } else {
+                //> MushLExit: rts                       ;and leave
+                return
+            }
+        }
+    }
+    //> NoUnder:  ldx $07                    ;load row of ledge
+    temp2 = memory[0x7].toInt()
+    //> ldy #$00                   ;set 0 for no bottom on this part
+    temp1 = 0x00
+    //> jmp RenderUnderPart
+}
+
+// Decompiled from PulleyRopeObject
+fun pulleyRopeObject(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var metatileBuffer by MemoryByte(MetatileBuffer)
+    val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
+    val pulleyRopeMetatiles by MemoryByteIndexed(PulleyRopeMetatiles)
+    //> PulleyRopeObject:
+    //> jsr ChkLrgObjLength       ;get length of pulley/rope object
+    chkLrgObjLength()
+    //> ldy #$00                  ;initialize metatile offset
+    //> bcs RenderPul             ;if starting, render left pulley
+    temp0 = 0x00
+    if (!flagC) {
+        //> iny
+        temp0 = (temp0 + 1) and 0xFF
+        //> lda AreaObjectLength,x    ;if not at the end, render rope
+        //> bne RenderPul
+        temp1 = areaObjectLength[X]
+        if (areaObjectLength[X] == 0) {
+            //> iny                       ;otherwise render right pulley
+            temp0 = (temp0 + 1) and 0xFF
+        }
+    }
+    //> RenderPul: lda PulleyRopeMetatiles,y
+    temp1 = pulleyRopeMetatiles[temp0]
+    //> sta MetatileBuffer        ;render at the top of the screen
+    metatileBuffer = temp1
+    //> MushLExit: rts                       ;and leave
+    return
+}
+
+// Decompiled from CastleObject
+fun castleObject(X: Int, Y: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var currentPageLoc by MemoryByte(CurrentPageLoc)
+    val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
+    val castleMetatiles by MemoryByteIndexed(CastleMetatiles)
+    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    //> CastleObject:
+    //> jsr GetLrgObjAttrib      ;save lower nybble as starting row
+    getLrgObjAttrib(X)
+    //> sty $07                  ;if starting row is above $0a, game will crash!!!
+    memory[0x7] = Y.toUByte()
+    //> ldy #$04
+    //> jsr ChkLrgObjFixedLength ;load length of castle if not already loaded
+    chkLrgObjFixedLength(X, 0x04)
+    //> txa
+    //> pha                      ;save obj buffer offset to stack
+    push(X)
+    //> ldy AreaObjectLength,x   ;use current length as offset for castle data
+    //> ldx $07                  ;begin at starting row
+    //> lda #$0b
+    //> sta $06                  ;load upper limit of number of rows to print
+    memory[0x6] = 0x0B.toUByte()
+    temp0 = memory[0x7].toInt()
+    temp1 = areaObjectLength[X]
+    do {
+        //> CRendLoop:  lda CastleMetatiles,y    ;load current byte using offset
+        //> sta MetatileBuffer,x
+        metatileBuffer[temp0] = castleMetatiles[temp1]
+        //> inx                      ;store in buffer and increment buffer offset
+        temp0 = (temp0 + 1) and 0xFF
+        //> lda $06
+        //> beq ChkCFloor            ;have we reached upper limit yet?
+        temp2 = memory[0x6].toInt()
+        if (memory[0x6].toInt() != 0) {
+            //> iny                      ;if not, increment column-wise
+            temp1 = (temp1 + 1) and 0xFF
+            //> iny                      ;to byte in next row
+            temp1 = (temp1 + 1) and 0xFF
+            //> iny
+            temp1 = (temp1 + 1) and 0xFF
+            //> iny
+            temp1 = (temp1 + 1) and 0xFF
+            //> iny
+            temp1 = (temp1 + 1) and 0xFF
+            //> dec $06                  ;move closer to upper limit
+            memory[0x6] = ((memory[0x6].toInt() - 1) and 0xFF).toUByte()
+        }
+        //> ChkCFloor:  cpx #$0b                 ;have we reached the row just before floor?
+        //> bne CRendLoop            ;if not, go back and do another row
+    } while (temp0 != 0x0B)
+    //> pla
+    temp2 = pull()
+    //> tax                      ;get obj buffer offset from before
+    //> lda CurrentPageLoc
+    temp2 = currentPageLoc
+    //> beq ExitCastle           ;if we're at page 0, we do not need to do anything else
+    temp0 = temp2
+    if (temp2 != 0) {
+        //> lda AreaObjectLength,x   ;check length
+        temp2 = areaObjectLength[temp0]
+        //> cmp #$01                 ;if length almost about to expire, put brick at floor
+        //> beq PlayerStop
+        if (temp2 != 0x01) {
+            //> ldy $07                  ;check starting row for tall castle ($00)
+            temp1 = memory[0x7].toInt()
+            //> bne NotTall
+            if (temp1 == 0) {
+                //> cmp #$03                 ;if found, then check to see if we're at the second column
+                //> beq PlayerStop
+                if (temp2 != 0x03) {
+                }
+            }
+            //> NotTall:    cmp #$02                 ;if not tall castle, check to see if we're at the third column
+            //> bne ExitCastle           ;if we aren't and the castle is tall, don't create flag yet
+            if (temp2 == 0x02) {
+                //> jsr GetAreaObjXPosition  ;otherwise, obtain and save horizontal pixel coordinate
+                getAreaObjXPosition()
+                //> pha
+                push(temp2)
+                //> jsr FindEmptyEnemySlot   ;find an empty place on the enemy object buffer
+                findEmptyEnemySlot()
+                //> pla
+                temp2 = pull()
+                //> sta Enemy_X_Position,x   ;then write horizontal coordinate for star flag
+                enemyXPosition[temp0] = temp2
+                //> lda CurrentPageLoc
+                temp2 = currentPageLoc
+                //> sta Enemy_PageLoc,x      ;set page location for star flag
+                enemyPageloc[temp0] = temp2
+                //> lda #$01
+                temp2 = 0x01
+                //> sta Enemy_Y_HighPos,x    ;set vertical high byte
+                enemyYHighpos[temp0] = temp2
+                //> sta Enemy_Flag,x         ;set flag for buffer
+                enemyFlag[temp0] = temp2
+                //> lda #$90
+                temp2 = 0x90
+                //> sta Enemy_Y_Position,x   ;set vertical coordinate
+                enemyYPosition[temp0] = temp2
+                //> lda #StarFlagObject      ;set star flag value in buffer itself
+                temp2 = StarFlagObject
+                //> sta Enemy_ID,x
+                enemyId[temp0] = temp2
+                //> rts
+                return
+            } else {
+                //> ExitCastle: rts
+                return
+            }
+        }
+        //> PlayerStop: ldy #$52                 ;put brick at floor to stop player at end of level
+        temp1 = 0x52
+        //> sty MetatileBuffer+10    ;this is only done if we're on the second column
+        metatileBuffer[10] = temp1
+    }
+}
+
+// Decompiled from WaterPipe
+fun waterPipe(X: Int) {
+    val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    //> WaterPipe:
+    //> jsr GetLrgObjAttrib     ;get row and lower nybble
+    getLrgObjAttrib(X)
+    //> ldy AreaObjectLength,x  ;get length (residual code, water pipe is 1 col thick)
+    //> ldx $07                 ;get row
+    //> lda #$6b
+    //> sta MetatileBuffer,x    ;draw something here and below it
+    metatileBuffer[memory[0x7].toInt()] = 0x6B
+    //> lda #$6c
+    //> sta MetatileBuffer+1,x
+    metatileBuffer[1 + memory[0x7].toInt()] = 0x6C
+    //> rts
+    return
+}
+
+// Decompiled from IntroPipe
+fun introPipe() {
+    var X: Int = 0
+    var temp0: Int = 0
+    var temp1: Int = 0
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    val verticalPipeData by MemoryByteIndexed(VerticalPipeData)
+    //> IntroPipe:
+    //> ldy #$03                 ;check if length set, if not set, set it
+    //> jsr ChkLrgObjFixedLength
+    chkLrgObjFixedLength(X, 0x03)
+    //> ldy #$0a                 ;set fixed value and render the sideways part
+    //> jsr RenderSidewaysPipe
+    renderSidewaysPipe(X, 0x0A)
+    //> bcs NoBlankP             ;if carry flag set, not time to draw vertical pipe part
+    temp0 = 0x0A
+    if (!flagC) {
+        //> ldx #$06                 ;blank everything above the vertical pipe part
+        temp1 = 0x06
+        do {
+            //> VPipeSectLoop: lda #$00                 ;all the way to the top of the screen
+            //> sta MetatileBuffer,x     ;because otherwise it will look like exit pipe
+            metatileBuffer[temp1] = 0x00
+            //> dex
+            temp1 = (temp1 - 1) and 0xFF
+            //> bpl VPipeSectLoop
+        } while ((temp1 and 0x80) == 0)
+        //> lda VerticalPipeData,y   ;draw the end of the vertical pipe part
+        //> sta MetatileBuffer+7
+        metatileBuffer[7] = verticalPipeData[temp0]
+    }
+    //> NoBlankP:      rts
+    return
+}
+
+// Decompiled from ExitPipe
+fun exitPipe() {
+    var X: Int = 0
+    //> ExitPipe:
+    //> ldy #$03                 ;check if length set, if not set, set it
+    //> jsr ChkLrgObjFixedLength
+    chkLrgObjFixedLength(X, 0x03)
+    //> jsr GetLrgObjAttrib      ;get vertical length, then plow on through RenderSidewaysPipe
+    getLrgObjAttrib(X)
+    // Fall-through tail call to renderSidewaysPipe
+    renderSidewaysPipe(X, 0x03)
 }
 
 // Decompiled from RenderSidewaysPipe
@@ -3079,6 +5527,127 @@ fun renderSidewaysPipe(X: Int, Y: Int) {
     return
 }
 
+// Decompiled from VerticalPipe
+fun verticalPipe(X: Int, Y: Int) {
+    var Y: Int = Y
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var areaNumber by MemoryByte(AreaNumber)
+    var currentPageLoc by MemoryByte(CurrentPageLoc)
+    var worldNumber by MemoryByte(WorldNumber)
+    val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
+    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    val verticalPipeData by MemoryByteIndexed(VerticalPipeData)
+    //> VerticalPipe:
+    //> jsr GetPipeHeight
+    getPipeHeight(X)
+    //> lda $00                  ;check to see if value was nullified earlier
+    //> beq WarpPipe             ;(if d3, the usage control bit of second byte, was set)
+    temp0 = memory[0x0].toInt()
+    if (memory[0x0].toInt() != 0) {
+        //> iny
+        Y = (Y + 1) and 0xFF
+        //> iny
+        Y = (Y + 1) and 0xFF
+        //> iny
+        Y = (Y + 1) and 0xFF
+        //> iny                      ;add four if usage control bit was not set
+        Y = (Y + 1) and 0xFF
+    }
+    //> WarpPipe: tya                      ;save value in stack
+    //> pha
+    push(Y)
+    //> lda AreaNumber
+    temp0 = areaNumber
+    //> ora WorldNumber          ;if at world 1-1, do not add piranha plant ever
+    temp1 = temp0 or worldNumber
+    //> beq DrawPipe
+    if (temp1 == 0) {
+        //  goto DrawPipe
+        return
+    }
+    temp0 = temp1
+    if (temp1 != 0) {
+        //> ldy AreaObjectLength,x   ;if on second column of pipe, branch
+        //> beq DrawPipe             ;(because we only need to do this once)
+        if (areaObjectLength[X] == 0) {
+            //  goto DrawPipe
+            return
+        }
+        temp2 = areaObjectLength[X]
+        if (areaObjectLength[X] != 0) {
+            //> jsr FindEmptyEnemySlot   ;check for an empty moving data buffer space
+            findEmptyEnemySlot()
+            //> bcs DrawPipe             ;if not found, too many enemies, thus skip
+            if (flagC) {
+                //  goto DrawPipe
+                return
+            }
+            if (!flagC) {
+                //> jsr GetAreaObjXPosition  ;get horizontal pixel coordinate
+                getAreaObjXPosition()
+                //> clc
+                //> adc #$08                 ;add eight to put the piranha plant in the center
+                temp3 = temp0 + 0x08
+                temp0 = temp3 and 0xFF
+                //> sta Enemy_X_Position,x   ;store as enemy's horizontal coordinate
+                enemyXPosition[X] = temp0
+                //> lda CurrentPageLoc       ;add carry to current page number
+                temp0 = currentPageLoc
+                //> adc #$00
+                temp4 = temp0 + (if (temp3 > 0xFF) 1 else 0)
+                temp0 = temp4 and 0xFF
+                //> sta Enemy_PageLoc,x      ;store as enemy's page coordinate
+                enemyPageloc[X] = temp0
+                //> lda #$01
+                temp0 = 0x01
+                //> sta Enemy_Y_HighPos,x
+                enemyYHighpos[X] = temp0
+                //> sta Enemy_Flag,x         ;activate enemy flag
+                enemyFlag[X] = temp0
+                //> jsr GetAreaObjYPosition  ;get piranha plant's vertical coordinate and store here
+                getAreaObjYPosition()
+                //> sta Enemy_Y_Position,x
+                enemyYPosition[X] = temp0
+                //> lda #PiranhaPlant        ;write piranha plant's value into buffer
+                temp0 = PiranhaPlant
+                //> sta Enemy_ID,x
+                enemyId[X] = temp0
+                //> jsr InitPiranhaPlant
+                initPiranhaPlant(X)
+            }
+        }
+    }
+    //> DrawPipe: pla                      ;get value saved earlier and use as Y
+    temp0 = pull()
+    //> tay
+    //> ldx $07                  ;get buffer offset
+    //> lda VerticalPipeData,y   ;draw the appropriate pipe with the Y we loaded earlier
+    temp0 = verticalPipeData[temp0]
+    //> sta MetatileBuffer,x     ;render the top of the pipe
+    metatileBuffer[memory[0x7].toInt()] = temp0
+    //> inx
+    temp5 = memory[0x7].toInt()
+    temp5 = (temp5 + 1) and 0xFF
+    //> lda VerticalPipeData+2,y ;render the rest of the pipe
+    temp0 = verticalPipeData[2 + temp0]
+    //> ldy $06                  ;subtract one from length and render the part underneath
+    temp2 = memory[0x6].toInt()
+    //> dey
+    temp2 = (temp2 - 1) and 0xFF
+    //> jmp RenderUnderPart
+}
+
 // Decompiled from GetPipeHeight
 fun getPipeHeight(X: Int) {
     var temp0: Int = 0
@@ -3107,81 +5676,760 @@ fun findEmptyEnemySlot(): Int {
     //> ldx #$00          ;start at first enemy slot
     temp0 = 0x00
     while (temp0 != 0x05) {
-        do {
-            //> EmptyChkLoop: clc               ;clear carry flag by default
-            //> lda Enemy_Flag,x  ;check enemy buffer for nonzero
-            //> beq ExitEmptyChk  ;if zero, leave
-            //> inx
-            temp0 = (temp0 + 1) and 0xFF
-            //> cpx #$05          ;if nonzero, check next value
-            //> bne EmptyChkLoop
-        } while (temp0 != 0x05)
+        //> inx
+        temp0 = (temp0 + 1) and 0xFF
+        //> cpx #$05          ;if nonzero, check next value
+        //> bne EmptyChkLoop
     }
     //> ExitEmptyChk: rts               ;if all values nonzero, carry flag is set
     return A
 }
 
+// Decompiled from Hole_Water
+fun holeWater() {
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    //> Hole_Water:
+    //> jsr ChkLrgObjLength   ;get low nybble and save as length
+    chkLrgObjLength()
+    //> lda #$86              ;render waves
+    //> sta MetatileBuffer+10
+    metatileBuffer[10] = 0x86
+    //> ldx #$0b
+    //> ldy #$01              ;now render the water underneath
+    //> lda #$87
+    //> jmp RenderUnderPart
+}
+
+// Decompiled from QuestionBlockRow_High
+fun questionblockrowHigh() {
+    //> QuestionBlockRow_High:
+    //> lda #$03    ;start on the fourth row
+    //> .db $2c     ;BIT instruction opcode
+    // Fall-through tail call to questionblockrowLow
+    questionblockrowLow()
+}
+
+// Decompiled from QuestionBlockRow_Low
+fun questionblockrowLow() {
+    var temp0: Int = 0
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    //> QuestionBlockRow_Low:
+    //> lda #$07             ;start on the eighth row
+    //> pha                  ;save whatever row to the stack for now
+    push(0x07)
+    //> jsr ChkLrgObjLength  ;get low nybble and save as length
+    chkLrgObjLength()
+    //> pla
+    temp0 = pull()
+    //> tax                  ;render question boxes with coins
+    //> lda #$c0
+    //> sta MetatileBuffer,x
+    metatileBuffer[temp0] = 0xC0
+    //> rts
+    return
+}
+
+// Decompiled from Bridge_High
+fun bridgeHigh() {
+    //> Bridge_High:
+    //> lda #$06  ;start on the seventh row from top of screen
+    //> .db $2c   ;BIT instruction opcode
+    // Fall-through tail call to bridgeMiddle
+    bridgeMiddle()
+}
+
+// Decompiled from Bridge_Middle
+fun bridgeMiddle() {
+    //> Bridge_Middle:
+    //> lda #$07  ;start on the eighth row
+    //> .db $2c   ;BIT instruction opcode
+    // Fall-through tail call to bridgeLow
+    bridgeLow()
+}
+
+// Decompiled from Bridge_Low
+fun bridgeLow() {
+    var temp0: Int = 0
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    //> Bridge_Low:
+    //> lda #$09             ;start on the tenth row
+    //> pha                  ;save whatever row to the stack for now
+    push(0x09)
+    //> jsr ChkLrgObjLength  ;get low nybble and save as length
+    chkLrgObjLength()
+    //> pla
+    temp0 = pull()
+    //> tax                  ;render bridge railing
+    //> lda #$0b
+    //> sta MetatileBuffer,x
+    metatileBuffer[temp0] = 0x0B
+    //> inx
+    temp0 = (temp0 + 1) and 0xFF
+    //> ldy #$00             ;now render the bridge itself
+    //> lda #$63
+    //> jmp RenderUnderPart
+}
+
+// Decompiled from FlagBalls_Residual
+fun flagballsResidual() {
+    var X: Int = 0
+    //> FlagBalls_Residual:
+    //> jsr GetLrgObjAttrib  ;get low nybble from object byte
+    getLrgObjAttrib(X)
+    //> ldx #$02             ;render flag balls on third row from top
+    //> lda #$6d             ;of screen downwards based on low nybble
+    //> jmp RenderUnderPart
+}
+
+// Decompiled from FlagpoleObject
+fun flagpoleObject() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var currentPageLoc by MemoryByte(CurrentPageLoc)
+    var flagpolefnumYPos by MemoryByte(FlagpoleFNum_Y_Pos)
+    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    //> FlagpoleObject:
+    //> lda #$24                 ;render flagpole ball on top
+    //> sta MetatileBuffer
+    metatileBuffer[0] = 0x24
+    //> ldx #$01                 ;now render the flagpole shaft
+    //> ldy #$08
+    //> lda #$25
+    //> jsr RenderUnderPart
+    renderUnderPart(0x25, 0x01, 0x08)
+    //> lda #$61                 ;render solid block at the bottom
+    //> sta MetatileBuffer+10
+    metatileBuffer[10] = 0x61
+    //> jsr GetAreaObjXPosition
+    getAreaObjXPosition()
+    //> sec                      ;get pixel coordinate of where the flagpole is,
+    //> sbc #$08                 ;subtract eight pixels and use as horizontal
+    temp0 = 0x61 - 0x08
+    //> sta Enemy_X_Position+5   ;coordinate for the flag
+    enemyXPosition[5] = temp0 and 0xFF
+    //> lda CurrentPageLoc
+    //> sbc #$00                 ;subtract borrow from page location and use as
+    temp1 = currentPageLoc - (if (temp0 >= 0) 0 else 1)
+    //> sta Enemy_PageLoc+5      ;page location for the flag
+    enemyPageloc[5] = temp1 and 0xFF
+    //> lda #$30
+    //> sta Enemy_Y_Position+5   ;set vertical coordinate for flag
+    enemyYPosition[5] = 0x30
+    //> lda #$b0
+    //> sta FlagpoleFNum_Y_Pos   ;set initial vertical coordinate for flagpole's floatey number
+    flagpolefnumYPos = 0xB0
+    //> lda #FlagpoleFlagObject
+    //> sta Enemy_ID+5           ;set flag identifier, note that identifier and coordinates
+    enemyId[5] = FlagpoleFlagObject
+    //> inc Enemy_Flag+5         ;use last space in enemy object buffer
+    enemyFlag[5] = (enemyFlag[5] + 1) and 0xFF
+    //> rts
+    return
+}
+
+// Decompiled from EndlessRope
+fun endlessRope() {
+    //> EndlessRope:
+    //> ldx #$00       ;render rope from the top to the bottom of screen
+    //> ldy #$0f
+    //> jmp DrawRope
+    //> DrawRope: lda #$40            ;render the actual rope
+    //> jmp RenderUnderPart
+}
+
+// Decompiled from BalancePlatRope
+fun balancePlatRope(X: Int) {
+    var temp0: Int = 0
+    //> BalancePlatRope:
+    //> txa                 ;save object buffer offset for now
+    //> pha
+    push(X)
+    //> ldx #$01            ;blank out all from second row to the bottom
+    //> ldy #$0f            ;with blank used for balance platform rope
+    //> lda #$44
+    //> jsr RenderUnderPart
+    renderUnderPart(0x44, 0x01, 0x0F)
+    //> pla                 ;get back object buffer offset
+    temp0 = pull()
+    //> tax
+    //> jsr GetLrgObjAttrib ;get vertical length from lower nybble
+    getLrgObjAttrib(temp0)
+    //> ldx #$01
+    //> DrawRope: lda #$40            ;render the actual rope
+    //> jmp RenderUnderPart
+}
+
+// Decompiled from RowOfCoins
+fun rowOfCoins() {
+    var temp0: Int = 0
+    var areaType by MemoryByte(AreaType)
+    val coinMetatileData by MemoryByteIndexed(CoinMetatileData)
+    //> RowOfCoins:
+    //> ldy AreaType            ;get area type
+    //> lda CoinMetatileData,y  ;load appropriate coin metatile
+    //> jmp GetRow
+    //> GetRow:  pha                        ;store metatile here
+    push(coinMetatileData[areaType])
+    //> jsr ChkLrgObjLength        ;get row number, load length
+    chkLrgObjLength()
+    //> DrawRow: ldx $07
+    //> ldy #$00                   ;set vertical height of 1
+    //> pla
+    temp0 = pull()
+    //> jmp RenderUnderPart        ;render object
+}
+
+// Decompiled from CastleBridgeObj
+fun castleBridgeObj() {
+    var X: Int = 0
+    //> CastleBridgeObj:
+    //> ldy #$0c                  ;load length of 13 columns
+    //> jsr ChkLrgObjFixedLength
+    chkLrgObjFixedLength(X, 0x0C)
+    //> jmp ChainObj
+}
+
+// Decompiled from AxeObj
+fun axeObj() {
+    var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
+    //> AxeObj:
+    //> lda #$08                  ;load bowser's palette into sprite portion of palette
+    //> sta VRAM_Buffer_AddrCtrl
+    vramBufferAddrctrl = 0x08
+    // Fall-through tail call to chainObj
+    chainObj()
+}
+
+// Decompiled from ChainObj
+fun chainObj() {
+    val cObjectmetatile by MemoryByteIndexed(C_ObjectMetatile)
+    val cObjectrow by MemoryByteIndexed(C_ObjectRow)
+    //> ChainObj:
+    //> ldy $00                   ;get value loaded earlier from decoder
+    //> ldx C_ObjectRow-2,y       ;get appropriate row and metatile for object
+    //> lda C_ObjectMetatile-2,y
+    //> jmp ColObj
+    //> ColObj: ldy #$00             ;column length of 1
+    //> jmp RenderUnderPart
+}
+
+// Decompiled from EmptyBlock
+fun emptyBlock() {
+    var X: Int = 0
+    //> EmptyBlock:
+    //> jsr GetLrgObjAttrib  ;get row location
+    getLrgObjAttrib(X)
+    //> ldx $07
+    //> lda #$c4
+    //> ColObj: ldy #$00             ;column length of 1
+    //> jmp RenderUnderPart
+}
+
+// Decompiled from RowOfBricks
+fun rowOfBricks() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var areaType by MemoryByte(AreaType)
+    var cloudTypeOverride by MemoryByte(CloudTypeOverride)
+    val brickMetatiles by MemoryByteIndexed(BrickMetatiles)
+    //> RowOfBricks:
+    //> ldy AreaType           ;load area type obtained from area offset pointer
+    //> lda CloudTypeOverride  ;check for cloud type override
+    //> beq DrawBricks
+    if (cloudTypeOverride == 0) {
+        //  goto DrawBricks
+        return
+    }
+    temp0 = cloudTypeOverride
+    temp1 = areaType
+    if (cloudTypeOverride != 0) {
+        //> ldy #$04               ;if cloud type, override area type
+        temp1 = 0x04
+    }
+    //> DrawBricks: lda BrickMetatiles,y   ;get appropriate metatile
+    temp0 = brickMetatiles[temp1]
+    //> jmp GetRow             ;and go render it
+    //> GetRow:  pha                        ;store metatile here
+    push(temp0)
+    //> jsr ChkLrgObjLength        ;get row number, load length
+    chkLrgObjLength()
+    //> DrawRow: ldx $07
+    //> ldy #$00                   ;set vertical height of 1
+    temp1 = 0x00
+    //> pla
+    temp0 = pull()
+    //> jmp RenderUnderPart        ;render object
+}
+
+// Decompiled from RowOfSolidBlocks
+fun rowOfSolidBlocks() {
+    var temp0: Int = 0
+    var areaType by MemoryByte(AreaType)
+    val solidBlockMetatiles by MemoryByteIndexed(SolidBlockMetatiles)
+    //> RowOfSolidBlocks:
+    //> ldy AreaType               ;load area type obtained from area offset pointer
+    //> lda SolidBlockMetatiles,y  ;get metatile
+    //> GetRow:  pha                        ;store metatile here
+    push(solidBlockMetatiles[areaType])
+    //> jsr ChkLrgObjLength        ;get row number, load length
+    chkLrgObjLength()
+    //> DrawRow: ldx $07
+    //> ldy #$00                   ;set vertical height of 1
+    //> pla
+    temp0 = pull()
+    //> jmp RenderUnderPart        ;render object
+    // Fall-through tail call to rowOfCoins
+    rowOfCoins()
+}
+
+// Decompiled from ColumnOfBricks
+fun columnOfBricks() {
+    var X: Int = 0
+    var temp0: Int = 0
+    var areaType by MemoryByte(AreaType)
+    val brickMetatiles by MemoryByteIndexed(BrickMetatiles)
+    //> ColumnOfBricks:
+    //> ldy AreaType          ;load area type obtained from area offset
+    //> lda BrickMetatiles,y  ;get metatile (no cloud override as for row)
+    //> jmp GetRow2
+    //> GetRow2: pha                        ;save metatile to stack for now
+    push(brickMetatiles[areaType])
+    //> jsr GetLrgObjAttrib        ;get length and row
+    getLrgObjAttrib(X)
+    //> pla                        ;restore metatile
+    temp0 = pull()
+    //> ldx $07                    ;get starting row
+    //> jmp RenderUnderPart        ;now render the column
+}
+
+// Decompiled from ColumnOfSolidBlocks
+fun columnOfSolidBlocks() {
+    var X: Int = 0
+    var temp0: Int = 0
+    var areaType by MemoryByte(AreaType)
+    val solidBlockMetatiles by MemoryByteIndexed(SolidBlockMetatiles)
+    //> ColumnOfSolidBlocks:
+    //> ldy AreaType               ;load area type obtained from area offset
+    //> lda SolidBlockMetatiles,y  ;get metatile
+    //> GetRow2: pha                        ;save metatile to stack for now
+    push(solidBlockMetatiles[areaType])
+    //> jsr GetLrgObjAttrib        ;get length and row
+    getLrgObjAttrib(X)
+    //> pla                        ;restore metatile
+    temp0 = pull()
+    //> ldx $07                    ;get starting row
+    //> jmp RenderUnderPart        ;now render the column
+}
+
+// Decompiled from BulletBillCannon
+fun bulletBillCannon(Y: Int) {
+    var X: Int = 0
+    var Y: Int = Y
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var cannonOffset by MemoryByte(Cannon_Offset)
+    var currentPageLoc by MemoryByte(CurrentPageLoc)
+    val cannonPageloc by MemoryByteIndexed(Cannon_PageLoc)
+    val cannonXPosition by MemoryByteIndexed(Cannon_X_Position)
+    val cannonYPosition by MemoryByteIndexed(Cannon_Y_Position)
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    //> BulletBillCannon:
+    //> jsr GetLrgObjAttrib      ;get row and length of bullet bill cannon
+    getLrgObjAttrib(X)
+    //> ldx $07                  ;start at first row
+    //> lda #$64                 ;render bullet bill cannon
+    //> sta MetatileBuffer,x
+    metatileBuffer[memory[0x7].toInt()] = 0x64
+    //> inx
+    temp0 = memory[0x7].toInt()
+    temp0 = (temp0 + 1) and 0xFF
+    //> dey                      ;done yet?
+    Y = (Y - 1) and 0xFF
+    //> bmi SetupCannon
+    temp1 = 0x64
+    if ((Y and 0x80) == 0) {
+        //> lda #$65                 ;if not, render middle part
+        temp1 = 0x65
+        //> sta MetatileBuffer,x
+        metatileBuffer[temp0] = temp1
+        //> inx
+        temp0 = (temp0 + 1) and 0xFF
+        //> dey                      ;done yet?
+        Y = (Y - 1) and 0xFF
+        //> bmi SetupCannon
+        if ((Y and 0x80) == 0) {
+            //> lda #$66                 ;if not, render bottom until length expires
+            temp1 = 0x66
+            //> jsr RenderUnderPart
+            renderUnderPart(temp1, temp0, Y)
+        }
+    }
+    //> SetupCannon: ldx Cannon_Offset        ;get offset for data used by cannons and whirlpools
+    temp0 = cannonOffset
+    //> jsr GetAreaObjYPosition  ;get proper vertical coordinate for cannon
+    getAreaObjYPosition()
+    //> sta Cannon_Y_Position,x  ;and store it here
+    cannonYPosition[temp0] = temp1
+    //> lda CurrentPageLoc
+    temp1 = currentPageLoc
+    //> sta Cannon_PageLoc,x     ;store page number for cannon here
+    cannonPageloc[temp0] = temp1
+    //> jsr GetAreaObjXPosition  ;get proper horizontal coordinate for cannon
+    getAreaObjXPosition()
+    //> sta Cannon_X_Position,x  ;and store it here
+    cannonXPosition[temp0] = temp1
+    //> inx
+    temp0 = (temp0 + 1) and 0xFF
+    //> cpx #$06                 ;increment and check offset
+    //> bcc StrCOffset           ;if not yet reached sixth cannon, branch to save offset
+    if (temp0 >= 0x06) {
+        //> ldx #$00                 ;otherwise initialize it
+        temp0 = 0x00
+    }
+    //> StrCOffset:  stx Cannon_Offset        ;save new offset and leave
+    cannonOffset = temp0
+    //> rts
+    return
+}
+
+// Decompiled from StaircaseObject
+fun staircaseObject() {
+    var staircaseControl by MemoryByte(StaircaseControl)
+    val staircaseHeightData by MemoryByteIndexed(StaircaseHeightData)
+    val staircaseRowData by MemoryByteIndexed(StaircaseRowData)
+    //> StaircaseObject:
+    //> jsr ChkLrgObjLength       ;check and load length
+    chkLrgObjLength()
+    //> bcc NextStair             ;if length already loaded, skip init part
+    if (!(flagC)) {
+        //  goto NextStair
+        return
+    }
+    if (flagC) {
+        //> lda #$09                  ;start past the end for the bottom
+        //> sta StaircaseControl      ;of the staircase
+        staircaseControl = 0x09
+    }
+    //> NextStair: dec StaircaseControl      ;move onto next step (or first if starting)
+    staircaseControl = (staircaseControl - 1) and 0xFF
+    //> ldy StaircaseControl
+    //> ldx StaircaseRowData,y    ;get starting row and height to render
+    //> lda StaircaseHeightData,y
+    //> tay
+    //> lda #$61                  ;now render solid block staircase
+    //> jmp RenderUnderPart
+}
+
+// Decompiled from Jumpspring
+fun jumpspring(A: Int, X: Int) {
+    var currentPageLoc by MemoryByte(CurrentPageLoc)
+    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val jumpspringFixedypos by MemoryByteIndexed(Jumpspring_FixedYPos)
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    //> Jumpspring:
+    //> jsr GetLrgObjAttrib
+    getLrgObjAttrib(X)
+    //> jsr FindEmptyEnemySlot      ;find empty space in enemy object buffer
+    findEmptyEnemySlot()
+    //> jsr GetAreaObjXPosition     ;get horizontal coordinate for jumpspring
+    getAreaObjXPosition()
+    //> sta Enemy_X_Position,x      ;and store
+    enemyXPosition[X] = A
+    //> lda CurrentPageLoc          ;store page location of jumpspring
+    //> sta Enemy_PageLoc,x
+    enemyPageloc[X] = currentPageLoc
+    //> jsr GetAreaObjYPosition     ;get vertical coordinate for jumpspring
+    getAreaObjYPosition()
+    //> sta Enemy_Y_Position,x      ;and store
+    enemyYPosition[X] = currentPageLoc
+    //> sta Jumpspring_FixedYPos,x  ;store as permanent coordinate here
+    jumpspringFixedypos[X] = currentPageLoc
+    //> lda #JumpspringObject
+    //> sta Enemy_ID,x              ;write jumpspring object to enemy object buffer
+    enemyId[X] = JumpspringObject
+    //> ldy #$01
+    //> sty Enemy_Y_HighPos,x       ;store vertical high byte
+    enemyYHighpos[X] = 0x01
+    //> inc Enemy_Flag,x            ;set flag for enemy object buffer
+    enemyFlag[X] = (enemyFlag[X] + 1) and 0xFF
+    //> ldx $07
+    //> lda #$67                    ;draw metatiles in two rows where jumpspring is
+    //> sta MetatileBuffer,x
+    metatileBuffer[memory[0x7].toInt()] = 0x67
+    //> lda #$68
+    //> sta MetatileBuffer+1,x
+    metatileBuffer[1 + memory[0x7].toInt()] = 0x68
+    //> rts
+    return
+}
+
+// Decompiled from Hidden1UpBlock
+fun hidden1UpBlock() {
+    var temp0: Int = 0
+    var hidden1UpFlag by MemoryByte(Hidden1UpFlag)
+    //> Hidden1UpBlock:
+    //> lda Hidden1UpFlag  ;if flag not set, do not render object
+    //> beq ExitDecBlock
+    if (hidden1UpFlag == 0) {
+        //  goto ExitDecBlock
+        return
+    }
+    temp0 = hidden1UpFlag
+    if (hidden1UpFlag != 0) {
+        //> lda #$00           ;if set, init for the next one
+        temp0 = 0x00
+        //> sta Hidden1UpFlag
+        hidden1UpFlag = temp0
+        //> jmp BrickWithItem  ;jump to code shared with unbreakable bricks
+    }
+    //> ExitDecBlock: rts
+    return
+}
+
+// Decompiled from QuestionBlock
+fun questionBlock(Y: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    val brickQBlockMetatiles by MemoryByteIndexed(BrickQBlockMetatiles)
+    //> DrawRow: ldx $07
+    //> ldy #$00                   ;set vertical height of 1
+    //> pla
+    temp0 = pull()
+    //> jmp RenderUnderPart        ;render object
+    //> QuestionBlock:
+    //> jsr GetAreaObjectID ;get value from level decoder routine
+    getAreaObjectID()
+    //> jmp DrawQBlk        ;go to render it
+    temp1 = memory[0x7].toInt()
+    temp2 = 0x00
+    while (true) {
+        //> DrawQBlk: lda BrickQBlockMetatiles,y  ;get appropriate metatile for brick (question block
+        //> pha                         ;if branched to here from question block routine)
+        push(brickQBlockMetatiles[temp2])
+        //> jsr GetLrgObjAttrib         ;get row from location byte
+        getLrgObjAttrib(temp1)
+        //> jmp DrawRow                 ;now render the object
+    }
+}
+
+// Decompiled from BrickWithCoins
+fun brickWithCoins() {
+    var brickCoinTimerFlag by MemoryByte(BrickCoinTimerFlag)
+    //> BrickWithCoins:
+    //> lda #$00                 ;initialize multi-coin timer flag
+    //> sta BrickCoinTimerFlag
+    brickCoinTimerFlag = 0x00
+    // Fall-through tail call to brickWithItem
+    brickWithItem(Y)
+}
+
+// Decompiled from BrickWithItem
+fun brickWithItem(Y: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var areaType by MemoryByte(AreaType)
+    val brickQBlockMetatiles by MemoryByteIndexed(BrickQBlockMetatiles)
+    //> DrawRow: ldx $07
+    //> ldy #$00                   ;set vertical height of 1
+    //> pla
+    temp0 = pull()
+    //> jmp RenderUnderPart        ;render object
+    //> BrickWithItem:
+    //> jsr GetAreaObjectID         ;save area object ID
+    getAreaObjectID()
+    //> sty $07
+    memory[0x7] = 0x00.toUByte()
+    //> lda #$00                    ;load default adder for bricks with lines
+    //> ldy AreaType                ;check level type for ground level
+    //> dey
+    areaType = (areaType - 1) and 0xFF
+    //> beq BWithL                  ;if ground type, do not start with 5
+    temp1 = 0x00
+    temp2 = memory[0x7].toInt()
+    temp3 = areaType
+    if (areaType != 0) {
+        //> lda #$05                    ;otherwise use adder for bricks without lines
+        temp1 = 0x05
+    }
+    //> BWithL:   clc                         ;add object ID to adder
+    //> adc $07
+    temp4 = temp1 + memory[0x7].toInt()
+    temp1 = temp4 and 0xFF
+    //> tay                         ;use as offset for metatile
+    temp3 = temp1
+    while (true) {
+        //> DrawQBlk: lda BrickQBlockMetatiles,y  ;get appropriate metatile for brick (question block
+        temp1 = brickQBlockMetatiles[temp3]
+        //> pha                         ;if branched to here from question block routine)
+        push(temp1)
+        //> jsr GetLrgObjAttrib         ;get row from location byte
+        getLrgObjAttrib(temp2)
+        //> jmp DrawRow                 ;now render the object
+    }
+    // Fall-through tail call to questionBlock
+    questionBlock(temp3)
+}
+
 // Decompiled from GetAreaObjectID
 fun getAreaObjectID() {
+    var temp0: Int = 0
     //> GetAreaObjectID:
     //> lda $00    ;get value saved from area parser routine
     //> sec
     //> sbc #$00   ;possibly residual code
+    temp0 = memory[0x0].toInt()
     //> tay        ;save to Y
     //> ExitDecBlock: rts
     return
 }
 
+// Decompiled from Hole_Empty
+fun holeEmpty() {
+    var Y: Int = 0
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var areaType by MemoryByte(AreaType)
+    var currentPageLoc by MemoryByte(CurrentPageLoc)
+    var whirlpoolOffset by MemoryByte(Whirlpool_Offset)
+    val holeMetatiles by MemoryByteIndexed(HoleMetatiles)
+    val whirlpoolLeftextent by MemoryByteIndexed(Whirlpool_LeftExtent)
+    val whirlpoolLength by MemoryByteIndexed(Whirlpool_Length)
+    val whirlpoolPageloc by MemoryByteIndexed(Whirlpool_PageLoc)
+    //> Hole_Empty:
+    //> jsr ChkLrgObjLength          ;get lower nybble and save as length
+    chkLrgObjLength()
+    //> bcc NoWhirlP                 ;skip this part if length already loaded
+    if (flagC) {
+        //> lda AreaType                 ;check for water type level
+        //> bne NoWhirlP                 ;if not water type, skip this part
+        temp0 = areaType
+        if (areaType == 0) {
+            //> ldx Whirlpool_Offset         ;get offset for data used by cannons and whirlpools
+            //> jsr GetAreaObjXPosition      ;get proper vertical coordinate of where we're at
+            getAreaObjXPosition()
+            //> sec
+            //> sbc #$10                     ;subtract 16 pixels
+            temp1 = temp0 - 0x10
+            temp0 = temp1 and 0xFF
+            //> sta Whirlpool_LeftExtent,x   ;store as left extent of whirlpool
+            whirlpoolLeftextent[whirlpoolOffset] = temp0
+            //> lda CurrentPageLoc           ;get page location of where we're at
+            temp0 = currentPageLoc
+            //> sbc #$00                     ;subtract borrow
+            temp2 = temp0 - (if (temp1 >= 0) 0 else 1)
+            temp0 = temp2 and 0xFF
+            //> sta Whirlpool_PageLoc,x      ;save as page location of whirlpool
+            whirlpoolPageloc[whirlpoolOffset] = temp0
+            //> iny
+            Y = (Y + 1) and 0xFF
+            //> iny                          ;increment length by 2
+            Y = (Y + 1) and 0xFF
+            //> tya
+            //> asl                          ;multiply by 16 to get size of whirlpool
+            Y = (Y shl 1) and 0xFF
+            //> asl                          ;note that whirlpool will always be
+            Y = (Y shl 1) and 0xFF
+            //> asl                          ;two blocks bigger than actual size of hole
+            Y = (Y shl 1) and 0xFF
+            //> asl                          ;and extend one block beyond each edge
+            Y = (Y shl 1) and 0xFF
+            //> sta Whirlpool_Length,x       ;save size of whirlpool here
+            whirlpoolLength[whirlpoolOffset] = Y
+            //> inx
+            whirlpoolOffset = (whirlpoolOffset + 1) and 0xFF
+            //> cpx #$05                     ;increment and check offset
+            //> bcc StrWOffset               ;if not yet reached fifth whirlpool, branch to save offset
+            temp0 = Y
+            temp3 = whirlpoolOffset
+            if (whirlpoolOffset >= 0x05) {
+                //> ldx #$00                     ;otherwise initialize it
+                temp3 = 0x00
+            }
+            //> StrWOffset: stx Whirlpool_Offset         ;save new offset here
+            whirlpoolOffset = temp3
+        }
+    }
+    //> NoWhirlP:   ldx AreaType                 ;get appropriate metatile, then
+    temp3 = areaType
+    //> lda HoleMetatiles,x          ;render the hole proper
+    temp0 = holeMetatiles[temp3]
+    //> ldx #$08
+    temp3 = 0x08
+    //> ldy #$0f                     ;start at ninth row and go to bottom, run RenderUnderPart
+    //> ;--------------------------------
+    // Fall-through tail call to renderUnderPart
+    renderUnderPart(temp0, temp3, 0x0F)
+}
+
 // Decompiled from RenderUnderPart
 fun renderUnderPart(A: Int, X: Int, Y: Int) {
     var X: Int = X
+    var temp0: Int = 0
     var areaObjectHeight by MemoryByte(AreaObjectHeight)
     val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
-    while (!flagN) {
-        //> cpy #$17
-        //> beq WaitOneRow        ;if middle part (tree ledge), wait until next row
-        if (Y != 0x17) {
-            //> cpy #$1a
-            //> beq WaitOneRow        ;if middle part (mushroom ledge), wait until next row
-            if (Y != 0x1A) {
-                //> cpy #$c0
-                //> beq DrawThisRow       ;if question block w/ coin, overwrite
-                if (Y != 0xC0) {
+    do {
+        //> RenderUnderPart:
+        //> sty AreaObjectHeight  ;store vertical length to render
+        areaObjectHeight = Y
+        //> ldy MetatileBuffer,x  ;check current spot to see if there's something
+        //> beq DrawThisRow       ;we need to keep, if nothing, go ahead
+        temp0 = metatileBuffer[X]
+        if (metatileBuffer[X] != 0) {
+            //> cpy #$17
+            //> beq WaitOneRow        ;if middle part (tree ledge), wait until next row
+            if (temp0 != 0x17) {
+                //> cpy #$1a
+                //> beq WaitOneRow        ;if middle part (mushroom ledge), wait until next row
+                if (temp0 != 0x1A) {
                     //> cpy #$c0
-                    //> bcs WaitOneRow        ;if any other metatile with palette 3, wait until next row
-                    if (!(Y >= 0xC0)) {
-                        //> cpy #$54
-                        //> bne DrawThisRow       ;if cracked rock terrain, overwrite
-                        if (Y == 0x54) {
-                            //> cmp #$50
-                            //> beq WaitOneRow        ;if stem top of mushroom, wait until next row
-                            if (A != 0x50) {
+                    //> beq DrawThisRow       ;if question block w/ coin, overwrite
+                    if (temp0 != 0xC0) {
+                        //> cpy #$c0
+                        //> bcs WaitOneRow        ;if any other metatile with palette 3, wait until next row
+                        if (!(temp0 >= 0xC0)) {
+                            //> cpy #$54
+                            //> bne DrawThisRow       ;if cracked rock terrain, overwrite
+                            if (temp0 == 0x54) {
+                                //> cmp #$50
+                                //> beq WaitOneRow        ;if stem top of mushroom, wait until next row
+                                if (A != 0x50) {
+                                }
                             }
                         }
                     }
                 }
-                //> DrawThisRow: sta MetatileBuffer,x  ;render contents of A from routine that called this
-                metatileBuffer[X] = A
             }
         }
+        //> DrawThisRow: sta MetatileBuffer,x  ;render contents of A from routine that called this
+        metatileBuffer[X] = A
         //> WaitOneRow:  inx
         X = (X + 1) and 0xFF
         //> cpx #$0d              ;stop rendering if we're at the bottom of the screen
         //> bcs ExitUPartR
         if (!(X >= 0x0D)) {
-            do {
-                //> RenderUnderPart:
-                //> sty AreaObjectHeight  ;store vertical length to render
-                areaObjectHeight = Y
-                //> ldy MetatileBuffer,x  ;check current spot to see if there's something
-                //> beq DrawThisRow       ;we need to keep, if nothing, go ahead
-                //> ldy AreaObjectHeight  ;decrement, and stop rendering if there is no more length
-                //> dey
-                areaObjectHeight = (areaObjectHeight - 1) and 0xFF
-                //> bpl RenderUnderPart
-            } while ((areaObjectHeight and 0x80) == 0)
+            //> ldy AreaObjectHeight  ;decrement, and stop rendering if there is no more length
+            temp0 = areaObjectHeight
+            //> dey
+            temp0 = (temp0 - 1) and 0xFF
+            //> bpl RenderUnderPart
         }
-    }
+    } while (!flagN)
     //> ExitUPartR:  rts
     return
 }
@@ -3192,6 +6440,8 @@ fun chkLrgObjLength() {
     //> ChkLrgObjLength:
     //> jsr GetLrgObjAttrib     ;get row location and size (length if branched to from here)
     getLrgObjAttrib(X)
+    // Fall-through tail call to chkLrgObjFixedLength
+    chkLrgObjFixedLength(X, Y)
 }
 
 // Decompiled from ChkLrgObjFixedLength
@@ -3256,6 +6506,7 @@ fun getAreaObjXPosition(): Int {
 
 // Decompiled from GetAreaObjYPosition
 fun getAreaObjYPosition(): Int {
+    var temp0: Int = 0
     //> GetAreaObjYPosition:
     //> lda $07  ;multiply value by 16
     //> asl
@@ -3264,6 +6515,7 @@ fun getAreaObjYPosition(): Int {
     //> asl
     //> clc
     //> adc #32  ;add 32 pixels for the status bar
+    temp0 = ((((((((memory[0x7].toInt() shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF) + 0x20
     //> rts
     return A
 }
@@ -3273,6 +6525,7 @@ fun getBlockBufferAddr(A: Int) {
     var A: Int = A
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
     val blockBufferAddr by MemoryByteIndexed(BlockBufferAddr)
     //> GetBlockBufferAddr:
     //> pha                      ;take value of A, save
@@ -3295,47 +6548,48 @@ fun getBlockBufferAddr(A: Int) {
     temp1 = temp0 and 0x0F
     //> clc
     //> adc BlockBufferAddr,y    ;add to low byte
+    temp2 = temp1 + blockBufferAddr[A]
     //> sta $06                  ;store here and leave
-    memory[0x6] = ((temp1 + blockBufferAddr[A]) and 0xFF).toUByte()
+    memory[0x6] = (temp2 and 0xFF).toUByte()
     //> rts
     return
 }
 
 // Decompiled from LoadAreaPointer
-// Fixed: Use the result from findAreaPointer(), not the parameter A
-fun loadAreaPointer(areaNum: Int) {
+fun loadAreaPointer(A: Int) {
     var areaPointer by MemoryByte(AreaPointer)
     //> LoadAreaPointer:
     //> jsr FindAreaPointer  ;find it and store it here
-    val result = findAreaPointer()
+    findAreaPointer()
     //> sta AreaPointer
-    areaPointer = result
+    areaPointer = A
+    // Fall-through tail call to getAreaType
+    getAreaType(A)
 }
 
 // Decompiled from GetAreaType
-// Fixed: Proper carry handling for ASL/ROL sequence
-// This extracts bits 5-6 from A and shifts them to bits 0-1
-fun getAreaType(inputA: Int): Int {
+fun getAreaType(A: Int): Int {
+    var temp0: Int = 0
     var areaType by MemoryByte(AreaType)
     //> GetAreaType: and #%01100000       ;mask out all but d6 and d5
-    val masked = inputA and 0x60
-    // Bits 5-6 of inputA are now in bits 5-6 of masked
-    // We need to shift them to bits 0-1
-    // ASL shifts left, putting bit 7 into carry
-    // ROL rotates left through carry, putting carry into bit 0 and bit 7 into carry
-    // After ASL + 3 ROLs, bits 5-6 end up in bits 0-1
-    //
-    // Simpler: just shift right by 5
-    val result = (masked shr 5) and 0x03
+    temp0 = A and 0x60
+    //> asl
+    temp0 = (temp0 shl 1) and 0xFF
+    //> rol
+    temp0 = (temp0 shl 1) and 0xFE or if ((temp0 and 0x80) != 0) 1 else 0
+    //> rol
+    temp0 = (temp0 shl 1) and 0xFE or if ((temp0 and 0x80) != 0) 1 else 0
+    //> rol                  ;make %0xx00000 into %000000xx
+    temp0 = (temp0 shl 1) and 0xFE or if ((temp0 and 0x80) != 0) 1 else 0
     //> sta AreaType         ;save 2 MSB as area type
-    areaType = result
+    areaType = temp0
     //> rts
-    return inputA
+    return A
 }
 
 // Decompiled from FindAreaPointer
-// Fixed: Actually implement the lookup logic
 fun findAreaPointer(): Int {
+    var temp0: Int = 0
     var areaNumber by MemoryByte(AreaNumber)
     var worldNumber by MemoryByte(WorldNumber)
     val areaAddrOffsets by MemoryByteIndexed(AreaAddrOffsets)
@@ -3343,13 +6597,11 @@ fun findAreaPointer(): Int {
     //> FindAreaPointer:
     //> ldy WorldNumber        ;load offset from world variable
     //> lda WorldAddrOffsets,y
-    val worldOffset = worldAddrOffsets[worldNumber]
     //> clc                    ;add area number used to find data
     //> adc AreaNumber
-    val index = (worldOffset + areaNumber) and 0xFF
+    temp0 = worldAddrOffsets[worldNumber] + areaNumber
     //> tay
     //> lda AreaAddrOffsets,y  ;from there we have our area pointer
-    A = areaAddrOffsets[index]
     //> rts
     return A
 }
@@ -3358,6 +6610,9 @@ fun findAreaPointer(): Int {
 fun getAreaDataAddrs() {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp10: Int = 0
+    var temp11: Int = 0
+    var temp12: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
@@ -3365,6 +6620,7 @@ fun getAreaDataAddrs() {
     var temp6: Int = 0
     var temp7: Int = 0
     var temp8: Int = 0
+    var temp9: Int = 0
     var areaAddrsLOffset by MemoryByte(AreaAddrsLOffset)
     var areaDataHigh by MemoryByte(AreaDataHigh)
     var areaDataLow by MemoryByte(AreaDataLow)
@@ -3399,129 +6655,161 @@ fun getAreaDataAddrs() {
     //> lda EnemyAddrHOffsets,y  ;load base value with 2 altered MSB,
     //> clc                      ;then add base value to 5 LSB, result
     //> adc AreaAddrsLOffset     ;becomes offset for level data
+    temp1 = enemyAddrHOffsets[areaPointer] + areaAddrsLOffset
     //> tay
     //> lda EnemyDataAddrLow,y   ;use offset to load pointer
     //> sta EnemyDataLow
-    enemyDataLow = enemyDataAddrLow[(enemyAddrHOffsets[areaPointer] + areaAddrsLOffset) and 0xFF]
+    enemyDataLow = enemyDataAddrLow[temp1 and 0xFF]
     //> lda EnemyDataAddrHigh,y
     //> sta EnemyDataHigh
-    enemyDataHigh = enemyDataAddrHigh[(enemyAddrHOffsets[areaPointer] + areaAddrsLOffset) and 0xFF]
+    enemyDataHigh = enemyDataAddrHigh[temp1 and 0xFF]
     //> ldy AreaType             ;use area type as offset
     //> lda AreaDataHOffsets,y   ;do the same thing but with different base value
     //> clc
     //> adc AreaAddrsLOffset
+    temp2 = areaDataHOffsets[areaType] + areaAddrsLOffset
     //> tay
     //> lda AreaDataAddrLow,y    ;use this offset to load another pointer
     //> sta AreaDataLow
-    areaDataLow = areaDataAddrLow[(areaDataHOffsets[areaType] + areaAddrsLOffset) and 0xFF]
+    areaDataLow = areaDataAddrLow[temp2 and 0xFF]
     //> lda AreaDataAddrHigh,y
     //> sta AreaDataHigh
-    areaDataHigh = areaDataAddrHigh[(areaDataHOffsets[areaType] + areaAddrsLOffset) and 0xFF]
+    areaDataHigh = areaDataAddrHigh[temp2 and 0xFF]
     //> ldy #$00                 ;load first byte of header
     //> lda (AreaData),y
     //> pha                      ;save it to the stack for now
     push(memory[readWord(AreaData)].toInt())
     //> and #%00000111           ;save 3 LSB for foreground scenery or bg color control
-    temp1 = memory[readWord(AreaData)].toInt() and 0x07
+    temp3 = memory[readWord(AreaData)].toInt() and 0x07
     //> cmp #$04
     //> bcc StoreFore
-    temp2 = temp1
-    temp3 = 0x00
-    if (temp1 >= 0x04) {
+    temp4 = temp3
+    temp5 = 0x00
+    if (temp3 >= 0x04) {
         //> sta BackgroundColorCtrl  ;if 4 or greater, save value here as bg color control
-        backgroundColorCtrl = temp2
+        backgroundColorCtrl = temp4
         //> lda #$00
-        temp2 = 0x00
+        temp4 = 0x00
     }
     //> StoreFore:  sta ForegroundScenery    ;if less, save value here as foreground scenery
-    foregroundScenery = temp2
+    foregroundScenery = temp4
     //> pla                      ;pull byte from stack and push it back
-    temp2 = pull()
+    temp4 = pull()
     //> pha
-    push(temp2)
+    push(temp4)
     //> and #%00111000           ;save player entrance control bits
-    temp4 = temp2 and 0x38
+    temp6 = temp4 and 0x38
     //> lsr                      ;shift bits over to LSBs
-    temp4 = temp4 shr 1
+    temp6 = temp6 shr 1
     //> lsr
-    temp4 = temp4 shr 1
+    temp6 = temp6 shr 1
     //> lsr
-    temp4 = temp4 shr 1
+    temp6 = temp6 shr 1
     //> sta PlayerEntranceCtrl       ;save value here as player entrance control
-    playerEntranceCtrl = temp4
+    playerEntranceCtrl = temp6
     //> pla                      ;pull byte again but do not push it back
-    temp2 = pull()
+    temp4 = pull()
     //> and #%11000000           ;save 2 MSB for game timer setting
-    temp5 = temp2 and 0xC0
+    temp7 = temp4 and 0xC0
     //> clc
     //> rol                      ;rotate bits over to LSBs
-    temp5 = (temp5 shl 1) and 0xFE
+    temp7 = (temp7 shl 1) and 0xFE
     //> rol
-    temp5 = (temp5 shl 1) and 0xFE or if ((temp5 and 0x80) != 0) 1 else 0
+    temp7 = (temp7 shl 1) and 0xFE or if ((temp7 and 0x80) != 0) 1 else 0
     //> rol
-    temp5 = (temp5 shl 1) and 0xFE or if ((temp5 and 0x80) != 0) 1 else 0
+    temp7 = (temp7 shl 1) and 0xFE or if ((temp7 and 0x80) != 0) 1 else 0
     //> sta GameTimerSetting     ;save value here as game timer setting
-    gameTimerSetting = temp5
+    gameTimerSetting = temp7
     //> iny
-    temp3 = (temp3 + 1) and 0xFF
+    temp5 = (temp5 + 1) and 0xFF
     //> lda (AreaData),y         ;load second byte of header
-    temp2 = memory[readWord(AreaData) + temp3].toInt()
+    temp4 = memory[readWord(AreaData) + temp5].toInt()
     //> pha                      ;save to stack
-    push(temp2)
+    push(temp4)
     //> and #%00001111           ;mask out all but lower nybble
-    temp6 = temp2 and 0x0F
+    temp8 = temp4 and 0x0F
     //> sta TerrainControl
-    terrainControl = temp6
+    terrainControl = temp8
     //> pla                      ;pull and push byte to copy it to A
-    temp2 = pull()
+    temp4 = pull()
     //> pha
-    push(temp2)
+    push(temp4)
     //> and #%00110000           ;save 2 MSB for background scenery type
-    temp7 = temp2 and 0x30
+    temp9 = temp4 and 0x30
     //> lsr
-    temp7 = temp7 shr 1
+    temp9 = temp9 shr 1
     //> lsr                      ;shift bits to LSBs
-    temp7 = temp7 shr 1
+    temp9 = temp9 shr 1
     //> lsr
-    temp7 = temp7 shr 1
+    temp9 = temp9 shr 1
     //> lsr
-    temp7 = temp7 shr 1
+    temp9 = temp9 shr 1
     //> sta BackgroundScenery    ;save as background scenery
-    backgroundScenery = temp7
+    backgroundScenery = temp9
     //> pla
-    temp2 = pull()
+    temp4 = pull()
     //> and #%11000000
-    temp8 = temp2 and 0xC0
+    temp10 = temp4 and 0xC0
     //> clc
     //> rol                      ;rotate bits over to LSBs
-    temp8 = (temp8 shl 1) and 0xFE
+    temp10 = (temp10 shl 1) and 0xFE
     //> rol
-    temp8 = (temp8 shl 1) and 0xFE or if ((temp8 and 0x80) != 0) 1 else 0
+    temp10 = (temp10 shl 1) and 0xFE or if ((temp10 and 0x80) != 0) 1 else 0
     //> rol
-    temp8 = (temp8 shl 1) and 0xFE or if ((temp8 and 0x80) != 0) 1 else 0
+    temp10 = (temp10 shl 1) and 0xFE or if ((temp10 and 0x80) != 0) 1 else 0
     //> cmp #%00000011           ;if set to 3, store here
     //> bne StoreStyle           ;and nullify other value
-    temp2 = temp8
-    if (temp8 == 0x03) {
+    temp4 = temp10
+    if (temp10 == 0x03) {
         //> sta CloudTypeOverride    ;otherwise store value in other place
-        cloudTypeOverride = temp2
+        cloudTypeOverride = temp4
         //> lda #$00
-        temp2 = 0x00
+        temp4 = 0x00
     }
     //> StoreStyle: sta AreaStyle
-    areaStyle = temp2
+    areaStyle = temp4
     //> lda AreaDataLow          ;increment area data address by 2 bytes
-    temp2 = areaDataLow
+    temp4 = areaDataLow
     //> clc
     //> adc #$02
+    temp11 = temp4 + 0x02
+    temp4 = temp11 and 0xFF
     //> sta AreaDataLow
-    areaDataLow = (temp2 + 0x02) and 0xFF
+    areaDataLow = temp4
     //> lda AreaDataHigh
-    temp2 = areaDataHigh
+    temp4 = areaDataHigh
     //> adc #$00
+    temp12 = temp4 + (if (temp11 > 0xFF) 1 else 0)
+    temp4 = temp12 and 0xFF
     //> sta AreaDataHigh
-    areaDataHigh = (temp2 + (if (temp2 + 0x02 > 0xFF) 1 else 0)) and 0xFF
+    areaDataHigh = temp4
     //> rts
+    return
+}
+
+// Decompiled from GameMode
+fun gameMode() {
+    var opermodeTask by MemoryByte(OperMode_Task)
+    //> GameMode:
+    //> lda OperMode_Task
+    //> jsr JumpEngine
+    when (opermodeTask) {
+        0 -> {
+            initializeArea()
+        }
+        1 -> {
+            screenRoutines()
+        }
+        2 -> {
+            secondaryGameSetup()
+        }
+        3 -> {
+            gameCoreRoutine()
+        }
+        else -> {
+            // Unknown JumpEngine index
+        }
+    }
     return
 }
 
@@ -3545,13 +6833,9 @@ fun gameCoreRoutine() {
     //> ldx CurrentPlayer          ;get which player is on the screen
     //> lda SavedJoypadBits,x      ;use appropriate player's controller bits
     //> sta SavedJoypadBits        ;as the master controller bits
-    val inputBits = savedJoypadBits[currentPlayer]
-    if (DEBUG_CONTROLLER && inputBits != 0) System.err.println("gameCoreRoutine: currentPlayer=$currentPlayer, savedJoypadBits[cp]=${inputBits.toString(16)}")
-    savedJoypadBits[0] = inputBits
+    savedJoypadBits[0] = savedJoypadBits[currentPlayer]
     //> jsr GameRoutines           ;execute one of many possible subs
-    if (DEBUG_GAME_CORE) { System.err.print("GCR: gameRoutines()..."); System.err.flush() }
     gameRoutines()
-    if (DEBUG_GAME_CORE) System.err.println("done")
     //> lda OperMode_Task          ;check major task of operating mode
     //> cmp #$03                   ;if we are supposed to be here,
     //> bcs GameEngine             ;branch to the game engine itself
@@ -3559,14 +6843,11 @@ fun gameCoreRoutine() {
     temp1 = currentPlayer
     if (!(opermodeTask >= 0x03)) {
         //> rts
-        if (DEBUG_GAME_CORE) System.err.println("GCR: early exit, task<3")
         return
     } else {
         //> GameEngine:
         //> jsr ProcFireball_Bubble    ;process fireballs and air bubbles
-        if (DEBUG_GAME_CORE) { System.err.print("GCR: procfireballBubble()..."); System.err.flush() }
         procfireballBubble()
-        if (DEBUG_GAME_CORE) System.err.println("done")
         //> ldx #$00
         temp1 = 0x00
     }
@@ -3574,9 +6855,7 @@ fun gameCoreRoutine() {
         //> ProcELoop:    stx ObjectOffset           ;put incremented offset in X as enemy object offset
         objectOffset = temp1
         //> jsr EnemiesAndLoopsCore    ;process enemy objects
-        if (DEBUG_GAME_CORE) { System.err.print("GCR: enemiesAndLoopsCore($temp1)..."); System.err.flush() }
         enemiesAndLoopsCore(temp1)
-        if (DEBUG_GAME_CORE) System.err.println("done")
         //> jsr FloateyNumbersRoutine  ;process floatey numbers
         floateyNumbersRoutine(temp1)
         //> inx
@@ -3669,11 +6948,14 @@ fun gameCoreRoutine() {
     temp0 = 0x00
     //> sta Left_Right_Buttons     ;nullify left and right buttons temp variable
     leftRightButtons = temp0
+    // Fall-through tail call to updScrollVar
+    updScrollVar()
 }
 
 // Decompiled from UpdScrollVar
 fun updScrollVar() {
     var temp0: Int = 0
+    var temp1: Int = 0
     var areaParserTaskNum by MemoryByte(AreaParserTaskNum)
     var scrollThirtyTwo by MemoryByte(ScrollThirtyTwo)
     var vramBuffer2Offset by MemoryByte(VRAM_Buffer2_Offset)
@@ -3695,8 +6977,10 @@ fun updScrollVar() {
                 //> lda ScrollThirtyTwo
                 temp0 = scrollThirtyTwo
                 //> sbc #$20                   ;otherwise subtract $20 to set appropriately
+                temp1 = temp0 - 0x20 - (if (temp0 >= 0x20) 0 else 1)
+                temp0 = temp1 and 0xFF
                 //> sta ScrollThirtyTwo        ;and store
-                scrollThirtyTwo = (temp0 - 0x20 - (if (temp0 >= 0x20) 0 else 1)) and 0xFF
+                scrollThirtyTwo = temp0
                 //> lda #$00                   ;reset vram buffer offset used in conjunction with
                 temp0 = 0x00
                 //> sta VRAM_Buffer2_Offset    ;level graphics buffer at $0341-$035f
@@ -3717,6 +7001,9 @@ fun scrollHandler() {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var leftRightButtons by MemoryByte(Left_Right_Buttons)
     var platformXScroll by MemoryByte(Platform_X_Scroll)
     var playerPageloc by MemoryByte(Player_PageLoc)
@@ -3735,115 +7022,127 @@ fun scrollHandler() {
     //> lda Player_X_Scroll       ;load value saved here
     //> clc
     //> adc Platform_X_Scroll     ;add value used by left/right platforms
+    temp0 = playerXScroll + platformXScroll
     //> sta Player_X_Scroll       ;save as new value here to impose force on scroll
-    playerXScroll = (playerXScroll + platformXScroll) and 0xFF
+    playerXScroll = temp0 and 0xFF
     //> lda ScrollLock            ;check scroll lock flag
     //> bne InitScrlAmt           ;skip a bunch of code here if set
-    temp0 = scrollLock
+    temp1 = scrollLock
     if (scrollLock == 0) {
         //> lda Player_Pos_ForScroll
-        temp0 = playerPosForscroll
+        temp1 = playerPosForscroll
         //> cmp #$50                  ;check player's horizontal screen position
         //> bcc InitScrlAmt           ;if less than 80 pixels to the right, branch
-        if (temp0 >= 0x50) {
+        if (temp1 >= 0x50) {
             //> lda SideCollisionTimer    ;if timer related to player's side collision
-            temp0 = sideCollisionTimer
+            temp1 = sideCollisionTimer
             //> bne InitScrlAmt           ;not expired, branch
-            if (temp0 == 0) {
+            if (temp1 == 0) {
                 //> ldy Player_X_Scroll       ;get value and decrement by one
                 //> dey                       ;if value originally set to zero or otherwise
                 playerXScroll = (playerXScroll - 1) and 0xFF
                 //> bmi InitScrlAmt           ;negative for left movement, branch
-                temp1 = playerXScroll
+                temp2 = playerXScroll
                 if ((playerXScroll and 0x80) == 0) {
                     //> iny
-                    temp1 = (temp1 + 1) and 0xFF
+                    temp2 = (temp2 + 1) and 0xFF
                     //> cpy #$02                  ;if value $01, branch and do not decrement
                     //> bcc ChkNearMid
-                    if (temp1 >= 0x02) {
+                    if (temp2 >= 0x02) {
                         //> dey                       ;otherwise decrement by one
-                        temp1 = (temp1 - 1) and 0xFF
+                        temp2 = (temp2 - 1) and 0xFF
                     }
                     //> ChkNearMid: lda Player_Pos_ForScroll
-                    temp0 = playerPosForscroll
+                    temp1 = playerPosForscroll
                     //> cmp #$70                  ;check player's horizontal screen position
                     //> bcc ScrollScreen          ;if less than 112 pixels to the right, branch
-                    if (!(temp0 >= 0x70)) {
+                    if (!(temp1 >= 0x70)) {
                         //  goto ScrollScreen
                         return
                     }
                     //> ldy Player_X_Scroll       ;otherwise get original value undecremented
-                    temp1 = playerXScroll
+                    temp2 = playerXScroll
                 }
             }
         }
     }
     //> InitScrlAmt:  lda #$00
-    temp0 = 0x00
+    temp1 = 0x00
     //> sta ScrollAmount          ;initialize value here
-    scrollAmount = temp0
+    scrollAmount = temp1
     //> ChkPOffscr:   ldx #$00                  ;set X for player offset
     //> jsr GetXOffscreenBits     ;get horizontal offscreen bits for player
     getXOffscreenBits(0x00)
     //> sta $00                   ;save them here
-    memory[0x0] = temp0.toUByte()
+    memory[0x0] = temp1.toUByte()
     //> ldy #$00                  ;load default offset (left side)
-    temp1 = 0x00
-    //> asl                       ;if d7 of offscreen bits are set,
-    temp0 = (temp0 shl 1) and 0xFF
-    //> bcs KeepOnscr             ;branch with default offset
     temp2 = 0x00
-    if ((temp0 and 0x80) == 0) {
+    //> asl                       ;if d7 of offscreen bits are set,
+    temp1 = (temp1 shl 1) and 0xFF
+    //> bcs KeepOnscr             ;branch with default offset
+    temp3 = 0x00
+    if ((temp1 and 0x80) == 0) {
         //> iny                         ;otherwise use different offset (right side)
-        temp1 = (temp1 + 1) and 0xFF
+        temp2 = (temp2 + 1) and 0xFF
         //> lda $00
-        temp0 = memory[0x0].toInt()
+        temp1 = memory[0x0].toInt()
         //> and #%00100000              ;check offscreen bits for d5 set
-        temp3 = temp0 and 0x20
+        temp4 = temp1 and 0x20
         //> beq InitPlatScrl            ;if not set, branch ahead of this part
-        temp0 = temp3
-        if (temp3 != 0) {
+        temp1 = temp4
+        if (temp4 != 0) {
         } else {
             //> InitPlatScrl: lda #$00                    ;nullify platform force imposed on scroll
-            temp0 = 0x00
+            temp1 = 0x00
             //> sta Platform_X_Scroll
-            platformXScroll = temp0
+            platformXScroll = temp1
             //> rts
             return
         }
     }
     //> KeepOnscr:    lda ScreenEdge_X_Pos,y      ;get left or right side coordinate based on offset
-    temp0 = screenedgeXPos[temp1]
+    temp1 = screenedgeXPos[temp2]
     //> sec
     //> sbc X_SubtracterData,y      ;subtract amount based on offset
+    temp5 = temp1 - xSubtracterdata[temp2]
+    temp1 = temp5 and 0xFF
     //> sta Player_X_Position       ;store as player position to prevent movement further
-    playerXPosition = (temp0 - xSubtracterdata[temp1]) and 0xFF
+    playerXPosition = temp1
     //> lda ScreenEdge_PageLoc,y    ;get left or right page location based on offset
-    temp0 = screenedgePageloc[temp1]
+    temp1 = screenedgePageloc[temp2]
     //> sbc #$00                    ;subtract borrow
+    temp6 = temp1 - (if (temp5 >= 0) 0 else 1)
+    temp1 = temp6 and 0xFF
     //> sta Player_PageLoc          ;save as player's page location
-    playerPageloc = (temp0 - (if (temp0 - xSubtracterdata[temp1] >= 0) 0 else 1)) and 0xFF
+    playerPageloc = temp1
     //> lda Left_Right_Buttons      ;check saved controller bits
-    temp0 = leftRightButtons
+    temp1 = leftRightButtons
     //> cmp OffscrJoypadBitsData,y  ;against bits based on offset
     //> beq InitPlatScrl            ;if not equal, branch
-    if (temp0 != offscrJoypadBitsData[temp1]) {
+    if (temp1 != offscrJoypadBitsData[temp2]) {
         //> lda #$00
-        temp0 = 0x00
+        temp1 = 0x00
         //> sta Player_X_Speed          ;otherwise nullify horizontal speed of player
-        playerXSpeed = temp0
+        playerXSpeed = temp1
     }
+    // Fall-through tail call to scrollScreen
+    scrollScreen(temp2)
 }
 
 // Decompiled from ScrollScreen
 fun scrollScreen(Y: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp10: Int = 0
+    var temp11: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
     var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var horizontalScroll by MemoryByte(HorizontalScroll)
     var leftRightButtons by MemoryByte(Left_Right_Buttons)
     var mirrorPpuCtrlReg1 by MemoryByte(Mirror_PPU_CTRL_REG1)
@@ -3866,30 +7165,33 @@ fun scrollScreen(Y: Int) {
     scrollAmount = Y
     //> clc
     //> adc ScrollThirtyTwo       ;add to value already set here
+    temp0 = Y + scrollThirtyTwo
     //> sta ScrollThirtyTwo       ;save as new value here
-    scrollThirtyTwo = (Y + scrollThirtyTwo) and 0xFF
+    scrollThirtyTwo = temp0 and 0xFF
     //> tya
     //> clc
     //> adc ScreenLeft_X_Pos      ;add to left side coordinate
+    temp1 = Y + screenleftXPos
     //> sta ScreenLeft_X_Pos      ;save as new left side coordinate
-    screenleftXPos = (Y + screenleftXPos) and 0xFF
+    screenleftXPos = temp1 and 0xFF
     //> sta HorizontalScroll      ;save here also
-    horizontalScroll = (Y + screenleftXPos) and 0xFF
+    horizontalScroll = temp1 and 0xFF
     //> lda ScreenLeft_PageLoc
     //> adc #$00                  ;add carry to page location for left
+    temp2 = screenleftPageloc + (if (temp1 > 0xFF) 1 else 0)
     //> sta ScreenLeft_PageLoc    ;side of the screen
-    screenleftPageloc = (screenleftPageloc + (if (Y + screenleftXPos > 0xFF) 1 else 0)) and 0xFF
+    screenleftPageloc = temp2 and 0xFF
     //> and #$01                  ;get LSB of page location
-    temp0 = (screenleftPageloc + (if (Y + screenleftXPos > 0xFF) 1 else 0)) and 0xFF and 0x01
+    temp3 = temp2 and 0xFF and 0x01
     //> sta $00                   ;save as temp variable for PPU register 1 mirror
-    memory[0x0] = temp0.toUByte()
+    memory[0x0] = temp3.toUByte()
     //> lda Mirror_PPU_CTRL_REG1  ;get PPU register 1 mirror
     //> and #%11111110            ;save all bits except d0
-    temp1 = mirrorPpuCtrlReg1 and 0xFE
+    temp4 = mirrorPpuCtrlReg1 and 0xFE
     //> ora $00                   ;get saved bit here and save in PPU register 1
-    temp2 = temp1 or memory[0x0].toInt()
+    temp5 = temp4 or memory[0x0].toInt()
     //> sta Mirror_PPU_CTRL_REG1  ;mirror to be used to set name table later
-    mirrorPpuCtrlReg1 = temp2
+    mirrorPpuCtrlReg1 = temp5
     //> jsr GetScreenPosition     ;figure out where the right side is
     getScreenPosition()
     //> lda #$08
@@ -3904,53 +7206,59 @@ fun scrollScreen(Y: Int) {
     //> ldy #$00                  ;load default offset (left side)
     //> asl                       ;if d7 of offscreen bits are set,
     //> bcs KeepOnscr             ;branch with default offset
-    temp3 = (0x08 shl 1) and 0xFF
-    temp4 = 0x00
-    temp5 = 0x00
+    temp6 = (0x08 shl 1) and 0xFF
+    temp7 = 0x00
+    temp8 = 0x00
     if ((0x08 and 0x80) == 0) {
         //> iny                         ;otherwise use different offset (right side)
-        temp5 = (temp5 + 1) and 0xFF
+        temp8 = (temp8 + 1) and 0xFF
         //> lda $00
-        temp3 = memory[0x0].toInt()
+        temp6 = memory[0x0].toInt()
         //> and #%00100000              ;check offscreen bits for d5 set
-        temp6 = temp3 and 0x20
+        temp9 = temp6 and 0x20
         //> beq InitPlatScrl            ;if not set, branch ahead of this part
-        temp3 = temp6
-        if (temp6 != 0) {
+        temp6 = temp9
+        if (temp9 != 0) {
         } else {
             //> InitPlatScrl: lda #$00                    ;nullify platform force imposed on scroll
-            temp3 = 0x00
+            temp6 = 0x00
             //> sta Platform_X_Scroll
-            platformXScroll = temp3
+            platformXScroll = temp6
             //> rts
             return
         }
     }
     //> KeepOnscr:    lda ScreenEdge_X_Pos,y      ;get left or right side coordinate based on offset
-    temp3 = screenedgeXPos[temp5]
+    temp6 = screenedgeXPos[temp8]
     //> sec
     //> sbc X_SubtracterData,y      ;subtract amount based on offset
+    temp10 = temp6 - xSubtracterdata[temp8]
+    temp6 = temp10 and 0xFF
     //> sta Player_X_Position       ;store as player position to prevent movement further
-    playerXPosition = (temp3 - xSubtracterdata[temp5]) and 0xFF
+    playerXPosition = temp6
     //> lda ScreenEdge_PageLoc,y    ;get left or right page location based on offset
-    temp3 = screenedgePageloc[temp5]
+    temp6 = screenedgePageloc[temp8]
     //> sbc #$00                    ;subtract borrow
+    temp11 = temp6 - (if (temp10 >= 0) 0 else 1)
+    temp6 = temp11 and 0xFF
     //> sta Player_PageLoc          ;save as player's page location
-    playerPageloc = (temp3 - (if (temp3 - xSubtracterdata[temp5] >= 0) 0 else 1)) and 0xFF
+    playerPageloc = temp6
     //> lda Left_Right_Buttons      ;check saved controller bits
-    temp3 = leftRightButtons
+    temp6 = leftRightButtons
     //> cmp OffscrJoypadBitsData,y  ;against bits based on offset
     //> beq InitPlatScrl            ;if not equal, branch
-    if (temp3 != offscrJoypadBitsData[temp5]) {
+    if (temp6 != offscrJoypadBitsData[temp8]) {
         //> lda #$00
-        temp3 = 0x00
+        temp6 = 0x00
         //> sta Player_X_Speed          ;otherwise nullify horizontal speed of player
-        playerXSpeed = temp3
+        playerXSpeed = temp6
     }
 }
 
 // Decompiled from GetScreenPosition
 fun getScreenPosition(): Int {
+    var temp0: Int = 0
+    var temp1: Int = 0
     var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
     var screenleftXPos by MemoryByte(ScreenLeft_X_Pos)
     var screenrightPageloc by MemoryByte(ScreenRight_PageLoc)
@@ -3959,276 +7267,16 @@ fun getScreenPosition(): Int {
     //> lda ScreenLeft_X_Pos    ;get coordinate of screen's left boundary
     //> clc
     //> adc #$ff                ;add 255 pixels
+    temp0 = screenleftXPos + 0xFF
     //> sta ScreenRight_X_Pos   ;store as coordinate of screen's right boundary
-    screenrightXPos = (screenleftXPos + 0xFF) and 0xFF
+    screenrightXPos = temp0 and 0xFF
     //> lda ScreenLeft_PageLoc  ;get page number where left boundary is
     //> adc #$00                ;add carry from before
+    temp1 = screenleftPageloc + (if (temp0 > 0xFF) 1 else 0)
     //> sta ScreenRight_PageLoc ;store as page number where right boundary is
-    screenrightPageloc = (screenleftPageloc + (if (screenleftXPos + 0xFF > 0xFF) 1 else 0)) and 0xFF
+    screenrightPageloc = temp1 and 0xFF
     //> rts
     return A
-}
-
-// Decompiled from Entrance_GameTimerSetup
-fun entranceGametimersetup() {
-    var temp0: Int = 0
-    var temp1: Int = 0
-    var temp2: Int = 0
-    var altEntranceControl by MemoryByte(AltEntranceControl)
-    var areaType by MemoryByte(AreaType)
-    var blockYPosition by MemoryByte(Block_Y_Position)
-    var fetchNewGameTimerFlag by MemoryByte(FetchNewGameTimerFlag)
-    var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
-    var gameTimerSetting by MemoryByte(GameTimerSetting)
-    var halfwayPage by MemoryByte(HalfwayPage)
-    var joypadOverride by MemoryByte(JoypadOverride)
-    var playerEntranceCtrl by MemoryByte(PlayerEntranceCtrl)
-    var playerFacingDir by MemoryByte(PlayerFacingDir)
-    var playerCollisionbits by MemoryByte(Player_CollisionBits)
-    var playerPageloc by MemoryByte(Player_PageLoc)
-    var playerSprattrib by MemoryByte(Player_SprAttrib)
-    var playerState by MemoryByte(Player_State)
-    var playerXPosition by MemoryByte(Player_X_Position)
-    var playerYHighpos by MemoryByte(Player_Y_HighPos)
-    var playerYPosition by MemoryByte(Player_Y_Position)
-    var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
-    var starInvincibleTimer by MemoryByte(StarInvincibleTimer)
-    var swimmingFlag by MemoryByte(SwimmingFlag)
-    var verticalForceDown by MemoryByte(VerticalForceDown)
-    val altYPosOffset by MemoryByteIndexed(AltYPosOffset)
-    val gameTimerData by MemoryByteIndexed(GameTimerData)
-    val gameTimerDisplay by MemoryByteIndexed(GameTimerDisplay)
-    val playerBGPriorityData by MemoryByteIndexed(PlayerBGPriorityData)
-    val playerstartingXPos by MemoryByteIndexed(PlayerStarting_X_Pos)
-    val playerstartingYPos by MemoryByteIndexed(PlayerStarting_Y_Pos)
-    //> Entrance_GameTimerSetup:
-    //> lda ScreenLeft_PageLoc      ;set current page for area objects
-    //> sta Player_PageLoc          ;as page location for player
-    playerPageloc = screenleftPageloc
-    //> lda #$28                    ;store value here
-    //> sta VerticalForceDown       ;for fractional movement downwards if necessary
-    verticalForceDown = 0x28
-    //> lda #$01                    ;set high byte of player position and
-    //> sta PlayerFacingDir         ;set facing direction so that player faces right
-    playerFacingDir = 0x01
-    //> sta Player_Y_HighPos
-    playerYHighpos = 0x01
-    //> lda #$00                    ;set player state to on the ground by default
-    //> sta Player_State
-    playerState = 0x00
-    //> dec Player_CollisionBits    ;initialize player's collision bits
-    playerCollisionbits = (playerCollisionbits - 1) and 0xFF
-    //> ldy #$00                    ;initialize halfway page
-    //> sty HalfwayPage
-    halfwayPage = 0x00
-    //> lda AreaType                ;check area type
-    //> bne ChkStPos                ;if water type, set swimming flag, otherwise do not set
-    temp0 = areaType
-    temp1 = 0x00
-    if (areaType == 0) {
-        //> iny
-        temp1 = (temp1 + 1) and 0xFF
-    }
-    //> ChkStPos: sty SwimmingFlag
-    swimmingFlag = temp1
-    //> ldx PlayerEntranceCtrl      ;get starting position loaded from header
-    //> ldy AltEntranceControl      ;check alternate mode of entry flag for 0 or 1
-    temp1 = altEntranceControl
-    //> beq SetStPos
-    temp2 = playerEntranceCtrl
-    if (temp1 != 0) {
-        //> cpy #$01
-        //> beq SetStPos
-        if (temp1 != 0x01) {
-            //> ldx AltYPosOffset-2,y       ;if not 0 or 1, override $0710 with new offset in X
-            temp2 = altYPosOffset[-2 + temp1]
-        }
-    }
-    //> SetStPos: lda PlayerStarting_X_Pos,y  ;load appropriate horizontal position
-    temp0 = playerstartingXPos[temp1]
-    //> sta Player_X_Position       ;and vertical positions for the player, using
-    playerXPosition = temp0
-    //> lda PlayerStarting_Y_Pos,x  ;AltEntranceControl as offset for horizontal and either $0710
-    temp0 = playerstartingYPos[temp2]
-    if (DEBUG_ENTRANCE) {
-        System.err.println("entranceGametimersetup: Setting player position - X[alt=$temp1]=${playerXPosition.toString(16)}, Y[entrCtrl=$temp2]=${temp0.toString(16)}")
-    }
-    //> sta Player_Y_Position       ;or value that overwrote $0710 as offset for vertical
-    playerYPosition = temp0
-    //> lda PlayerBGPriorityData,x
-    temp0 = playerBGPriorityData[temp2]
-    //> sta Player_SprAttrib        ;set player sprite attributes using offset in X
-    playerSprattrib = temp0
-    //> jsr GetPlayerColors         ;get appropriate player palette
-    getPlayerColors()
-    //> ldy GameTimerSetting        ;get timer control value from header
-    temp1 = gameTimerSetting
-    //> beq ChkOverR                ;if set to zero, branch (do not use dummy byte for this)
-    if (temp1 != 0) {
-        //> lda FetchNewGameTimerFlag   ;do we need to set the game timer? if not, use
-        temp0 = fetchNewGameTimerFlag
-        //> beq ChkOverR                ;old game timer setting
-        if (temp0 != 0) {
-            //> lda GameTimerData,y         ;if game timer is set and game timer flag is also set,
-            temp0 = gameTimerData[temp1]
-            //> sta GameTimerDisplay        ;use value of game timer control for first digit of game timer
-            gameTimerDisplay[0] = temp0
-            //> lda #$01
-            temp0 = 0x01
-            //> sta GameTimerDisplay+2      ;set last digit of game timer to 1
-            gameTimerDisplay[2] = temp0
-            //> lsr
-            temp0 = temp0 shr 1
-            //> sta GameTimerDisplay+1      ;set second digit of game timer
-            gameTimerDisplay[1] = temp0
-            //> sta FetchNewGameTimerFlag   ;clear flag for game timer reset
-            fetchNewGameTimerFlag = temp0
-            //> sta StarInvincibleTimer     ;clear star mario timer
-            starInvincibleTimer = temp0
-        }
-    }
-    //> ChkOverR: ldy JoypadOverride          ;if controller bits not set, branch to skip this part
-    temp1 = joypadOverride
-    //> beq ChkSwimE
-    if (temp1 != 0) {
-        //> lda #$03                    ;set player state to climbing
-        temp0 = 0x03
-        //> sta Player_State
-        playerState = temp0
-        //> ldx #$00                    ;set offset for first slot, for block object
-        temp2 = 0x00
-        //> jsr InitBlock_XY_Pos
-        initblockXyPos(temp2)
-        //> lda #$f0                    ;set vertical coordinate for block object
-        temp0 = 0xF0
-        //> sta Block_Y_Position
-        blockYPosition = temp0
-        //> ldx #$05                    ;set offset in X for last enemy object buffer slot
-        temp2 = 0x05
-        //> ldy #$00                    ;set offset in Y for object coordinates used earlier
-        temp1 = 0x00
-        //> jsr Setup_Vine              ;do a sub to grow vine
-        setupVine(temp2, temp1)
-    }
-    //> ChkSwimE: ldy AreaType                ;if level not water-type,
-    temp1 = areaType
-    //> bne SetPESub                ;skip this subroutine
-    if (temp1 == 0) {
-        //> jsr SetupBubble             ;otherwise, execute sub to set up air bubbles
-        setupBubble(temp2)
-    }
-    //> SetPESub: lda #$07                    ;set to run player entrance subroutine
-    temp0 = 0x07
-    //> sta GameEngineSubroutine    ;on the next frame of game engine
-    gameEngineSubroutine = temp0
-    //> rts
-    return
-}
-
-// Decompiled from PlayerEntrance - manually simplified for correct control flow
-fun playerEntrance() {
-    var altEntranceControl by MemoryByte(AltEntranceControl)
-    var joypadOverride by MemoryByte(JoypadOverride)
-    var playerEntranceCtrl by MemoryByte(PlayerEntranceCtrl)
-    var playerFacingDir by MemoryByte(PlayerFacingDir)
-    var playerSprattrib by MemoryByte(Player_SprAttrib)
-    var playerState by MemoryByte(Player_State)
-    var playerXPosition by MemoryByte(Player_X_Position)
-    var playerYPosition by MemoryByte(Player_Y_Position)
-    var vineHeight by MemoryByte(VineHeight)
-    var disableCollisionDet by MemoryByte(DisableCollisionDet)
-    var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
-    var changeAreaTimer by MemoryByte(ChangeAreaTimer)
-    var disableIntermediate by MemoryByte(DisableIntermediate)
-    var areaNumber by MemoryByte(AreaNumber)
-    var fetchNewGameTimerFlag by MemoryByte(FetchNewGameTimerFlag)
-    var halfwayPage by MemoryByte(HalfwayPage)
-    var eventMusicQueue by MemoryByte(EventMusicQueue)
-
-    // Check for alternate entry mode
-    if (altEntranceControl == 0x02) {
-        // EntrMode2 - entering from pipe or with vine
-        if (joypadOverride == 0) {
-            // Move player upwards (pipe entry)
-            movePlayerYAxis(0xFF)  // -1
-            if (playerYPosition >= 0x91) {
-                return  // Not risen enough yet
-            }
-            // Fall through to PlayerRdy below
-        } else {
-            // VineEntr - entering with vine
-            if (vineHeight != 0x60) {
-                return  // Vine not at max height yet
-            }
-            // Continue with vine entry logic
-            val yPos = playerYPosition
-            var controlVal = 0x01
-            var disCol = 0x00
-            if (yPos >= 0x99) {
-                playerState = 0x03  // Climbing
-                disCol = 0x01
-                controlVal = 0x08
-            }
-            disableCollisionDet = disCol
-            autoControlPlayer(controlVal)
-            if (playerXPosition < 0x48) {
-                return  // Not far enough right yet
-            }
-            // Fall through to PlayerRdy
-        }
-    } else {
-        // Normal entry mode (not from pipe/vine)
-        if (playerYPosition < 0x30) {
-            // Player Y position above threshold, auto control
-            autoControlPlayer(0x00)
-            return
-        }
-
-        // Check entry bits from header
-        val entranceCtrl = playerEntranceCtrl
-        if (entranceCtrl != 0x06 && entranceCtrl != 0x07) {
-            // PlayerRdy - go straight to normal gameplay
-            // (Common case for level 1-1 start)
-            gameEngineSubroutine = 0x08  // PlayerCtrlRoutine
-            playerFacingDir = 0x01
-            altEntranceControl = 0x00
-            disableCollisionDet = 0x00
-            joypadOverride = 0x00
-            return
-        }
-
-        // ChkBehPipe - pipe intro code
-        if (playerSprattrib == 0) {
-            // Force player to walk right
-            autoControlPlayer(0x01)
-            return
-        }
-
-        // IntroEntr - move player through pipe
-        enterSidePipe()
-        changeAreaTimer = (changeAreaTimer - 1) and 0xFF
-        if (changeAreaTimer != 0) {
-            return  // Timer not expired yet
-        }
-
-        // Timer expired, go to next area
-        disableIntermediate = (disableIntermediate + 1) and 0xFF
-        // Fall through to NextArea
-        areaNumber = (areaNumber + 1) and 0xFF
-        loadAreaPointer(0)
-        fetchNewGameTimerFlag = (fetchNewGameTimerFlag + 1) and 0xFF
-        chgAreaMode()
-        halfwayPage = 0
-        eventMusicQueue = Silence
-        return
-    }
-
-    // PlayerRdy - set up for normal gameplay
-    gameEngineSubroutine = 0x08  // PlayerCtrlRoutine
-    playerFacingDir = 0x01
-    altEntranceControl = 0x00
-    disableCollisionDet = 0x00
-    joypadOverride = 0x00
 }
 
 // Decompiled from GameRoutines
@@ -4281,6 +7329,162 @@ fun gameRoutines() {
             // Unknown JumpEngine index
         }
     }
+    return
+}
+
+// Decompiled from PlayerEntrance
+fun playerEntrance() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var altEntranceControl by MemoryByte(AltEntranceControl)
+    var areaNumber by MemoryByte(AreaNumber)
+    var changeAreaTimer by MemoryByte(ChangeAreaTimer)
+    var disableCollisionDet by MemoryByte(DisableCollisionDet)
+    var disableIntermediate by MemoryByte(DisableIntermediate)
+    var eventMusicQueue by MemoryByte(EventMusicQueue)
+    var fetchNewGameTimerFlag by MemoryByte(FetchNewGameTimerFlag)
+    var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
+    var halfwayPage by MemoryByte(HalfwayPage)
+    var joypadOverride by MemoryByte(JoypadOverride)
+    var playerEntranceCtrl by MemoryByte(PlayerEntranceCtrl)
+    var playerFacingDir by MemoryByte(PlayerFacingDir)
+    var playerSprattrib by MemoryByte(Player_SprAttrib)
+    var playerState by MemoryByte(Player_State)
+    var playerXPosition by MemoryByte(Player_X_Position)
+    var playerYPosition by MemoryByte(Player_Y_Position)
+    var vineHeight by MemoryByte(VineHeight)
+    //> PlayerEntrance:
+    //> lda AltEntranceControl    ;check for mode of alternate entry
+    //> cmp #$02
+    //> beq EntrMode2             ;if found, branch to enter from pipe or with vine
+    temp0 = altEntranceControl
+    if (altEntranceControl != 0x02) {
+        //> lda #$00
+        temp0 = 0x00
+        //> ldy Player_Y_Position     ;if vertical position above a certain
+        //> cpy #$30                  ;point, nullify controller bits and continue
+        //> bcc AutoControlPlayer     ;with player movement code, do not return
+        if (!(playerYPosition >= 0x30)) {
+            //  goto AutoControlPlayer
+            return
+        }
+        //> lda PlayerEntranceCtrl    ;check player entry bits from header
+        temp0 = playerEntranceCtrl
+        //> cmp #$06
+        //> beq ChkBehPipe            ;if set to 6 or 7, execute pipe intro code
+        temp1 = playerYPosition
+        if (temp0 != 0x06) {
+            //> cmp #$07                  ;otherwise branch to normal entry
+            //> bne PlayerRdy
+            if (temp0 == 0x07) {
+            }
+        }
+        //> ChkBehPipe: lda Player_SprAttrib      ;check for sprite attributes
+        temp0 = playerSprattrib
+        //> bne IntroEntr             ;branch if found
+        if (temp0 == 0) {
+            //> lda #$01
+            temp0 = 0x01
+            //> jmp AutoControlPlayer     ;force player to walk to the right
+        }
+        //> IntroEntr:  jsr EnterSidePipe         ;execute sub to move player to the right
+        enterSidePipe()
+        //> dec ChangeAreaTimer       ;decrement timer for change of area
+        changeAreaTimer = (changeAreaTimer - 1) and 0xFF
+        //> bne ExitEntr              ;branch to exit if not yet expired
+        if (changeAreaTimer == 0) {
+            //> inc DisableIntermediate   ;set flag to skip world and lives display
+            disableIntermediate = (disableIntermediate + 1) and 0xFF
+            //> jmp NextArea              ;jump to increment to next area and set modes
+        } else {
+            //> ExitEntr:   rts                       ;leave!
+            return
+        }
+    } else {
+        //> EntrMode2:  lda JoypadOverride        ;if controller override bits set here,
+        temp0 = joypadOverride
+        //> bne VineEntr              ;branch to enter with vine
+        if (temp0 == 0) {
+            //> lda #$ff                  ;otherwise, set value here then execute sub
+            temp0 = 0xFF
+            //> jsr MovePlayerYAxis       ;to move player upwards (note $ff = -1)
+            movePlayerYAxis(temp0)
+            //> lda Player_Y_Position     ;check to see if player is at a specific coordinate
+            temp0 = playerYPosition
+            //> cmp #$91                  ;if player risen to a certain point (this requires pipes
+            //> bcc PlayerRdy             ;to be at specific height to look/function right) branch
+            if (temp0 >= 0x91) {
+                //> rts                       ;to the last part, otherwise leave
+                return
+            }
+        }
+        //> VineEntr:   lda VineHeight
+        temp0 = vineHeight
+        //> cmp #$60                  ;check vine height
+        //> bne ExitEntr              ;if vine not yet reached maximum height, branch to leave
+        if (temp0 == 0x60) {
+            //> lda Player_Y_Position     ;get player's vertical coordinate
+            temp0 = playerYPosition
+            //> cmp #$99                  ;check player's vertical coordinate against preset value
+            //> ldy #$00                  ;load default values to be written to
+            temp1 = 0x00
+            //> lda #$01                  ;this value moves player to the right off the vine
+            temp0 = 0x01
+            //> bcc OffVine               ;if vertical coordinate < preset value, use defaults
+            if (temp0 >= 0x99) {
+                //> lda #$03
+                temp0 = 0x03
+                //> sta Player_State          ;otherwise set player state to climbing
+                playerState = temp0
+                //> iny                       ;increment value in Y
+                temp1 = (temp1 + 1) and 0xFF
+                //> lda #$08                  ;set block in block buffer to cover hole, then
+                temp0 = 0x08
+                //> sta Block_Buffer_1+$b4    ;use same value to force player to climb
+            }
+            //> OffVine:    sty DisableCollisionDet   ;set collision detection disable flag
+            disableCollisionDet = temp1
+            //> jsr AutoControlPlayer     ;use contents of A to move player up or right, execute sub
+            autoControlPlayer(temp0)
+            //> lda Player_X_Position
+            temp0 = playerXPosition
+            //> cmp #$48                  ;check player's horizontal position
+            //> bcc ExitEntr              ;if not far enough to the right, branch to leave
+            if (temp0 >= 0x48) {
+                //> PlayerRdy:  lda #$08                  ;set routine to be executed by game engine next frame
+                temp0 = 0x08
+                //> sta GameEngineSubroutine
+                gameEngineSubroutine = temp0
+                //> lda #$01                  ;set to face player to the right
+                temp0 = 0x01
+                //> sta PlayerFacingDir
+                playerFacingDir = temp0
+                //> lsr                       ;init A
+                temp0 = temp0 shr 1
+                //> sta AltEntranceControl    ;init mode of entry
+                altEntranceControl = temp0
+                //> sta DisableCollisionDet   ;init collision detection disable flag
+                disableCollisionDet = temp0
+                //> sta JoypadOverride        ;nullify controller override bits
+                joypadOverride = temp0
+            }
+        }
+    }
+    //> NextArea: inc AreaNumber            ;increment area number used for address loader
+    areaNumber = (areaNumber + 1) and 0xFF
+    //> jsr LoadAreaPointer       ;get new level pointer
+    loadAreaPointer(temp0)
+    //> inc FetchNewGameTimerFlag ;set flag to load new game timer
+    fetchNewGameTimerFlag = (fetchNewGameTimerFlag + 1) and 0xFF
+    //> jsr ChgAreaMode           ;do sub to set secondary mode, disable screen and sprite 0
+    chgAreaMode()
+    //> sta HalfwayPage           ;reset halfway page to 0 (beginning)
+    halfwayPage = temp0
+    //> lda #Silence
+    temp0 = Silence
+    //> sta EventMusicQueue       ;silence music and leave
+    eventMusicQueue = temp0
+    //> ExitNA:   rts
     return
 }
 
@@ -4339,30 +7543,22 @@ fun playerCtrlRoutine() {
         if (temp0 == 0) {
             //> ldy Player_Y_HighPos
             //> dey                         ;if not in vertical area between
-            // Note: This uses Y register as temp, doesn't modify memory!
-            val yHighPos = (playerYHighpos - 1) and 0xFF
+            playerYHighpos = (playerYHighpos - 1) and 0xFF
             //> bne DisJoyp                 ;status bar and bottom, branch
-            temp1 = yHighPos
-            if (yHighPos != 0) {
-                // DisJoyp - player Y high position is not 1, disable joypad
-                //> DisJoyp:    lda #$00                    ;disable controller bits
-                temp0 = 0x00
-                //> sta SavedJoypadBits
-                savedJoypadBits = temp0
-            } else {
+            temp1 = playerYHighpos
+            if (playerYHighpos == 0) {
                 //> lda Player_Y_Position
                 temp0 = playerYPosition
                 //> cmp #$d0                    ;if nearing the bottom of the screen or
                 //> bcc SaveJoyp                ;not in the vertical area between status bar or bottom,
                 if (temp0 >= 0xD0) {
-                    // DisJoyp - Y position >= 0xD0, disable joypad
-                    temp0 = 0x00
-                    savedJoypadBits = temp0
                 }
-                // else: SaveJoyp - keep savedJoypadBits as is
             }
+            //> DisJoyp:    lda #$00                    ;disable controller bits
+            temp0 = 0x00
+            //> sta SavedJoypadBits
+            savedJoypadBits = temp0
         }
-        // SaveJoyp - in non-water areas or after water check
         //> SaveJoyp:   lda SavedJoypadBits         ;otherwise store A and B buttons in $0a
         temp0 = savedJoypadBits
         //> and #%11000000
@@ -4559,6 +7755,41 @@ fun playerCtrlRoutine() {
     return
 }
 
+// Decompiled from Vine_AutoClimb
+fun vineAutoclimb() {
+    var temp0: Int = 0
+    var joypadOverride by MemoryByte(JoypadOverride)
+    var playerState by MemoryByte(Player_State)
+    var playerYHighpos by MemoryByte(Player_Y_HighPos)
+    var playerYPosition by MemoryByte(Player_Y_Position)
+    //> Vine_AutoClimb:
+    //> lda Player_Y_HighPos   ;check to see whether player reached position
+    //> bne AutoClimb          ;above the status bar yet and if so, set modes
+    if (!(playerYHighpos == 0)) {
+        //  goto AutoClimb
+        return
+    }
+    temp0 = playerYHighpos
+    if (playerYHighpos == 0) {
+        //> lda Player_Y_Position
+        temp0 = playerYPosition
+        //> cmp #$e4
+        //> bcc SetEntr
+        if (!(temp0 >= 0xE4)) {
+            //  goto SetEntr
+            return
+        }
+    }
+    //> AutoClimb: lda #%00001000         ;set controller bits override to up
+    temp0 = 0x08
+    //> sta JoypadOverride
+    joypadOverride = temp0
+    //> ldy #$03               ;set player state to climbing
+    //> sty Player_State
+    playerState = 0x03
+    //> jmp AutoControlPlayer
+}
+
 // Decompiled from SetEntr
 fun setEntr() {
     var altEntranceControl by MemoryByte(AltEntranceControl)
@@ -4568,15 +7799,81 @@ fun setEntr() {
     //> jmp ChgAreaMode        ;set modes
 }
 
+// Decompiled from VerticalPipeEntry
+fun verticalPipeEntry() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var altEntranceControl by MemoryByte(AltEntranceControl)
+    var areaType by MemoryByte(AreaType)
+    var changeAreaTimer by MemoryByte(ChangeAreaTimer)
+    var warpZoneControl by MemoryByte(WarpZoneControl)
+    //> VerticalPipeEntry:
+    //> lda #$01             ;set 1 as movement amount
+    //> jsr MovePlayerYAxis  ;do sub to move player downwards
+    movePlayerYAxis(0x01)
+    //> jsr ScrollHandler    ;do sub to scroll screen with saved force if necessary
+    scrollHandler()
+    //> ldy #$00             ;load default mode of entry
+    //> lda WarpZoneControl  ;check warp zone control variable/flag
+    //> bne ChgAreaPipe      ;if set, branch to use mode 0
+    temp0 = warpZoneControl
+    temp1 = 0x00
+    if (warpZoneControl == 0) {
+        //> iny
+        temp1 = (temp1 + 1) and 0xFF
+        //> lda AreaType         ;check for castle level type
+        temp0 = areaType
+        //> cmp #$03
+        //> bne ChgAreaPipe      ;if not castle type level, use mode 1
+        if (temp0 == 0x03) {
+            //> iny
+            temp1 = (temp1 + 1) and 0xFF
+            //> jmp ChgAreaPipe      ;otherwise use mode 2
+        }
+    }
+    //> ChgAreaPipe: dec ChangeAreaTimer       ;decrement timer for change of area
+    changeAreaTimer = (changeAreaTimer - 1) and 0xFF
+    //> bne ExitCAPipe
+    if (changeAreaTimer == 0) {
+        //> sty AltEntranceControl    ;when timer expires set mode of alternate entry
+        altEntranceControl = temp1
+    }
+    //> ExitCAPipe:  rts                       ;leave
+    return
+}
+
 // Decompiled from MovePlayerYAxis
 fun movePlayerYAxis(A: Int) {
+    var temp0: Int = 0
     var playerYPosition by MemoryByte(Player_Y_Position)
     //> MovePlayerYAxis:
     //> clc
     //> adc Player_Y_Position ;add contents of A to player position
+    temp0 = A + playerYPosition
     //> sta Player_Y_Position
-    playerYPosition = (A + playerYPosition) and 0xFF
+    playerYPosition = temp0 and 0xFF
     //> rts
+    return
+}
+
+// Decompiled from SideExitPipeEntry
+fun sideExitPipeEntry() {
+    var temp0: Int = 0
+    var altEntranceControl by MemoryByte(AltEntranceControl)
+    var changeAreaTimer by MemoryByte(ChangeAreaTimer)
+    //> SideExitPipeEntry:
+    //> jsr EnterSidePipe         ;execute sub to move player to the right
+    enterSidePipe()
+    //> ldy #$02
+    //> ChgAreaPipe: dec ChangeAreaTimer       ;decrement timer for change of area
+    changeAreaTimer = (changeAreaTimer - 1) and 0xFF
+    //> bne ExitCAPipe
+    temp0 = 0x02
+    if (changeAreaTimer == 0) {
+        //> sty AltEntranceControl    ;when timer expires set mode of alternate entry
+        altEntranceControl = temp0
+    }
+    //> ExitCAPipe:  rts                       ;leave
     return
 }
 
@@ -4626,6 +7923,114 @@ fun enterSidePipe() {
     return
 }
 
+// Decompiled from PlayerChangeSize
+fun playerChangeSize() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var playerAnimCtrl by MemoryByte(PlayerAnimCtrl)
+    var playerChangeSizeFlag by MemoryByte(PlayerChangeSizeFlag)
+    var playerSize by MemoryByte(PlayerSize)
+    var timerControl by MemoryByte(TimerControl)
+    //> PlayerChangeSize:
+    //> lda TimerControl    ;check master timer control
+    //> cmp #$f8            ;for specific moment in time
+    //> bne EndChgSize      ;branch if before or after that point
+    temp0 = timerControl
+    if (timerControl == 0xF8) {
+    } else {
+        //> EndChgSize:  cmp #$c4            ;check again for another specific moment
+        //> bne ExitChgSize     ;and branch to leave if before or after that point
+        if (temp0 == 0xC4) {
+            //> jsr DonePlayerTask  ;otherwise do sub to init timer control and set routine
+            donePlayerTask()
+        }
+        //> ExitChgSize: rts                 ;and then leave
+        return
+    }
+    //> InitChangeSize:
+    //> ldy PlayerChangeSizeFlag  ;if growing/shrinking flag already set
+    //> bne ExitBoth              ;then branch to leave
+    temp1 = playerChangeSizeFlag
+    if (playerChangeSizeFlag == 0) {
+        //> sty PlayerAnimCtrl        ;otherwise initialize player's animation frame control
+        playerAnimCtrl = temp1
+        //> inc PlayerChangeSizeFlag  ;set growing/shrinking flag
+        playerChangeSizeFlag = (playerChangeSizeFlag + 1) and 0xFF
+        //> lda PlayerSize
+        temp0 = playerSize
+        //> eor #$01                  ;invert player's size
+        temp2 = temp0 xor 0x01
+        //> sta PlayerSize
+        playerSize = temp2
+    }
+    //> ExitBoth: rts                       ;leave
+    return
+}
+
+// Decompiled from PlayerInjuryBlink
+fun playerInjuryBlink() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var playerAnimCtrl by MemoryByte(PlayerAnimCtrl)
+    var playerChangeSizeFlag by MemoryByte(PlayerChangeSizeFlag)
+    var playerSize by MemoryByte(PlayerSize)
+    var timerControl by MemoryByte(TimerControl)
+    //> PlayerInjuryBlink:
+    //> lda TimerControl       ;check master timer control
+    //> cmp #$f0               ;for specific moment in time
+    //> bcs ExitBlink          ;branch if before that point
+    temp0 = timerControl
+    if (!(timerControl >= 0xF0)) {
+        //> cmp #$c8               ;check again for another specific point
+        //> beq DonePlayerTask     ;branch if at that point, and not before or after
+        if (temp0 - 0xC8 == 0) {
+            //  goto DonePlayerTask
+            return
+        }
+        //> jmp PlayerCtrlRoutine  ;otherwise run player control routine
+    }
+    //> ExitBlink: bne ExitBoth           ;do unconditional branch to leave
+    if (flagZ) {
+        //> InitChangeSize:
+        //> ldy PlayerChangeSizeFlag  ;if growing/shrinking flag already set
+        //> bne ExitBoth              ;then branch to leave
+        temp1 = playerChangeSizeFlag
+        if (playerChangeSizeFlag == 0) {
+            //> sty PlayerAnimCtrl        ;otherwise initialize player's animation frame control
+            playerAnimCtrl = temp1
+            //> inc PlayerChangeSizeFlag  ;set growing/shrinking flag
+            playerChangeSizeFlag = (playerChangeSizeFlag + 1) and 0xFF
+            //> lda PlayerSize
+            temp0 = playerSize
+            //> eor #$01                  ;invert player's size
+            temp2 = temp0 xor 0x01
+            //> sta PlayerSize
+            playerSize = temp2
+        }
+    }
+    //> ExitBoth: rts                       ;leave
+    return
+}
+
+// Decompiled from PlayerDeath
+fun playerDeath() {
+    var temp0: Int = 0
+    var timerControl by MemoryByte(TimerControl)
+    //> PlayerDeath:
+    //> lda TimerControl       ;check master timer control
+    //> cmp #$f0               ;for specific moment in time
+    //> bcs ExitDeath          ;branch to leave if before that point
+    temp0 = timerControl
+    if (!(timerControl >= 0xF0)) {
+        //> jmp PlayerCtrlRoutine  ;otherwise run player control routine
+    }
+    //> ExitDeath:
+    //> rts          ;leave from death routine
+    return
+}
+
 // Decompiled from DonePlayerTask
 fun donePlayerTask() {
     var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
@@ -4639,6 +8044,31 @@ fun donePlayerTask() {
     gameEngineSubroutine = 0x08
     //> rts                       ;leave
     return
+}
+
+// Decompiled from PlayerFireFlower
+fun playerFireFlower() {
+    var temp0: Int = 0
+    var frameCounter by MemoryByte(FrameCounter)
+    var timerControl by MemoryByte(TimerControl)
+    //> PlayerFireFlower:
+    //> lda TimerControl       ;check master timer control
+    //> cmp #$c0               ;for specific moment in time
+    //> beq ResetPalFireFlower ;branch if at moment, not before or after
+    temp0 = timerControl
+    if (timerControl != 0xC0) {
+        //> lda FrameCounter       ;get frame counter
+        temp0 = frameCounter
+        //> lsr
+        temp0 = temp0 shr 1
+        //> lsr                    ;divide by four to change every four frames
+        temp0 = temp0 shr 1
+    }
+    //> ResetPalFireFlower:
+    //> jsr DonePlayerTask    ;do sub to init timer control and run player control routine
+    donePlayerTask()
+    // Fall-through tail call to cyclePlayerPalette
+    cyclePlayerPalette(temp0)
 }
 
 // Decompiled from CyclePlayerPalette
@@ -4677,8 +8107,164 @@ fun resetPalStar() {
     return
 }
 
+// Decompiled from FlagpoleSlide
+fun flagpoleSlide() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var flagpoleSoundQueue by MemoryByte(FlagpoleSoundQueue)
+    var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
+    var playerYPosition by MemoryByte(Player_Y_Position)
+    var square1SoundQueue by MemoryByte(Square1SoundQueue)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    //> FlagpoleSlide:
+    //> lda Enemy_ID+5           ;check special use enemy slot
+    //> cmp #FlagpoleFlagObject  ;for flagpole flag object
+    //> bne NoFPObj              ;if not found, branch to something residual
+    temp0 = enemyId[5]
+    if (enemyId[5] == FlagpoleFlagObject) {
+        //> lda FlagpoleSoundQueue   ;load flagpole sound
+        temp0 = flagpoleSoundQueue
+        //> sta Square1SoundQueue    ;into square 1's sfx queue
+        square1SoundQueue = temp0
+        //> lda #$00
+        temp0 = 0x00
+        //> sta FlagpoleSoundQueue   ;init flagpole sound queue
+        flagpoleSoundQueue = temp0
+        //> ldy Player_Y_Position
+        //> cpy #$9e                 ;check to see if player has slid down
+        //> bcs SlidePlayer          ;far enough, and if so, branch with no controller bits set
+        if (playerYPosition >= 0x9E) {
+            //  goto SlidePlayer
+            return
+        }
+        temp1 = playerYPosition
+        if (!(playerYPosition >= 0x9E)) {
+            //> lda #$04                 ;otherwise force player to climb down (to slide)
+            temp0 = 0x04
+        }
+        //> SlidePlayer: jmp AutoControlPlayer    ;jump to player control routine
+    }
+    //> NoFPObj:     inc GameEngineSubroutine ;increment to next routine (this may
+    gameEngineSubroutine = (gameEngineSubroutine + 1) and 0xFF
+    //> rts                      ;be residual code)
+    return
+}
+
+// Decompiled from PlayerEndLevel
+fun playerEndLevel() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var areaNumber by MemoryByte(AreaNumber)
+    var coinTallyFor1Ups by MemoryByte(CoinTallyFor1Ups)
+    var eventMusicQueue by MemoryByte(EventMusicQueue)
+    var fetchNewGameTimerFlag by MemoryByte(FetchNewGameTimerFlag)
+    var halfwayPage by MemoryByte(HalfwayPage)
+    var hidden1UpFlag by MemoryByte(Hidden1UpFlag)
+    var levelNumber by MemoryByte(LevelNumber)
+    var playerCollisionbits by MemoryByte(Player_CollisionBits)
+    var playerSprattrib by MemoryByte(Player_SprAttrib)
+    var playerYPosition by MemoryByte(Player_Y_Position)
+    var scrollLock by MemoryByte(ScrollLock)
+    var starFlagTaskControl by MemoryByte(StarFlagTaskControl)
+    var worldNumber by MemoryByte(WorldNumber)
+    val hidden1UpCoinAmts by MemoryByteIndexed(Hidden1UpCoinAmts)
+    //> PlayerEndLevel:
+    //> lda #$01                  ;force player to walk to the right
+    //> jsr AutoControlPlayer
+    autoControlPlayer(0x01)
+    //> lda Player_Y_Position     ;check player's vertical position
+    //> cmp #$ae
+    //> bcc ChkStop               ;if player is not yet off the flagpole, skip this part
+    temp0 = playerYPosition
+    if (playerYPosition >= 0xAE) {
+        //> lda ScrollLock            ;if scroll lock not set, branch ahead to next part
+        temp0 = scrollLock
+        //> beq ChkStop               ;because we only need to do this part once
+        if (temp0 != 0) {
+            //> lda #EndOfLevelMusic
+            temp0 = EndOfLevelMusic
+            //> sta EventMusicQueue       ;load win level music in event music queue
+            eventMusicQueue = temp0
+            //> lda #$00
+            temp0 = 0x00
+            //> sta ScrollLock            ;turn off scroll lock to skip this part later
+            scrollLock = temp0
+        }
+    }
+    //> ChkStop:  lda Player_CollisionBits  ;get player collision bits
+    temp0 = playerCollisionbits
+    //> lsr                       ;check for d0 set
+    temp0 = temp0 shr 1
+    //> bcs RdyNextA              ;if d0 set, skip to next part
+    if ((temp0 and 0x01) == 0) {
+        //> lda StarFlagTaskControl   ;if star flag task control already set,
+        temp0 = starFlagTaskControl
+        //> bne InCastle              ;go ahead with the rest of the code
+        if (temp0 == 0) {
+            //> inc StarFlagTaskControl   ;otherwise set task control now (this gets ball rolling!)
+            starFlagTaskControl = (starFlagTaskControl + 1) and 0xFF
+        }
+        //> InCastle: lda #%00100000            ;set player's background priority bit to
+        temp0 = 0x20
+        //> sta Player_SprAttrib      ;give illusion of being inside the castle
+        playerSprattrib = temp0
+    }
+    //> RdyNextA: lda StarFlagTaskControl
+    temp0 = starFlagTaskControl
+    //> cmp #$05                  ;if star flag task control not yet set
+    //> bne ExitNA                ;beyond last valid task number, branch to leave
+    if (!(temp0 - 0x05 == 0)) {
+        //  goto ExitNA
+        return
+    }
+    if (temp0 == 0x05) {
+        //> inc LevelNumber           ;increment level number used for game logic
+        levelNumber = (levelNumber + 1) and 0xFF
+        //> lda LevelNumber
+        temp0 = levelNumber
+        //> cmp #$03                  ;check to see if we have yet reached level -4
+        //> bne NextArea              ;and skip this last part here if not
+        if (!(temp0 - 0x03 == 0)) {
+            //  goto NextArea
+            return
+        }
+        if (temp0 == 0x03) {
+            //> ldy WorldNumber           ;get world number as offset
+            //> lda CoinTallyFor1Ups      ;check third area coin tally for bonus 1-ups
+            temp0 = coinTallyFor1Ups
+            //> cmp Hidden1UpCoinAmts,y   ;against minimum value, if player has not collected
+            //> bcc NextArea              ;at least this number of coins, leave flag clear
+            if (!(temp0 >= hidden1UpCoinAmts[worldNumber])) {
+                //  goto NextArea
+                return
+            }
+            temp1 = worldNumber
+            if (temp0 >= hidden1UpCoinAmts[worldNumber]) {
+                //> inc Hidden1UpFlag         ;otherwise set hidden 1-up box control flag
+                hidden1UpFlag = (hidden1UpFlag + 1) and 0xFF
+            }
+        }
+        //> NextArea: inc AreaNumber            ;increment area number used for address loader
+        areaNumber = (areaNumber + 1) and 0xFF
+        //> jsr LoadAreaPointer       ;get new level pointer
+        loadAreaPointer(temp0)
+        //> inc FetchNewGameTimerFlag ;set flag to load new game timer
+        fetchNewGameTimerFlag = (fetchNewGameTimerFlag + 1) and 0xFF
+        //> jsr ChgAreaMode           ;do sub to set secondary mode, disable screen and sprite 0
+        chgAreaMode()
+        //> sta HalfwayPage           ;reset halfway page to 0 (beginning)
+        halfwayPage = temp0
+        //> lda #Silence
+        temp0 = Silence
+        //> sta EventMusicQueue       ;silence music and leave
+        eventMusicQueue = temp0
+    }
+    //> ExitNA:   rts
+    return
+}
+
 // Decompiled from PlayerMovementSubs
-fun playerMovementSubs(): Int {  // FIX: Added return type
+fun playerMovementSubs() {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
@@ -4741,38 +8327,14 @@ fun playerMovementSubs(): Int {  // FIX: Added return type
                 // Unknown JumpEngine index
             }
         }
-        return 0
-    } else {
-        //> NoMoveSub: rts
-        return 0
+        return
+        //> .dw OnGroundStateSub
+        //> .dw JumpSwimSub
+        //> .dw FallingSub
+        //> .dw ClimbingSub
     }
-}
-
-// Decompiled from MovePlayerVertically
-// This function wasn't auto-decompiled because it's reached via JMP, not JSR
-fun movePlayerVertically() {
-    var timerControl by MemoryByte(TimerControl)
-    var jumpspringAnimCtrl by MemoryByte(JumpspringAnimCtrl)
-    var verticalForce by MemoryByte(VerticalForce)
-    //> MovePlayerVertically:
-    //> ldx #$00                ;set X for player offset
-    val X = 0x00
-    //> lda TimerControl
-    //> bne NoJSChk             ;if master timer control set, branch ahead
-    if (timerControl == 0) {
-        //> lda JumpspringAnimCtrl  ;otherwise check to see if jumpspring is animating
-        //> bne ExXMove             ;branch to leave if so
-        if (jumpspringAnimCtrl != 0) {
-            return
-        }
-    }
-    //> NoJSChk: lda VerticalForce       ;dump vertical force
-    //> sta $00
-    memory[0x00] = verticalForce.toUByte()
-    //> lda #$04                ;set maximum vertical speed here
-    val A = 0x04
-    //> jmp ImposeGravitySprObj ;then jump to move player vertically
-    imposeGravitySprObj(A)
+    //> NoMoveSub: rts
+    return
 }
 
 // Decompiled from OnGroundStateSub
@@ -4829,6 +8391,10 @@ fun fallingSub() {
     temp0 = gameEngineSubroutine
     //> cmp #$0b                   ;check for specific routine selected
     //> bne ExitMov1               ;branch if not set to run
+    if (!(temp0 - 0x0B == 0)) {
+        //  goto ExitMov1
+        return
+    }
     if (temp0 == 0x0B) {
         //> lda #$28
         temp0 = 0x28
@@ -4836,7 +8402,7 @@ fun fallingSub() {
         verticalForce = temp0
     }
     //> ExitMov1: jmp MovePlayerVertically   ;jump to move player vertically, then leave
-    movePlayerVertically()
+    //> ExXMove:  rts                         ;and leave
     return
 }
 
@@ -4846,6 +8412,7 @@ fun jumpSwimSub() {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
     var aBButtons by MemoryByte(A_B_Buttons)
     var diffToHaltJump by MemoryByte(DiffToHaltJump)
     var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
@@ -4876,11 +8443,11 @@ fun jumpSwimSub() {
             temp3 = jumporiginYPosition
             //> sec
             //> sbc Player_Y_Position      ;subtract current from original vertical coordinate
+            temp4 = temp3 - playerYPosition
+            temp3 = temp4 and 0xFF
             //> cmp DiffToHaltJump         ;compare to value set here to see if player is in mid-jump
             //> bcc ProcSwim               ;or just starting to jump, if just starting, skip ahead
-            temp3 = (temp3 - playerYPosition) and 0xFF
             if (temp3 >= diffToHaltJump) {
-                // fall through to DumpFall
             }
         }
     }
@@ -4891,6 +8458,10 @@ fun jumpSwimSub() {
     //> ProcSwim: lda SwimmingFlag           ;if swimming flag not set,
     temp3 = swimmingFlag
     //> beq LRAir                  ;branch ahead to last part
+    if (temp3 == 0) {
+        //  goto LRAir
+        return
+    }
     if (temp3 != 0) {
         //> jsr GetPlayerAnimSpeed     ;do a sub to get animation frame timing
         getPlayerAnimSpeed()
@@ -4898,7 +8469,7 @@ fun jumpSwimSub() {
         temp3 = playerYPosition
         //> cmp #$14                   ;check vertical position against preset value
         //> bcs LRWater                ;if not yet reached a certain position, branch ahead
-        if (temp3 < 0x14) {
+        if (!(temp3 >= 0x14)) {
             //> lda #$18
             temp3 = 0x18
             //> sta VerticalForce          ;otherwise set fractional
@@ -4907,6 +8478,10 @@ fun jumpSwimSub() {
         //> LRWater:  lda Left_Right_Buttons     ;check left/right controller bits (check for swimming)
         temp3 = leftRightButtons
         //> beq LRAir                  ;if not pressing any, skip
+        if (temp3 == 0) {
+            //  goto LRAir
+            return
+        }
         if (temp3 != 0) {
             //> sta PlayerFacingDir        ;otherwise set facing direction accordingly
             playerFacingDir = temp3
@@ -4927,6 +8502,10 @@ fun jumpSwimSub() {
     temp3 = gameEngineSubroutine
     //> cmp #$0b                   ;check for specific routine selected
     //> bne ExitMov1               ;branch if not set to run
+    if (!(temp3 - 0x0B == 0)) {
+        //  goto ExitMov1
+        return
+    }
     if (temp3 == 0x0B) {
         //> lda #$28
         temp3 = 0x28
@@ -4934,7 +8513,7 @@ fun jumpSwimSub() {
         verticalForce = temp3
     }
     //> ExitMov1: jmp MovePlayerVertically   ;jump to move player vertically, then leave
-    movePlayerVertically()
+    //> ExXMove:  rts                         ;and leave
     return
 }
 
@@ -4945,6 +8524,11 @@ fun climbingSub() {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var climbSideTimer by MemoryByte(ClimbSideTimer)
     var leftRightButtons by MemoryByte(Left_Right_Buttons)
     var playerFacingDir by MemoryByte(PlayerFacingDir)
@@ -4962,89 +8546,94 @@ fun climbingSub() {
     //> lda Player_YMF_Dummy
     //> clc                      ;add movement force to dummy variable
     //> adc Player_Y_MoveForce   ;save with carry
+    temp0 = playerYmfDummy + playerYMoveforce
     //> sta Player_YMF_Dummy
-    val carry = if (playerYmfDummy + playerYMoveforce > 0xFF) 1 else 0
-    playerYmfDummy = (playerYmfDummy + playerYMoveforce) and 0xFF
+    playerYmfDummy = temp0 and 0xFF
     //> ldy #$00                 ;set default adder here
     //> lda Player_Y_Speed       ;get player's vertical speed
     //> bpl MoveOnVine           ;if not moving upwards, branch
-    temp0 = playerYSpeed
-    temp1 = 0x00
+    temp1 = playerYSpeed
+    temp2 = 0x00
     if ((playerYSpeed and 0x80) != 0) {
         //> dey                      ;otherwise set adder to $ff
-        temp1 = 0xFF
+        temp2 = (temp2 - 1) and 0xFF
     }
     //> MoveOnVine:  sty $00                  ;store adder here
-    memory[0x0] = temp1.toUByte()
+    memory[0x0] = temp2.toUByte()
     //> adc Player_Y_Position    ;add carry to player's vertical position
+    temp3 = temp1 + playerYPosition + (if (temp0 > 0xFF) 1 else 0)
+    temp1 = temp3 and 0xFF
     //> sta Player_Y_Position    ;and store to move player up or down
-    val newY = (temp0 + playerYPosition + carry) and 0xFF
-    val carry2 = if (temp0 + playerYPosition + carry > 0xFF) 1 else 0
-    playerYPosition = newY
+    playerYPosition = temp1
     //> lda Player_Y_HighPos
-    temp0 = playerYHighpos
+    temp1 = playerYHighpos
     //> adc $00                  ;add carry to player's page location
+    temp4 = temp1 + memory[0x0].toInt() + (if (temp3 > 0xFF) 1 else 0)
+    temp1 = temp4 and 0xFF
     //> sta Player_Y_HighPos     ;and store
-    playerYHighpos = (temp0 + temp1 + carry2) and 0xFF
+    playerYHighpos = temp1
     //> lda Left_Right_Buttons   ;compare left/right controller bits
-    temp0 = leftRightButtons
+    temp1 = leftRightButtons
     //> and Player_CollisionBits ;to collision flag
-    temp2 = temp0 and playerCollisionbits
+    temp5 = temp1 and playerCollisionbits
     //> beq InitCSTimer          ;if not set, skip to end
-    temp0 = temp2
-    if (temp2 != 0) {
+    temp1 = temp5
+    if (temp5 != 0) {
         //> ldy ClimbSideTimer       ;otherwise check timer
-        temp1 = climbSideTimer
+        temp2 = climbSideTimer
         //> bne ExitCSub             ;if timer not expired, branch to leave
-        if (temp1 == 0) {
+        if (temp2 == 0) {
             //> ldy #$18
-            temp1 = 0x18
+            temp2 = 0x18
             //> sty ClimbSideTimer       ;otherwise set timer now
-            climbSideTimer = temp1
+            climbSideTimer = temp2
             //> ldx #$00                 ;set default offset here
             //> ldy PlayerFacingDir      ;get facing direction
-            temp1 = playerFacingDir
+            temp2 = playerFacingDir
             //> lsr                      ;move right button controller bit to carry
-            temp0 = temp0 shr 1
+            temp1 = temp1 shr 1
             //> bcs ClimbFD              ;if controller right pressed, branch ahead
-            temp3 = 0x00
-            if ((temp0 and 0x01) == 0) {
+            temp6 = 0x00
+            if ((temp1 and 0x01) == 0) {
                 //> inx
-                temp3 = (temp3 + 1) and 0xFF
+                temp6 = (temp6 + 1) and 0xFF
                 //> inx                      ;otherwise increment offset by 2 bytes
-                temp3 = (temp3 + 1) and 0xFF
+                temp6 = (temp6 + 1) and 0xFF
             }
             //> ClimbFD:     dey                      ;check to see if facing right
-            temp1 = (temp1 - 1) and 0xFF
+            temp2 = (temp2 - 1) and 0xFF
             //> beq CSetFDir             ;if so, branch, do not increment
-            if (temp1 != 0) {
+            if (temp2 != 0) {
                 //> inx                      ;otherwise increment by 1 byte
-                temp3 = (temp3 + 1) and 0xFF
+                temp6 = (temp6 + 1) and 0xFF
             }
             //> CSetFDir:    lda Player_X_Position
-            temp0 = playerXPosition
+            temp1 = playerXPosition
             //> clc                      ;add or subtract from player's horizontal position
             //> adc ClimbAdderLow,x      ;using value here as adder and X as offset
+            temp7 = temp1 + climbAdderLow[temp6]
+            temp1 = temp7 and 0xFF
             //> sta Player_X_Position
-            val xCarry = if (temp0 + climbAdderLow[temp3] > 0xFF) 1 else 0
-            playerXPosition = (temp0 + climbAdderLow[temp3]) and 0xFF
+            playerXPosition = temp1
             //> lda Player_PageLoc       ;add or subtract carry or borrow using value here
-            temp0 = playerPageloc
+            temp1 = playerPageloc
             //> adc ClimbAdderHigh,x     ;from the player's page location
+            temp8 = temp1 + climbAdderHigh[temp6] + (if (temp7 > 0xFF) 1 else 0)
+            temp1 = temp8 and 0xFF
             //> sta Player_PageLoc
-            playerPageloc = (temp0 + climbAdderHigh[temp3] + xCarry) and 0xFF
+            playerPageloc = temp1
             //> lda Left_Right_Buttons   ;get left/right controller bits again
-            temp0 = leftRightButtons
+            temp1 = leftRightButtons
             //> eor #%00000011           ;invert them and store them while player
-            temp4 = temp0 xor 0x03
+            temp9 = temp1 xor 0x03
             //> sta PlayerFacingDir      ;is on vine to face player in opposite direction
-            playerFacingDir = temp4
+            playerFacingDir = temp9
         }
         //> ExitCSub:    rts                      ;then leave
         return
     } else {
         //> InitCSTimer: sta ClimbSideTimer       ;initialize timer here
-        climbSideTimer = temp0
+        climbSideTimer = temp1
         //> rts
         return
     }
@@ -5514,6 +9103,11 @@ fun imposeFriction(A: Int): Int {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
     var frictionAdderHigh by MemoryByte(FrictionAdderHigh)
     var frictionAdderLow by MemoryByte(FrictionAdderLow)
     var maximumLeftSpeed by MemoryByte(MaximumLeftSpeed)
@@ -5554,17 +9148,20 @@ fun imposeFriction(A: Int): Int {
         temp1 = playerXMoveforce
         //> clc
         //> adc FrictionAdderLow      ;add to it another value set here
+        temp2 = temp1 + frictionAdderLow
+        temp1 = temp2 and 0xFF
         //> sta Player_X_MoveForce    ;store here
-        playerXMoveforce = (temp1 + frictionAdderLow) and 0xFF
+        playerXMoveforce = temp1
         //> lda Player_X_Speed
         temp1 = playerXSpeed
         //> adc FrictionAdderHigh     ;add value plus carry to horizontal speed
+        temp3 = temp1 + frictionAdderHigh + (if (temp2 > 0xFF) 1 else 0)
+        temp1 = temp3 and 0xFF
         //> sta Player_X_Speed        ;set as new horizontal speed
-        playerXSpeed = (temp1 + frictionAdderHigh + (if (temp1 + frictionAdderLow > 0xFF) 1 else 0)) and 0xFF
+        playerXSpeed = temp1
         //> cmp MaximumRightSpeed     ;compare against maximum value for right movement
         //> bmi XSpdSign              ;if horizontal speed greater negatively, branch
-        temp1 = (temp1 + frictionAdderHigh + (if (temp1 + frictionAdderLow > 0xFF) 1 else 0)) and 0xFF
-        if (!(((temp1 + frictionAdderHigh + if (temp1 + frictionAdderLow > 0xFF) 1 else 0) and 0xFF) - maximumRightSpeed < 0)) {
+        if (!(temp1 - maximumRightSpeed < 0)) {
             //> lda MaximumRightSpeed     ;otherwise set preset value as horizontal speed
             temp1 = maximumRightSpeed
             //> sta Player_X_Speed        ;thus slowing the player's left movement down
@@ -5576,17 +9173,20 @@ fun imposeFriction(A: Int): Int {
         temp1 = playerXMoveforce
         //> sec
         //> sbc FrictionAdderLow      ;subtract from it another value set here
+        temp4 = temp1 - frictionAdderLow
+        temp1 = temp4 and 0xFF
         //> sta Player_X_MoveForce    ;store here
-        playerXMoveforce = (temp1 - frictionAdderLow) and 0xFF
+        playerXMoveforce = temp1
         //> lda Player_X_Speed
         temp1 = playerXSpeed
         //> sbc FrictionAdderHigh     ;subtract value plus borrow from horizontal speed
+        temp5 = temp1 - frictionAdderHigh - (if (temp4 >= 0) 0 else 1)
+        temp1 = temp5 and 0xFF
         //> sta Player_X_Speed        ;set as new horizontal speed
-        playerXSpeed = (temp1 - frictionAdderHigh - (if (temp1 - frictionAdderLow >= 0) 0 else 1)) and 0xFF
+        playerXSpeed = temp1
         //> cmp MaximumLeftSpeed      ;compare against maximum value for left movement
         //> bpl XSpdSign              ;if horizontal speed greater positively, branch
-        temp1 = (temp1 - frictionAdderHigh - (if (temp1 - frictionAdderLow >= 0) 0 else 1)) and 0xFF
-        if (((temp1 - frictionAdderHigh - if (temp1 - frictionAdderLow >= 0) 0 else 1) and 0xFF) - maximumLeftSpeed < 0) {
+        if (temp1 - maximumLeftSpeed < 0) {
             //> lda MaximumLeftSpeed      ;otherwise set preset value as horizontal speed
             temp1 = maximumLeftSpeed
             //> sta Player_X_Speed        ;thus slowing the player's right movement down
@@ -5596,12 +9196,14 @@ fun imposeFriction(A: Int): Int {
         //> bpl SetAbsSpd             ;branch and leave horizontal speed value unmodified
         if (temp1 < 0) {
             //> eor #$ff
-            temp2 = temp1 xor 0xFF
+            temp6 = temp1 xor 0xFF
             //> clc                       ;otherwise get two's compliment to get absolute
             //> adc #$01                  ;unsigned walking/running speed
+            temp7 = temp6 + 0x01
+            temp1 = temp7 and 0xFF
         }
     }
-    return 0  // FIX: Default return
+    return A
 }
 
 // Decompiled from ProcFireball_Bubble
@@ -5631,7 +9233,6 @@ fun procfireballBubble() {
     //> cmp #$02
     //> bcc ProcAirBubbles         ;if not fiery, branch
     temp0 = playerStatus
-    if (DEBUG_GAME_CORE) { System.err.println("  procfireballBubble: playerStatus=$playerStatus, areaType=$areaType") }
     if (playerStatus >= 0x02) {
         //> lda A_B_Buttons
         temp0 = aBButtons
@@ -5698,47 +9299,35 @@ fun procfireballBubble() {
         //> ldx #$00
         temp4 = 0x00
         //> jsr FireballObjCore  ;process first fireball object
-        if (DEBUG_GAME_CORE) { System.err.print("  fireballObjCore(0)..."); System.err.flush() }
         fireballObjCore(temp4)
-        if (DEBUG_GAME_CORE) System.err.println("done")
         //> ldx #$01
         temp4 = 0x01
         //> jsr FireballObjCore  ;process second fireball object, then do air bubbles
-        if (DEBUG_GAME_CORE) { System.err.print("  fireballObjCore(1)..."); System.err.flush() }
         fireballObjCore(temp4)
-        if (DEBUG_GAME_CORE) System.err.println("done")
     }
     //> ProcAirBubbles:
     //> lda AreaType                ;if not water type level, skip the rest of this
     temp0 = areaType
     //> bne BublExit
-    if (DEBUG_GAME_CORE) { System.err.print("  procAirBubbles (areaType=$areaType)..."); System.err.flush() }
     if (temp0 == 0) {
         //> ldx #$02                    ;otherwise load counter and use as offset
         temp4 = 0x02
         do {
-            if (DEBUG_GAME_CORE) { System.err.print("bubble[$temp4]..."); System.err.flush() }
             //> BublLoop: stx ObjectOffset            ;store offset
             objectOffset = temp4
             //> jsr BubbleCheck             ;check timers and coordinates, create air bubble
-            if (DEBUG_GAME_CORE) { System.err.print("check..."); System.err.flush() }
             bubbleCheck(temp4)
             //> jsr RelativeBubblePosition  ;get relative coordinates
-            if (DEBUG_GAME_CORE) { System.err.print("rel..."); System.err.flush() }
             relativeBubblePosition()
             //> jsr GetBubbleOffscreenBits  ;get offscreen information
-            if (DEBUG_GAME_CORE) { System.err.print("offscr..."); System.err.flush() }
             getBubbleOffscreenBits()
             //> jsr DrawBubble              ;draw the air bubble
-            if (DEBUG_GAME_CORE) { System.err.print("draw..."); System.err.flush() }
             drawBubble(temp4)
             //> dex
             temp4 = (temp4 - 1) and 0xFF
-            if (DEBUG_GAME_CORE) System.err.println("next=$temp4")
             //> bpl BublLoop                ;do this until all three are handled
         } while ((temp4 and 0x80) == 0)
     }
-    if (DEBUG_GAME_CORE) System.err.println("done")
     //> BublExit: rts                         ;then leave
     return
 }
@@ -5750,6 +9339,9 @@ fun fireballObjCore(X: Int) {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
     var fballOffscreenbits by MemoryByte(FBall_OffscreenBits)
     var fireballRelXpos by MemoryByte(Fireball_Rel_XPos)
     var fireballRelYpos by MemoryByte(Fireball_Rel_YPos)
@@ -5794,13 +9386,17 @@ fun fireballObjCore(X: Int) {
                 //> lda Player_X_Position        ;get player's horizontal position
                 temp0 = playerXPosition
                 //> adc #$04                     ;add four pixels and store as fireball's horizontal position
+                temp2 = temp0 + 0x04 + (if ((fireballState[X] and 0x80) != 0) 1 else 0)
+                temp0 = temp2 and 0xFF
                 //> sta Fireball_X_Position,x
-                fireballXPosition[X] = (temp0 + 0x04 + (if ((fireballState[X] and 0x80) != 0) 1 else 0)) and 0xFF
+                fireballXPosition[X] = temp0
                 //> lda Player_PageLoc           ;get player's page location
                 temp0 = playerPageloc
                 //> adc #$00                     ;add carry and store as fireball's page location
+                temp3 = temp0 + (if (temp2 > 0xFF) 1 else 0)
+                temp0 = temp3 and 0xFF
                 //> sta Fireball_PageLoc,x
-                fireballPageloc[X] = (temp0 + (if (temp0 + 0x04 + (if ((fireballState[X] and 0x80) != 0) 1 else 0) > 0xFF) 1 else 0)) and 0xFF
+                fireballPageloc[X] = temp0
                 //> lda Player_Y_Position        ;get player's vertical position and store
                 temp0 = playerYPosition
                 //> sta Fireball_Y_Position,x
@@ -5831,6 +9427,8 @@ fun fireballObjCore(X: Int) {
             //> RunFB:   txa                          ;add 7 to offset to use
             //> clc                          ;as fireball offset for next routines
             //> adc #$07
+            temp4 = X + 0x07
+            temp0 = temp4 and 0xFF
             //> tax
             //> lda #$50                     ;set downward movement force here
             temp0 = 0x50
@@ -5843,46 +9441,34 @@ fun fireballObjCore(X: Int) {
             //> lda #$00
             temp0 = 0x00
             //> jsr ImposeGravity            ;do sub here to impose gravity on fireball and move vertically
-            if (DEBUG_GAME_CORE) { System.err.print("    imposeGravity..."); System.err.flush() }
-            imposeGravity(temp0, (X + 0x07) and 0xFF)
-            if (DEBUG_GAME_CORE) System.err.println("done")
+            imposeGravity(temp0, temp0)
             //> jsr MoveObjectHorizontally   ;do another sub to move it horizontally
-            if (DEBUG_GAME_CORE) { System.err.print("    moveObjectHorizontally..."); System.err.flush() }
-            moveObjectHorizontally((X + 0x07) and 0xFF)
-            if (DEBUG_GAME_CORE) System.err.println("done")
+            moveObjectHorizontally(temp0)
             //> ldx ObjectOffset             ;return fireball offset to X
             //> jsr RelativeFireballPosition ;get relative coordinates
-            if (DEBUG_GAME_CORE) { System.err.print("    relativeFireballPosition..."); System.err.flush() }
             relativeFireballPosition()
-            if (DEBUG_GAME_CORE) System.err.println("done")
             //> jsr GetFireballOffscreenBits ;get offscreen information
-            if (DEBUG_GAME_CORE) { System.err.print("    getFireballOffscreenBits..."); System.err.flush() }
             getFireballOffscreenBits()
-            if (DEBUG_GAME_CORE) System.err.println("done")
             //> jsr GetFireballBoundBox      ;get bounding box coordinates
-            if (DEBUG_GAME_CORE) { System.err.print("    getFireballBoundBox..."); System.err.flush() }
             getFireballBoundBox(objectOffset)
-            if (DEBUG_GAME_CORE) System.err.println("done")
             //> jsr FireballBGCollision      ;do fireball to background collision detection
-            if (DEBUG_GAME_CORE) { System.err.print("    fireballBGCollision..."); System.err.flush() }
             fireballBGCollision(objectOffset)
-            if (DEBUG_GAME_CORE) System.err.println("done")
             //> lda FBall_OffscreenBits      ;get fireball offscreen bits
             temp0 = fballOffscreenbits
             //> and #%11001100               ;mask out certain bits
-            temp2 = temp0 and 0xCC
+            temp5 = temp0 and 0xCC
             //> bne EraseFB                  ;if any bits still set, branch to kill fireball
-            temp0 = temp2
-            temp3 = objectOffset
-            if (temp2 == 0) {
+            temp0 = temp5
+            temp6 = objectOffset
+            if (temp5 == 0) {
                 //> jsr FireballEnemyCollision   ;do fireball to enemy collision detection and deal with collisions
-                fireballEnemyCollision(temp3)
+                fireballEnemyCollision(temp6)
                 //> jmp DrawFireball             ;draw fireball appropriately and leave
             }
             //> EraseFB: lda #$00                     ;erase fireball state
             temp0 = 0x00
             //> sta Fireball_State,x
-            fireballState[temp3] = temp0
+            fireballState[temp6] = temp0
         }
         //> NoFBall: rts                          ;leave
         return
@@ -5894,7 +9480,7 @@ fun fireballObjCore(X: Int) {
     }
     //> DrawFireball:
     //> ldy FBall_SprDataOffset,x  ;get fireball's sprite data offset
-    temp1 = fballSprdataoffset[temp3]
+    temp1 = fballSprdataoffset[temp6]
     //> lda Fireball_Rel_YPos      ;get relative vertical coordinate
     temp0 = fireballRelYpos
     //> sta Sprite_Y_Position,y    ;store as sprite Y coordinate
@@ -5905,25 +9491,25 @@ fun fireballObjCore(X: Int) {
     spriteXPosition[temp1] = temp0
     //> DrawExplosion_Fireball:
     //> ldy Alt_SprDataOffset,x  ;get OAM data offset of alternate sort for fireball's explosion
-    temp1 = altSprdataoffset[temp3]
+    temp1 = altSprdataoffset[temp6]
     //> lda Fireball_State,x     ;load fireball state
-    temp0 = fireballState[temp3]
+    temp0 = fireballState[temp6]
     //> inc Fireball_State,x     ;increment state for next frame
-    fireballState[temp3] = (fireballState[temp3] + 1) and 0xFF
+    fireballState[temp6] = (fireballState[temp6] + 1) and 0xFF
     //> lsr                      ;divide by 2
     temp0 = temp0 shr 1
     //> and #%00000111           ;mask out all but d3-d1
-    temp4 = temp0 and 0x07
+    temp7 = temp0 and 0x07
     //> cmp #$03                 ;check to see if time to kill fireball
     //> bcs KillFireBall         ;branch if so, otherwise continue to draw explosion
-    temp0 = temp4
-    if (!(temp4 >= 0x03)) {
+    temp0 = temp7
+    if (!(temp7 >= 0x03)) {
     }
     //> KillFireBall:
     //> lda #$00                    ;clear fireball state to kill it
     temp0 = 0x00
     //> sta Fireball_State,x
-    fireballState[temp3] = temp0
+    fireballState[temp6] = temp0
     //> rts
     return
 }
@@ -5933,6 +9519,8 @@ fun bubbleCheck(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
     var airBubbleTimer by MemoryByte(AirBubbleTimer)
     val bubbleMforcedata by MemoryByteIndexed(Bubble_MForceData)
     val bubbleYmfDummy by MemoryByteIndexed(Bubble_YMF_Dummy)
@@ -5948,45 +9536,52 @@ fun bubbleCheck(X: Int) {
     //> cmp #$f8                    ;if offscreen coordinate not set,
     //> bne MoveBubl                ;branch to move air bubble
     temp1 = bubbleYPosition[X]
-    if (temp1 == 0xF8) {
-        // Bubble at offscreen coordinate, check timer to create new bubble
+    if (bubbleYPosition[X] == 0xF8) {
         //> lda AirBubbleTimer          ;if air bubble timer not expired,
         temp1 = airBubbleTimer
         //> bne ExitBubl                ;branch to leave, otherwise create new air bubble
-        if (temp1 != 0) {
+        if (temp1 == 0) {
+        } else {
             //> ExitBubl: rts                      ;leave
             return
         }
-        // Timer expired - setup new bubble (but this path isn't implemented, just return)
-        return
     }
-    // MoveBubl: bubble exists, move it
     //> MoveBubl: ldy $07                  ;get pseudorandom bit again, use as offset
     //> lda Bubble_YMF_Dummy,x
     temp1 = bubbleYmfDummy[X]
     //> sec                      ;subtract pseudorandom amount from dummy variable
     //> sbc Bubble_MForceData,y
+    temp2 = temp1 - bubbleMforcedata[memory[0x7].toInt()]
+    temp1 = temp2 and 0xFF
     //> sta Bubble_YMF_Dummy,x   ;save dummy variable
-    bubbleYmfDummy[X] = (temp1 - bubbleMforcedata[memory[0x7].toInt()]) and 0xFF
+    bubbleYmfDummy[X] = temp1
     //> lda Bubble_Y_Position,x
     temp1 = bubbleYPosition[X]
     //> sbc #$00                 ;subtract borrow from airbubble's vertical coordinate
+    temp3 = temp1 - (if (temp2 >= 0) 0 else 1)
+    temp1 = temp3 and 0xFF
     //> cmp #$20                 ;if below the status bar,
     //> bcs Y_Bubl               ;branch to go ahead and use to move air bubble upwards
-    temp1 = (temp1 - (if (temp1 - bubbleMforcedata[memory[0x7].toInt()] >= 0) 0 else 1)) and 0xFF
-    temp2 = memory[0x7].toInt()
-    if (!(((temp1 - if (temp1 - bubbleMforcedata[memory[0x7].toInt()] >= 0) 0 else 1) and 0xFF) >= 0x20)) {
+    temp4 = memory[0x7].toInt()
+    if (!(temp1 >= 0x20)) {
         //> lda #$f8                 ;otherwise set offscreen coordinate
         temp1 = 0xF8
     }
     //> Y_Bubl:   sta Bubble_Y_Position,x  ;store as new vertical coordinate for air bubble
     bubbleYPosition[X] = temp1
+    // Fall-through tail call to setupBubble
+    setupBubble(X)
 }
 
 // Decompiled from SetupBubble
 fun setupBubble(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var airBubbleTimer by MemoryByte(AirBubbleTimer)
     var playerFacingDir by MemoryByte(PlayerFacingDir)
     var playerPageloc by MemoryByte(Player_PageLoc)
@@ -6013,19 +9608,25 @@ fun setupBubble(X: Int) {
     }
     //> PosBubl:  tya                      ;use value loaded as adder
     //> adc Player_X_Position    ;add to player's horizontal position
+    temp2 = temp1 + playerXPosition + (if ((playerFacingDir and 0x01) != 0) 1 else 0)
+    temp0 = temp2 and 0xFF
     //> sta Bubble_X_Position,x  ;save as horizontal position for airbubble
-    bubbleXPosition[X] = (temp1 + playerXPosition + (if ((playerFacingDir and 0x01) != 0) 1 else 0)) and 0xFF
+    bubbleXPosition[X] = temp0
     //> lda Player_PageLoc
     temp0 = playerPageloc
     //> adc #$00                 ;add carry to player's page location
+    temp3 = temp0 + (if (temp2 > 0xFF) 1 else 0)
+    temp0 = temp3 and 0xFF
     //> sta Bubble_PageLoc,x     ;save as page location for airbubble
-    bubblePageloc[X] = (temp0 + (if (temp1 + playerXPosition + (if ((playerFacingDir and 0x01) != 0) 1 else 0) > 0xFF) 1 else 0)) and 0xFF
+    bubblePageloc[X] = temp0
     //> lda Player_Y_Position
     temp0 = playerYPosition
     //> clc                      ;add eight pixels to player's vertical position
     //> adc #$08
+    temp4 = temp0 + 0x08
+    temp0 = temp4 and 0xFF
     //> sta Bubble_Y_Position,x  ;save as vertical position for air bubble
-    bubbleYPosition[X] = (temp0 + 0x08) and 0xFF
+    bubbleYPosition[X] = temp0
     //> lda #$01
     temp0 = 0x01
     //> sta Bubble_Y_HighPos,x   ;set vertical high byte for air bubble
@@ -6042,15 +9643,18 @@ fun setupBubble(X: Int) {
     temp0 = bubbleYmfDummy[X]
     //> sec                      ;subtract pseudorandom amount from dummy variable
     //> sbc Bubble_MForceData,y
+    temp5 = temp0 - bubbleMforcedata[temp1]
+    temp0 = temp5 and 0xFF
     //> sta Bubble_YMF_Dummy,x   ;save dummy variable
-    bubbleYmfDummy[X] = (temp0 - bubbleMforcedata[temp1]) and 0xFF
+    bubbleYmfDummy[X] = temp0
     //> lda Bubble_Y_Position,x
     temp0 = bubbleYPosition[X]
     //> sbc #$00                 ;subtract borrow from airbubble's vertical coordinate
+    temp6 = temp0 - (if (temp5 >= 0) 0 else 1)
+    temp0 = temp6 and 0xFF
     //> cmp #$20                 ;if below the status bar,
     //> bcs Y_Bubl               ;branch to go ahead and use to move air bubble upwards
-    temp0 = (temp0 - (if (temp0 - bubbleMforcedata[temp1] >= 0) 0 else 1)) and 0xFF
-    if (!(((temp0 - if (temp0 - bubbleMforcedata[temp1] >= 0) 0 else 1) and 0xFF) >= 0x20)) {
+    if (!(temp0 >= 0x20)) {
         //> lda #$f8                 ;otherwise set offscreen coordinate
         temp0 = 0xF8
     }
@@ -6165,10 +9769,22 @@ fun runGameTimer() {
     return
 }
 
+// Decompiled from WarpZoneObject
+fun warpZoneObject() {
+    //> ExGTimer:  rts                        ;leave
+    return
+}
+
 // Decompiled from ProcessWhirlpools
 fun processWhirlpools() {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
     var areaType by MemoryByte(AreaType)
     var playerPageloc by MemoryByte(Player_PageLoc)
     var playerXPosition by MemoryByte(Player_X_Position)
@@ -6190,47 +9806,57 @@ fun processWhirlpools() {
         if (temp0 == 0) {
             //> ldy #$04                    ;otherwise start with last whirlpool data
             temp1 = 0x04
-            while ((temp1 and 0x80) == 0) {
-                //> adc #$00                    ;add carry
-                //> sta $01                     ;store result as page location of right extent here
-                memory[0x1] = ((temp0) and 0xFF).toUByte()
-                //> lda Player_X_Position       ;get player's horizontal position
-                temp0 = playerXPosition
-                //> sec
-                //> sbc Whirlpool_LeftExtent,y  ;subtract left extent
-                //> lda Player_PageLoc          ;get player's page location
-                temp0 = playerPageloc
-                //> sbc Whirlpool_PageLoc,y     ;subtract borrow
-                //> bmi NextWh                  ;if player too far left, branch to get next data
-                temp0 = (temp0 - whirlpoolPageloc[temp1] - (if (temp0 - whirlpoolLeftextent[temp1] >= 0) 0 else 1)) and 0xFF
-                if (((temp0 - whirlpoolPageloc[temp1] - if (temp0 - whirlpoolLeftextent[temp1] >= 0) 0 else 1) and 0xFF and 0x80) == 0) {
-                    //> lda $02                     ;otherwise get right extent
-                    temp0 = memory[0x2].toInt()
+            do {
+                //> WhLoop: lda Whirlpool_LeftExtent,y  ;get left extent of whirlpool
+                temp0 = whirlpoolLeftextent[temp1]
+                //> clc
+                //> adc Whirlpool_Length,y      ;add length of whirlpool
+                temp2 = temp0 + whirlpoolLength[temp1]
+                temp0 = temp2 and 0xFF
+                //> sta $02                     ;store result as right extent here
+                memory[0x2] = temp0.toUByte()
+                //> lda Whirlpool_PageLoc,y     ;get page location
+                temp0 = whirlpoolPageloc[temp1]
+                //> beq NextWh                  ;if none or page 0, branch to get next data
+                if (temp0 != 0) {
+                    //> adc #$00                    ;add carry
+                    temp3 = temp0 + (if (temp2 > 0xFF) 1 else 0)
+                    temp0 = temp3 and 0xFF
+                    //> sta $01                     ;store result as page location of right extent here
+                    memory[0x1] = temp0.toUByte()
+                    //> lda Player_X_Position       ;get player's horizontal position
+                    temp0 = playerXPosition
                     //> sec
-                    //> sbc Player_X_Position       ;subtract player's horizontal coordinate
-                    //> lda $01                     ;get right extent's page location
-                    temp0 = memory[0x1].toInt()
-                    //> sbc Player_PageLoc          ;subtract borrow
-                    //> bpl WhirlpoolActivate       ;if player within right extent, branch to whirlpool code
-                    temp0 = (temp0 - playerPageloc - (if (temp0 - playerXPosition >= 0) 0 else 1)) and 0xFF
-                    if (((temp0 - playerPageloc - if (temp0 - playerXPosition >= 0) 0 else 1) and 0xFF and 0x80) != 0) {
+                    //> sbc Whirlpool_LeftExtent,y  ;subtract left extent
+                    temp4 = temp0 - whirlpoolLeftextent[temp1]
+                    temp0 = temp4 and 0xFF
+                    //> lda Player_PageLoc          ;get player's page location
+                    temp0 = playerPageloc
+                    //> sbc Whirlpool_PageLoc,y     ;subtract borrow
+                    temp5 = temp0 - whirlpoolPageloc[temp1] - (if (temp4 >= 0) 0 else 1)
+                    temp0 = temp5 and 0xFF
+                    //> bmi NextWh                  ;if player too far left, branch to get next data
+                    if ((temp5 and 0xFF and 0x80) == 0) {
+                        //> lda $02                     ;otherwise get right extent
+                        temp0 = memory[0x2].toInt()
+                        //> sec
+                        //> sbc Player_X_Position       ;subtract player's horizontal coordinate
+                        temp6 = temp0 - playerXPosition
+                        temp0 = temp6 and 0xFF
+                        //> lda $01                     ;get right extent's page location
+                        temp0 = memory[0x1].toInt()
+                        //> sbc Player_PageLoc          ;subtract borrow
+                        temp7 = temp0 - playerPageloc - (if (temp6 >= 0) 0 else 1)
+                        temp0 = temp7 and 0xFF
+                        //> bpl WhirlpoolActivate       ;if player within right extent, branch to whirlpool code
+                        if ((temp7 and 0xFF and 0x80) != 0) {
+                        }
                     }
                 }
-                do {
-                    //> WhLoop: lda Whirlpool_LeftExtent,y  ;get left extent of whirlpool
-                    temp0 = whirlpoolLeftextent[temp1]
-                    //> clc
-                    //> adc Whirlpool_Length,y      ;add length of whirlpool
-                    //> sta $02                     ;store result as right extent here
-                    memory[0x2] = ((temp0 + whirlpoolLength[temp1]) and 0xFF).toUByte()
-                    //> lda Whirlpool_PageLoc,y     ;get page location
-                    temp0 = whirlpoolPageloc[temp1]
-                    //> beq NextWh                  ;if none or page 0, branch to get next data
-                    //> NextWh: dey                         ;move onto next whirlpool data
-                    temp1 = (temp1 - 1) and 0xFF
-                    //> bpl WhLoop                  ;do this until all whirlpools are checked
-                } while ((temp1 and 0x80) == 0)
-            }
+                //> NextWh: dey                         ;move onto next whirlpool data
+                temp1 = (temp1 - 1) and 0xFF
+                //> bpl WhLoop                  ;do this until all whirlpools are checked
+            } while ((temp1 and 0x80) == 0)
         }
     }
     //> ExitWh: rts                         ;leave
@@ -6241,6 +9867,10 @@ fun processWhirlpools() {
 fun flagpoleRoutine() {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     var flagpolefnumYmfdummy by MemoryByte(FlagpoleFNum_YMFDummy)
     var flagpolefnumYPos by MemoryByte(FlagpoleFNum_Y_Pos)
     var flagpoleScore by MemoryByte(FlagpoleScore)
@@ -6295,24 +9925,32 @@ fun flagpoleRoutine() {
                         //> lda Enemy_YMF_Dummy,x
                         temp0 = enemyYmfDummy[temp1]
                         //> adc #$ff                  ;add movement amount to dummy variable
+                        temp2 = temp0 + 0xFF + (if (temp0 >= 0xA2) 1 else 0)
+                        temp0 = temp2 and 0xFF
                         //> sta Enemy_YMF_Dummy,x     ;save dummy variable
-                        enemyYmfDummy[temp1] = (temp0 + 0xFF + (if (temp0 >= 0xA2) 1 else 0)) and 0xFF
+                        enemyYmfDummy[temp1] = temp0
                         //> lda Enemy_Y_Position,x    ;get flag's vertical coordinate
                         temp0 = enemyYPosition[temp1]
                         //> adc #$01                  ;add 1 plus carry to move flag, and
+                        temp3 = temp0 + 0x01 + (if (temp2 > 0xFF) 1 else 0)
+                        temp0 = temp3 and 0xFF
                         //> sta Enemy_Y_Position,x    ;store vertical coordinate
-                        enemyYPosition[temp1] = (temp0 + 0x01 + (if (temp0 + 0xFF + (if (temp0 >= 0xA2) 1 else 0) > 0xFF) 1 else 0)) and 0xFF
+                        enemyYPosition[temp1] = temp0
                         //> lda FlagpoleFNum_YMFDummy
                         temp0 = flagpolefnumYmfdummy
                         //> sec                       ;subtract movement amount from dummy variable
                         //> sbc #$ff
+                        temp4 = temp0 - 0xFF
+                        temp0 = temp4 and 0xFF
                         //> sta FlagpoleFNum_YMFDummy ;save dummy variable
-                        flagpolefnumYmfdummy = (temp0 - 0xFF) and 0xFF
+                        flagpolefnumYmfdummy = temp0
                         //> lda FlagpoleFNum_Y_Pos
                         temp0 = flagpolefnumYPos
                         //> sbc #$01                  ;subtract one plus borrow to move floatey number,
+                        temp5 = temp0 - 0x01 - (if (temp4 >= 0) 0 else 1)
+                        temp0 = temp5 and 0xFF
                         //> sta FlagpoleFNum_Y_Pos    ;and store vertical coordinate here
-                        flagpolefnumYPos = (temp0 - 0x01 - (if (temp0 - 0xFF >= 0) 0 else 1)) and 0xFF
+                        flagpolefnumYPos = temp0
                     }
                 }
             }
@@ -6339,6 +9977,127 @@ fun flagpoleRoutine() {
         flagpoleGfxHandler(temp1)
     }
     //> ExitFlagP: rts
+    return
+}
+
+// Decompiled from JumpspringHandler
+fun jumpspringHandler(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var aBButtons by MemoryByte(A_B_Buttons)
+    var jumpspringAnimCtrl by MemoryByte(JumpspringAnimCtrl)
+    var jumpspringForce by MemoryByte(JumpspringForce)
+    var jumpspringTimer by MemoryByte(JumpspringTimer)
+    var playerYPosition by MemoryByte(Player_Y_Position)
+    var playerYSpeed by MemoryByte(Player_Y_Speed)
+    var previousaBButtons by MemoryByte(PreviousA_B_Buttons)
+    var timerControl by MemoryByte(TimerControl)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val jumpspringFixedypos by MemoryByteIndexed(Jumpspring_FixedYPos)
+    val jumpspringYPosdata by MemoryByteIndexed(Jumpspring_Y_PosData)
+    //> JumpspringHandler:
+    //> jsr GetEnemyOffscreenBits   ;get offscreen information
+    getEnemyOffscreenBits(X)
+    //> lda TimerControl            ;check master timer control
+    //> bne DrawJSpr                ;branch to last section if set
+    temp0 = timerControl
+    if (timerControl == 0) {
+        //> lda JumpspringAnimCtrl      ;check jumpspring frame control
+        temp0 = jumpspringAnimCtrl
+        //> beq DrawJSpr                ;branch to last section if not set
+        if (temp0 != 0) {
+            //> tay
+            //> dey                         ;subtract one from frame control,
+            temp0 = (temp0 - 1) and 0xFF
+            //> tya                         ;the only way a poor nmos 6502 can
+            //> and #%00000010              ;mask out all but d1, original value still in Y
+            temp1 = temp0 and 0x02
+            //> bne DownJSpr                ;if set, branch to move player up
+            temp0 = temp1
+            temp2 = temp0
+            if (temp1 == 0) {
+                //> inc Player_Y_Position
+                playerYPosition = (playerYPosition + 1) and 0xFF
+                //> inc Player_Y_Position       ;move player's vertical position down two pixels
+                playerYPosition = (playerYPosition + 1) and 0xFF
+                //> jmp PosJSpr                 ;skip to next part
+            } else {
+                //> DownJSpr:  dec Player_Y_Position       ;move player's vertical position up two pixels
+                playerYPosition = (playerYPosition - 1) and 0xFF
+                //> dec Player_Y_Position
+                playerYPosition = (playerYPosition - 1) and 0xFF
+            }
+            //> PosJSpr:   lda Jumpspring_FixedYPos,x  ;get permanent vertical position
+            temp0 = jumpspringFixedypos[X]
+            //> clc
+            //> adc Jumpspring_Y_PosData,y  ;add value using frame control as offset
+            temp3 = temp0 + jumpspringYPosdata[temp2]
+            temp0 = temp3 and 0xFF
+            //> sta Enemy_Y_Position,x      ;store as new vertical position
+            enemyYPosition[X] = temp0
+            //> cpy #$01                    ;check frame control offset (second frame is $00)
+            //> bcc BounceJS                ;if offset not yet at third frame ($01), skip to next part
+            if (temp2 >= 0x01) {
+                //> lda A_B_Buttons
+                temp0 = aBButtons
+                //> and #A_Button               ;check saved controller bits for A button press
+                temp4 = temp0 and A_Button
+                //> beq BounceJS                ;skip to next part if A not pressed
+                temp0 = temp4
+                if (temp4 != 0) {
+                    //> and PreviousA_B_Buttons     ;check for A button pressed in previous frame
+                    temp5 = temp0 and previousaBButtons
+                    //> bne BounceJS                ;skip to next part if so
+                    temp0 = temp5
+                    if (temp5 == 0) {
+                        //> lda #$f4
+                        temp0 = 0xF4
+                        //> sta JumpspringForce         ;otherwise write new jumpspring force here
+                        jumpspringForce = temp0
+                    }
+                }
+            }
+            //> BounceJS:  cpy #$03                    ;check frame control offset again
+            //> bne DrawJSpr                ;skip to last part if not yet at fifth frame ($03)
+            if (temp2 == 0x03) {
+                //> lda JumpspringForce
+                temp0 = jumpspringForce
+                //> sta Player_Y_Speed          ;store jumpspring force as player's new vertical speed
+                playerYSpeed = temp0
+                //> lda #$00
+                temp0 = 0x00
+                //> sta JumpspringAnimCtrl      ;initialize jumpspring frame control
+                jumpspringAnimCtrl = temp0
+            }
+        }
+    }
+    //> DrawJSpr:  jsr RelativeEnemyPosition   ;get jumpspring's relative coordinates
+    relativeEnemyPosition()
+    //> jsr EnemyGfxHandler         ;draw jumpspring
+    enemyGfxHandler(X)
+    //> jsr OffscreenBoundsCheck    ;check to see if we need to kill it
+    offscreenBoundsCheck(X)
+    //> lda JumpspringAnimCtrl      ;if frame control at zero, don't bother
+    temp0 = jumpspringAnimCtrl
+    //> beq ExJSpring               ;trying to animate it, just leave
+    if (temp0 != 0) {
+        //> lda JumpspringTimer
+        temp0 = jumpspringTimer
+        //> bne ExJSpring               ;if jumpspring timer not expired yet, leave
+        if (temp0 == 0) {
+            //> lda #$04
+            temp0 = 0x04
+            //> sta JumpspringTimer         ;otherwise initialize jumpspring timer
+            jumpspringTimer = temp0
+            //> inc JumpspringAnimCtrl      ;increment frame control to animate jumpspring
+            jumpspringAnimCtrl = (jumpspringAnimCtrl + 1) and 0xFF
+        }
+    }
+    //> ExJSpring: rts                         ;leave
     return
 }
 
@@ -6395,12 +10154,139 @@ fun setupVine(X: Int, Y: Int) {
     return
 }
 
+// Decompiled from VineObjectHandler
+fun vineObjectHandler(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
+    var frameCounter by MemoryByte(FrameCounter)
+    var objectOffset by MemoryByte(ObjectOffset)
+    var vineFlagOffset by MemoryByte(VineFlagOffset)
+    var vineHeight by MemoryByte(VineHeight)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val vineHeightData by MemoryByteIndexed(VineHeightData)
+    val vineObjOffset by MemoryByteIndexed(VineObjOffset)
+    //> VineObjectHandler:
+    //> cpx #$05                  ;check enemy offset for special use slot
+    //> bne ExitVH                ;if not in last slot, branch to leave
+    if (X == 0x05) {
+        //> ldy VineFlagOffset
+        //> dey                       ;decrement vine flag in Y, use as offset
+        vineFlagOffset = (vineFlagOffset - 1) and 0xFF
+        //> lda VineHeight
+        //> cmp VineHeightData,y      ;if vine has reached certain height,
+        //> beq RunVSubs              ;branch ahead to skip this part
+        temp0 = vineHeight
+        temp1 = vineFlagOffset
+        if (vineHeight != vineHeightData[vineFlagOffset]) {
+            //> lda FrameCounter          ;get frame counter
+            temp0 = frameCounter
+            //> lsr                       ;shift d1 into carry
+            temp0 = temp0 shr 1
+            //> lsr
+            temp0 = temp0 shr 1
+            //> bcc RunVSubs              ;if d1 not set (2 frames every 4) skip this part
+            if ((temp0 and 0x01) != 0) {
+                //> lda Enemy_Y_Position+5
+                temp0 = enemyYPosition[5]
+                //> sbc #$01                  ;subtract vertical position of vine
+                temp2 = temp0 - 0x01 - (if ((temp0 and 0x01) != 0) 0 else 1)
+                temp0 = temp2 and 0xFF
+                //> sta Enemy_Y_Position+5    ;one pixel every frame it's time
+                enemyYPosition[5] = temp0
+                //> inc VineHeight            ;increment vine height
+                vineHeight = (vineHeight + 1) and 0xFF
+            }
+        }
+        //> RunVSubs:  lda VineHeight            ;if vine still very small,
+        temp0 = vineHeight
+        //> cmp #$08                  ;branch to leave
+        //> bcc ExitVH
+        if (temp0 >= 0x08) {
+            //> jsr RelativeEnemyPosition ;get relative coordinates of vine,
+            relativeEnemyPosition()
+            //> jsr GetEnemyOffscreenBits ;and any offscreen bits
+            getEnemyOffscreenBits(X)
+            //> ldy #$00                  ;initialize offset used in draw vine sub
+            temp1 = 0x00
+            do {
+                //> VDrawLoop: jsr DrawVine              ;draw vine
+                drawVine(temp1)
+                //> iny                       ;increment offset
+                temp1 = (temp1 + 1) and 0xFF
+                //> cpy VineFlagOffset        ;if offset in Y and offset here
+                //> bne VDrawLoop             ;do not yet match, loop back to draw more vine
+            } while (temp1 != vineFlagOffset)
+            //> lda Enemy_OffscreenBits
+            temp0 = enemyOffscreenbits
+            //> and #%00001100            ;mask offscreen bits
+            temp3 = temp0 and 0x0C
+            //> beq WrCMTile              ;if none of the saved offscreen bits set, skip ahead
+            temp0 = temp3
+            if (temp3 != 0) {
+                //> dey                       ;otherwise decrement Y to get proper offset again
+                temp1 = (temp1 - 1) and 0xFF
+                do {
+                    //> KillVine:  ldx VineObjOffset,y       ;get enemy object offset for this vine object
+                    //> jsr EraseEnemyObject      ;kill this vine object
+                    eraseEnemyObject(vineObjOffset[temp1])
+                    //> dey                       ;decrement Y
+                    temp1 = (temp1 - 1) and 0xFF
+                    //> bpl KillVine              ;if any vine objects left, loop back to kill it
+                } while ((temp1 and 0x80) == 0)
+                //> sta VineFlagOffset        ;initialize vine flag/offset
+                vineFlagOffset = temp0
+                //> sta VineHeight            ;initialize vine height
+                vineHeight = temp0
+            }
+            //> WrCMTile:  lda VineHeight            ;check vine height
+            temp0 = vineHeight
+            //> cmp #$20                  ;if vine small (less than 32 pixels tall)
+            //> bcc ExitVH                ;then branch ahead to leave
+            if (temp0 >= 0x20) {
+                //> ldx #$06                  ;set offset in X to last enemy slot
+                //> lda #$01                  ;set A to obtain horizontal in $04, but we don't care
+                temp0 = 0x01
+                //> ldy #$1b                  ;set Y to offset to get block at ($04, $10) of coordinates
+                temp1 = 0x1B
+                //> jsr BlockBufferCollision  ;do a sub to get block buffer address set, return contents
+                blockBufferCollision(temp0, 0x06, temp1)
+                //> ldy $02
+                temp1 = memory[0x2].toInt()
+                //> cpy #$d0                  ;if vertical high nybble offset beyond extent of
+                //> bcs ExitVH                ;current block buffer, branch to leave, do not write
+                temp4 = 0x06
+                if (!(temp1 >= 0xD0)) {
+                    //> lda ($06),y               ;otherwise check contents of block buffer at
+                    temp0 = memory[readWord(0x6) + temp1].toInt()
+                    //> bne ExitVH                ;current offset, if not empty, branch to leave
+                    if (temp0 == 0) {
+                        //> lda #$26
+                        temp0 = 0x26
+                        //> sta ($06),y               ;otherwise, write climbing metatile to block buffer
+                        memory[readWord(0x6) + temp1] = temp0.toUByte()
+                    }
+                }
+            }
+        }
+    }
+    //> ExitVH:    ldx ObjectOffset          ;get enemy object offset and leave
+    temp4 = objectOffset
+    //> rts
+    return
+}
+
 // Decompiled from ProcessCannons
 fun processCannons() {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     var areaType by MemoryByte(AreaType)
     var objectOffset by MemoryByte(ObjectOffset)
     var secondaryHardMode by MemoryByte(SecondaryHardMode)
@@ -6453,8 +10339,10 @@ fun processCannons() {
                     //> beq FireCannon              ;if expired, branch to fire cannon
                     if (temp0 != 0) {
                         //> sbc #$00                    ;otherwise subtract borrow (note carry will always be clear here)
+                        temp4 = temp0 - (if (temp2 >= 0x06) 0 else 1)
+                        temp0 = temp4 and 0xFF
                         //> sta Cannon_Timer,y          ;to count timer down
-                        cannonTimer[temp3] = (temp0 - (if (temp2 >= 0x06) 0 else 1)) and 0xFF
+                        cannonTimer[temp3] = temp0
                         //> jmp Chk_BB                  ;then jump ahead to check enemy
                     } else {
                         //> FireCannon:
@@ -6478,8 +10366,10 @@ fun processCannons() {
                             temp0 = cannonYPosition[temp3]
                             //> sec
                             //> sbc #$08                   ;subtract eight pixels (because enemies are 24 pixels tall)
+                            temp5 = temp0 - 0x08
+                            temp0 = temp5 and 0xFF
                             //> sta Enemy_Y_Position,x     ;save as vertical coordinate of bullet bill
-                            enemyYPosition[temp1] = (temp0 - 0x08) and 0xFF
+                            enemyYPosition[temp1] = temp0
                             //> lda #$01
                             temp0 = 0x01
                             //> sta Enemy_Y_HighPos,x      ;set vertical high byte of bullet bill
@@ -6536,6 +10426,7 @@ fun bulletBillHandler(X: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
     var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
     var square2SoundQueue by MemoryByte(Square2SoundQueue)
     var timerControl by MemoryByte(TimerControl)
@@ -6585,10 +10476,11 @@ fun bulletBillHandler(X: Int) {
                 //> lda $00                   ;get horizontal difference
                 temp0 = memory[0x0].toInt()
                 //> adc #$28                  ;add 40 pixels
+                temp3 = temp0 + 0x28 + (if (temp1 >= 0x0C) 1 else 0)
+                temp0 = temp3 and 0xFF
                 //> cmp #$50                  ;if less than a certain amount, player is too close
                 //> bcc KillBB                ;to cannon either on left or right side, thus branch
-                temp0 = (temp0 + 0x28 + (if (temp1 >= 0x0C) 1 else 0)) and 0xFF
-                if (((temp0 + 0x28 + if (temp1 >= 0x0C) 1 else 0) and 0xFF) >= 0x50) {
+                if (temp0 >= 0x50) {
                     //> lda #$01
                     temp0 = 0x01
                     //> sta Enemy_State,x         ;otherwise set bullet bill's state
@@ -6612,10 +10504,10 @@ fun bulletBillHandler(X: Int) {
         //> ChkDSte:   lda Enemy_State,x         ;check enemy state for d5 set
         temp0 = enemyState[X]
         //> and #%00100000
-        temp3 = temp0 and 0x20
+        temp4 = temp0 and 0x20
         //> beq BBFly                 ;if not set, skip to move horizontally
-        temp0 = temp3
-        if (temp3 != 0) {
+        temp0 = temp4
+        if (temp4 != 0) {
             //> jsr MoveD_EnemyVertically ;otherwise do sub to move bullet bill vertically
             movedEnemyvertically(X)
         }
@@ -6703,6 +10595,10 @@ fun procHammerObj(X: Int) {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     var timerControl by MemoryByte(TimerControl)
     val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
@@ -6739,6 +10635,8 @@ fun procHammerObj(X: Int) {
                 //> txa
                 //> clc                        ;add 13 bytes to use
                 //> adc #$0d                   ;proper misc object
+                temp3 = X + 0x0D
+                temp0 = temp3 and 0xFF
                 //> tax                        ;return offset to X
                 //> lda #$10
                 temp0 = 0x10
@@ -6755,9 +10653,9 @@ fun procHammerObj(X: Int) {
                 //> lda #$00                   ;set A to impose gravity on hammer
                 temp0 = 0x00
                 //> jsr ImposeGravity          ;do sub to impose gravity on hammer and move vertically
-                imposeGravity(temp0, (X + 0x0D) and 0xFF)
+                imposeGravity(temp0, temp0)
                 //> jsr MoveObjectHorizontally ;do sub to move it horizontally
-                moveObjectHorizontally((X + 0x0D) and 0xFF)
+                moveObjectHorizontally(temp0)
                 //> ldx ObjectOffset           ;get original misc object offset
                 //> jmp RunAllH                ;branch to essential subroutines
             }
@@ -6769,42 +10667,48 @@ fun procHammerObj(X: Int) {
             //> lda Enemy_State,y          ;get enemy object state
             temp0 = enemyState[temp2]
             //> and #%11110111             ;mask out d3
-            temp3 = temp0 and 0xF7
+            temp4 = temp0 and 0xF7
             //> sta Enemy_State,y          ;store new state
-            enemyState[temp2] = temp3
+            enemyState[temp2] = temp4
             //> ldx Enemy_MovingDir,y      ;get enemy's moving direction
             //> dex                        ;decrement to use as offset
-            temp4 = enemyMovingdir[temp2]
-            temp4 = (temp4 - 1) and 0xFF
+            temp5 = enemyMovingdir[temp2]
+            temp5 = (temp5 - 1) and 0xFF
             //> lda HammerXSpdData,x       ;get proper speed to use based on moving direction
-            temp0 = hammerXSpdData[temp4]
+            temp0 = hammerXSpdData[temp5]
             //> ldx ObjectOffset           ;reobtain hammer's buffer offset
-            temp4 = objectOffset
+            temp5 = objectOffset
             //> sta Misc_X_Speed,x         ;set hammer's horizontal speed
-            miscXSpeed[temp4] = temp0
+            miscXSpeed[temp5] = temp0
             //> SetHPos:  dec Misc_State,x           ;decrement hammer's state
-            miscState[temp4] = (miscState[temp4] - 1) and 0xFF
+            miscState[temp5] = (miscState[temp5] - 1) and 0xFF
             //> lda Enemy_X_Position,y     ;get enemy's horizontal position
             temp0 = enemyXPosition[temp2]
             //> clc
             //> adc #$02                   ;set position 2 pixels to the right
+            temp6 = temp0 + 0x02
+            temp0 = temp6 and 0xFF
             //> sta Misc_X_Position,x      ;store as hammer's horizontal position
-            miscXPosition[temp4] = (temp0 + 0x02) and 0xFF
+            miscXPosition[temp5] = temp0
             //> lda Enemy_PageLoc,y        ;get enemy's page location
             temp0 = enemyPageloc[temp2]
             //> adc #$00                   ;add carry
+            temp7 = temp0 + (if (temp6 > 0xFF) 1 else 0)
+            temp0 = temp7 and 0xFF
             //> sta Misc_PageLoc,x         ;store as hammer's page location
-            miscPageloc[temp4] = (temp0 + (if (temp0 + 0x02 > 0xFF) 1 else 0)) and 0xFF
+            miscPageloc[temp5] = temp0
             //> lda Enemy_Y_Position,y     ;get enemy's vertical position
             temp0 = enemyYPosition[temp2]
             //> sec
             //> sbc #$0a                   ;move position 10 pixels upward
+            temp8 = temp0 - 0x0A
+            temp0 = temp8 and 0xFF
             //> sta Misc_Y_Position,x      ;store as hammer's vertical position
-            miscYPosition[temp4] = (temp0 - 0x0A) and 0xFF
+            miscYPosition[temp5] = temp0
             //> lda #$01
             temp0 = 0x01
             //> sta Misc_Y_HighPos,x       ;set hammer's vertical high byte
-            miscYHighpos[temp4] = temp0
+            miscYHighpos[temp5] = temp0
             //> bne RunHSubs               ;unconditional branch to skip first routine
             if (temp0 == 0) {
             } else {
@@ -6813,21 +10717,75 @@ fun procHammerObj(X: Int) {
                 //> jsr RelativeMiscPosition   ;get relative coordinates
                 relativeMiscPosition()
                 //> jsr GetMiscBoundBox        ;get bounding box coordinates
-                getMiscBoundBox(temp4)
+                getMiscBoundBox(temp5)
                 //> jsr DrawHammer             ;draw the hammer
-                drawHammer(temp4)
+                drawHammer(temp5)
                 //> rts                        ;and we are done here
                 return
             }
         }
         //> RunAllH:  jsr PlayerHammerCollision  ;handle collisions
-        playerHammerCollision(temp4)
+        playerHammerCollision(temp5)
     }
+}
+
+// Decompiled from CoinBlock
+fun coinBlock(X: Int, Y: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var coinTallyFor1Ups by MemoryByte(CoinTallyFor1Ups)
+    var objectOffset by MemoryByte(ObjectOffset)
+    var square2SoundQueue by MemoryByte(Square2SoundQueue)
+    val blockPageloc by MemoryByteIndexed(Block_PageLoc)
+    val blockXPosition by MemoryByteIndexed(Block_X_Position)
+    val blockYPosition by MemoryByteIndexed(Block_Y_Position)
+    val miscPageloc by MemoryByteIndexed(Misc_PageLoc)
+    val miscState by MemoryByteIndexed(Misc_State)
+    val miscXPosition by MemoryByteIndexed(Misc_X_Position)
+    val miscYHighpos by MemoryByteIndexed(Misc_Y_HighPos)
+    val miscYPosition by MemoryByteIndexed(Misc_Y_Position)
+    val miscYSpeed by MemoryByteIndexed(Misc_Y_Speed)
+    //> CoinBlock:
+    //> jsr FindEmptyMiscSlot   ;set offset for empty or last misc object buffer slot
+    findEmptyMiscSlot()
+    //> lda Block_PageLoc,x     ;get page location of block object
+    //> sta Misc_PageLoc,y      ;store as page location of misc object
+    miscPageloc[Y] = blockPageloc[X]
+    //> lda Block_X_Position,x  ;get horizontal coordinate of block object
+    //> ora #$05                ;add 5 pixels
+    temp0 = blockXPosition[X] or 0x05
+    //> sta Misc_X_Position,y   ;store as horizontal coordinate of misc object
+    miscXPosition[Y] = temp0
+    //> lda Block_Y_Position,x  ;get vertical coordinate of block object
+    //> sbc #$10                ;subtract 16 pixels
+    temp1 = blockYPosition[X] - 0x10
+    //> sta Misc_Y_Position,y   ;store as vertical coordinate of misc object
+    miscYPosition[Y] = temp1 and 0xFF
+    //> jmp JCoinC              ;jump to rest of code as applies to this misc object
+    //> JCoinC: lda #$fb
+    //> sta Misc_Y_Speed,y     ;set vertical speed
+    miscYSpeed[Y] = 0xFB
+    //> lda #$01
+    //> sta Misc_Y_HighPos,y   ;set vertical high byte
+    miscYHighpos[Y] = 0x01
+    //> sta Misc_State,y       ;set state for misc object
+    miscState[Y] = 0x01
+    //> sta Square2SoundQueue  ;load coin grab sound
+    square2SoundQueue = 0x01
+    //> stx ObjectOffset       ;store current control bit as misc object offset
+    objectOffset = X
+    //> jsr GiveOneCoin        ;update coin tally on the screen and coin amount variable
+    giveOneCoin()
+    //> inc CoinTallyFor1Ups   ;increment coin tally used to activate 1-up block flag
+    coinTallyFor1Ups = (coinTallyFor1Ups + 1) and 0xFF
+    //> rts
+    return
 }
 
 // Decompiled from SetupJumpCoin
 fun setupJumpCoin(X: Int, Y: Int) {
     var temp0: Int = 0
+    var temp1: Int = 0
     var coinTallyFor1Ups by MemoryByte(CoinTallyFor1Ups)
     var objectOffset by MemoryByte(ObjectOffset)
     var square2SoundQueue by MemoryByte(Square2SoundQueue)
@@ -6855,8 +10813,9 @@ fun setupJumpCoin(X: Int, Y: Int) {
     miscXPosition[Y] = temp0
     //> lda $02                ;get vertical high nybble offset from earlier
     //> adc #$20               ;add 32 pixels for the status bar
+    temp1 = memory[0x2].toInt() + 0x20 + (if (((((((memory[0x6].toInt() shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF and 0x80) != 0) 1 else 0)
     //> sta Misc_Y_Position,y  ;store as vertical coordinate
-    miscYPosition[Y] = (memory[0x2].toInt() + 0x20 + (if (((((((memory[0x6].toInt() shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF and 0x80) != 0) 1 else 0)) and 0xFF
+    miscYPosition[Y] = temp1 and 0xFF
     //> JCoinC: lda #$fb
     //> sta Misc_Y_Speed,y     ;set vertical speed
     miscYSpeed[Y] = 0xFB
@@ -6886,14 +10845,10 @@ fun findEmptyMiscSlot() {
     //> ldy #$08                ;start at end of misc objects buffer
     temp0 = 0x08
     while (temp0 != 0x05) {
-        do {
-            //> FMiscLoop: lda Misc_State,y        ;get misc object state
-            //> beq UseMiscS            ;branch if none found to use current offset
-            //> dey                     ;decrement offset
-            temp0 = (temp0 - 1) and 0xFF
-            //> cpy #$05                ;do this for three slots
-            //> bne FMiscLoop           ;do this until all slots are checked
-        } while (temp0 != 0x05)
+        //> dey                     ;decrement offset
+        temp0 = (temp0 - 1) and 0xFF
+        //> cpy #$05                ;do this for three slots
+        //> bne FMiscLoop           ;do this until all slots are checked
     }
     //> ldy #$08                ;if no empty slots found, use last slot
     temp0 = 0x08
@@ -6908,6 +10863,9 @@ fun miscObjectsCore() {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     var scrollAmount by MemoryByte(ScrollAmount)
     val miscPageloc by MemoryByteIndexed(Misc_PageLoc)
@@ -6944,13 +10902,17 @@ fun miscObjectsCore() {
                 temp0 = miscXPosition[temp1]
                 //> clc                       ;whether its jumping coin (state 0 only) or floatey number
                 //> adc ScrollAmount          ;add current scroll speed
+                temp3 = temp0 + scrollAmount
+                temp0 = temp3 and 0xFF
                 //> sta Misc_X_Position,x     ;store as new horizontal coordinate
-                miscXPosition[temp1] = (temp0 + scrollAmount) and 0xFF
+                miscXPosition[temp1] = temp0
                 //> lda Misc_PageLoc,x        ;get page location
                 temp0 = miscPageloc[temp1]
                 //> adc #$00                  ;add carry
+                temp4 = temp0 + (if (temp3 > 0xFF) 1 else 0)
+                temp0 = temp4 and 0xFF
                 //> sta Misc_PageLoc,x        ;store as new page location
-                miscPageloc[temp1] = (temp0 + (if (temp0 + scrollAmount > 0xFF) 1 else 0)) and 0xFF
+                miscPageloc[temp1] = temp0
                 //> lda Misc_State,x
                 temp0 = miscState[temp1]
                 //> cmp #$30                  ;check state of object for preset value
@@ -6966,6 +10928,8 @@ fun miscObjectsCore() {
                 //> JCoinRun:  txa
                 //> clc                       ;add 13 bytes to offset for next subroutine
                 //> adc #$0d
+                temp5 = temp1 + 0x0D
+                temp0 = temp5 and 0xFF
                 //> tax
                 //> lda #$50                  ;set downward movement amount
                 temp0 = 0x50
@@ -6982,7 +10946,7 @@ fun miscObjectsCore() {
                 //> lda #$00                  ;set A to impose gravity on jumping coin
                 temp0 = 0x00
                 //> jsr ImposeGravity         ;do sub to move coin vertically and impose gravity on it
-                imposeGravity(temp0, (temp1 + 0x0D) and 0xFF)
+                imposeGravity(temp0, temp0)
                 //> ldx ObjectOffset          ;get original misc object offset
                 temp1 = objectOffset
                 //> lda Misc_Y_Speed,x        ;check vertical speed
@@ -7058,6 +11022,8 @@ fun giveOneCoin() {
     temp0 = 0x02
     //> sta DigitModifier+4    ;200 points to the player
     digitModifier[4] = temp0
+    // Fall-through tail call to addToScore
+    addToScore()
 }
 
 // Decompiled from AddToScore
@@ -7069,6 +11035,8 @@ fun addToScore() {
     //> ldy ScoreOffsets,x     ;get offset for player's score
     //> jsr DigitsMathRoutine  ;update the score internally with value in digit modifier
     digitsMathRoutine(scoreOffsets[currentPlayer])
+    // Fall-through tail call to getSBNybbles
+    getSBNybbles()
 }
 
 // Decompiled from GetSBNybbles
@@ -7078,6 +11046,8 @@ fun getSBNybbles() {
     //> GetSBNybbles:
     //> ldy CurrentPlayer      ;get current player
     //> lda StatusBarNybbles,y ;get nybbles based on player, use to update score and coins
+    // Fall-through tail call to updateNumber
+    updateNumber()
 }
 
 // Decompiled from UpdateNumber
@@ -7107,6 +11077,176 @@ fun updateNumber() {
     return
 }
 
+// Decompiled from PwrUpJmp
+fun pwrUpJmp() {
+    var temp0: Int = 0
+    var playerStatus by MemoryByte(PlayerStatus)
+    var powerUpType by MemoryByte(PowerUpType)
+    var square2SoundQueue by MemoryByte(Square2SoundQueue)
+    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
+    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
+    val enemySprattrib by MemoryByteIndexed(Enemy_SprAttrib)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    //> PwrUpJmp:  lda #$01                  ;this is a residual jump point in enemy object jump table
+    //> sta Enemy_State+5         ;set power-up object's state
+    enemyState[5] = 0x01
+    //> sta Enemy_Flag+5          ;set buffer flag
+    enemyFlag[5] = 0x01
+    //> lda #$03
+    //> sta Enemy_BoundBoxCtrl+5  ;set bounding box size control for power-up object
+    enemyBoundboxctrl[5] = 0x03
+    //> lda PowerUpType
+    //> cmp #$02                  ;check currently loaded power-up type
+    //> bcs PutBehind             ;if star or 1-up, branch ahead
+    temp0 = powerUpType
+    if (!(powerUpType >= 0x02)) {
+        //> lda PlayerStatus          ;otherwise check player's current status
+        temp0 = playerStatus
+        //> cmp #$02
+        //> bcc StrType               ;if player not fiery, use status as power-up type
+        if (temp0 >= 0x02) {
+            //> lsr                       ;otherwise shift right to force fire flower type
+            temp0 = temp0 shr 1
+        }
+        //> StrType:   sta PowerUpType           ;store type here
+        powerUpType = temp0
+    }
+    //> PutBehind: lda #%00100000
+    temp0 = 0x20
+    //> sta Enemy_SprAttrib+5     ;set background priority bit
+    enemySprattrib[5] = temp0
+    //> lda #Sfx_GrowPowerUp
+    temp0 = Sfx_GrowPowerUp
+    //> sta Square2SoundQueue     ;load power-up reveal sound and leave
+    square2SoundQueue = temp0
+    //> rts
+    return
+}
+
+// Decompiled from PowerUpObjHandler
+fun powerUpObjHandler() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var frameCounter by MemoryByte(FrameCounter)
+    var objectOffset by MemoryByte(ObjectOffset)
+    var powerUpType by MemoryByte(PowerUpType)
+    var timerControl by MemoryByte(TimerControl)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemySprattrib by MemoryByteIndexed(Enemy_SprAttrib)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    //> PowerUpObjHandler:
+    //> ldx #$05                   ;set object offset for last slot in enemy object buffer
+    //> stx ObjectOffset
+    objectOffset = 0x05
+    //> lda Enemy_State+5          ;check power-up object's state
+    //> beq ExitPUp                ;if not set, branch to leave
+    temp0 = enemyState[5]
+    temp1 = 0x05
+    if (enemyState[5] != 0) {
+        //> asl                        ;shift to check if d7 was set in object state
+        temp0 = (temp0 shl 1) and 0xFF
+        //> bcc GrowThePowerUp         ;if not set, branch ahead to skip this part
+        if ((temp0 and 0x80) != 0) {
+            //> lda TimerControl           ;if master timer control set,
+            temp0 = timerControl
+            //> bne RunPUSubs              ;branch ahead to enemy object routines
+            if (temp0 == 0) {
+                //> lda PowerUpType            ;check power-up type
+                temp0 = powerUpType
+                //> beq ShroomM                ;if normal mushroom, branch ahead to move it
+                if (temp0 == 0) {
+                    //  goto ShroomM
+                    return
+                }
+                if (temp0 != 0) {
+                    //> cmp #$03
+                    //> beq ShroomM                ;if 1-up mushroom, branch ahead to move it
+                    if (temp0 - 0x03 == 0) {
+                        //  goto ShroomM
+                        return
+                    }
+                    if (temp0 != 0x03) {
+                        //> cmp #$02
+                        //> bne RunPUSubs              ;if not star, branch elsewhere to skip movement
+                        if (temp0 == 0x02) {
+                            //> jsr MoveJumpingEnemy       ;otherwise impose gravity on star power-up and make it jump
+                            moveJumpingEnemy()
+                            //> jsr EnemyJump              ;note that green paratroopa shares the same code here
+                            enemyJump(temp1)
+                            //> jmp RunPUSubs              ;then jump to other power-up subroutines
+                        }
+                    }
+                }
+                //> ShroomM: jsr MoveNormalEnemy        ;do sub to make mushrooms move
+                moveNormalEnemy(temp1)
+                //> jsr EnemyToBGCollisionDet  ;deal with collisions
+                enemyToBGCollisionDet(temp1)
+                //> jmp RunPUSubs              ;run the other subroutines
+            }
+        } else {
+            //> GrowThePowerUp:
+            //> lda FrameCounter           ;get frame counter
+            temp0 = frameCounter
+            //> and #$03                   ;mask out all but 2 LSB
+            temp2 = temp0 and 0x03
+            //> bne ChkPUSte               ;if any bits set here, branch
+            temp0 = temp2
+            if (temp2 == 0) {
+                //> dec Enemy_Y_Position+5     ;otherwise decrement vertical coordinate slowly
+                enemyYPosition[5] = (enemyYPosition[5] - 1) and 0xFF
+                //> lda Enemy_State+5          ;load power-up object state
+                temp0 = enemyState[5]
+                //> inc Enemy_State+5          ;increment state for next frame (to make power-up rise)
+                enemyState[5] = (enemyState[5] + 1) and 0xFF
+                //> cmp #$11                   ;if power-up object state not yet past 16th pixel,
+                //> bcc ChkPUSte               ;branch ahead to last part here
+                if (temp0 >= 0x11) {
+                    //> lda #$10
+                    temp0 = 0x10
+                    //> sta Enemy_X_Speed,x        ;otherwise set horizontal speed
+                    enemyXSpeed[temp1] = temp0
+                    //> lda #%10000000
+                    temp0 = 0x80
+                    //> sta Enemy_State+5          ;and then set d7 in power-up object's state
+                    enemyState[5] = temp0
+                    //> asl                        ;shift once to init A
+                    temp0 = (temp0 shl 1) and 0xFF
+                    //> sta Enemy_SprAttrib+5      ;initialize background priority bit set here
+                    enemySprattrib[5] = temp0
+                    //> rol                        ;rotate A to set right moving direction
+                    temp0 = (temp0 shl 1) and 0xFE or if ((temp0 and 0x80) != 0) 1 else 0
+                    //> sta Enemy_MovingDir,x      ;set moving direction
+                    enemyMovingdir[temp1] = temp0
+                }
+            }
+            //> ChkPUSte:  lda Enemy_State+5          ;check power-up object's state
+            temp0 = enemyState[5]
+            //> cmp #$06                   ;for if power-up has risen enough
+            //> bcc ExitPUp                ;if not, don't even bother running these routines
+            if (temp0 >= 0x06) {
+            } else {
+                //> ExitPUp:   rts                        ;and we're done
+                return
+            }
+        }
+        //> RunPUSubs: jsr RelativeEnemyPosition  ;get coordinates relative to screen
+        relativeEnemyPosition()
+        //> jsr GetEnemyOffscreenBits  ;get offscreen bits
+        getEnemyOffscreenBits(temp1)
+        //> jsr GetEnemyBoundBox       ;get bounding box coordinates
+        getEnemyBoundBox(temp1)
+        //> jsr DrawPowerUp            ;draw the power-up object
+        drawPowerUp()
+        //> jsr PlayerEnemyCollision   ;check for collision with player
+        playerEnemyCollision(temp1)
+        //> jsr OffscreenBoundsCheck   ;check to see if it went offscreen
+        offscreenBoundsCheck(temp1)
+    }
+}
+
 // Decompiled from PlayerHeadCollision
 fun playerHeadCollision(A: Int) {
     var temp0: Int = 0
@@ -7114,6 +11254,7 @@ fun playerHeadCollision(A: Int) {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
     var blockBounceTimer by MemoryByte(BlockBounceTimer)
     var brickCoinTimer by MemoryByte(BrickCoinTimer)
     var brickCoinTimerFlag by MemoryByte(BrickCoinTimerFlag)
@@ -7242,15 +11383,17 @@ fun playerHeadCollision(A: Int) {
     temp0 = playerYPosition
     //> clc
     //> adc BlockYPosAdderData,y ;add value determined by size
+    temp3 = temp0 + blockYPosAdderData[temp2]
+    temp0 = temp3 and 0xFF
     //> and #$f0                 ;mask out low nybble to get 16-pixel correspondence
-    temp3 = (temp0 + blockYPosAdderData[temp2]) and 0xFF and 0xF0
+    temp4 = temp0 and 0xF0
     //> sta Block_Y_Position,x   ;save as vertical coordinate for block object
-    blockYPosition[temp1] = temp3
+    blockYPosition[temp1] = temp4
     //> ldy Block_State,x        ;get block object state
     temp2 = blockState[temp1]
     //> cpy #$11
     //> beq Unbreak              ;if set to value loaded for unbreakable, branch
-    temp0 = temp3
+    temp0 = temp4
     if (temp2 != 0x11) {
         //> jsr BrickShatter         ;execute code for breakable brick
         brickShatter(temp1)
@@ -7262,9 +11405,9 @@ fun playerHeadCollision(A: Int) {
     //> InvOBit:   lda SprDataOffset_Ctrl   ;invert control bit used by block objects
     temp0 = sprdataoffsetCtrl
     //> eor #$01                 ;and floatey numbers
-    temp4 = temp0 xor 0x01
+    temp5 = temp0 xor 0x01
     //> sta SprDataOffset_Ctrl
-    sprdataoffsetCtrl = temp4
+    sprdataoffsetCtrl = temp5
     //> rts                      ;leave!
     return
 }
@@ -7272,6 +11415,8 @@ fun playerHeadCollision(A: Int) {
 // Decompiled from InitBlock_XY_Pos
 fun initblockXyPos(X: Int) {
     var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
     var playerPageloc by MemoryByte(Player_PageLoc)
     var playerXPosition by MemoryByte(Player_X_Position)
     var playerYHighpos by MemoryByte(Player_Y_HighPos)
@@ -7283,16 +11428,18 @@ fun initblockXyPos(X: Int) {
     //> lda Player_X_Position   ;get player's horizontal coordinate
     //> clc
     //> adc #$08                ;add eight pixels
+    temp0 = playerXPosition + 0x08
     //> and #$f0                ;mask out low nybble to give 16-pixel correspondence
-    temp0 = (playerXPosition + 0x08) and 0xFF and 0xF0
+    temp1 = temp0 and 0xFF and 0xF0
     //> sta Block_X_Position,x  ;save as horizontal coordinate for block object
-    blockXPosition[X] = temp0
+    blockXPosition[X] = temp1
     //> lda Player_PageLoc
     //> adc #$00                ;add carry to page location of player
+    temp2 = playerPageloc + (if (temp0 > 0xFF) 1 else 0)
     //> sta Block_PageLoc,x     ;save as page location of block object
-    blockPageloc[X] = (playerPageloc + (if (playerXPosition + 0x08 > 0xFF) 1 else 0)) and 0xFF
+    blockPageloc[X] = temp2 and 0xFF
     //> sta Block_PageLoc2,x    ;save elsewhere to be used later
-    blockPageloc2[X] = (playerPageloc + (if (playerXPosition + 0x08 > 0xFF) 1 else 0)) and 0xFF
+    blockPageloc2[X] = temp2 and 0xFF
     //> lda Player_Y_HighPos
     //> sta Block_Y_HighPos,x   ;save vertical high byte of player into
     blockYHighpos[X] = playerYHighpos
@@ -7303,6 +11450,7 @@ fun initblockXyPos(X: Int) {
 // Decompiled from BumpBlock
 fun bumpBlock(X: Int, Y: Int) {
     var temp0: Int = 0
+    var temp1: Int = 0
     var playerYSpeed by MemoryByte(Player_Y_Speed)
     var square1SoundQueue by MemoryByte(Square1SoundQueue)
     val blockXSpeed by MemoryByteIndexed(Block_X_Speed)
@@ -7336,6 +11484,8 @@ fun bumpBlock(X: Int, Y: Int) {
         temp0 = Y
         if (Y >= 0x09) {
             //> sbc #$05                ;otherwise subtract 5 for second set to get proper number
+            temp1 = temp0 - 0x05 - (if (Y >= 0x09) 0 else 1)
+            temp0 = temp1 and 0xFF
         }
         //> BlockCode: jsr JumpEngine          ;run appropriate subroutine depending on block number
         when (temp0) {
@@ -7343,13 +11493,13 @@ fun bumpBlock(X: Int, Y: Int) {
                 mushFlowerBlock()
             }
             1 -> {
-                coinBlock()
+                coinBlock(X, Y)
             }
             2 -> {
-                coinBlock()
+                coinBlock(X, Y)
             }
             3 -> {
-                extraLifeMushBlock()
+                extraLifeMushBlock(X)
             }
             4 -> {
                 mushFlowerBlock()
@@ -7361,21 +11511,102 @@ fun bumpBlock(X: Int, Y: Int) {
                 starBlock()
             }
             7 -> {
-                coinBlock()
+                coinBlock(X, Y)
             }
             8 -> {
-                extraLifeMushBlock()
+                extraLifeMushBlock(X)
             }
             else -> {
                 // Unknown JumpEngine index
             }
         }
         return
-    } else {
-        //> ExitBlockChk:
-        //> rts                     ;leave
-        return
+        //> .dw MushFlowerBlock
+        //> .dw CoinBlock
+        //> .dw CoinBlock
+        //> .dw ExtraLifeMushBlock
+        //> .dw MushFlowerBlock
+        //> .dw VineBlock
+        //> .dw StarBlock
+        //> .dw CoinBlock
+        //> .dw ExtraLifeMushBlock
+        //> ;--------------------------------
     }
+    //> ExitBlockChk:
+    //> rts                     ;leave
+    return
+}
+
+// Decompiled from MushFlowerBlock
+fun mushFlowerBlock() {
+    //> MushFlowerBlock:
+    //> lda #$00       ;load mushroom/fire flower into power-up type
+    //> .db $2c        ;BIT instruction opcode
+    // Fall-through tail call to starBlock
+    starBlock()
+}
+
+// Decompiled from StarBlock
+fun starBlock() {
+    //> StarBlock:
+    //> lda #$02       ;load star into power-up type
+    //> .db $2c        ;BIT instruction opcode
+    // Fall-through tail call to extraLifeMushBlock
+    extraLifeMushBlock(X)
+}
+
+// Decompiled from ExtraLifeMushBlock
+fun extraLifeMushBlock(X: Int) {
+    var temp0: Int = 0
+    val blockPageloc by MemoryByteIndexed(Block_PageLoc)
+    val blockXPosition by MemoryByteIndexed(Block_X_Position)
+    val blockYPosition by MemoryByteIndexed(Block_Y_Position)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    //> SetupPowerUp:
+    //> lda #PowerUpObject        ;load power-up identifier into
+    //> sta Enemy_ID+5            ;special use slot of enemy object buffer
+    enemyId[5] = PowerUpObject
+    //> lda Block_PageLoc,x       ;store page location of block object
+    //> sta Enemy_PageLoc+5       ;as page location of power-up object
+    enemyPageloc[5] = blockPageloc[X]
+    //> lda Block_X_Position,x    ;store horizontal coordinate of block object
+    //> sta Enemy_X_Position+5    ;as horizontal coordinate of power-up object
+    enemyXPosition[5] = blockXPosition[X]
+    //> lda #$01
+    //> sta Enemy_Y_HighPos+5     ;set vertical high byte of power-up object
+    enemyYHighpos[5] = 0x01
+    //> lda Block_Y_Position,x    ;get vertical coordinate of block object
+    //> sec
+    //> sbc #$08                  ;subtract 8 pixels
+    temp0 = blockYPosition[X] - 0x08
+    //> sta Enemy_Y_Position+5    ;and use as vertical coordinate of power-up object
+    enemyYPosition[5] = temp0 and 0xFF
+    while (true) {
+        //> ExtraLifeMushBlock:
+        //> lda #$03         ;load 1-up mushroom into power-up type
+        //> sta $39          ;store correct power-up type
+        memory[0x39] = 0x03.toUByte()
+        //> jmp SetupPowerUp
+    }
+    // Fall-through tail call to pwrUpJmp
+    pwrUpJmp()
+}
+
+// Decompiled from VineBlock
+fun vineBlock() {
+    var sprdataoffsetCtrl by MemoryByte(SprDataOffset_Ctrl)
+    //> VineBlock:
+    //> ldx #$05                ;load last slot for enemy object buffer
+    //> ldy SprDataOffset_Ctrl  ;get control bit
+    //> jsr Setup_Vine          ;set up vine object
+    setupVine(0x05, sprdataoffsetCtrl)
+    //> ExitBlockChk:
+    //> rts                     ;leave
+    return
 }
 
 // Decompiled from BlockBumpedChk
@@ -7386,13 +11617,9 @@ fun blockBumpedChk(A: Int) {
     //> ldy #$0d                    ;start at end of metatile data
     temp0 = 0x0D
     while ((temp0 and 0x80) == 0) {
-        do {
-            //> BumpChkLoop: cmp BrickQBlockMetatiles,y  ;check to see if current metatile matches
-            //> beq MatchBump               ;metatile found in block buffer, branch if so
-            //> dey                         ;otherwise move onto next metatile
-            temp0 = (temp0 - 1) and 0xFF
-            //> bpl BumpChkLoop             ;do this until all metatiles are checked
-        } while ((temp0 and 0x80) == 0)
+        //> dey                         ;otherwise move onto next metatile
+        temp0 = (temp0 - 1) and 0xFF
+        //> bpl BumpChkLoop             ;do this until all metatiles are checked
     }
     //> clc                         ;if none match, return with carry clear
     //> MatchBump:   rts                         ;note carry is set if found match
@@ -7434,6 +11661,7 @@ fun checkTopOfBlock() {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
     var sprdataoffsetCtrl by MemoryByte(SprDataOffset_Ctrl)
     //> CheckTopOfBlock:
     //> ldx SprDataOffset_Ctrl  ;load control bit
@@ -7445,19 +11673,20 @@ fun checkTopOfBlock() {
         //> tya                     ;otherwise set to A
         //> sec
         //> sbc #$10                ;subtract $10 to move up one row in the block buffer
+        temp2 = temp1 - 0x10
         //> sta $02                 ;store as new vertical high nybble offset
-        memory[0x2] = ((temp1 - 0x10) and 0xFF).toUByte()
+        memory[0x2] = (temp2 and 0xFF).toUByte()
         //> tay
         //> lda ($06),y             ;get contents of block buffer in same column, one row up
         //> cmp #$c2                ;is it a coin? (not underwater)
         //> bne TopEx               ;if not, branch to leave
-        temp2 = memory[readWord(0x6) + ((temp1 - 0x10) and 0xFF)].toInt()
-        temp1 = (temp1 - 0x10) and 0xFF
-        if (memory[readWord(0x6) + ((temp1 - 0x10) and 0xFF)].toInt() == 0xC2) {
+        temp3 = memory[readWord(0x6) + (temp2 and 0xFF)].toInt()
+        temp1 = temp2 and 0xFF
+        if (memory[readWord(0x6) + (temp2 and 0xFF)].toInt() == 0xC2) {
             //> lda #$00
-            temp2 = 0x00
+            temp3 = 0x00
             //> sta ($06),y             ;otherwise put blank metatile where coin was
-            memory[readWord(0x6) + temp1] = temp2.toUByte()
+            memory[readWord(0x6) + temp1] = temp3.toUByte()
             //> jsr RemoveCoin_Axe      ;write blank metatile to vram buffer
             removecoinAxe()
             //> ldx SprDataOffset_Ctrl  ;get control bit
@@ -7472,6 +11701,7 @@ fun checkTopOfBlock() {
 
 // Decompiled from SpawnBrickChunks
 fun spawnBrickChunks(X: Int) {
+    var temp0: Int = 0
     val blockOrigXpos by MemoryByteIndexed(Block_Orig_XPos)
     val blockPageloc by MemoryByteIndexed(Block_PageLoc)
     val blockXPosition by MemoryByteIndexed(Block_X_Position)
@@ -7508,8 +11738,9 @@ fun spawnBrickChunks(X: Int) {
     //> lda Block_Y_Position,x
     //> clc                        ;add 8 pixels to vertical coordinate
     //> adc #$08                   ;and save as vertical coordinate for one of them
+    temp0 = blockYPosition[X] + 0x08
     //> sta Block_Y_Position+2,x
-    blockYPosition[2 + X] = (blockYPosition[X] + 0x08) and 0xFF
+    blockYPosition[2 + X] = temp0 and 0xFF
     //> lda #$fa
     //> sta Block_Y_Speed,x        ;set vertical speed...again??? (redundant)
     blockYSpeed[X] = 0xFA
@@ -7524,6 +11755,8 @@ fun blockObjectsCore(X: Int) {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     val blockRepflag by MemoryByteIndexed(Block_RepFlag)
     val blockState by MemoryByteIndexed(Block_State)
@@ -7542,52 +11775,55 @@ fun blockObjectsCore(X: Int) {
         //> txa
         //> clc
         //> adc #$09                    ;add 9 bytes to offset (note two block objects are created
+        temp2 = X + 0x09
+        temp0 = temp2 and 0xFF
         //> tax                         ;when using brick chunks, but only one offset for both)
         //> dey                         ;decrement Y to check for solid block state
         temp1 = (temp1 - 1) and 0xFF
         //> beq BouncingBlockHandler    ;branch if found, otherwise continue for brick chunks
-        temp0 = (X + 0x09) and 0xFF
-        temp2 = (X + 0x09) and 0xFF
-        temp3 = temp1
+        temp3 = temp0
+        temp4 = temp1
         if (temp1 != 0) {
             //> jsr ImposeGravityBlock      ;do sub to impose gravity on one block object object
             imposeGravityBlock()
             //> jsr MoveObjectHorizontally  ;do another sub to move horizontally
-            moveObjectHorizontally(temp2)
+            moveObjectHorizontally(temp3)
             //> txa
             //> clc                         ;move onto next block object
             //> adc #$02
+            temp5 = temp3 + 0x02
+            temp0 = temp5 and 0xFF
             //> tax
             //> jsr ImposeGravityBlock      ;do sub to impose gravity on other block object
             imposeGravityBlock()
             //> jsr MoveObjectHorizontally  ;do another sub to move horizontally
-            moveObjectHorizontally((temp2 + 0x02) and 0xFF)
+            moveObjectHorizontally(temp0)
             //> ldx ObjectOffset            ;get block object offset used for both
-            temp2 = objectOffset
+            temp3 = objectOffset
             //> jsr RelativeBlockPosition   ;get relative coordinates
-            relativeBlockPosition(temp2)
+            relativeBlockPosition(temp3)
             //> jsr GetBlockOffscreenBits   ;get offscreen information
-            getBlockOffscreenBits(temp2)
+            getBlockOffscreenBits(temp3)
             //> jsr DrawBrickChunks         ;draw the brick chunks
-            drawBrickChunks(temp2)
+            drawBrickChunks(temp3)
             //> pla                         ;get lower nybble of saved state
             temp0 = pull()
             //> ldy Block_Y_HighPos,x       ;check vertical high byte of block object
-            temp3 = blockYHighpos[temp2]
+            temp4 = blockYHighpos[temp3]
             //> beq UpdSte                  ;if above the screen, branch to kill it
-            if (temp3 != 0) {
+            if (temp4 != 0) {
                 //> pha                         ;otherwise save state back into stack
                 push(temp0)
                 //> lda #$f0
                 temp0 = 0xF0
                 //> cmp Block_Y_Position+2,x    ;check to see if bottom block object went
                 //> bcs ChkTop                  ;to the bottom of the screen, and branch if not
-                if (!(temp0 >= blockYPosition[2 + temp2])) {
+                if (!(temp0 >= blockYPosition[2 + temp3])) {
                     //> sta Block_Y_Position+2,x    ;otherwise set offscreen coordinate
-                    blockYPosition[2 + temp2] = temp0
+                    blockYPosition[2 + temp3] = temp0
                 }
                 //> ChkTop: lda Block_Y_Position,x      ;get top block object's vertical coordinate
-                temp0 = blockYPosition[temp2]
+                temp0 = blockYPosition[temp3]
                 //> cmp #$f0                    ;see if it went to the bottom of the screen
                 //> pla                         ;pull block object state from stack
                 temp0 = pull()
@@ -7598,7 +11834,7 @@ fun blockObjectsCore(X: Int) {
                     }
                 } else {
                     //> UpdSte:    sta Block_State,x          ;store contents of A in block object state
-                    blockState[temp2] = temp0
+                    blockState[temp3] = temp0
                     //> rts
                     return
                 }
@@ -7608,26 +11844,26 @@ fun blockObjectsCore(X: Int) {
         //> jsr ImposeGravityBlock     ;do sub to impose gravity on block object
         imposeGravityBlock()
         //> ldx ObjectOffset           ;get block object offset
-        temp2 = objectOffset
+        temp3 = objectOffset
         //> jsr RelativeBlockPosition  ;get relative coordinates
-        relativeBlockPosition(temp2)
+        relativeBlockPosition(temp3)
         //> jsr GetBlockOffscreenBits  ;get offscreen information
-        getBlockOffscreenBits(temp2)
+        getBlockOffscreenBits(temp3)
         //> jsr DrawBlock              ;draw the block
-        drawBlock(temp2)
+        drawBlock(temp3)
         //> lda Block_Y_Position,x     ;get vertical coordinate
-        temp0 = blockYPosition[temp2]
+        temp0 = blockYPosition[temp3]
         //> and #$0f                   ;mask out high nybble
-        temp4 = temp0 and 0x0F
+        temp6 = temp0 and 0x0F
         //> cmp #$05                   ;check to see if low nybble wrapped around
         //> pla                        ;pull state from stack
         temp0 = pull()
         //> bcs UpdSte                 ;if still above amount, not time to kill block yet, thus branch
-        if (!(temp4 >= 0x05)) {
+        if (!(temp6 >= 0x05)) {
             //> lda #$01
             temp0 = 0x01
             //> sta Block_RepFlag,x        ;otherwise set flag to replace metatile
-            blockRepflag[temp2] = temp0
+            blockRepflag[temp3] = temp0
             //> KillBlock: lda #$00                   ;if branched here, nullify object state
             temp0 = 0x00
         }
@@ -7647,46 +11883,46 @@ fun blockobjmtUpdater() {
     //> BlockObjMT_Updater:
     //> ldx #$01                  ;set offset to start with second block object
     temp0 = 0x01
-    while ((temp0 and 0x80) == 0) {
-        //> lda Block_RepFlag,x       ;if flag for block object already clear,
-        //> beq NextBUpd              ;branch to move onto next block object
-        temp1 = blockRepflag[temp0]
-        if (blockRepflag[temp0] != 0) {
-            //> lda Block_BBuf_Low,x      ;get low byte of block buffer
-            temp1 = blockBbufLow[temp0]
-            //> sta $06                   ;store into block buffer address
-            memory[0x6] = temp1.toUByte()
-            //> lda #$05
-            temp1 = 0x05
-            //> sta $07                   ;set high byte of block buffer address
-            memory[0x7] = temp1.toUByte()
-            //> lda Block_Orig_YPos,x     ;get original vertical coordinate of block object
-            temp1 = blockOrigYpos[temp0]
-            //> sta $02                   ;store here and use as offset to block buffer
-            memory[0x2] = temp1.toUByte()
-            //> tay
-            //> lda Block_Metatile,x      ;get metatile to be written
-            temp1 = blockMetatile[temp0]
-            //> sta ($06),y               ;write it to the block buffer
-            memory[readWord(0x6) + temp1] = temp1.toUByte()
-            //> jsr ReplaceBlockMetatile  ;do sub to replace metatile where block object is
-            replaceBlockMetatile(temp0)
-            //> lda #$00
-            temp1 = 0x00
-            //> sta Block_RepFlag,x       ;clear block object flag
-            blockRepflag[temp0] = temp1
+    do {
+        //> UpdateLoop: stx ObjectOffset          ;set offset here
+        objectOffset = temp0
+        //> lda VRAM_Buffer1          ;if vram buffer already being used here,
+        //> bne NextBUpd              ;branch to move onto next block object
+        temp1 = vramBuffer1
+        if (vramBuffer1 == 0) {
+            //> lda Block_RepFlag,x       ;if flag for block object already clear,
+            temp1 = blockRepflag[temp0]
+            //> beq NextBUpd              ;branch to move onto next block object
+            if (temp1 != 0) {
+                //> lda Block_BBuf_Low,x      ;get low byte of block buffer
+                temp1 = blockBbufLow[temp0]
+                //> sta $06                   ;store into block buffer address
+                memory[0x6] = temp1.toUByte()
+                //> lda #$05
+                temp1 = 0x05
+                //> sta $07                   ;set high byte of block buffer address
+                memory[0x7] = temp1.toUByte()
+                //> lda Block_Orig_YPos,x     ;get original vertical coordinate of block object
+                temp1 = blockOrigYpos[temp0]
+                //> sta $02                   ;store here and use as offset to block buffer
+                memory[0x2] = temp1.toUByte()
+                //> tay
+                //> lda Block_Metatile,x      ;get metatile to be written
+                temp1 = blockMetatile[temp0]
+                //> sta ($06),y               ;write it to the block buffer
+                memory[readWord(0x6) + temp1] = temp1.toUByte()
+                //> jsr ReplaceBlockMetatile  ;do sub to replace metatile where block object is
+                replaceBlockMetatile(temp0)
+                //> lda #$00
+                temp1 = 0x00
+                //> sta Block_RepFlag,x       ;clear block object flag
+                blockRepflag[temp0] = temp1
+            }
         }
-        do {
-            //> UpdateLoop: stx ObjectOffset          ;set offset here
-            objectOffset = temp0
-            //> lda VRAM_Buffer1          ;if vram buffer already being used here,
-            temp1 = vramBuffer1
-            //> bne NextBUpd              ;branch to move onto next block object
-            //> NextBUpd:   dex                       ;decrement block object offset
-            temp0 = (temp0 - 1) and 0xFF
-            //> bpl UpdateLoop            ;do this until both block objects are dealt with
-        } while ((temp0 and 0x80) == 0)
-    }
+        //> NextBUpd:   dex                       ;decrement block object offset
+        temp0 = (temp0 - 1) and 0xFF
+        //> bpl UpdateLoop            ;do this until both block objects are dealt with
+    } while ((temp0 and 0x80) == 0)
     //> rts                       ;then leave
     return
 }
@@ -7706,27 +11942,33 @@ fun moveEnemyHorizontally(X: Int) {
 }
 
 // Decompiled from MovePlayerHorizontally
-// Fixed: This function falls through to MoveObjectHorizontally
 fun movePlayerHorizontally(): Int {
+    var temp0: Int = 0
     var jumpspringAnimCtrl by MemoryByte(JumpspringAnimCtrl)
     //> MovePlayerHorizontally:
     //> lda JumpspringAnimCtrl  ;if jumpspring currently animating,
     //> bne ExXMove             ;branch to leave
-    if (jumpspringAnimCtrl != 0) {
-        // A register still has value from lda JumpspringAnimCtrl
-        return jumpspringAnimCtrl
+    if (!(jumpspringAnimCtrl == 0)) {
+        //  goto ExXMove
+        return A
     }
-    //> tax                     ;otherwise set zero for offset to use player's stuff
-    // Fall through to MoveObjectHorizontally with X=0
-    return moveObjectHorizontally(0x00)
+    temp0 = jumpspringAnimCtrl
+    if (jumpspringAnimCtrl == 0) {
+        //> tax                     ;otherwise set zero for offset to use player's stuff
+    }
+    //> ExXMove:  rts                         ;and leave
+    return A
 }
 
 // Decompiled from MoveObjectHorizontally
-// Fixed: Returns the horizontal speed value for scroll calculations
-fun moveObjectHorizontally(X: Int): Int {
+fun moveObjectHorizontally(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     val sprobjectPageloc by MemoryByteIndexed(SprObject_PageLoc)
     val sprobjectXMoveforce by MemoryByteIndexed(SprObject_X_MoveForce)
     val sprobjectXPosition by MemoryByteIndexed(SprObject_X_Position)
@@ -7738,8 +11980,7 @@ fun moveObjectHorizontally(X: Int): Int {
     //> asl
     //> asl
     //> sta $01                     ;store result here
-    val speedLowToHigh = (sprobjectXSpeed[X] shl 4) and 0xFF
-    memory[0x1] = speedLowToHigh.toUByte()
+    memory[0x1] = ((((((((sprobjectXSpeed[X] shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF).toUByte()
     //> lda SprObject_X_Speed,x     ;get saved value again
     //> lsr                         ;move high nybble to low
     //> lsr
@@ -7747,10 +11988,10 @@ fun moveObjectHorizontally(X: Int): Int {
     //> lsr
     //> cmp #$08                    ;if < 8, branch, do not change
     //> bcc SaveXSpd
-    temp0 = (sprobjectXSpeed[X] shr 4) and 0x0F
-    if (temp0 >= 0x08) {
+    temp0 = sprobjectXSpeed[X] shr 1 shr 1 shr 1 shr 1
+    if (sprobjectXSpeed[X] shr 1 shr 1 shr 1 shr 1 >= 0x08) {
         //> ora #%11110000              ;otherwise alter high nybble
-        temp0 = temp0 or 0xF0
+        temp1 = temp0 or 0xF0
     }
     //> SaveXSpd: sta $00                     ;save result here
     memory[0x0] = temp0.toUByte()
@@ -7758,44 +11999,50 @@ fun moveObjectHorizontally(X: Int): Int {
     //> cmp #$00                    ;if result positive, leave Y alone
     //> bpl UseAdder
     temp2 = 0x00
-    if ((temp0 and 0x80) != 0) {
+    if (temp0 < 0) {
         //> dey                         ;otherwise decrement Y
-        temp2 = 0xFF
+        temp2 = (temp2 - 1) and 0xFF
     }
     //> UseAdder: sty $02                     ;save Y here
     memory[0x2] = temp2.toUByte()
     //> lda SprObject_X_MoveForce,x ;get whatever number's here
-    val oldForce = sprobjectXMoveforce[X]
+    temp0 = sprobjectXMoveforce[X]
     //> clc
     //> adc $01                     ;add low nybble moved to high
+    temp3 = temp0 + memory[0x1].toInt()
+    temp0 = temp3 and 0xFF
     //> sta SprObject_X_MoveForce,x ;store result here
-    val newForce = (oldForce + speedLowToHigh) and 0xFF
-    val carry1 = if (oldForce + speedLowToHigh > 0xFF) 1 else 0
-    sprobjectXMoveforce[X] = newForce
+    sprobjectXMoveforce[X] = temp0
     //> lda #$00                    ;init A
+    temp0 = 0x00
     //> rol                         ;rotate carry into d0
-    val savedCarry = carry1
+    temp0 = (temp0 shl 1) and 0xFE or if (temp3 > 0xFF) 1 else 0
     //> pha                         ;push onto stack
+    push(temp0)
     //> ror                         ;rotate d0 back onto carry
-    // carry remains as savedCarry
+    temp0 = temp0 shr 1 or if ((temp0 and 0x80) != 0) 0x80 else 0
     //> lda SprObject_X_Position,x
-    val oldXPos = sprobjectXPosition[X]
+    temp0 = sprobjectXPosition[X]
     //> adc $00                     ;add carry plus saved value (high nybble moved to low
+    temp4 = temp0 + memory[0x0].toInt() + (if ((temp0 and 0x01) != 0) 1 else 0)
+    temp0 = temp4 and 0xFF
     //> sta SprObject_X_Position,x  ;plus $f0 if necessary) to object's horizontal position
-    val newXPos = (oldXPos + memory[0x0].toInt() + savedCarry) and 0xFF
-    val carry2 = if (oldXPos + memory[0x0].toInt() + savedCarry > 0xFF) 1 else 0
-    sprobjectXPosition[X] = newXPos
+    sprobjectXPosition[X] = temp0
     //> lda SprObject_PageLoc,x
-    val oldPageLoc = sprobjectPageloc[X]
+    temp0 = sprobjectPageloc[X]
     //> adc $02                     ;add carry plus other saved value to the
+    temp5 = temp0 + memory[0x2].toInt() + (if (temp4 > 0xFF) 1 else 0)
+    temp0 = temp5 and 0xFF
     //> sta SprObject_PageLoc,x     ;object's page location and save
-    sprobjectPageloc[X] = (oldPageLoc + memory[0x2].toInt() + carry2) and 0xFF
+    sprobjectPageloc[X] = temp0
     //> pla
+    temp0 = pull()
     //> clc                         ;pull old carry from stack and add
     //> adc $00                     ;to high nybble moved to low
-    val result = (savedCarry + memory[0x0].toInt()) and 0xFF
+    temp6 = temp0 + memory[0x0].toInt()
+    temp0 = temp6 and 0xFF
     //> ExXMove:  rts                         ;and leave
-    return result
+    return
 }
 
 // Decompiled from MoveD_EnemyVertically
@@ -7819,6 +12066,8 @@ fun movedEnemyvertically(X: Int) {
     //> ContVMove: jmp SetHiMax   ;jump to skip the rest of this
     //> SetHiMax:    lda #$03                ;set maximum speed in A
     temp0 = 0x03
+    // Fall-through tail call to moveFallingPlatform
+    moveFallingPlatform()
 }
 
 // Decompiled from MoveFallingPlatform
@@ -7835,10 +12084,6 @@ fun moveDropPlatform() {
     //> MoveDropPlatform:
     //> ldy #$7f      ;set movement amount for drop platform
     //> bne SetMdMax  ;skip ahead of other value set here
-    if (!(0x7F == 0)) {
-        //  goto SetMdMax
-        return
-    }
     temp0 = 0x7F
     if (0x7F == 0) {
     }
@@ -7850,6 +12095,8 @@ fun moveDropPlatform() {
     } else {
         //> ;--------------------------------
     }
+    // Fall-through tail call to moveEnemySlowVert
+    moveEnemySlowVert()
 }
 
 // Decompiled from MoveEnemySlowVert
@@ -7864,6 +12111,8 @@ fun moveEnemySlowVert() {
     } else {
         //> ;--------------------------------
     }
+    // Fall-through tail call to moveDropPlatform
+    moveDropPlatform()
 }
 
 // Decompiled from MoveJ_EnemyVertically
@@ -7871,6 +12120,8 @@ fun movejEnemyvertically() {
     //> MoveJ_EnemyVertically:
     //> ldy #$1c                ;set movement amount for podoboo/other objects
     //> SetHiMax:    lda #$03                ;set maximum speed in A
+    // Fall-through tail call to setXMoveAmt
+    setXMoveAmt(X, 0x1C)
 }
 
 // Decompiled from SetXMoveAmt
@@ -7898,6 +12149,8 @@ fun imposeGravityBlock() {
     //> sta $00
     memory[0x0] = 0x50.toUByte()
     //> lda MaxSpdBlockData,y    ;get maximum speed
+    // Fall-through tail call to imposeGravitySprObj
+    imposeGravitySprObj(maxSpdBlockData[0x01])
 }
 
 // Decompiled from ImposeGravitySprObj
@@ -7914,6 +12167,8 @@ fun movePlatformDown() {
     //> MovePlatformDown:
     //> lda #$00    ;save value to stack (if branching here, execute next
     //> .db $2c     ;part as BIT instruction)
+    // Fall-through tail call to movePlatformUp
+    movePlatformUp(X)
 }
 
 // Decompiled from MovePlatformUp
@@ -7965,6 +12220,13 @@ fun imposeGravity(A: Int, X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     val sprobjectYmfDummy by MemoryByteIndexed(SprObject_YMF_Dummy)
     val sprobjectYHighpos by MemoryByteIndexed(SprObject_Y_HighPos)
     val sprobjectYMoveforce by MemoryByteIndexed(SprObject_Y_MoveForce)
@@ -7976,99 +12238,110 @@ fun imposeGravity(A: Int, X: Int) {
     //> lda SprObject_YMF_Dummy,x
     //> clc                          ;add value in movement force to contents of dummy variable
     //> adc SprObject_Y_MoveForce,x
+    temp0 = sprobjectYmfDummy[X] + sprobjectYMoveforce[X]
     //> sta SprObject_YMF_Dummy,x
-    sprobjectYmfDummy[X] = (sprobjectYmfDummy[X] + sprobjectYMoveforce[X]) and 0xFF
+    sprobjectYmfDummy[X] = temp0 and 0xFF
     //> ldy #$00                     ;set Y to zero by default
     //> lda SprObject_Y_Speed,x      ;get current vertical speed
     //> bpl AlterYP                  ;if currently moving downwards, do not decrement Y
-    temp0 = sprobjectYSpeed[X]
-    temp1 = 0x00
+    temp1 = sprobjectYSpeed[X]
+    temp2 = 0x00
     if ((sprobjectYSpeed[X] and 0x80) != 0) {
         //> dey                          ;otherwise decrement Y
-        temp1 = (temp1 - 1) and 0xFF
+        temp2 = (temp2 - 1) and 0xFF
     }
     //> AlterYP: sty $07                      ;store Y here
-    memory[0x7] = temp1.toUByte()
+    memory[0x7] = temp2.toUByte()
     //> adc SprObject_Y_Position,x   ;add vertical position to vertical speed plus carry
+    temp3 = temp1 + sprobjectYPosition[X] + (if (temp0 > 0xFF) 1 else 0)
+    temp1 = temp3 and 0xFF
     //> sta SprObject_Y_Position,x   ;store as new vertical position
-    sprobjectYPosition[X] = (temp0 + sprobjectYPosition[X] + (if (sprobjectYmfDummy[X] + sprobjectYMoveforce[X] > 0xFF) 1 else 0)) and 0xFF
+    sprobjectYPosition[X] = temp1
     //> lda SprObject_Y_HighPos,x
-    temp0 = sprobjectYHighpos[X]
+    temp1 = sprobjectYHighpos[X]
     //> adc $07                      ;add carry plus contents of $07 to vertical high byte
+    temp4 = temp1 + memory[0x7].toInt() + (if (temp3 > 0xFF) 1 else 0)
+    temp1 = temp4 and 0xFF
     //> sta SprObject_Y_HighPos,x    ;store as new vertical high byte
-    sprobjectYHighpos[X] = (temp0 + memory[0x7].toInt() + (if (temp0 + sprobjectYPosition[X] + (if (sprobjectYmfDummy[X] + sprobjectYMoveforce[X] > 0xFF) 1 else 0) > 0xFF) 1 else 0)) and 0xFF
+    sprobjectYHighpos[X] = temp1
     //> lda SprObject_Y_MoveForce,x
-    temp0 = sprobjectYMoveforce[X]
+    temp1 = sprobjectYMoveforce[X]
     //> clc
     //> adc $00                      ;add downward movement amount to contents of $0433
+    temp5 = temp1 + memory[0x0].toInt()
+    temp1 = temp5 and 0xFF
     //> sta SprObject_Y_MoveForce,x
-    sprobjectYMoveforce[X] = (temp0 + memory[0x0].toInt()) and 0xFF
+    sprobjectYMoveforce[X] = temp1
     //> lda SprObject_Y_Speed,x      ;add carry to vertical speed and store
-    temp0 = sprobjectYSpeed[X]
+    temp1 = sprobjectYSpeed[X]
     //> adc #$00
+    temp6 = temp1 + (if (temp5 > 0xFF) 1 else 0)
+    temp1 = temp6 and 0xFF
     //> sta SprObject_Y_Speed,x
-    sprobjectYSpeed[X] = (temp0 + (if (temp0 + memory[0x0].toInt() > 0xFF) 1 else 0)) and 0xFF
+    sprobjectYSpeed[X] = temp1
     //> cmp $02                      ;compare to maximum speed
     //> bmi ChkUpM                   ;if less than preset value, skip this part
-    temp0 = (temp0 + (if (temp0 + memory[0x0].toInt() > 0xFF) 1 else 0)) and 0xFF
-    if (!(((temp0 + if (temp0 + memory[0x0].toInt() > 0xFF) 1 else 0) and 0xFF) - memory[0x2].toInt() < 0)) {
+    if (!(temp1 - memory[0x2].toInt() < 0)) {
         //> lda SprObject_Y_MoveForce,x
-        temp0 = sprobjectYMoveforce[X]
+        temp1 = sprobjectYMoveforce[X]
         //> cmp #$80                     ;if less positively than preset maximum, skip this part
         //> bcc ChkUpM
-        if (temp0 >= 0x80) {
+        if (temp1 >= 0x80) {
             //> lda $02
-            temp0 = memory[0x2].toInt()
+            temp1 = memory[0x2].toInt()
             //> sta SprObject_Y_Speed,x      ;keep vertical speed within maximum value
-            sprobjectYSpeed[X] = temp0
+            sprobjectYSpeed[X] = temp1
             //> lda #$00
-            temp0 = 0x00
+            temp1 = 0x00
             //> sta SprObject_Y_MoveForce,x  ;clear fractional
-            sprobjectYMoveforce[X] = temp0
+            sprobjectYMoveforce[X] = temp1
         }
     }
     //> ChkUpM:  pla                          ;get value from stack
-    temp0 = pull()
+    temp1 = pull()
     //> beq ExVMove                  ;if set to zero, branch to leave
-    if (temp0 != 0) {
+    if (temp1 != 0) {
         //> lda $02
-        temp0 = memory[0x2].toInt()
+        temp1 = memory[0x2].toInt()
         //> eor #%11111111               ;otherwise get two's compliment of maximum speed
-        temp2 = temp0 xor 0xFF
+        temp7 = temp1 xor 0xFF
         //> tay
         //> iny
-        temp2 = (temp2 + 1) and 0xFF
+        temp7 = (temp7 + 1) and 0xFF
         //> sty $07                      ;store two's compliment here
-        memory[0x7] = temp2.toUByte()
+        memory[0x7] = temp7.toUByte()
         //> lda SprObject_Y_MoveForce,x
-        temp0 = sprobjectYMoveforce[X]
+        temp1 = sprobjectYMoveforce[X]
         //> sec                          ;subtract upward movement amount from contents
         //> sbc $01                      ;of movement force, note that $01 is twice as large as $00,
+        temp8 = temp1 - memory[0x1].toInt()
+        temp1 = temp8 and 0xFF
         //> sta SprObject_Y_MoveForce,x  ;thus it effectively undoes add we did earlier
-        sprobjectYMoveforce[X] = (temp0 - memory[0x1].toInt()) and 0xFF
+        sprobjectYMoveforce[X] = temp1
         //> lda SprObject_Y_Speed,x
-        temp0 = sprobjectYSpeed[X]
+        temp1 = sprobjectYSpeed[X]
         //> sbc #$00                     ;subtract borrow from vertical speed and store
+        temp9 = temp1 - (if (temp8 >= 0) 0 else 1)
+        temp1 = temp9 and 0xFF
         //> sta SprObject_Y_Speed,x
-        sprobjectYSpeed[X] = (temp0 - (if (temp0 - memory[0x1].toInt() >= 0) 0 else 1)) and 0xFF
+        sprobjectYSpeed[X] = temp1
         //> cmp $07                      ;compare vertical speed to two's compliment
         //> bpl ExVMove                  ;if less negatively than preset maximum, skip this part
-        temp0 = (temp0 - (if (temp0 - memory[0x1].toInt() >= 0) 0 else 1)) and 0xFF
-        temp1 = temp2
-        if (((temp0 - if (temp0 - memory[0x1].toInt() >= 0) 0 else 1) and 0xFF) - memory[0x7].toInt() < 0) {
+        temp2 = temp7
+        if (temp1 - memory[0x7].toInt() < 0) {
             //> lda SprObject_Y_MoveForce,x
-            temp0 = sprobjectYMoveforce[X]
+            temp1 = sprobjectYMoveforce[X]
             //> cmp #$80                     ;check if fractional part is above certain amount,
             //> bcs ExVMove                  ;and if so, branch to leave
-            if (!(temp0 >= 0x80)) {
+            if (!(temp1 >= 0x80)) {
                 //> lda $07
-                temp0 = memory[0x7].toInt()
+                temp1 = memory[0x7].toInt()
                 //> sta SprObject_Y_Speed,x      ;keep vertical speed within maximum value
-                sprobjectYSpeed[X] = temp0
+                sprobjectYSpeed[X] = temp1
                 //> lda #$ff
-                temp0 = 0xFF
+                temp1 = 0xFF
                 //> sta SprObject_Y_MoveForce,x  ;clear fractional
-                sprobjectYMoveforce[X] = temp0
+                sprobjectYMoveforce[X] = temp1
             }
         }
     }
@@ -8087,7 +12360,15 @@ fun enemiesAndLoopsCore(X: Int) {
     var temp14: Int = 0
     var temp15: Int = 0
     var temp16: Int = 0
+    var temp17: Int = 0
+    var temp18: Int = 0
+    var temp19: Int = 0
     var temp2: Int = 0
+    var temp20: Int = 0
+    var temp21: Int = 0
+    var temp22: Int = 0
+    var temp23: Int = 0
+    var temp24: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
@@ -8141,9 +12422,6 @@ fun enemiesAndLoopsCore(X: Int) {
         //> beq ChkAreaTsk           ;if data zero, branch
         if (temp0 != 0) {
             //> jmp RunEnemyObjectsCore  ;otherwise, jump to run enemy subroutines
-            // Fixed: Actually call the RunEnemyObjectsCore code and return
-            runEnemyObjectsCoreInline(X, objectOffset, enemyFlag, enemyId, enemyState, enemyYHighpos, enemyYPosition, enemyXPosition, enemyPageloc)
-            return
         }
         //> ChkAreaTsk: lda AreaParserTaskNum    ;check number of tasks to perform
         temp0 = areaParserTaskNum
@@ -8170,9 +12448,6 @@ fun enemiesAndLoopsCore(X: Int) {
         if (temp0 == 0) {
             //> sta Enemy_Flag,x         ;if second enemy flag not set, also clear first one
             enemyFlag[X] = temp0
-        } else {
-            // ExitELCore: return when flag is non-zero (bowser case)
-            return
         }
     }
     //> ProcLoopCommand:
@@ -8186,28 +12461,15 @@ fun enemiesAndLoopsCore(X: Int) {
         if (temp0 == 0) {
             //> ldy #$0b                  ;start at the end of each set of loop data
             temp3 = 0x0B
-            // Fixed: Correct loop structure for FindLoop
-            // Original assembly: DEY, BMI exit, check world (bne FindLoop), check page (bne FindLoop)
-            // Both world and page checks go back to FindLoop which decrements first
-            run findLoop@{
-                while (true) {
-                    //> FindLoop: dey
-                    temp3 = (temp3 - 1) and 0xFF
-                    //> bmi ChkEnemyFrenzy        ;if all data is checked and not match, do not loop
-                    if ((temp3 and 0x80) != 0) return@findLoop  // Exit when negative (wrapped from 0)
-                    //> lda WorldNumber           ;check to see if one of the world numbers
-                    temp0 = worldNumber
-                    //> cmp LoopCmdWorldNumber,y  ;matches our current world number
-                    //> bne FindLoop
-                    if (temp0 != loopCmdWorldNumber[temp3]) continue
-                    //> lda CurrentPageLoc        ;check to see if one of the page numbers
-                    temp0 = currentPageLoc
-                    //> cmp LoopCmdPageNumber,y   ;matches the page we're currently on
-                    //> bne FindLoop
-                    if (temp0 != loopCmdPageNumber[temp3]) continue
-                    // Found a match - exit the loop
-                    break
-                }
+            while (temp0 != loopCmdPageNumber[temp3]) {
+                //> lda WorldNumber           ;check to see if one of the world numbers
+                temp0 = worldNumber
+                //> cmp LoopCmdWorldNumber,y  ;matches our current world number
+                //> bne FindLoop
+                //> lda CurrentPageLoc        ;check to see if one of the page numbers
+                temp0 = currentPageLoc
+                //> cmp LoopCmdPageNumber,y   ;matches the page we're currently on
+                //> bne FindLoop
             }
             //> lda Player_Y_Position     ;check to see if the player is at the correct position
             temp0 = playerYPosition
@@ -8327,15 +12589,19 @@ fun enemiesAndLoopsCore(X: Int) {
         temp0 = screenrightXPos
         //> clc
         //> adc #$30
+        temp6 = temp0 + 0x30
+        temp0 = temp6 and 0xFF
         //> and #%11110000           ;store high nybble
-        temp6 = (temp0 + 0x30) and 0xFF and 0xF0
+        temp7 = temp0 and 0xF0
         //> sta $07
-        memory[0x7] = temp6.toUByte()
+        memory[0x7] = temp7.toUByte()
         //> lda ScreenRight_PageLoc  ;add carry to page location of right boundary
         temp0 = screenrightPageloc
         //> adc #$00
+        temp8 = temp0 + (if (temp6 > 0xFF) 1 else 0)
+        temp0 = temp8 and 0xFF
         //> sta $06                  ;store page location + carry
-        memory[0x6] = ((temp0 + (if (temp0 + 0x30 > 0xFF) 1 else 0)) and 0xFF).toUByte()
+        memory[0x6] = temp0.toUByte()
         //> ldy EnemyDataOffset
         temp3 = enemyDataOffset
         //> iny
@@ -8362,34 +12628,36 @@ fun enemiesAndLoopsCore(X: Int) {
         //> lda (EnemyData),y        ;reread first byte
         temp0 = memory[readWord(EnemyData) + temp3].toInt()
         //> and #$0f
-        temp7 = temp0 and 0x0F
+        temp9 = temp0 and 0x0F
         //> cmp #$0f                 ;check for special row $0f
         //> bne PositionEnemyObj     ;if not found, branch to position enemy object
-        temp0 = temp7
-        if (temp7 == 0x0F) {
+        temp0 = temp9
+        if (temp9 == 0x0F) {
             //> lda EnemyObjectPageSel   ;if page select set,
             temp0 = enemyObjectPageSel
             //> bne PositionEnemyObj     ;branch without reading second byte
             if (temp0 == 0) {
-                // This block handles special row $0F with page select = 0
-                // Original code: jmp CheckFrenzyBuffer / jmp ProcLoopCommand
-                // We execute once and return - will be called again on next frame
-                //> iny
-                temp3 = (temp3 + 1) and 0xFF
-                //> lda (EnemyData),y        ;otherwise, get second byte, mask out 2 MSB
-                temp0 = memory[readWord(EnemyData) + temp3].toInt()
-                //> and #%00111111
-                temp8 = temp0 and 0x3F
-                //> sta EnemyObjectPageLoc   ;store as page control for enemy object data
-                enemyObjectPageLoc = temp8
-                //> inc EnemyDataOffset      ;increment enemy object data offset 2 bytes
-                enemyDataOffset = (enemyDataOffset + 1) and 0xFF
-                //> inc EnemyDataOffset
-                enemyDataOffset = (enemyDataOffset + 1) and 0xFF
-                //> inc EnemyObjectPageSel   ;set page select for enemy object data and
-                enemyObjectPageSel = (enemyObjectPageSel + 1) and 0xFF
-                //> jmp ProcLoopCommand      ;jump back to process loop commands
-                return  // Exit and restart from beginning on next call
+                while (true) {
+                    //> FindLoop: dey
+                    temp3 = (temp3 - 1) and 0xFF
+                    //> bmi ChkEnemyFrenzy        ;if all data is checked and not match, do not loop
+                    //> jmp CheckFrenzyBuffer    ;if found, jump to check frenzy buffer, otherwise
+                    //> iny
+                    temp3 = (temp3 + 1) and 0xFF
+                    //> lda (EnemyData),y        ;otherwise, get second byte, mask out 2 MSB
+                    temp0 = memory[readWord(EnemyData) + temp3].toInt()
+                    //> and #%00111111
+                    temp10 = temp0 and 0x3F
+                    //> sta EnemyObjectPageLoc   ;store as page control for enemy object data
+                    enemyObjectPageLoc = temp10
+                    //> inc EnemyDataOffset      ;increment enemy object data offset 2 bytes
+                    enemyDataOffset = (enemyDataOffset + 1) and 0xFF
+                    //> inc EnemyDataOffset
+                    enemyDataOffset = (enemyDataOffset + 1) and 0xFF
+                    //> inc EnemyObjectPageSel   ;set page select for enemy object data and
+                    enemyObjectPageSel = (enemyObjectPageSel + 1) and 0xFF
+                    //> jmp ProcLoopCommand      ;jump back to process loop commands again
+                }
             }
         }
         //> PositionEnemyObj:
@@ -8400,24 +12668,25 @@ fun enemiesAndLoopsCore(X: Int) {
         //> lda (EnemyData),y        ;get first byte of enemy object
         temp0 = memory[readWord(EnemyData) + temp3].toInt()
         //> and #%11110000
-        temp9 = temp0 and 0xF0
+        temp11 = temp0 and 0xF0
         //> sta Enemy_X_Position,x   ;store column position
-        enemyXPosition[X] = temp9
+        enemyXPosition[X] = temp11
         //> cmp ScreenRight_X_Pos    ;check column position against right boundary
         //> lda Enemy_PageLoc,x      ;without subtracting, then subtract borrow
         temp0 = enemyPageloc[X]
         //> sbc ScreenRight_PageLoc  ;from page location
+        temp12 = temp0 - screenrightPageloc - (if (temp11 >= screenrightXPos) 0 else 1)
+        temp0 = temp12 and 0xFF
         //> bcs CheckRightExtBounds  ;if enemy object beyond or at boundary, branch
-        temp0 = (temp0 - screenrightPageloc - (if (temp9 >= screenrightXPos) 0 else 1)) and 0xFF
-        if (!((temp0 - screenrightPageloc - (if (temp9 >= screenrightXPos) 0 else 1)) >= 0)) {
+        if (!(temp12 >= 0)) {
             //> lda (EnemyData),y
             temp0 = memory[readWord(EnemyData) + temp3].toInt()
             //> and #%00001111           ;check for special row $0e
-            temp10 = temp0 and 0x0F
+            temp13 = temp0 and 0x0F
             //> cmp #$0e                 ;if found, jump elsewhere
             //> beq ParseRow0e
-            temp0 = temp10
-            if (temp10 != 0x0E) {
+            temp0 = temp13
+            if (temp13 != 0x0E) {
                 //> jmp CheckThreeBytes      ;if not found, unconditional jump
             }
         }
@@ -8428,9 +12697,10 @@ fun enemiesAndLoopsCore(X: Int) {
         //> lda $06                  ;then subtract borrow from page control temp
         temp0 = memory[0x6].toInt()
         //> sbc Enemy_PageLoc,x      ;plus carry
+        temp14 = temp0 - enemyPageloc[X] - (if (temp0 >= enemyXPosition[X]) 0 else 1)
+        temp0 = temp14 and 0xFF
         //> bcc CheckFrenzyBuffer    ;if enemy object beyond extended boundary, branch
-        temp0 = (temp0 - enemyPageloc[X] - (if (temp0 >= enemyXPosition[X]) 0 else 1)) and 0xFF
-        if ((temp0 - enemyPageloc[X] - (if (temp0 >= enemyXPosition[X]) 0 else 1)) >= 0) {
+        if (temp14 >= 0) {
             //> lda #$01                 ;store value in vertical high byte
             temp0 = 0x01
             //> sta Enemy_Y_HighPos,x
@@ -8455,10 +12725,10 @@ fun enemiesAndLoopsCore(X: Int) {
                 //> lda (EnemyData),y        ;get second byte of object
                 temp0 = memory[readWord(EnemyData) + temp3].toInt()
                 //> and #%01000000           ;check to see if hard mode bit is set
-                temp11 = temp0 and 0x40
+                temp15 = temp0 and 0x40
                 //> beq CheckForEnemyGroup   ;if not, branch to check for group enemy objects
-                temp0 = temp11
-                if (temp11 != 0) {
+                temp0 = temp15
+                if (temp15 != 0) {
                     //> lda SecondaryHardMode    ;if set, check to see if secondary hard mode flag
                     temp0 = secondaryHardMode
                     //> beq Inc2B                ;is on, and if not, branch to skip this object completely
@@ -8481,11 +12751,11 @@ fun enemiesAndLoopsCore(X: Int) {
                 //> lda (EnemyData),y      ;get second byte and mask out 2 MSB
                 temp0 = memory[readWord(EnemyData) + temp3].toInt()
                 //> and #%00111111
-                temp12 = temp0 and 0x3F
+                temp16 = temp0 and 0x3F
                 //> cmp #$37               ;check for value below $37
                 //> bcc BuzzyBeetleMutate
-                temp0 = temp12
-                if (temp12 >= 0x37) {
+                temp0 = temp16
+                if (temp16 >= 0x37) {
                     //> cmp #$3f               ;if $37 or greater, check for value
                     //> bcc DoGroup            ;below $3f, branch if below $3f
                     if (!(temp0 >= 0x3F)) {
@@ -8581,9 +12851,9 @@ fun enemiesAndLoopsCore(X: Int) {
         //> lda (EnemyData),y        ;get third byte again, and this time mask out
         temp0 = memory[readWord(EnemyData) + temp3].toInt()
         //> and #%00011111           ;the 3 MSB from before, save as page number to be
-        temp13 = temp0 and 0x1F
+        temp17 = temp0 and 0x1F
         //> sta EntrancePage         ;used upon entry to area, if area is entered
-        entrancePage = temp13
+        entrancePage = temp17
     }
     //> NotUse: jmp Inc3B
     //> CheckThreeBytes:
@@ -8592,11 +12862,11 @@ fun enemiesAndLoopsCore(X: Int) {
     //> lda (EnemyData),y        ;get first byte
     temp0 = memory[readWord(EnemyData) + temp3].toInt()
     //> and #%00001111           ;check for special row $0e
-    temp14 = temp0 and 0x0F
+    temp18 = temp0 and 0x0F
     //> cmp #$0e
     //> bne Inc2B
-    temp0 = temp14
-    if (temp14 == 0x0E) {
+    temp0 = temp18
+    if (temp18 == 0x0E) {
         //> Inc3B:  inc EnemyDataOffset      ;if row = $0e, increment three bytes
         enemyDataOffset = (enemyDataOffset + 1) and 0xFF
     }
@@ -8605,12 +12875,13 @@ fun enemiesAndLoopsCore(X: Int) {
     temp3 = 0x00
     //> sec
     //> sbc #$37                  ;subtract $37 from second byte read
+    temp19 = temp0 - 0x37
+    temp0 = temp19 and 0xFF
     //> pha                       ;save result in stack for now
-    push((temp0 - 0x37) and 0xFF)
+    push(temp0)
     //> cmp #$04                  ;was byte in $3b-$3e range?
     //> bcs SnglID                ;if so, branch
-    temp0 = (temp0 - 0x37) and 0xFF
-    if (!(((temp0 - 0x37) and 0xFF) >= 0x04)) {
+    if (!(temp0 >= 0x04)) {
         //> pha                       ;save another copy to stack
         push(temp0)
         //> ldy #Goomba               ;load value for goomba enemy
@@ -8630,10 +12901,10 @@ fun enemiesAndLoopsCore(X: Int) {
     //> ldy #$b0                  ;load default y coordinate
     temp3 = 0xB0
     //> and #$02                  ;check to see if d1 was set
-    temp15 = temp0 and 0x02
+    temp20 = temp0 and 0x02
     //> beq SetYGp                ;if so, move y coordinate up,
-    temp0 = temp15
-    if (temp15 != 0) {
+    temp0 = temp20
+    if (temp20 != 0) {
         //> ldy #$70                  ;otherwise branch and use default
         temp3 = 0x70
     }
@@ -8660,83 +12931,89 @@ fun enemiesAndLoopsCore(X: Int) {
     }
     //> CntGrp: sty NumberofGroupEnemies  ;save number of enemies here
     numberofGroupEnemies = temp3
-    while (((numberofGroupEnemies - 1) and 0xFF) != 0) {
+    while (numberofGroupEnemies != 0) {
         //> GrLoop: ldx #$ff                  ;start at beginning of enemy buffers
         //> GSltLp: inx                       ;increment and branch if past
-        temp16 = 0xFF
-        temp16 = (temp16 + 1) and 0xFF
+        temp21 = 0xFF
+        temp21 = (temp21 + 1) and 0xFF
         //> cpx #$05                  ;end of buffers
         //> bcs NextED
-        if (temp16 >= 0x05) {
+        if (temp21 >= 0x05) {
             //  goto NextED
             return
         }
         //> lda Enemy_Flag,x          ;check to see if enemy is already
-        temp0 = enemyFlag[temp16]
+        temp0 = enemyFlag[temp21]
         //> bne GSltLp                ;stored in buffer, and branch if so
         //> lda $01
         temp0 = memory[0x1].toInt()
         //> sta Enemy_ID,x            ;store enemy object identifier
-        enemyId[temp16] = temp0
+        enemyId[temp21] = temp0
         //> lda $02
         temp0 = memory[0x2].toInt()
         //> sta Enemy_PageLoc,x       ;store page location for enemy object
-        enemyPageloc[temp16] = temp0
+        enemyPageloc[temp21] = temp0
         //> lda $03
         temp0 = memory[0x3].toInt()
         //> sta Enemy_X_Position,x    ;store x coordinate for enemy object
-        enemyXPosition[temp16] = temp0
+        enemyXPosition[temp21] = temp0
         //> clc
         //> adc #$18                  ;add 24 pixels for next enemy
+        temp22 = temp0 + 0x18
+        temp0 = temp22 and 0xFF
         //> sta $03
-        memory[0x3] = ((temp0 + 0x18) and 0xFF).toUByte()
+        memory[0x3] = temp0.toUByte()
         //> lda $02                   ;add carry to page location for
         temp0 = memory[0x2].toInt()
         //> adc #$00                  ;next enemy
+        temp23 = temp0 + (if (temp22 > 0xFF) 1 else 0)
+        temp0 = temp23 and 0xFF
         //> sta $02
-        memory[0x2] = ((temp0 + (if (temp0 + 0x18 > 0xFF) 1 else 0)) and 0xFF).toUByte()
+        memory[0x2] = temp0.toUByte()
         //> lda $00                   ;store y coordinate for enemy object
         temp0 = memory[0x0].toInt()
         //> sta Enemy_Y_Position,x
-        enemyYPosition[temp16] = temp0
+        enemyYPosition[temp21] = temp0
         //> lda #$01                  ;activate flag for buffer, and
         temp0 = 0x01
         //> sta Enemy_Y_HighPos,x     ;put enemy within the screen vertically
-        enemyYHighpos[temp16] = temp0
+        enemyYHighpos[temp21] = temp0
         //> sta Enemy_Flag,x
-        enemyFlag[temp16] = temp0
+        enemyFlag[temp21] = temp0
         //> jsr CheckpointEnemyID     ;process each enemy object separately
-        checkpointEnemyID(temp16)
+        checkpointEnemyID(temp21)
         //> dec NumberofGroupEnemies  ;do this until we run out of enemy objects
         numberofGroupEnemies = (numberofGroupEnemies - 1) and 0xFF
         //> bne GrLoop
     }
-    // NextED: jmp Inc2B - increment data offset and return
-    enemyDataOffset = (enemyDataOffset + 2) and 0xFF
-    return
+    while (true) {
+        //> NextED: jmp Inc2B                 ;jump to increment data offset and leave
+    }
     //> RunEnemyObjectsCore:
     //> ldx ObjectOffset  ;get offset for enemy object buffer
-    temp16 = objectOffset
+    temp21 = objectOffset
     //> lda #$00          ;load value 0 for jump engine by default
     temp0 = 0x00
     //> ldy Enemy_ID,x
-    temp3 = enemyId[temp16]
+    temp3 = enemyId[temp21]
     //> cpy #$15          ;if enemy object < $15, use default value
     //> bcc JmpEO
     if (temp3 >= 0x15) {
         //> tya               ;otherwise subtract $14 from the value and use
         //> sbc #$14          ;as value for jump engine
+        temp24 = temp3 - 0x14 - (if (temp3 >= 0x15) 0 else 1)
+        temp0 = temp24 and 0xFF
     }
     //> JmpEO: jsr JumpEngine
     when (temp0) {
         0 -> {
-            runNormalEnemies()
+            runNormalEnemies(temp21)
         }
         1 -> {
             runBowserFlame()
         }
         2 -> {
-            runFireworks()
+            runFireworks(temp21)
         }
         3 -> {
             noRunCode()
@@ -8805,13 +13082,13 @@ fun enemiesAndLoopsCore(X: Int) {
             runSmallPlatform()
         }
         25 -> {
-            runBowser()
+            runBowser(temp21)
         }
         26 -> {
             powerUpObjHandler()
         }
         27 -> {
-            vineObjectHandler()
+            vineObjectHandler(temp21)
         }
         28 -> {
             noRunCode()
@@ -8820,7 +13097,7 @@ fun enemiesAndLoopsCore(X: Int) {
             runStarFlagObj()
         }
         30 -> {
-            jumpspringHandler()
+            jumpspringHandler(temp21)
         }
         31 -> {
             noRunCode()
@@ -8840,6 +13117,11 @@ fun enemiesAndLoopsCore(X: Int) {
 
 // Decompiled from ExecGameLoopback
 fun execGameLoopback(Y: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
     var areaDataOffset by MemoryByte(AreaDataOffset)
     var areaObjectPageLoc by MemoryByte(AreaObjectPageLoc)
     var areaObjectPageSel by MemoryByte(AreaObjectPageSel)
@@ -8855,28 +13137,33 @@ fun execGameLoopback(Y: Int) {
     //> lda Player_PageLoc        ;send player back four pages
     //> sec
     //> sbc #$04
+    temp0 = playerPageloc - 0x04
     //> sta Player_PageLoc
-    playerPageloc = (playerPageloc - 0x04) and 0xFF
+    playerPageloc = temp0 and 0xFF
     //> lda CurrentPageLoc        ;send current page back four pages
     //> sec
     //> sbc #$04
+    temp1 = currentPageLoc - 0x04
     //> sta CurrentPageLoc
-    currentPageLoc = (currentPageLoc - 0x04) and 0xFF
+    currentPageLoc = temp1 and 0xFF
     //> lda ScreenLeft_PageLoc    ;subtract four from page location
     //> sec                       ;of screen's left border
     //> sbc #$04
+    temp2 = screenleftPageloc - 0x04
     //> sta ScreenLeft_PageLoc
-    screenleftPageloc = (screenleftPageloc - 0x04) and 0xFF
+    screenleftPageloc = temp2 and 0xFF
     //> lda ScreenRight_PageLoc   ;do the same for the page location
     //> sec                       ;of screen's right border
     //> sbc #$04
+    temp3 = screenrightPageloc - 0x04
     //> sta ScreenRight_PageLoc
-    screenrightPageloc = (screenrightPageloc - 0x04) and 0xFF
+    screenrightPageloc = temp3 and 0xFF
     //> lda AreaObjectPageLoc     ;subtract four from page control
     //> sec                       ;for area objects
     //> sbc #$04
+    temp4 = areaObjectPageLoc - 0x04
     //> sta AreaObjectPageLoc
-    areaObjectPageLoc = (areaObjectPageLoc - 0x04) and 0xFF
+    areaObjectPageLoc = temp4 and 0xFF
     //> lda #$00                  ;initialize page select for both
     //> sta EnemyObjectPageSel    ;area and enemy objects
     enemyObjectPageSel = 0x00
@@ -8909,6 +13196,7 @@ fun initEnemyObject(X: Int) {
 // Decompiled from CheckpointEnemyID
 fun checkpointEnemyID(X: Int) {
     var temp0: Int = 0
+    var temp1: Int = 0
     val enemyOffscrBitsMasked by MemoryByteIndexed(EnemyOffscrBitsMasked)
     val enemyId by MemoryByteIndexed(Enemy_ID)
     val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
@@ -8922,8 +13210,10 @@ fun checkpointEnemyID(X: Int) {
         //> lda Enemy_Y_Position,x
         temp0 = enemyYPosition[X]
         //> adc #$08                     ;add eight pixels to what will eventually be the
+        temp1 = temp0 + 0x08 + (if (enemyId[X] >= 0x15) 1 else 0)
+        temp0 = temp1 and 0xFF
         //> sta Enemy_Y_Position,x       ;enemy object's vertical coordinate ($00-$14 only)
-        enemyYPosition[X] = (temp0 + 0x08 + (if (enemyId[X] >= 0x15) 1 else 0)) and 0xFF
+        enemyYPosition[X] = temp0
         //> lda #$01
         temp0 = 0x01
         //> sta EnemyOffscrBitsMasked,x  ;set offscreen masked bit
@@ -8943,31 +13233,31 @@ fun checkpointEnemyID(X: Int) {
             initNormalEnemy(X)
         }
         3 -> {
-            initRedKoopa()
+            initRedKoopa(X)
         }
         4 -> {
             noInitCode()
         }
         5 -> {
-            initHammerBro()
+            initHammerBro(X)
         }
         6 -> {
             initGoomba()
         }
         7 -> {
-            initBloober()
+            initBloober(X)
         }
         8 -> {
-            initBulletBill()
+            initBulletBill(X)
         }
         9 -> {
             noInitCode()
         }
         10 -> {
-            initCheepCheep()
+            initCheepCheep(X)
         }
         11 -> {
-            initCheepCheep()
+            initCheepCheep(X)
         }
         12 -> {
             initPodoboo(X)
@@ -8976,10 +13266,10 @@ fun checkpointEnemyID(X: Int) {
             initPiranhaPlant(X)
         }
         14 -> {
-            initJumpGPTroopa()
+            initJumpGPTroopa(X)
         }
         15 -> {
-            initRedPTroopa()
+            initRedPTroopa(X)
         }
         16 -> {
             initHorizFlySwimEnemy(X)
@@ -8988,25 +13278,25 @@ fun checkpointEnemyID(X: Int) {
             initLakitu()
         }
         18 -> {
-            initEnemyFrenzy()
+            initEnemyFrenzy(X)
         }
         19 -> {
             noInitCode()
         }
         20 -> {
-            initEnemyFrenzy()
+            initEnemyFrenzy(X)
         }
         21 -> {
-            initEnemyFrenzy()
+            initEnemyFrenzy(X)
         }
         22 -> {
-            initEnemyFrenzy()
+            initEnemyFrenzy(X)
         }
         23 -> {
-            initEnemyFrenzy()
+            initEnemyFrenzy(X)
         }
         24 -> {
-            endFrenzy()
+            endFrenzy(X)
         }
         25 -> {
             noInitCode()
@@ -9015,16 +13305,16 @@ fun checkpointEnemyID(X: Int) {
             noInitCode()
         }
         27 -> {
-            initShortFirebar()
+            initShortFirebar(X)
         }
         28 -> {
-            initShortFirebar()
+            initShortFirebar(X)
         }
         29 -> {
-            initShortFirebar()
+            initShortFirebar(X)
         }
         30 -> {
-            initShortFirebar()
+            initShortFirebar(X)
         }
         31 -> {
             initLongFirebar()
@@ -9042,25 +13332,25 @@ fun checkpointEnemyID(X: Int) {
             noInitCode()
         }
         36 -> {
-            initBalPlatform()
+            initBalPlatform(X)
         }
         37 -> {
-            initVertPlatform()
+            initVertPlatform(X)
         }
         38 -> {
-            largeLiftUp()
+            largeLiftUp(X)
         }
         39 -> {
-            largeLiftDown()
+            largeLiftDown(X)
         }
         40 -> {
-            initHoriPlatform()
+            initHoriPlatform(X)
         }
         41 -> {
-            initDropPlatform()
+            initDropPlatform(X)
         }
         42 -> {
-            initHoriPlatform()
+            initHoriPlatform(X)
         }
         43 -> {
             platLiftUp(X)
@@ -9069,7 +13359,7 @@ fun checkpointEnemyID(X: Int) {
             platLiftDown(X)
         }
         45 -> {
-            initBowser()
+            initBowser(X)
         }
         46 -> {
             pwrUpJmp()
@@ -9093,7 +13383,7 @@ fun checkpointEnemyID(X: Int) {
             noInitCode()
         }
         53 -> {
-            initRetainerObj()
+            initRetainerObj(X)
         }
         54 -> {
             endOfEnemyInitCode()
@@ -9103,6 +13393,22 @@ fun checkpointEnemyID(X: Int) {
         }
     }
     return
+}
+
+// Decompiled from NoInitCode
+fun noInitCode() {
+    //> NoInitCode:
+    //> rts               ;this executed when enemy object has no init code
+    return
+}
+
+// Decompiled from InitGoomba
+fun initGoomba() {
+    var X: Int = 0
+    //> InitGoomba:
+    //> jsr InitNormalEnemy  ;set appropriate horizontal speed
+    initNormalEnemy(X)
+    //> jmp SmallBBox        ;set $09 as bounding box control, set other values
 }
 
 // Decompiled from InitPodoboo
@@ -9124,6 +13430,17 @@ fun initPodoboo(X: Int) {
     //> sta Enemy_State,x         ;initialize enemy state, then jump to use
     enemyState[X] = 0x02 shr 1 shr 1
     //> jmp SmallBBox             ;$09 as bounding box size and set other things
+}
+
+// Decompiled from InitRetainerObj
+fun initRetainerObj(X: Int) {
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    //> InitRetainerObj:
+    //> lda #$b8                ;set fixed vertical position for
+    //> sta Enemy_Y_Position,x  ;princess/mushroom retainer object
+    enemyYPosition[X] = 0xB8
+    //> rts
+    return
 }
 
 // Decompiled from InitNormalEnemy
@@ -9160,6 +13477,47 @@ fun initNormalEnemy(X: Int) {
     enemyMovingdir[X] = temp0
 }
 
+// Decompiled from InitRedKoopa
+fun initRedKoopa(X: Int) {
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    //> InitRedKoopa:
+    //> jsr InitNormalEnemy   ;load appropriate horizontal speed
+    initNormalEnemy(X)
+    //> lda #$01              ;set enemy state for red koopa troopa $03
+    //> sta Enemy_State,x
+    enemyState[X] = 0x01
+    //> rts
+    return
+}
+
+// Decompiled from InitHammerBro
+fun initHammerBro(X: Int) {
+    var secondaryHardMode by MemoryByte(SecondaryHardMode)
+    val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
+    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
+    val hBroWalkingTimerData by MemoryByteIndexed(HBroWalkingTimerData)
+    val hammerThrowingTimer by MemoryByteIndexed(HammerThrowingTimer)
+    //> InitHammerBro:
+    //> lda #$00                    ;init horizontal speed and timer used by hammer bro
+    //> sta HammerThrowingTimer,x   ;apparently to time hammer throwing
+    hammerThrowingTimer[X] = 0x00
+    //> sta Enemy_X_Speed,x
+    enemyXSpeed[X] = 0x00
+    //> ldy SecondaryHardMode       ;get secondary hard mode flag
+    //> lda HBroWalkingTimerData,y
+    //> sta EnemyIntervalTimer,x    ;set value as delay for hammer bro to walk left
+    enemyIntervalTimer[X] = hBroWalkingTimerData[secondaryHardMode]
+    //> lda #$0b                    ;set specific value for bounding box size control
+    //> jmp SetBBox
+    //> SetBBox:  sta Enemy_BoundBoxCtrl,x    ;set bounding box control here
+    enemyBoundboxctrl[X] = 0x0B
+    //> lda #$02                    ;set moving direction for left
+    //> sta Enemy_MovingDir,x
+    enemyMovingdir[X] = 0x02
+}
+
 // Decompiled from InitHorizFlySwimEnemy
 fun initHorizFlySwimEnemy(X: Int) {
     var A: Int = 0
@@ -9169,7 +13527,11 @@ fun initHorizFlySwimEnemy(X: Int) {
     //> SetESpd: sta Enemy_X_Speed,x   ;store as speed for enemy object
     enemyXSpeed[X] = A
     //> jmp TallBBox          ;branch to set bounding box control and other data
-    // (Unreachable code removed: InitHorizFlySwimEnemy)
+    while (true) {
+        //> InitHorizFlySwimEnemy:
+        //> lda #$00        ;initialize horizontal speed
+        //> jmp SetESpd
+    }
     //> TallBBox: lda #$03                    ;set specific bounding box size control
     //> SetBBox:  sta Enemy_BoundBoxCtrl,x    ;set bounding box control here
     enemyBoundboxctrl[X] = 0x03
@@ -9178,42 +13540,27 @@ fun initHorizFlySwimEnemy(X: Int) {
     enemyMovingdir[X] = 0x02
 }
 
+// Decompiled from InitBloober
+fun initBloober(X: Int) {
+    val blooperMoveSpeed by MemoryByteIndexed(BlooperMoveSpeed)
+    //> InitBloober:
+    //> lda #$00               ;initialize horizontal speed
+    //> sta BlooperMoveSpeed,x
+    blooperMoveSpeed[X] = 0x00
+    // Fall-through tail call to smallBBox
+    smallBBox(X)
+}
+
 // Decompiled from SmallBBox
 fun smallBBox(X: Int): Int {
     var temp0: Int = 0
-    var temp1: Int = 0
     val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
     val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
-    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
-    val redPTroopaCenterYPos by MemoryByteIndexed(RedPTroopaCenterYPos)
-    val redPTroopaOrigXPos by MemoryByteIndexed(RedPTroopaOrigXPos)
     //> SmallBBox: lda #$09               ;set specific bounding box size control
     //> bne SetBBox            ;unconditional branch
-    if (!(0x09 == 0)) {
-        //  goto SetBBox
-        return A
-    }
     temp0 = 0x09
     if (0x09 == 0) {
         //> ;--------------------------------
-        //> InitRedPTroopa:
-        //> ldy #$30                    ;load central position adder for 48 pixels down
-        //> lda Enemy_Y_Position,x      ;set vertical coordinate into location to
-        temp0 = enemyYPosition[X]
-        //> sta RedPTroopaOrigXPos,x    ;be used as original vertical coordinate
-        redPTroopaOrigXPos[X] = temp0
-        //> bpl GetCent                 ;if vertical coordinate < $80
-        temp1 = 0x30
-        if ((temp0 and 0x80) != 0) {
-            //> ldy #$e0                    ;if => $80, load position adder for 32 pixels up
-            temp1 = 0xE0
-        }
-        //> GetCent:  tya                         ;send central position adder to A
-        //> adc Enemy_Y_Position,x      ;add to current vertical coordinate
-        //> sta RedPTroopaCenterYPos,x  ;store as central vertical coordinate
-        redPTroopaCenterYPos[X] = (temp1 + enemyYPosition[X]) and 0xFF
-        //> TallBBox: lda #$03                    ;set specific bounding box size control
-        temp0 = 0x03
     }
     //> SetBBox:  sta Enemy_BoundBoxCtrl,x    ;set bounding box control here
     enemyBoundboxctrl[X] = temp0
@@ -9221,7 +13568,49 @@ fun smallBBox(X: Int): Int {
     temp0 = 0x02
     //> sta Enemy_MovingDir,x
     enemyMovingdir[X] = temp0
-    return 0
+    // Fall-through tail call to initRedPTroopa
+    initRedPTroopa(X)
+    return A
+}
+
+// Decompiled from InitRedPTroopa
+fun initRedPTroopa(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val redPTroopaCenterYPos by MemoryByteIndexed(RedPTroopaCenterYPos)
+    val redPTroopaOrigXPos by MemoryByteIndexed(RedPTroopaOrigXPos)
+    //> InitRedPTroopa:
+    //> ldy #$30                    ;load central position adder for 48 pixels down
+    //> lda Enemy_Y_Position,x      ;set vertical coordinate into location to
+    //> sta RedPTroopaOrigXPos,x    ;be used as original vertical coordinate
+    redPTroopaOrigXPos[X] = enemyYPosition[X]
+    //> bpl GetCent                 ;if vertical coordinate < $80
+    temp0 = enemyYPosition[X]
+    temp1 = 0x30
+    if ((enemyYPosition[X] and 0x80) != 0) {
+        //> ldy #$e0                    ;if => $80, load position adder for 32 pixels up
+        temp1 = 0xE0
+    }
+    //> GetCent:  tya                         ;send central position adder to A
+    //> adc Enemy_Y_Position,x      ;add to current vertical coordinate
+    temp2 = temp1 + enemyYPosition[X]
+    temp0 = temp2 and 0xFF
+    //> sta RedPTroopaCenterYPos,x  ;store as central vertical coordinate
+    redPTroopaCenterYPos[X] = temp0
+    //> TallBBox: lda #$03                    ;set specific bounding box size control
+    temp0 = 0x03
+    //> SetBBox:  sta Enemy_BoundBoxCtrl,x    ;set bounding box control here
+    enemyBoundboxctrl[X] = temp0
+    //> lda #$02                    ;set moving direction for left
+    temp0 = 0x02
+    //> sta Enemy_MovingDir,x
+    enemyMovingdir[X] = temp0
+    // Fall-through tail call to smallBBox
+    smallBBox(X)
 }
 
 // Decompiled from InitVStf
@@ -9235,6 +13624,63 @@ fun initVStf(X: Int): Int {
     enemyYMoveforce[X] = 0x00
     //> rts
     return A
+}
+
+// Decompiled from InitBulletBill
+fun initBulletBill(X: Int) {
+    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    //> InitBulletBill:
+    //> lda #$02                  ;set moving direction for left
+    //> sta Enemy_MovingDir,x
+    enemyMovingdir[X] = 0x02
+    //> lda #$09                  ;set bounding box control for $09
+    //> sta Enemy_BoundBoxCtrl,x
+    enemyBoundboxctrl[X] = 0x09
+    //> rts
+    return
+}
+
+// Decompiled from InitCheepCheep
+fun initCheepCheep(X: Int) {
+    var temp0: Int = 0
+    val cheepCheepMoveMFlag by MemoryByteIndexed(CheepCheepMoveMFlag)
+    val cheepCheepOrigYPos by MemoryByteIndexed(CheepCheepOrigYPos)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val pseudoRandomBitReg by MemoryByteIndexed(PseudoRandomBitReg)
+    //> InitCheepCheep:
+    //> jsr SmallBBox              ;set vertical bounding box, speed, init others
+    smallBBox(X)
+    //> lda PseudoRandomBitReg,x   ;check one portion of LSFR
+    //> and #%00010000             ;get d4 from it
+    temp0 = pseudoRandomBitReg[X] and 0x10
+    //> sta CheepCheepMoveMFlag,x  ;save as movement flag of some sort
+    cheepCheepMoveMFlag[X] = temp0
+    //> lda Enemy_Y_Position,x
+    //> sta CheepCheepOrigYPos,x   ;save original vertical coordinate here
+    cheepCheepOrigYPos[X] = enemyYPosition[X]
+    //> rts
+    return
+}
+
+// Decompiled from InitLakitu
+fun initLakitu() {
+    var temp0: Int = 0
+    var enemyFrenzyBuffer by MemoryByte(EnemyFrenzyBuffer)
+    //> InitLakitu:
+    //> lda EnemyFrenzyBuffer      ;check to see if an enemy is already in
+    //> bne KillLakitu             ;the frenzy buffer, and branch to kill lakitu if so
+    if (!(enemyFrenzyBuffer == 0)) {
+        //  goto KillLakitu
+        return
+    }
+    temp0 = enemyFrenzyBuffer
+    if (enemyFrenzyBuffer == 0) {
+    }
+    //> KillLakitu:
+    //> jmp EraseEnemyObject
+    // Fall-through tail call to setupLakitu
+    setupLakitu(X)
 }
 
 // Decompiled from SetupLakitu
@@ -9251,6 +13697,215 @@ fun setupLakitu(X: Int) {
     //> TallBBox2: lda #$03                  ;set specific value for bounding box control
     //> SetBBox2:  sta Enemy_BoundBoxCtrl,x  ;set bounding box control then leave
     enemyBoundboxctrl[X] = 0x03
+    //> rts
+    return
+}
+
+// Decompiled from LakituAndSpinyHandler
+fun lakituAndSpinyHandler(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var frenzyEnemyTimer by MemoryByte(FrenzyEnemyTimer)
+    var lakituReappearTimer by MemoryByte(LakituReappearTimer)
+    var objectOffset by MemoryByte(ObjectOffset)
+    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
+    val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val enemyYSpeed by MemoryByteIndexed(Enemy_Y_Speed)
+    val pRDiffAdjustData by MemoryByteIndexed(PRDiffAdjustData)
+    val pseudoRandomBitReg by MemoryByteIndexed(PseudoRandomBitReg)
+    //> LakituAndSpinyHandler:
+    //> lda FrenzyEnemyTimer    ;if timer here not expired, leave
+    //> bne ExLSHand
+    temp0 = frenzyEnemyTimer
+    if (frenzyEnemyTimer == 0) {
+        //> cpx #$05                ;if we are on the special use slot, leave
+        //> bcs ExLSHand
+        if (!(X >= 0x05)) {
+            //> lda #$80                ;set timer
+            temp0 = 0x80
+            //> sta FrenzyEnemyTimer
+            frenzyEnemyTimer = temp0
+            //> ldy #$04                ;start with the last enemy slot
+            temp1 = 0x04
+            while ((temp1 and 0x80) == 0) {
+                //> dey                     ;otherwise check another slot
+                temp1 = (temp1 - 1) and 0xFF
+                //> bpl ChkLak              ;loop until all slots are checked
+            }
+            //> inc LakituReappearTimer ;increment reappearance timer
+            lakituReappearTimer = (lakituReappearTimer + 1) and 0xFF
+            //> lda LakituReappearTimer
+            temp0 = lakituReappearTimer
+            //> cmp #$07                ;check to see if we're up to a certain value yet
+            //> bcc ExLSHand            ;if not, leave
+            if (temp0 >= 0x07) {
+                //> ldx #$04                ;start with the last enemy slot again
+                temp2 = 0x04
+                while ((temp2 and 0x80) == 0) {
+                    //> dex                     ;otherwise check next slot
+                    temp2 = (temp2 - 1) and 0xFF
+                    //> bpl ChkNoEn             ;branch until all slots are checked
+                }
+                //> bmi RetEOfs             ;if no empty slots were found, branch to leave
+                if ((temp2 and 0x80) == 0) {
+                    //> CreateL:  lda #$00                ;initialize enemy state
+                    temp0 = 0x00
+                    //> sta Enemy_State,x
+                    enemyState[temp2] = temp0
+                    //> lda #Lakitu             ;create lakitu enemy object
+                    temp0 = Lakitu
+                    //> sta Enemy_ID,x
+                    enemyId[temp2] = temp0
+                    //> jsr SetupLakitu         ;do a sub to set up lakitu
+                    setupLakitu(temp2)
+                    //> lda #$20
+                    temp0 = 0x20
+                    //> jsr PutAtRightExtent    ;finish setting up lakitu
+                    putAtRightExtent(temp0, temp2)
+                }
+                //> RetEOfs:  ldx ObjectOffset        ;get enemy object buffer offset again and leave
+                temp2 = objectOffset
+            }
+        }
+    }
+    //> ExLSHand: rts
+    return
+}
+
+// Decompiled from InitLongFirebar
+fun initLongFirebar() {
+    var X: Int = 0
+    //> InitLongFirebar:
+    //> jsr DuplicateEnemyObj       ;create enemy object for long firebar
+    duplicateEnemyObj(X)
+    // Fall-through tail call to initShortFirebar
+    initShortFirebar(X)
+}
+
+// Decompiled from InitShortFirebar
+fun initShortFirebar(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val firebarSpinDirData by MemoryByteIndexed(FirebarSpinDirData)
+    val firebarSpinDirection by MemoryByteIndexed(FirebarSpinDirection)
+    val firebarSpinSpdData by MemoryByteIndexed(FirebarSpinSpdData)
+    val firebarSpinSpeed by MemoryByteIndexed(FirebarSpinSpeed)
+    val firebarspinstateLow by MemoryByteIndexed(FirebarSpinState_Low)
+    //> InitShortFirebar:
+    //> lda #$00                    ;initialize low byte of spin state
+    //> sta FirebarSpinState_Low,x
+    firebarspinstateLow[X] = 0x00
+    //> lda Enemy_ID,x              ;subtract $1b from enemy identifier
+    //> sec                         ;to get proper offset for firebar data
+    //> sbc #$1b
+    temp0 = enemyId[X] - 0x1B
+    //> tay
+    //> lda FirebarSpinSpdData,y    ;get spinning speed of firebar
+    //> sta FirebarSpinSpeed,x
+    firebarSpinSpeed[X] = firebarSpinSpdData[temp0 and 0xFF]
+    //> lda FirebarSpinDirData,y    ;get spinning direction of firebar
+    //> sta FirebarSpinDirection,x
+    firebarSpinDirection[X] = firebarSpinDirData[temp0 and 0xFF]
+    //> lda Enemy_Y_Position,x
+    //> clc                         ;add four pixels to vertical coordinate
+    //> adc #$04
+    temp1 = enemyYPosition[X] + 0x04
+    //> sta Enemy_Y_Position,x
+    enemyYPosition[X] = temp1 and 0xFF
+    //> lda Enemy_X_Position,x
+    //> clc                         ;add four pixels to horizontal coordinate
+    //> adc #$04
+    temp2 = enemyXPosition[X] + 0x04
+    //> sta Enemy_X_Position,x
+    enemyXPosition[X] = temp2 and 0xFF
+    //> lda Enemy_PageLoc,x
+    //> adc #$00                    ;add carry to page location
+    temp3 = enemyPageloc[X] + (if (temp2 > 0xFF) 1 else 0)
+    //> sta Enemy_PageLoc,x
+    enemyPageloc[X] = temp3 and 0xFF
+    //> jmp TallBBox2               ;set bounding box control (not used) and leave
+    //> TallBBox2: lda #$03                  ;set specific value for bounding box control
+    //> SetBBox2:  sta Enemy_BoundBoxCtrl,x  ;set bounding box control then leave
+    enemyBoundboxctrl[X] = 0x03
+    //> rts
+    return
+}
+
+// Decompiled from InitFlyingCheepCheep
+fun initFlyingCheepCheep(X: Int) {
+    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
+    val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val enemyYSpeed by MemoryByteIndexed(Enemy_Y_Speed)
+    val flyCCTimerData by MemoryByteIndexed(FlyCCTimerData)
+    val flyCCXPositionData by MemoryByteIndexed(FlyCCXPositionData)
+    val flyCCXSpeedData by MemoryByteIndexed(FlyCCXSpeedData)
+    val pseudoRandomBitReg by MemoryByteIndexed(PseudoRandomBitReg)
+    //> ChpChpEx: rts
+    return
+}
+
+// Decompiled from InitBowser
+fun initBowser(X: Int) {
+    var bowserBodyControls by MemoryByte(BowserBodyControls)
+    var bowserFeetCounter by MemoryByte(BowserFeetCounter)
+    var bowserFireBreathTimer by MemoryByte(BowserFireBreathTimer)
+    var bowserfrontOffset by MemoryByte(BowserFront_Offset)
+    var bowserHitPoints by MemoryByte(BowserHitPoints)
+    var bowserMovementSpeed by MemoryByte(BowserMovementSpeed)
+    var bowserOrigXPos by MemoryByte(BowserOrigXPos)
+    var bridgeCollapseOffset by MemoryByte(BridgeCollapseOffset)
+    val enemyFrameTimer by MemoryByteIndexed(EnemyFrameTimer)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    //> InitBowser:
+    //> jsr DuplicateEnemyObj     ;jump to create another bowser object
+    duplicateEnemyObj(X)
+    //> stx BowserFront_Offset    ;save offset of first here
+    bowserfrontOffset = X
+    //> lda #$00
+    //> sta BowserBodyControls    ;initialize bowser's body controls
+    bowserBodyControls = 0x00
+    //> sta BridgeCollapseOffset  ;and bridge collapse offset
+    bridgeCollapseOffset = 0x00
+    //> lda Enemy_X_Position,x
+    //> sta BowserOrigXPos        ;store original horizontal position here
+    bowserOrigXPos = enemyXPosition[X]
+    //> lda #$df
+    //> sta BowserFireBreathTimer ;store something here
+    bowserFireBreathTimer = 0xDF
+    //> sta Enemy_MovingDir,x     ;and in moving direction
+    enemyMovingdir[X] = 0xDF
+    //> lda #$20
+    //> sta BowserFeetCounter     ;set bowser's feet timer and in enemy timer
+    bowserFeetCounter = 0x20
+    //> sta EnemyFrameTimer,x
+    enemyFrameTimer[X] = 0x20
+    //> lda #$05
+    //> sta BowserHitPoints       ;give bowser 5 hit points
+    bowserHitPoints = 0x05
+    //> lsr
+    //> sta BowserMovementSpeed   ;set default movement speed here
+    bowserMovementSpeed = 0x05 shr 1
     //> rts
     return
 }
@@ -9299,8 +13954,26 @@ fun duplicateEnemyObj(X: Int) {
     return
 }
 
+// Decompiled from InitBowserFlame
+fun initBowserFlame(X: Int) {
+    val bowserFlamePRandomOfs by MemoryByteIndexed(BowserFlamePRandomOfs)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYmfDummy by MemoryByteIndexed(Enemy_YMF_Dummy)
+    val enemyYMoveforce by MemoryByteIndexed(Enemy_Y_MoveForce)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val flameYMFAdderData by MemoryByteIndexed(FlameYMFAdderData)
+    val flameYPosData by MemoryByteIndexed(FlameYPosData)
+    val pseudoRandomBitReg by MemoryByteIndexed(PseudoRandomBitReg)
+    //> FlmEx:  rts                     ;and then leave
+    return
+}
+
 // Decompiled from PutAtRightExtent
 fun putAtRightExtent(A: Int, X: Int): Int {
+    var temp0: Int = 0
+    var temp1: Int = 0
     var screenrightPageloc by MemoryByte(ScreenRight_PageLoc)
     var screenrightXPos by MemoryByte(ScreenRight_X_Pos)
     val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
@@ -9317,12 +13990,14 @@ fun putAtRightExtent(A: Int, X: Int): Int {
     //> lda ScreenRight_X_Pos
     //> clc
     //> adc #$20                  ;place enemy 32 pixels beyond right side of screen
+    temp0 = screenrightXPos + 0x20
     //> sta Enemy_X_Position,x
-    enemyXPosition[X] = (screenrightXPos + 0x20) and 0xFF
+    enemyXPosition[X] = temp0 and 0xFF
     //> lda ScreenRight_PageLoc
     //> adc #$00                  ;add carry
+    temp1 = screenrightPageloc + (if (temp0 > 0xFF) 1 else 0)
     //> sta Enemy_PageLoc,x
-    enemyPageloc[X] = (screenrightPageloc + (if (screenrightXPos + 0x20 > 0xFF) 1 else 0)) and 0xFF
+    enemyPageloc[X] = temp1 and 0xFF
     //> jmp FinishFlame           ;skip this part to finish setting values
     //> FinishFlame:
     //> lda #$08                 ;set $08 for bounding box control
@@ -9342,8 +14017,136 @@ fun putAtRightExtent(A: Int, X: Int): Int {
     return A
 }
 
+// Decompiled from InitFireworks
+fun initFireworks(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var fireworksCounter by MemoryByte(FireworksCounter)
+    var frenzyEnemyTimer by MemoryByte(FrenzyEnemyTimer)
+    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val explosionGfxCounter by MemoryByteIndexed(ExplosionGfxCounter)
+    val explosionTimerCounter by MemoryByteIndexed(ExplosionTimerCounter)
+    val fireworksXPosData by MemoryByteIndexed(FireworksXPosData)
+    val fireworksYPosData by MemoryByteIndexed(FireworksYPosData)
+    //> InitFireworks:
+    //> lda FrenzyEnemyTimer         ;if timer not expired yet, branch to leave
+    //> bne ExitFWk
+    temp0 = frenzyEnemyTimer
+    if (frenzyEnemyTimer == 0) {
+        //> lda #$20                     ;otherwise reset timer
+        temp0 = 0x20
+        //> sta FrenzyEnemyTimer
+        frenzyEnemyTimer = temp0
+        //> dec FireworksCounter         ;decrement for each explosion
+        fireworksCounter = (fireworksCounter - 1) and 0xFF
+        //> ldy #$06                     ;start at last slot
+        temp1 = 0x06
+        do {
+            //> StarFChk: dey
+            temp1 = (temp1 - 1) and 0xFF
+            //> lda Enemy_ID,y               ;check for presence of star flag object
+            temp0 = enemyId[temp1]
+            //> cmp #StarFlagObject          ;if there isn't a star flag object,
+            //> bne StarFChk                 ;routine goes into infinite loop = crash
+        } while (temp0 != StarFlagObject)
+        //> lda Enemy_X_Position,y
+        temp0 = enemyXPosition[temp1]
+        //> sec                          ;get horizontal coordinate of star flag object, then
+        //> sbc #$30                     ;subtract 48 pixels from it and save to
+        temp2 = temp0 - 0x30
+        temp0 = temp2 and 0xFF
+        //> pha                          ;the stack
+        push(temp0)
+        //> lda Enemy_PageLoc,y
+        temp0 = enemyPageloc[temp1]
+        //> sbc #$00                     ;subtract the carry from the page location
+        temp3 = temp0 - (if (temp2 >= 0) 0 else 1)
+        temp0 = temp3 and 0xFF
+        //> sta $00                      ;of the star flag object
+        memory[0x0] = temp0.toUByte()
+        //> lda FireworksCounter         ;get fireworks counter
+        temp0 = fireworksCounter
+        //> clc
+        //> adc Enemy_State,y            ;add state of star flag object (possibly not necessary)
+        temp4 = temp0 + enemyState[temp1]
+        temp0 = temp4 and 0xFF
+        //> tay                          ;use as offset
+        //> pla                          ;get saved horizontal coordinate of star flag - 48 pixels
+        temp0 = pull()
+        //> clc
+        //> adc FireworksXPosData,y      ;add number based on offset of fireworks counter
+        temp5 = temp0 + fireworksXPosData[temp0]
+        temp0 = temp5 and 0xFF
+        //> sta Enemy_X_Position,x       ;store as the fireworks object horizontal coordinate
+        enemyXPosition[X] = temp0
+        //> lda $00
+        temp0 = memory[0x0].toInt()
+        //> adc #$00                     ;add carry and store as page location for
+        temp6 = temp0 + (if (temp5 > 0xFF) 1 else 0)
+        temp0 = temp6 and 0xFF
+        //> sta Enemy_PageLoc,x          ;the fireworks object
+        enemyPageloc[X] = temp0
+        //> lda FireworksYPosData,y      ;get vertical position using same offset
+        temp0 = fireworksYPosData[temp0]
+        //> sta Enemy_Y_Position,x       ;and store as vertical coordinate for fireworks object
+        enemyYPosition[X] = temp0
+        //> lda #$01
+        temp0 = 0x01
+        //> sta Enemy_Y_HighPos,x        ;store in vertical high byte
+        enemyYHighpos[X] = temp0
+        //> sta Enemy_Flag,x             ;and activate enemy buffer flag
+        enemyFlag[X] = temp0
+        //> lsr
+        temp0 = temp0 shr 1
+        //> sta ExplosionGfxCounter,x    ;initialize explosion counter
+        explosionGfxCounter[X] = temp0
+        //> lda #$08
+        temp0 = 0x08
+        //> sta ExplosionTimerCounter,x  ;set explosion timing counter
+        explosionTimerCounter[X] = temp0
+    }
+    //> ExitFWk:  rts
+    return
+}
+
+// Decompiled from BulletBillCheepCheep
+fun bulletBillCheepCheep(X: Int) {
+    var enemyDataOffset by MemoryByte(EnemyDataOffset)
+    var enemyObjectPageSel by MemoryByte(EnemyObjectPageSel)
+    var objectOffset by MemoryByte(ObjectOffset)
+    val bitmasks by MemoryByteIndexed(Bitmasks)
+    val enemy17YPosData by MemoryByteIndexed(Enemy17YPosData)
+    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyYmfDummy by MemoryByteIndexed(Enemy_YMF_Dummy)
+    val pseudoRandomBitReg by MemoryByteIndexed(PseudoRandomBitReg)
+    val swimccIddata by MemoryByteIndexed(SwimCC_IDData)
+    //> Inc2B:  inc EnemyDataOffset      ;otherwise increment two bytes
+    enemyDataOffset = (enemyDataOffset + 1) and 0xFF
+    //> inc EnemyDataOffset
+    enemyDataOffset = (enemyDataOffset + 1) and 0xFF
+    //> lda #$00                 ;init page select for enemy objects
+    //> sta EnemyObjectPageSel
+    enemyObjectPageSel = 0x00
+    //> ldx ObjectOffset         ;reload current offset in enemy buffers
+    //> rts                      ;and leave
+    return
+}
+
 // Decompiled from InitPiranhaPlant
 fun initPiranhaPlant(X: Int) {
+    var temp0: Int = 0
     val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
     val enemyState by MemoryByteIndexed(Enemy_State)
     val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
@@ -9365,12 +14168,355 @@ fun initPiranhaPlant(X: Int) {
     piranhaPlantDownYPos[X] = enemyYPosition[X]
     //> sec
     //> sbc #$18
+    temp0 = enemyYPosition[X] - 0x18
     //> sta PiranhaPlantUpYPos,x     ;save original vertical coordinate - 24 pixels here
-    piranhaPlantUpYPos[X] = (enemyYPosition[X] - 0x18) and 0xFF
+    piranhaPlantUpYPos[X] = temp0 and 0xFF
     //> lda #$09
     //> jmp SetBBox2                 ;set specific value for bounding box control
     //> SetBBox2:  sta Enemy_BoundBoxCtrl,x  ;set bounding box control then leave
     enemyBoundboxctrl[X] = 0x09
+    //> rts
+    return
+}
+
+// Decompiled from InitEnemyFrenzy
+fun initEnemyFrenzy(X: Int) {
+    var temp0: Int = 0
+    var enemyFrenzyBuffer by MemoryByte(EnemyFrenzyBuffer)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    //> InitEnemyFrenzy:
+    //> lda Enemy_ID,x        ;load enemy identifier
+    //> sta EnemyFrenzyBuffer ;save in enemy frenzy buffer
+    enemyFrenzyBuffer = enemyId[X]
+    //> sec
+    //> sbc #$12              ;subtract 12 and use as offset for jump engine
+    temp0 = enemyId[X] - 0x12
+    //> jsr JumpEngine
+    when (temp0 and 0xFF) {
+        0 -> {
+            lakituAndSpinyHandler(X)
+        }
+        1 -> {
+            noFrenzyCode()
+        }
+        2 -> {
+            initFlyingCheepCheep(X)
+        }
+        3 -> {
+            initBowserFlame(X)
+        }
+        4 -> {
+            initFireworks(X)
+        }
+        5 -> {
+            bulletBillCheepCheep(X)
+        }
+        else -> {
+            // Unknown JumpEngine index
+        }
+    }
+    return
+}
+
+// Decompiled from NoFrenzyCode
+fun noFrenzyCode() {
+    //> NoFrenzyCode:
+    //> rts
+    return
+}
+
+// Decompiled from EndFrenzy
+fun endFrenzy(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var enemyFrenzyBuffer by MemoryByte(EnemyFrenzyBuffer)
+    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    //> EndFrenzy:
+    //> ldy #$05               ;start at last slot
+    temp0 = 0x05
+    do {
+        //> LakituChk: lda Enemy_ID,y         ;check enemy identifiers
+        //> cmp #Lakitu            ;for lakitu
+        //> bne NextFSlot
+        temp1 = enemyId[temp0]
+        if (enemyId[temp0] == Lakitu) {
+            //> lda #$01               ;if found, set state
+            temp1 = 0x01
+            //> sta Enemy_State,y
+            enemyState[temp0] = temp1
+        }
+        //> NextFSlot: dey                    ;move onto the next slot
+        temp0 = (temp0 - 1) and 0xFF
+        //> bpl LakituChk          ;do this until all slots are checked
+    } while ((temp0 and 0x80) == 0)
+    //> lda #$00
+    temp1 = 0x00
+    //> sta EnemyFrenzyBuffer  ;empty enemy frenzy buffer
+    enemyFrenzyBuffer = temp1
+    //> sta Enemy_Flag,x       ;disable enemy buffer flag for this object
+    enemyFlag[X] = temp1
+    //> rts
+    return
+}
+
+// Decompiled from InitJumpGPTroopa
+fun initJumpGPTroopa(X: Int) {
+    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
+    //> InitJumpGPTroopa:
+    //> lda #$02                  ;set for movement to the left
+    //> sta Enemy_MovingDir,x
+    enemyMovingdir[X] = 0x02
+    //> lda #$f8                  ;set horizontal speed
+    //> sta Enemy_X_Speed,x
+    enemyXSpeed[X] = 0xF8
+    //> TallBBox2: lda #$03                  ;set specific value for bounding box control
+    //> SetBBox2:  sta Enemy_BoundBoxCtrl,x  ;set bounding box control then leave
+    enemyBoundboxctrl[X] = 0x03
+    //> rts
+    return
+}
+
+// Decompiled from InitBalPlatform
+fun initBalPlatform(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var balPlatformAlignment by MemoryByte(BalPlatformAlignment)
+    var secondaryHardMode by MemoryByte(SecondaryHardMode)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    //> InitBalPlatform:
+    //> dec Enemy_Y_Position,x    ;raise vertical position by two pixels
+    enemyYPosition[X] = (enemyYPosition[X] - 1) and 0xFF
+    //> dec Enemy_Y_Position,x
+    enemyYPosition[X] = (enemyYPosition[X] - 1) and 0xFF
+    //> ldy SecondaryHardMode     ;if secondary hard mode flag not set,
+    //> bne AlignP                ;branch ahead
+    temp0 = secondaryHardMode
+    if (secondaryHardMode == 0) {
+        //> ldy #$02                  ;otherwise set value here
+        temp0 = 0x02
+        //> jsr PosPlatform           ;do a sub to add or subtract pixels
+        posPlatform(X, temp0)
+    }
+    //> AlignP: ldy #$ff                  ;set default value here for now
+    temp0 = 0xFF
+    //> lda BalPlatformAlignment  ;get current balance platform alignment
+    //> sta Enemy_State,x         ;set platform alignment to object state here
+    enemyState[X] = balPlatformAlignment
+    //> bpl SetBPA                ;if old alignment $ff, put $ff as alignment for negative
+    temp1 = balPlatformAlignment
+    if ((balPlatformAlignment and 0x80) != 0) {
+        //> txa                       ;if old contents already $ff, put
+        //> tay                       ;object offset as alignment to make next positive
+    }
+    //> SetBPA: sty BalPlatformAlignment  ;store whatever value's in Y here
+    balPlatformAlignment = temp0
+    //> lda #$00
+    temp1 = 0x00
+    //> sta Enemy_MovingDir,x     ;init moving direction
+    enemyMovingdir[X] = temp1
+    //> tay                       ;init Y
+    //> jsr PosPlatform           ;do a sub to add 8 pixels, then run shared code here
+    posPlatform(X, temp1)
+    //> ;--------------------------------
+    // Fall-through tail call to initDropPlatform
+    initDropPlatform(X)
+}
+
+// Decompiled from InitDropPlatform
+fun initDropPlatform(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var areaType by MemoryByte(AreaType)
+    var secondaryHardMode by MemoryByte(SecondaryHardMode)
+    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
+    val platformCollisionFlag by MemoryByteIndexed(PlatformCollisionFlag)
+    //> InitDropPlatform:
+    //> lda #$ff
+    //> sta PlatformCollisionFlag,x  ;set some value here
+    platformCollisionFlag[X] = 0xFF
+    //> jmp CommonPlatCode           ;then jump ahead to execute more code
+    //> CommonPlatCode:
+    //> jsr InitVStf              ;do a sub to init certain other values
+    initVStf(X)
+    //> SPBBox: lda #$05                  ;set default bounding box size control
+    //> ldy AreaType
+    //> cpy #$03                  ;check for castle-type level
+    //> beq CasPBB                ;use default value if found
+    temp0 = 0x05
+    temp1 = areaType
+    if (areaType != 0x03) {
+        //> ldy SecondaryHardMode     ;otherwise check for secondary hard mode flag
+        temp1 = secondaryHardMode
+        //> bne CasPBB                ;if set, use default value
+        if (temp1 == 0) {
+            //> lda #$06                  ;use alternate value if not castle or secondary not set
+            temp0 = 0x06
+        }
+    }
+    //> CasPBB: sta Enemy_BoundBoxCtrl,x  ;set bounding box size control here and leave
+    enemyBoundboxctrl[X] = temp0
+    //> rts
+    return
+}
+
+// Decompiled from InitHoriPlatform
+fun initHoriPlatform(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var areaType by MemoryByte(AreaType)
+    var secondaryHardMode by MemoryByte(SecondaryHardMode)
+    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
+    val xMoveSecondaryCounter by MemoryByteIndexed(XMoveSecondaryCounter)
+    //> InitHoriPlatform:
+    //> lda #$00
+    //> sta XMoveSecondaryCounter,x  ;init one of the moving counters
+    xMoveSecondaryCounter[X] = 0x00
+    //> jmp CommonPlatCode           ;jump ahead to execute more code
+    //> CommonPlatCode:
+    //> jsr InitVStf              ;do a sub to init certain other values
+    initVStf(X)
+    //> SPBBox: lda #$05                  ;set default bounding box size control
+    //> ldy AreaType
+    //> cpy #$03                  ;check for castle-type level
+    //> beq CasPBB                ;use default value if found
+    temp0 = 0x05
+    temp1 = areaType
+    if (areaType != 0x03) {
+        //> ldy SecondaryHardMode     ;otherwise check for secondary hard mode flag
+        temp1 = secondaryHardMode
+        //> bne CasPBB                ;if set, use default value
+        if (temp1 == 0) {
+            //> lda #$06                  ;use alternate value if not castle or secondary not set
+            temp0 = 0x06
+        }
+    }
+    //> CasPBB: sta Enemy_BoundBoxCtrl,x  ;set bounding box size control here and leave
+    enemyBoundboxctrl[X] = temp0
+    //> rts
+    return
+}
+
+// Decompiled from InitVertPlatform
+fun initVertPlatform(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var areaType by MemoryByte(AreaType)
+    var secondaryHardMode by MemoryByte(SecondaryHardMode)
+    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val yPlatformCenterYPos by MemoryByteIndexed(YPlatformCenterYPos)
+    val yPlatformTopYPos by MemoryByteIndexed(YPlatformTopYPos)
+    //> InitVertPlatform:
+    //> ldy #$40                    ;set default value here
+    //> lda Enemy_Y_Position,x      ;check vertical position
+    //> bpl SetYO                   ;if above a certain point, skip this part
+    temp0 = enemyYPosition[X]
+    temp1 = 0x40
+    if ((enemyYPosition[X] and 0x80) != 0) {
+        //> eor #$ff
+        temp2 = temp0 xor 0xFF
+        //> clc                         ;otherwise get two's compliment
+        //> adc #$01
+        temp3 = temp2 + 0x01
+        temp0 = temp3 and 0xFF
+        //> ldy #$c0                    ;get alternate value to add to vertical position
+        temp1 = 0xC0
+    }
+    //> SetYO: sta YPlatformTopYPos,x      ;save as top vertical position
+    yPlatformTopYPos[X] = temp0
+    //> tya
+    //> clc                         ;load value from earlier, add number of pixels
+    //> adc Enemy_Y_Position,x      ;to vertical position
+    temp4 = temp1 + enemyYPosition[X]
+    temp0 = temp4 and 0xFF
+    //> sta YPlatformCenterYPos,x   ;save result as central vertical position
+    yPlatformCenterYPos[X] = temp0
+    //> ;--------------------------------
+    //> CommonPlatCode:
+    //> jsr InitVStf              ;do a sub to init certain other values
+    initVStf(X)
+    //> SPBBox: lda #$05                  ;set default bounding box size control
+    temp0 = 0x05
+    //> ldy AreaType
+    temp1 = areaType
+    //> cpy #$03                  ;check for castle-type level
+    //> beq CasPBB                ;use default value if found
+    if (temp1 != 0x03) {
+        //> ldy SecondaryHardMode     ;otherwise check for secondary hard mode flag
+        temp1 = secondaryHardMode
+        //> bne CasPBB                ;if set, use default value
+        if (temp1 == 0) {
+            //> lda #$06                  ;use alternate value if not castle or secondary not set
+            temp0 = 0x06
+        }
+    }
+    //> CasPBB: sta Enemy_BoundBoxCtrl,x  ;set bounding box size control here and leave
+    enemyBoundboxctrl[X] = temp0
+    //> rts
+    return
+}
+
+// Decompiled from LargeLiftUp
+fun largeLiftUp(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var areaType by MemoryByte(AreaType)
+    var secondaryHardMode by MemoryByte(SecondaryHardMode)
+    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
+    //> SPBBox: lda #$05                  ;set default bounding box size control
+    //> ldy AreaType
+    //> cpy #$03                  ;check for castle-type level
+    //> beq CasPBB                ;use default value if found
+    temp0 = 0x05
+    temp1 = areaType
+    if (areaType != 0x03) {
+        //> ldy SecondaryHardMode     ;otherwise check for secondary hard mode flag
+        temp1 = secondaryHardMode
+        //> bne CasPBB                ;if set, use default value
+        if (temp1 == 0) {
+            //> lda #$06                  ;use alternate value if not castle or secondary not set
+            temp0 = 0x06
+        }
+    }
+    //> CasPBB: sta Enemy_BoundBoxCtrl,x  ;set bounding box size control here and leave
+    enemyBoundboxctrl[X] = temp0
+    //> rts
+    return
+}
+
+// Decompiled from LargeLiftDown
+fun largeLiftDown(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var areaType by MemoryByte(AreaType)
+    var secondaryHardMode by MemoryByte(SecondaryHardMode)
+    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
+    //> SPBBox: lda #$05                  ;set default bounding box size control
+    //> ldy AreaType
+    //> cpy #$03                  ;check for castle-type level
+    //> beq CasPBB                ;use default value if found
+    temp0 = 0x05
+    temp1 = areaType
+    if (areaType != 0x03) {
+        //> ldy SecondaryHardMode     ;otherwise check for secondary hard mode flag
+        temp1 = secondaryHardMode
+        //> bne CasPBB                ;if set, use default value
+        if (temp1 == 0) {
+            //> lda #$06                  ;use alternate value if not castle or secondary not set
+            temp0 = 0x06
+        }
+    }
+    //> CasPBB: sta Enemy_BoundBoxCtrl,x  ;set bounding box size control here and leave
+    enemyBoundboxctrl[X] = temp0
     //> rts
     return
 }
@@ -9425,6 +14571,8 @@ fun platLiftDown(X: Int) {
 
 // Decompiled from PosPlatform
 fun posPlatform(X: Int, Y: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
     val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
     val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
     val platPosDataHigh by MemoryByteIndexed(PlatPosDataHigh)
@@ -9433,13 +14581,29 @@ fun posPlatform(X: Int, Y: Int) {
     //> lda Enemy_X_Position,x  ;get horizontal coordinate
     //> clc
     //> adc PlatPosDataLow,y    ;add or subtract pixels depending on offset
+    temp0 = enemyXPosition[X] + platPosDataLow[Y]
     //> sta Enemy_X_Position,x  ;store as new horizontal coordinate
-    enemyXPosition[X] = (enemyXPosition[X] + platPosDataLow[Y]) and 0xFF
+    enemyXPosition[X] = temp0 and 0xFF
     //> lda Enemy_PageLoc,x
     //> adc PlatPosDataHigh,y   ;add or subtract page location depending on offset
+    temp1 = enemyPageloc[X] + platPosDataHigh[Y] + (if (temp0 > 0xFF) 1 else 0)
     //> sta Enemy_PageLoc,x     ;store as new page location
-    enemyPageloc[X] = (enemyPageloc[X] + platPosDataHigh[Y] + (if (enemyXPosition[X] + platPosDataLow[Y] > 0xFF) 1 else 0)) and 0xFF
+    enemyPageloc[X] = temp1 and 0xFF
     //> rts                     ;and go back
+    return
+}
+
+// Decompiled from EndOfEnemyInitCode
+fun endOfEnemyInitCode() {
+    //> EndOfEnemyInitCode:
+    //> rts
+    return
+}
+
+// Decompiled from NoRunCode
+fun noRunCode() {
+    //> NoRunCode:
+    //> rts
     return
 }
 
@@ -9452,6 +14616,46 @@ fun runRetainerObj() {
     //> jsr RelativeEnemyPosition
     relativeEnemyPosition()
     //> jmp EnemyGfxHandler
+}
+
+// Decompiled from RunNormalEnemies
+fun runNormalEnemies(X: Int) {
+    var Y: Int = 0
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var timerControl by MemoryByte(TimerControl)
+    val enemySprattrib by MemoryByteIndexed(Enemy_SprAttrib)
+    //> RunNormalEnemies:
+    //> lda #$00                  ;init sprite attributes
+    //> sta Enemy_SprAttrib,x
+    enemySprattrib[X] = 0x00
+    //> jsr GetEnemyOffscreenBits
+    getEnemyOffscreenBits(X)
+    //> jsr RelativeEnemyPosition
+    relativeEnemyPosition()
+    //> jsr EnemyGfxHandler
+    enemyGfxHandler(X)
+    //> jsr GetEnemyBoundBox
+    getEnemyBoundBox(X)
+    //> jsr EnemyToBGCollisionDet
+    enemyToBGCollisionDet(X)
+    //> jsr EnemiesCollision
+    enemiesCollision(X, Y)
+    //> jsr PlayerEnemyCollision
+    playerEnemyCollision(X)
+    //> ldy TimerControl          ;if master timer control set, skip to last routine
+    //> bne SkipMove
+    if (!(timerControl == 0)) {
+        //  goto SkipMove
+        return
+    }
+    temp0 = 0x00
+    temp1 = timerControl
+    if (timerControl == 0) {
+        //> jsr EnemyMovementSubs
+        enemyMovementSubs(X)
+    }
+    //> SkipMove: jmp OffscreenBoundsCheck
 }
 
 // Decompiled from EnemyMovementSubs
@@ -9477,43 +14681,43 @@ fun enemyMovementSubs(X: Int) {
             moveNormalEnemy(X)
         }
         5 -> {
-            procHammerBro()
+            procHammerBro(X)
         }
         6 -> {
             moveNormalEnemy(X)
         }
         7 -> {
-            moveBloober()
+            moveBloober(X)
         }
         8 -> {
-            moveBulletBill()
+            moveBulletBill(X)
         }
         9 -> {
             noMoveCode()
         }
         10 -> {
-            moveSwimmingCheepCheep()
+            moveSwimmingCheepCheep(X)
         }
         11 -> {
-            moveSwimmingCheepCheep()
+            moveSwimmingCheepCheep(X)
         }
         12 -> {
-            movePodoboo()
+            movePodoboo(X)
         }
         13 -> {
-            movePiranhaPlant()
+            movePiranhaPlant(X)
         }
         14 -> {
             moveJumpingEnemy()
         }
         15 -> {
-            procMoveRedPTroopa()
+            procMoveRedPTroopa(X)
         }
         16 -> {
-            moveFlyGreenPTroopa()
+            moveFlyGreenPTroopa(X)
         }
         17 -> {
-            moveLakitu()
+            moveLakitu(X)
         }
         18 -> {
             moveNormalEnemy(X)
@@ -9522,7 +14726,7 @@ fun enemyMovementSubs(X: Int) {
             noMoveCode()
         }
         20 -> {
-            moveFlyingCheepCheep()
+            moveFlyingCheepCheep(X)
         }
         else -> {
             // Unknown JumpEngine index
@@ -9531,35 +14735,125 @@ fun enemyMovementSubs(X: Int) {
     return
 }
 
+// Decompiled from NoMoveCode
+fun noMoveCode() {
+    //> NoMoveCode:
+    //> rts
+    return
+}
+
+// Decompiled from RunBowserFlame
+fun runBowserFlame() {
+    var X: Int = 0
+    //> RunBowserFlame:
+    //> jsr ProcBowserFlame
+    procBowserFlame(X)
+    //> jsr GetEnemyOffscreenBits
+    getEnemyOffscreenBits(X)
+    //> jsr RelativeEnemyPosition
+    relativeEnemyPosition()
+    //> jsr GetEnemyBoundBox
+    getEnemyBoundBox(X)
+    //> jsr PlayerEnemyCollision
+    playerEnemyCollision(X)
+    //> jmp OffscreenBoundsCheck
+}
+
+// Decompiled from RunFirebarObj
+fun runFirebarObj() {
+    var X: Int = 0
+    //> RunFirebarObj:
+    //> jsr ProcFirebar
+    procFirebar(X)
+    //> jmp OffscreenBoundsCheck
+}
+
+// Decompiled from RunSmallPlatform
+fun runSmallPlatform() {
+    var X: Int = 0
+    var Y: Int = 0
+    //> RunSmallPlatform:
+    //> jsr GetEnemyOffscreenBits
+    getEnemyOffscreenBits(X)
+    //> jsr RelativeEnemyPosition
+    relativeEnemyPosition()
+    //> jsr SmallPlatformBoundBox
+    smallPlatformBoundBox(X)
+    //> jsr SmallPlatformCollision
+    smallPlatformCollision(X, Y)
+    //> jsr RelativeEnemyPosition
+    relativeEnemyPosition()
+    //> jsr DrawSmallPlatform
+    drawSmallPlatform(X)
+    //> jsr MoveSmallPlatform
+    moveSmallPlatform(X)
+    //> jmp OffscreenBoundsCheck
+}
+
+// Decompiled from RunLargePlatform
+fun runLargePlatform() {
+    var A: Int = 0
+    var X: Int = 0
+    var temp0: Int = 0
+    var timerControl by MemoryByte(TimerControl)
+    //> RunLargePlatform:
+    //> jsr GetEnemyOffscreenBits
+    getEnemyOffscreenBits(X)
+    //> jsr RelativeEnemyPosition
+    relativeEnemyPosition()
+    //> jsr LargePlatformBoundBox
+    largePlatformBoundBox(A, X)
+    //> jsr LargePlatformCollision
+    largePlatformCollision(X)
+    //> lda TimerControl             ;if master timer control set,
+    //> bne SkipPT                   ;skip subroutine tree
+    if (!(timerControl == 0)) {
+        //  goto SkipPT
+        return
+    }
+    temp0 = timerControl
+    if (timerControl == 0) {
+        //> jsr LargePlatformSubroutines
+        largePlatformSubroutines(X)
+    }
+    //> SkipPT: jsr RelativeEnemyPosition
+    relativeEnemyPosition()
+    //> jsr DrawLargePlatform
+    drawLargePlatform(X)
+    //> jmp OffscreenBoundsCheck
+}
+
 // Decompiled from LargePlatformSubroutines
 fun largePlatformSubroutines(X: Int) {
+    var temp0: Int = 0
     val enemyId by MemoryByteIndexed(Enemy_ID)
     //> LargePlatformSubroutines:
     //> lda Enemy_ID,x  ;subtract $24 to get proper offset for jump table
     //> sec
     //> sbc #$24
+    temp0 = enemyId[X] - 0x24
     //> jsr JumpEngine
-    when ((enemyId[X] - 0x24) and 0xFF) {
+    when (temp0 and 0xFF) {
         0 -> {
-            balancePlatform()
+            balancePlatform(X)
         }
         1 -> {
-            yMovingPlatform()
+            yMovingPlatform(X)
         }
         2 -> {
-            moveLargeLiftPlat()
+            moveLargeLiftPlat(X)
         }
         3 -> {
-            moveLargeLiftPlat()
+            moveLargeLiftPlat(X)
         }
         4 -> {
-            xMovingPlatform()
+            xMovingPlatform(X)
         }
         5 -> {
-            dropPlatform()
+            dropPlatform(X)
         }
         6 -> {
-            rightPlatform()
+            rightPlatform(6, X)
         }
         else -> {
             // Unknown JumpEngine index
@@ -9600,6 +14894,268 @@ fun eraseEnemyObject(X: Int) {
     return
 }
 
+// Decompiled from MovePodoboo
+fun movePodoboo(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
+    val enemyYMoveforce by MemoryByteIndexed(Enemy_Y_MoveForce)
+    val enemyYSpeed by MemoryByteIndexed(Enemy_Y_Speed)
+    val pseudoRandomBitReg by MemoryByteIndexed(PseudoRandomBitReg)
+    //> MovePodoboo:
+    //> lda EnemyIntervalTimer,x   ;check enemy timer
+    //> bne PdbM                   ;branch to move enemy if not expired
+    if (!(enemyIntervalTimer[X] == 0)) {
+        //  goto PdbM
+        return
+    }
+    temp0 = enemyIntervalTimer[X]
+    if (enemyIntervalTimer[X] == 0) {
+        //> jsr InitPodoboo            ;otherwise set up podoboo again
+        initPodoboo(X)
+        //> lda PseudoRandomBitReg+1,x ;get part of LSFR
+        temp0 = pseudoRandomBitReg[1 + X]
+        //> ora #%10000000             ;set d7
+        temp1 = temp0 or 0x80
+        //> sta Enemy_Y_MoveForce,x    ;store as movement force
+        enemyYMoveforce[X] = temp1
+        //> and #%00001111             ;mask out high nybble
+        temp2 = temp1 and 0x0F
+        //> ora #$06                   ;set for at least six intervals
+        temp3 = temp2 or 0x06
+        //> sta EnemyIntervalTimer,x   ;store as new enemy timer
+        enemyIntervalTimer[X] = temp3
+        //> lda #$f9
+        temp0 = 0xF9
+        //> sta Enemy_Y_Speed,x        ;set vertical speed to move podoboo upwards
+        enemyYSpeed[X] = temp0
+    }
+    //> PdbM: jmp MoveJ_EnemyVertically  ;branch to impose gravity on podoboo
+}
+
+// Decompiled from ProcHammerBro
+fun procHammerBro(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp10: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
+    var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
+    var frameCounter by MemoryByte(FrameCounter)
+    var secondaryHardMode by MemoryByte(SecondaryHardMode)
+    val enemyFrameTimer by MemoryByteIndexed(EnemyFrameTimer)
+    val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val enemyYSpeed by MemoryByteIndexed(Enemy_Y_Speed)
+    val hammerBroJumpLData by MemoryByteIndexed(HammerBroJumpLData)
+    val hammerBroJumpTimer by MemoryByteIndexed(HammerBroJumpTimer)
+    val hammerThrowTmrData by MemoryByteIndexed(HammerThrowTmrData)
+    val hammerThrowingTimer by MemoryByteIndexed(HammerThrowingTimer)
+    val pseudoRandomBitReg by MemoryByteIndexed(PseudoRandomBitReg)
+    //> ProcHammerBro:
+    //> lda Enemy_State,x          ;check hammer bro's enemy state for d5 set
+    //> and #%00100000
+    temp0 = enemyState[X] and 0x20
+    //> beq ChkJH                  ;if not set, go ahead with code
+    temp1 = temp0
+    if (temp0 != 0) {
+    } else {
+        //> ChkJH: lda HammerBroJumpTimer,x   ;check jump timer
+        temp1 = hammerBroJumpTimer[X]
+        //> beq HammerBroJumpCode      ;if expired, branch to jump
+        if (temp1 != 0) {
+            //> dec HammerBroJumpTimer,x   ;otherwise decrement jump timer
+            hammerBroJumpTimer[X] = (hammerBroJumpTimer[X] - 1) and 0xFF
+            //> lda Enemy_OffscreenBits
+            temp1 = enemyOffscreenbits
+            //> and #%00001100             ;check offscreen bits
+            temp2 = temp1 and 0x0C
+            //> bne MoveHammerBroXDir      ;if hammer bro a little offscreen, skip to movement code
+            if (!(temp2 == 0)) {
+                //  goto MoveHammerBroXDir
+                return
+            }
+            temp1 = temp2
+            if (temp2 == 0) {
+                //> lda HammerThrowingTimer,x  ;check hammer throwing timer
+                temp1 = hammerThrowingTimer[X]
+                //> bne DecHT                  ;if not expired, skip ahead, do not throw hammer
+                if (!(temp1 == 0)) {
+                    //  goto DecHT
+                    return
+                }
+                if (temp1 == 0) {
+                    //> ldy SecondaryHardMode      ;otherwise get secondary hard mode flag
+                    //> lda HammerThrowTmrData,y   ;get timer data using flag as offset
+                    temp1 = hammerThrowTmrData[secondaryHardMode]
+                    //> sta HammerThrowingTimer,x  ;set as new timer
+                    hammerThrowingTimer[X] = temp1
+                    //> jsr SpawnHammerObj         ;do a sub here to spawn hammer object
+                    spawnHammerObj()
+                    //> bcc DecHT                  ;if carry clear, hammer not spawned, skip to decrement timer
+                    if (!(flagC)) {
+                        //  goto DecHT
+                        return
+                    }
+                    temp3 = secondaryHardMode
+                    if (flagC) {
+                        //> lda Enemy_State,x
+                        temp1 = enemyState[X]
+                        //> ora #%00001000             ;set d3 in enemy state for hammer throw
+                        temp4 = temp1 or 0x08
+                        //> sta Enemy_State,x
+                        enemyState[X] = temp4
+                        //> jmp MoveHammerBroXDir      ;jump to move hammer bro
+                    }
+                }
+                //> DecHT: dec HammerThrowingTimer,x  ;decrement timer
+                hammerThrowingTimer[X] = (hammerThrowingTimer[X] - 1) and 0xFF
+                //> jmp MoveHammerBroXDir      ;jump to move hammer bro
+            }
+        } else {
+            //> HammerBroJumpCode:
+            //> lda Enemy_State,x           ;get hammer bro's enemy state
+            temp1 = enemyState[X]
+            //> and #%00000111              ;mask out all but 3 LSB
+            temp5 = temp1 and 0x07
+            //> cmp #$01                    ;check for d0 set (for jumping)
+            //> beq MoveHammerBroXDir       ;if set, branch ahead to moving code
+            if (temp5 - 0x01 == 0) {
+                //  goto MoveHammerBroXDir
+                return
+            }
+            temp1 = temp5
+            if (temp5 != 0x01) {
+                //> lda #$00                    ;load default value here
+                temp1 = 0x00
+                //> sta $00                     ;save into temp variable for now
+                memory[0x0] = temp1.toUByte()
+                //> ldy #$fa                    ;set default vertical speed
+                temp3 = 0xFA
+                //> lda Enemy_Y_Position,x      ;check hammer bro's vertical coordinate
+                temp1 = enemyYPosition[X]
+                //> bmi SetHJ                   ;if on the bottom half of the screen, use current speed
+                if ((temp1 and 0x80) != 0) {
+                    //  goto SetHJ
+                    return
+                }
+                if ((temp1 and 0x80) == 0) {
+                    //> ldy #$fd                    ;otherwise set alternate vertical speed
+                    temp3 = 0xFD
+                    //> cmp #$70                    ;check to see if hammer bro is above the middle of screen
+                    //> inc $00                     ;increment preset value to $01
+                    memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
+                    //> bcc SetHJ                   ;if above the middle of the screen, use current speed and $01
+                    if (!(temp1 >= 0x70)) {
+                        //  goto SetHJ
+                        return
+                    }
+                    if (temp1 >= 0x70) {
+                        //> dec $00                     ;otherwise return value to $00
+                        memory[0x0] = ((memory[0x0].toInt() - 1) and 0xFF).toUByte()
+                        //> lda PseudoRandomBitReg+1,x  ;get part of LSFR, mask out all but LSB
+                        temp1 = pseudoRandomBitReg[1 + X]
+                        //> and #$01
+                        temp6 = temp1 and 0x01
+                        //> bne SetHJ                   ;if d0 of LSFR set, branch and use current speed and $00
+                        if (!(temp6 == 0)) {
+                            //  goto SetHJ
+                            return
+                        }
+                        temp1 = temp6
+                        if (temp6 == 0) {
+                            //> ldy #$fa                    ;otherwise reset to default vertical speed
+                            temp3 = 0xFA
+                        }
+                    }
+                }
+                //> SetHJ: sty Enemy_Y_Speed,x         ;set vertical speed for jumping
+                enemyYSpeed[X] = temp3
+                //> lda Enemy_State,x           ;set d0 in enemy state for jumping
+                temp1 = enemyState[X]
+                //> ora #$01
+                temp7 = temp1 or 0x01
+                //> sta Enemy_State,x
+                enemyState[X] = temp7
+                //> lda $00                     ;load preset value here to use as bitmask
+                temp1 = memory[0x0].toInt()
+                //> and PseudoRandomBitReg+2,x  ;and do bit-wise comparison with part of LSFR
+                temp8 = temp1 and pseudoRandomBitReg[2 + X]
+                //> tay                         ;then use as offset
+                //> lda SecondaryHardMode       ;check secondary hard mode flag
+                temp1 = secondaryHardMode
+                //> bne HJump
+                temp3 = temp8
+                if (temp1 == 0) {
+                    //> tay                         ;if secondary hard mode flag clear, set offset to 0
+                }
+                //> HJump: lda HammerBroJumpLData,y    ;get jump length timer data using offset from before
+                temp1 = hammerBroJumpLData[temp3]
+                //> sta EnemyFrameTimer,x       ;save in enemy timer
+                enemyFrameTimer[X] = temp1
+                //> lda PseudoRandomBitReg+1,x
+                temp1 = pseudoRandomBitReg[1 + X]
+                //> ora #%11000000              ;get contents of part of LSFR, set d7 and d6, then
+                temp9 = temp1 or 0xC0
+                //> sta HammerBroJumpTimer,x    ;store in jump timer
+                hammerBroJumpTimer[X] = temp9
+            }
+        }
+        //> MoveHammerBroXDir:
+        //> ldy #$fc                  ;move hammer bro a little to the left
+        temp3 = 0xFC
+        //> lda FrameCounter
+        temp1 = frameCounter
+        //> and #%01000000            ;change hammer bro's direction every 64 frames
+        temp10 = temp1 and 0x40
+        //> bne Shimmy
+        temp1 = temp10
+        if (temp10 == 0) {
+            //> ldy #$04                  ;if d6 set in counter, move him a little to the right
+            temp3 = 0x04
+        }
+        //> Shimmy:  sty Enemy_X_Speed,x       ;store horizontal speed
+        enemyXSpeed[X] = temp3
+        //> ldy #$01                  ;set to face right by default
+        temp3 = 0x01
+        //> jsr PlayerEnemyDiff       ;get horizontal difference between player and hammer bro
+        playerEnemyDiff(X)
+        //> bmi SetShim               ;if enemy to the left of player, skip this part
+        if ((temp3 and 0x80) == 0) {
+            //> iny                       ;set to face left
+            temp3 = (temp3 + 1) and 0xFF
+            //> lda EnemyIntervalTimer,x  ;check walking timer
+            temp1 = enemyIntervalTimer[X]
+            //> bne SetShim               ;if not yet expired, skip to set moving direction
+            if (temp1 == 0) {
+                //> lda #$f8
+                temp1 = 0xF8
+                //> sta Enemy_X_Speed,x       ;otherwise, make the hammer bro walk left towards player
+                enemyXSpeed[X] = temp1
+            }
+        }
+        //> SetShim: sty Enemy_MovingDir,x     ;set moving direction
+        enemyMovingdir[X] = temp3
+    }
+    //> MoveDefeatedEnemy:
+    //> jsr MoveD_EnemyVertically      ;execute sub to move defeated enemy downwards
+    movedEnemyvertically(X)
+    //> jmp MoveEnemyHorizontally      ;now move defeated enemy horizontally
+    // Fall-through tail call to chkforbumpHammerbroj
+    chkforbumpHammerbroj(X)
+}
+
 // Decompiled from MoveNormalEnemy
 fun moveNormalEnemy(X: Int) {
     var temp0: Int = 0
@@ -9608,9 +15164,13 @@ fun moveNormalEnemy(X: Int) {
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
+    var temp6: Int = 0
+    val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
     val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
     val enemyState by MemoryByteIndexed(Enemy_State)
     val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
+    val revivedXSpeed by MemoryByteIndexed(RevivedXSpeed)
     val xSpeedAdderData by MemoryByteIndexed(XSpeedAdderData)
     //> MoveNormalEnemy:
     //> ldy #$00                   ;init Y to leave horizontal movement as-is
@@ -9702,8 +15262,10 @@ fun moveNormalEnemy(X: Int) {
     }
     //> AddHS:  clc
     //> adc XSpeedAdderData,y     ;add value here to slow enemy down if necessary
+    temp6 = temp1 + xSpeedAdderData[temp2]
+    temp1 = temp6 and 0xFF
     //> sta Enemy_X_Speed,x       ;save as horizontal speed temporarily
-    enemyXSpeed[X] = (temp1 + xSpeedAdderData[temp2]) and 0xFF
+    enemyXSpeed[X] = temp1
     //> jsr MoveEnemyHorizontally ;then do a sub to move horizontally
     moveEnemyHorizontally(X)
     //> pla
@@ -9722,10 +15284,96 @@ fun moveJumpingEnemy() {
     //> jmp MoveEnemyHorizontally  ;jump to move enemy horizontally
 }
 
+// Decompiled from ProcMoveRedPTroopa
+fun procMoveRedPTroopa(X: Int) {
+    var X: Int = X
+    var objectOffset by MemoryByte(ObjectOffset)
+    val enemyYmfDummy by MemoryByteIndexed(Enemy_YMF_Dummy)
+    val enemyYMoveforce by MemoryByteIndexed(Enemy_Y_MoveForce)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val enemyYSpeed by MemoryByteIndexed(Enemy_Y_Speed)
+    val redPTroopaCenterYPos by MemoryByteIndexed(RedPTroopaCenterYPos)
+    val redPTroopaOrigXPos by MemoryByteIndexed(RedPTroopaOrigXPos)
+    //> MoveRedPTroopaDown:
+    //> ldy #$00            ;set Y to move downwards
+    //> jmp MoveRedPTroopa  ;skip to movement routine
+    //> MoveRedPTroopaUp:
+    //> ldy #$01            ;set Y to move upwards
+    //> MoveRedPTroopa:
+    //> inx                 ;increment X for enemy offset
+    X = (X + 1) and 0xFF
+    //> lda #$03
+    //> sta $00             ;set downward movement amount here
+    memory[0x0] = 0x03.toUByte()
+    //> lda #$06
+    //> sta $01             ;set upward movement amount here
+    memory[0x1] = 0x06.toUByte()
+    //> lda #$02
+    //> sta $02             ;set maximum speed here
+    memory[0x2] = 0x02.toUByte()
+    //> tya                 ;set movement direction in A, and
+    //> jmp RedPTroopaGrav  ;jump to move this thing
+    //> RedPTroopaGrav:
+    //> jsr ImposeGravity  ;do a sub to move object gradually
+    imposeGravity(0x01, X)
+    //> ldx ObjectOffset   ;get enemy object offset and leave
+    //> rts
+    return
+}
+
+// Decompiled from MoveFlyGreenPTroopa
+fun moveFlyGreenPTroopa(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var frameCounter by MemoryByte(FrameCounter)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    //> MoveFlyGreenPTroopa:
+    //> jsr XMoveCntr_GreenPTroopa ;do sub to increment primary and secondary counters
+    xmovecntrGreenptroopa()
+    //> jsr MoveWithXMCntrs        ;do sub to move green paratroopa accordingly, and horizontally
+    moveWithXMCntrs(X)
+    //> ldy #$01                   ;set Y to move green paratroopa down
+    //> lda FrameCounter
+    //> and #%00000011             ;check frame counter 2 LSB for any bits set
+    temp0 = frameCounter and 0x03
+    //> bne NoMGPT                 ;branch to leave if set to move up/down every fourth frame
+    temp1 = temp0
+    temp2 = 0x01
+    if (temp0 == 0) {
+        //> lda FrameCounter
+        temp1 = frameCounter
+        //> and #%01000000             ;check frame counter for d6 set
+        temp3 = temp1 and 0x40
+        //> bne YSway                  ;branch to move green paratroopa down if set
+        temp1 = temp3
+        if (temp3 == 0) {
+            //> ldy #$ff                   ;otherwise set Y to move green paratroopa up
+            temp2 = 0xFF
+        }
+        //> YSway:  sty $00                    ;store adder here
+        memory[0x0] = temp2.toUByte()
+        //> lda Enemy_Y_Position,x
+        temp1 = enemyYPosition[X]
+        //> clc                        ;add or subtract from vertical position
+        //> adc $00                    ;to give green paratroopa a wavy flight
+        temp4 = temp1 + memory[0x0].toInt()
+        temp1 = temp4 and 0xFF
+        //> sta Enemy_Y_Position,x
+        enemyYPosition[X] = temp1
+    }
+    //> NoMGPT: rts                        ;leave!
+    return
+}
+
 // Decompiled from XMoveCntr_GreenPTroopa
 fun xmovecntrGreenptroopa() {
     //> XMoveCntr_GreenPTroopa:
     //> lda #$13                    ;load preset maximum value for secondary counter
+    // Fall-through tail call to xmovecntrPlatform
+    xmovecntrPlatform(0x13, X)
 }
 
 // Decompiled from XMoveCntr_Platform
@@ -9776,6 +15424,7 @@ fun moveWithXMCntrs(X: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
     val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
     val xMovePrimaryCounter by MemoryByteIndexed(XMovePrimaryCounter)
     val xMoveSecondaryCounter by MemoryByteIndexed(XMoveSecondaryCounter)
@@ -9797,8 +15446,10 @@ fun moveWithXMCntrs(X: Int) {
         temp3 = temp1 xor 0xFF
         //> clc                          ;counter to two's compliment
         //> adc #$01
+        temp4 = temp3 + 0x01
+        temp1 = temp4 and 0xFF
         //> sta XMoveSecondaryCounter,x
-        xMoveSecondaryCounter[X] = (temp3 + 0x01) and 0xFF
+        xMoveSecondaryCounter[X] = temp1
         //> ldy #$02                     ;load alternate value here
         temp2 = 0x02
     }
@@ -9816,11 +15467,144 @@ fun moveWithXMCntrs(X: Int) {
     return
 }
 
+// Decompiled from MoveBloober
+fun moveBloober(X: Int) {
+    var X: Int = X
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var playerMovingdir by MemoryByte(Player_MovingDir)
+    var secondaryHardMode by MemoryByte(SecondaryHardMode)
+    val blooberBitmasks by MemoryByteIndexed(BlooberBitmasks)
+    val blooperMoveSpeed by MemoryByteIndexed(BlooperMoveSpeed)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYMoveforce by MemoryByteIndexed(Enemy_Y_MoveForce)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val pseudoRandomBitReg by MemoryByteIndexed(PseudoRandomBitReg)
+    //> MoveBloober:
+    //> lda Enemy_State,x
+    //> and #%00100000             ;check enemy state for d5 set
+    temp0 = enemyState[X] and 0x20
+    //> bne MoveDefeatedBloober    ;branch if set to move defeated bloober
+    if (!(temp0 == 0)) {
+        //  goto MoveDefeatedBloober
+        return
+    }
+    temp1 = temp0
+    if (temp0 == 0) {
+        //> ldy SecondaryHardMode      ;use secondary hard mode flag as offset
+        //> lda PseudoRandomBitReg+1,x ;get LSFR
+        temp1 = pseudoRandomBitReg[1 + X]
+        //> and BlooberBitmasks,y      ;mask out bits in LSFR using bitmask loaded with offset
+        temp2 = temp1 and blooberBitmasks[secondaryHardMode]
+        //> bne BlooberSwim            ;if any bits set, skip ahead to make swim
+        temp1 = temp2
+        temp3 = secondaryHardMode
+        if (temp2 == 0) {
+            //> txa
+            //> lsr                        ;check to see if on second or fourth slot (1 or 3)
+            X = X shr 1
+            //> bcc FBLeft                 ;if not, branch to figure out moving direction
+            temp1 = X
+            if ((X and 0x01) != 0) {
+                //> ldy Player_MovingDir       ;otherwise, load player's moving direction and
+                temp3 = playerMovingdir
+                //> bcs SBMDir                 ;do an unconditional branch to set
+                if ((X and 0x01) == 0) {
+                }
+            }
+            //> FBLeft: ldy #$02                   ;set left moving direction by default
+            temp3 = 0x02
+            //> jsr PlayerEnemyDiff        ;get horizontal difference between player and bloober
+            playerEnemyDiff(X)
+            //> bpl SBMDir                 ;if enemy to the right of player, keep left
+            if ((temp3 and 0x80) != 0) {
+                //> dey                        ;otherwise decrement to set right moving direction
+                temp3 = (temp3 - 1) and 0xFF
+            }
+            //> SBMDir: sty Enemy_MovingDir,x      ;set moving direction of bloober, then continue on here
+            enemyMovingdir[X] = temp3
+        }
+        //> BlooberSwim:
+        //> jsr ProcSwimmingB        ;execute sub to make bloober swim characteristically
+        procSwimmingB(X)
+        //> lda Enemy_Y_Position,x   ;get vertical coordinate
+        temp1 = enemyYPosition[X]
+        //> sec
+        //> sbc Enemy_Y_MoveForce,x  ;subtract movement force
+        temp4 = temp1 - enemyYMoveforce[X]
+        temp1 = temp4 and 0xFF
+        //> cmp #$20                 ;check to see if position is above edge of status bar
+        //> bcc SwimX                ;if so, don't do it
+        if (temp1 >= 0x20) {
+            //> sta Enemy_Y_Position,x   ;otherwise, set new vertical position, make bloober swim
+            enemyYPosition[X] = temp1
+        }
+        //> SwimX: ldy Enemy_MovingDir,x    ;check moving direction
+        temp3 = enemyMovingdir[X]
+        //> dey
+        temp3 = (temp3 - 1) and 0xFF
+        //> bne LeftSwim             ;if moving to the left, branch to second part
+        if (temp3 == 0) {
+            //> lda Enemy_X_Position,x
+            temp1 = enemyXPosition[X]
+            //> clc                      ;add movement speed to horizontal coordinate
+            //> adc BlooperMoveSpeed,x
+            temp5 = temp1 + blooperMoveSpeed[X]
+            temp1 = temp5 and 0xFF
+            //> sta Enemy_X_Position,x   ;store result as new horizontal coordinate
+            enemyXPosition[X] = temp1
+            //> lda Enemy_PageLoc,x
+            temp1 = enemyPageloc[X]
+            //> adc #$00                 ;add carry to page location
+            temp6 = temp1 + (if (temp5 > 0xFF) 1 else 0)
+            temp1 = temp6 and 0xFF
+            //> sta Enemy_PageLoc,x      ;store as new page location and leave
+            enemyPageloc[X] = temp1
+            //> rts
+            return
+        }
+        //> LeftSwim:
+        //> lda Enemy_X_Position,x
+        temp1 = enemyXPosition[X]
+        //> sec                      ;subtract movement speed from horizontal coordinate
+        //> sbc BlooperMoveSpeed,x
+        temp7 = temp1 - blooperMoveSpeed[X]
+        temp1 = temp7 and 0xFF
+        //> sta Enemy_X_Position,x   ;store result as new horizontal coordinate
+        enemyXPosition[X] = temp1
+        //> lda Enemy_PageLoc,x
+        temp1 = enemyPageloc[X]
+        //> sbc #$00                 ;subtract borrow from page location
+        temp8 = temp1 - (if (temp7 >= 0) 0 else 1)
+        temp1 = temp8 and 0xFF
+        //> sta Enemy_PageLoc,x      ;store as new page location and leave
+        enemyPageloc[X] = temp1
+        //> rts
+        return
+    } else {
+        //> MoveDefeatedBloober:
+        //> jmp MoveEnemySlowVert    ;jump to move defeated bloober downwards
+    }
+}
+
 // Decompiled from ProcSwimmingB
 fun procSwimmingB(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     var frameCounter by MemoryByte(FrameCounter)
     var playerYPosition by MemoryByte(Player_Y_Position)
     val blooperMoveCounter by MemoryByteIndexed(BlooperMoveCounter)
@@ -9855,14 +15639,15 @@ fun procSwimmingB(X: Int) {
                 temp1 = enemyYMoveforce[X]
                 //> clc                       ;add to movement force to speed up swim
                 //> adc #$01
+                temp3 = temp1 + 0x01
+                temp1 = temp3 and 0xFF
                 //> sta Enemy_Y_MoveForce,x   ;set movement force
-                enemyYMoveforce[X] = (temp1 + 0x01) and 0xFF
+                enemyYMoveforce[X] = temp1
                 //> sta BlooperMoveSpeed,x    ;set as movement speed
-                blooperMoveSpeed[X] = (temp1 + 0x01) and 0xFF
+                blooperMoveSpeed[X] = temp1
                 //> cmp #$02
                 //> bne BSwimE                ;if certain horizontal speed, branch to leave
-                temp1 = (temp1 + 0x01) and 0xFF
-                if (((temp1 + 0x01) and 0xFF) == 0x02) {
+                if (temp1 == 0x02) {
                     //> inc BlooperMoveCounter,x  ;otherwise increment movement counter
                     blooperMoveCounter[X] = (blooperMoveCounter[X] + 1) and 0xFF
                 }
@@ -9879,13 +15664,14 @@ fun procSwimmingB(X: Int) {
             temp1 = enemyYMoveforce[X]
             //> sec                      ;subtract from movement force to slow swim
             //> sbc #$01
+            temp4 = temp1 - 0x01
+            temp1 = temp4 and 0xFF
             //> sta Enemy_Y_MoveForce,x  ;set movement force
-            enemyYMoveforce[X] = (temp1 - 0x01) and 0xFF
+            enemyYMoveforce[X] = temp1
             //> sta BlooperMoveSpeed,x   ;set as movement speed
-            blooperMoveSpeed[X] = (temp1 - 0x01) and 0xFF
+            blooperMoveSpeed[X] = temp1
             //> bne NoSSw                ;if any speed, branch to leave
-            temp1 = (temp1 - 0x01) and 0xFF
-            if (((temp1 - 0x01) and 0xFF) == 0) {
+            if ((temp4 and 0xFF) == 0) {
                 //> inc BlooperMoveCounter,x ;otherwise increment movement counter
                 blooperMoveCounter[X] = (blooperMoveCounter[X] + 1) and 0xFF
                 //> lda #$02
@@ -9921,14 +15707,206 @@ fun procSwimmingB(X: Int) {
         //> lda Enemy_Y_Position,x    ;get vertical coordinate
         temp1 = enemyYPosition[X]
         //> adc #$10                  ;add sixteen pixels
+        temp5 = temp1 + 0x10
+        temp1 = temp5 and 0xFF
         //> cmp Player_Y_Position     ;compare result with player's vertical coordinate
         //> bcc Floatdown             ;if modified vertical less than player's, branch
-    } while (!(((temp1 + 0x10) and 0xFF) >= playerYPosition))
+    } while (!(temp1 >= playerYPosition))
     //> lda #$00
     temp1 = 0x00
     //> sta BlooperMoveCounter,x  ;otherwise nullify movement counter
     blooperMoveCounter[X] = temp1
     //> rts
+    return
+}
+
+// Decompiled from MoveBulletBill
+fun moveBulletBill(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
+    //> MoveBulletBill:
+    //> lda Enemy_State,x          ;check bullet bill's enemy object state for d5 set
+    //> and #%00100000
+    temp0 = enemyState[X] and 0x20
+    //> beq NotDefB                ;if not set, continue with movement code
+    if (temp0 == 0) {
+        //  goto NotDefB
+        return
+    }
+    temp1 = temp0
+    if (temp0 != 0) {
+        //> jmp MoveJ_EnemyVertically  ;otherwise jump to move defeated bullet bill downwards
+    }
+    //> NotDefB: lda #$e8                   ;set bullet bill's horizontal speed
+    temp1 = 0xE8
+    //> sta Enemy_X_Speed,x        ;and move it accordingly (note: this bullet bill
+    enemyXSpeed[X] = temp1
+    //> jmp MoveEnemyHorizontally  ;object occurs in frenzy object $17, not from cannons)
+}
+
+// Decompiled from MoveSwimmingCheepCheep
+fun moveSwimmingCheepCheep(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp10: Int = 0
+    var temp11: Int = 0
+    var temp12: Int = 0
+    var temp13: Int = 0
+    var temp14: Int = 0
+    var temp15: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
+    val cheepCheepMoveMFlag by MemoryByteIndexed(CheepCheepMoveMFlag)
+    val cheepCheepOrigYPos by MemoryByteIndexed(CheepCheepOrigYPos)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyXMoveforce by MemoryByteIndexed(Enemy_X_MoveForce)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYmfDummy by MemoryByteIndexed(Enemy_YMF_Dummy)
+    val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val swimCCXMoveData by MemoryByteIndexed(SwimCCXMoveData)
+    //> MoveSwimmingCheepCheep:
+    //> lda Enemy_State,x         ;check cheep-cheep's enemy object state
+    //> and #%00100000            ;for d5 set
+    temp0 = enemyState[X] and 0x20
+    //> beq CCSwim                ;if not set, continue with movement code
+    temp1 = temp0
+    if (temp0 != 0) {
+        //> jmp MoveEnemySlowVert     ;otherwise jump to move defeated cheep-cheep downwards
+    }
+    //> CCSwim: sta $03                   ;save enemy state in $03
+    memory[0x3] = temp1.toUByte()
+    //> lda Enemy_ID,x            ;get enemy identifier
+    temp1 = enemyId[X]
+    //> sec
+    //> sbc #$0a                  ;subtract ten for cheep-cheep identifiers
+    temp2 = temp1 - 0x0A
+    temp1 = temp2 and 0xFF
+    //> tay                       ;use as offset
+    //> lda SwimCCXMoveData,y     ;load value here
+    temp1 = swimCCXMoveData[temp1]
+    //> sta $02
+    memory[0x2] = temp1.toUByte()
+    //> lda Enemy_X_MoveForce,x   ;load horizontal force
+    temp1 = enemyXMoveforce[X]
+    //> sec
+    //> sbc $02                   ;subtract preset value from horizontal force
+    temp3 = temp1 - memory[0x2].toInt()
+    temp1 = temp3 and 0xFF
+    //> sta Enemy_X_MoveForce,x   ;store as new horizontal force
+    enemyXMoveforce[X] = temp1
+    //> lda Enemy_X_Position,x    ;get horizontal coordinate
+    temp1 = enemyXPosition[X]
+    //> sbc #$00                  ;subtract borrow (thus moving it slowly)
+    temp4 = temp1 - (if (temp3 >= 0) 0 else 1)
+    temp1 = temp4 and 0xFF
+    //> sta Enemy_X_Position,x    ;and save as new horizontal coordinate
+    enemyXPosition[X] = temp1
+    //> lda Enemy_PageLoc,x
+    temp1 = enemyPageloc[X]
+    //> sbc #$00                  ;subtract borrow again, this time from the
+    temp5 = temp1 - (if (temp4 >= 0) 0 else 1)
+    temp1 = temp5 and 0xFF
+    //> sta Enemy_PageLoc,x       ;page location, then save
+    enemyPageloc[X] = temp1
+    //> lda #$20
+    temp1 = 0x20
+    //> sta $02                   ;save new value here
+    memory[0x2] = temp1.toUByte()
+    //> cpx #$02                  ;check enemy object offset
+    //> bcc ExSwCC                ;if in first or second slot, branch to leave
+    temp6 = temp1
+    if (X >= 0x02) {
+        //> lda CheepCheepMoveMFlag,x ;check movement flag
+        temp1 = cheepCheepMoveMFlag[X]
+        //> cmp #$10                  ;if movement speed set to $00,
+        //> bcc CCSwimUpwards         ;branch to move upwards
+        if (temp1 >= 0x10) {
+            //> lda Enemy_YMF_Dummy,x
+            temp1 = enemyYmfDummy[X]
+            //> clc
+            //> adc $02                   ;add preset value to dummy variable to get carry
+            temp7 = temp1 + memory[0x2].toInt()
+            temp1 = temp7 and 0xFF
+            //> sta Enemy_YMF_Dummy,x     ;and save dummy
+            enemyYmfDummy[X] = temp1
+            //> lda Enemy_Y_Position,x    ;get vertical coordinate
+            temp1 = enemyYPosition[X]
+            //> adc $03                   ;add carry to it plus enemy state to slowly move it downwards
+            temp8 = temp1 + memory[0x3].toInt() + (if (temp7 > 0xFF) 1 else 0)
+            temp1 = temp8 and 0xFF
+            //> sta Enemy_Y_Position,x    ;save as new vertical coordinate
+            enemyYPosition[X] = temp1
+            //> lda Enemy_Y_HighPos,x
+            temp1 = enemyYHighpos[X]
+            //> adc #$00                  ;add carry to page location and
+            temp9 = temp1 + (if (temp8 > 0xFF) 1 else 0)
+            temp1 = temp9 and 0xFF
+            //> jmp ChkSwimYPos           ;jump to end of movement code
+        } else {
+            //> CCSwimUpwards:
+            //> lda Enemy_YMF_Dummy,x
+            temp1 = enemyYmfDummy[X]
+            //> sec
+            //> sbc $02                   ;subtract preset value to dummy variable to get borrow
+            temp10 = temp1 - memory[0x2].toInt()
+            temp1 = temp10 and 0xFF
+            //> sta Enemy_YMF_Dummy,x     ;and save dummy
+            enemyYmfDummy[X] = temp1
+            //> lda Enemy_Y_Position,x    ;get vertical coordinate
+            temp1 = enemyYPosition[X]
+            //> sbc $03                   ;subtract borrow to it plus enemy state to slowly move it upwards
+            temp11 = temp1 - memory[0x3].toInt() - (if (temp10 >= 0) 0 else 1)
+            temp1 = temp11 and 0xFF
+            //> sta Enemy_Y_Position,x    ;save as new vertical coordinate
+            enemyYPosition[X] = temp1
+            //> lda Enemy_Y_HighPos,x
+            temp1 = enemyYHighpos[X]
+            //> sbc #$00                  ;subtract borrow from page location
+            temp12 = temp1 - (if (temp11 >= 0) 0 else 1)
+            temp1 = temp12 and 0xFF
+        }
+        //> ChkSwimYPos:
+        //> sta Enemy_Y_HighPos,x     ;save new page location here
+        enemyYHighpos[X] = temp1
+        //> ldy #$00                  ;load movement speed to upwards by default
+        temp6 = 0x00
+        //> lda Enemy_Y_Position,x    ;get vertical coordinate
+        temp1 = enemyYPosition[X]
+        //> sec
+        //> sbc CheepCheepOrigYPos,x  ;subtract original coordinate from current
+        temp13 = temp1 - cheepCheepOrigYPos[X]
+        temp1 = temp13 and 0xFF
+        //> bpl YPDiff                ;if result positive, skip to next part
+        if ((temp13 and 0xFF and 0x80) != 0) {
+            //> ldy #$10                  ;otherwise load movement speed to downwards
+            temp6 = 0x10
+            //> eor #$ff
+            temp14 = temp1 xor 0xFF
+            //> clc                       ;get two's compliment of result
+            //> adc #$01                  ;to obtain total difference of original vs. current
+            temp15 = temp14 + 0x01
+            temp1 = temp15 and 0xFF
+        }
+        //> YPDiff: cmp #$0f                  ;if difference between original vs. current vertical
+        //> bcc ExSwCC                ;coordinates < 15 pixels, leave movement speed alone
+        if (temp1 >= 0x0F) {
+            //> tya
+            //> sta CheepCheepMoveMFlag,x ;otherwise change movement speed
+            cheepCheepMoveMFlag[X] = temp6
+        }
+    }
+    //> ExSwCC: rts                       ;leave
     return
 }
 
@@ -9938,6 +15916,7 @@ fun procFirebar(X: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
     var duplicateobjOffset by MemoryByte(DuplicateObj_Offset)
     var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
     var enemyRelXpos by MemoryByte(Enemy_Rel_XPos)
@@ -9988,8 +15967,10 @@ fun procFirebar(X: Int) {
             }
             //> SkpFSte:  clc
             //> adc #$01                    ;add one to spinning thing to avoid horizontal state
+            temp4 = temp1 + 0x01
+            temp1 = temp4 and 0xFF
             //> sta FirebarSpinState_High,x
-            firebarspinstateHigh[X] = (temp1 + 0x01) and 0xFF
+            firebarspinstateHigh[X] = temp1
         }
         //> SetupGFB: sta $ef                     ;save high byte of spinning thing, modified or otherwise
         memory[0xEF] = temp1.toUByte()
@@ -10033,32 +16014,32 @@ fun procFirebar(X: Int) {
         temp1 = 0x00
         //> sta $00                     ;initialize counter here
         memory[0x0] = temp1.toUByte()
-        while (!(temp1 >= memory[0xED].toInt())) {
-            //> ldy DuplicateObj_Offset     ;if we arrive at fifth firebar part,
-            temp3 = duplicateobjOffset
-            //> lda Enemy_SprDataOffset,y   ;get offset from long firebar and load OAM data offset
-            temp1 = enemySprdataoffset[temp3]
-            //> sta $06                     ;using long firebar offset, then store as new one here
-            memory[0x6] = temp1.toUByte()
-            do {
-                //> DrawFbar: lda $ef                     ;load high byte of spinstate
-                temp1 = memory[0xEF].toInt()
-                //> jsr GetFirebarPosition      ;get fireball position data depending on firebar part
-                getFirebarPosition(temp1)
-                //> jsr DrawFirebar_Collision   ;position it properly, draw it and do collision detection
-                drawfirebarCollision()
-                //> lda $00                     ;check which firebar part
-                temp1 = memory[0x0].toInt()
-                //> cmp #$04
-                //> bne NextFbar
-                //> NextFbar: inc $00                     ;move onto the next firebar part
-                memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
-                //> lda $00
-                temp1 = memory[0x0].toInt()
-                //> cmp $ed                     ;if we end up at the maximum part, go on and leave
-                //> bcc DrawFbar                ;otherwise go back and do another
-            } while (!(temp1 >= memory[0xED].toInt()))
-        }
+        do {
+            //> DrawFbar: lda $ef                     ;load high byte of spinstate
+            temp1 = memory[0xEF].toInt()
+            //> jsr GetFirebarPosition      ;get fireball position data depending on firebar part
+            getFirebarPosition(temp1)
+            //> jsr DrawFirebar_Collision   ;position it properly, draw it and do collision detection
+            drawfirebarCollision()
+            //> lda $00                     ;check which firebar part
+            temp1 = memory[0x0].toInt()
+            //> cmp #$04
+            //> bne NextFbar
+            if (temp1 == 0x04) {
+                //> ldy DuplicateObj_Offset     ;if we arrive at fifth firebar part,
+                temp3 = duplicateobjOffset
+                //> lda Enemy_SprDataOffset,y   ;get offset from long firebar and load OAM data offset
+                temp1 = enemySprdataoffset[temp3]
+                //> sta $06                     ;using long firebar offset, then store as new one here
+                memory[0x6] = temp1.toUByte()
+            }
+            //> NextFbar: inc $00                     ;move onto the next firebar part
+            memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
+            //> lda $00
+            temp1 = memory[0x0].toInt()
+            //> cmp $ed                     ;if we end up at the maximum part, go on and leave
+            //> bcc DrawFbar                ;otherwise go back and do another
+        } while (!(temp1 >= memory[0xED].toInt()))
     }
     //> SkipFBar: rts
     return
@@ -10070,6 +16051,12 @@ fun drawfirebarCollision() {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var enemyRelXpos by MemoryByte(Enemy_Rel_XPos)
     var enemyRelYpos by MemoryByte(Enemy_Rel_YPos)
     val spriteXPosition by MemoryByteIndexed(Sprite_X_Position)
@@ -10089,25 +16076,32 @@ fun drawfirebarCollision() {
         //> eor #$ff
         temp2 = temp0 xor 0xFF
         //> adc #$01                 ;otherwise get two's compliment of horizontal adder
+        temp3 = temp2 + 0x01 + (if ((memory[0x5].toInt() and 0x01) != 0) 1 else 0)
+        temp0 = temp3 and 0xFF
     }
     //> AddHA:   clc                      ;add horizontal coordinate relative to screen to
     //> adc Enemy_Rel_XPos       ;horizontal adder, modified or otherwise
+    temp4 = temp0 + enemyRelXpos
+    temp0 = temp4 and 0xFF
     //> sta Sprite_X_Position,y  ;store as X coordinate here
-    spriteXPosition[temp1] = (temp0 + enemyRelXpos) and 0xFF
+    spriteXPosition[temp1] = temp0
     //> sta $06                  ;store here for now, note offset is saved in Y still
-    memory[0x6] = ((temp0 + enemyRelXpos) and 0xFF).toUByte()
+    memory[0x6] = temp0.toUByte()
     //> cmp Enemy_Rel_XPos       ;compare X coordinate of sprite to original X of firebar
     //> bcs SubtR1               ;if sprite coordinate => original coordinate, branch
-    temp0 = (temp0 + enemyRelXpos) and 0xFF
-    if (!(((temp0 + enemyRelXpos) and 0xFF) >= enemyRelXpos)) {
+    if (!(temp0 >= enemyRelXpos)) {
         //> lda Enemy_Rel_XPos
         temp0 = enemyRelXpos
         //> sec                      ;otherwise subtract sprite X from the
         //> sbc $06                  ;original one and skip this part
+        temp5 = temp0 - memory[0x6].toInt()
+        temp0 = temp5 and 0xFF
         //> jmp ChkFOfs
     } else {
         //> SubtR1:  sec                      ;subtract original X from the
         //> sbc Enemy_Rel_XPos       ;current sprite X
+        temp6 = temp0 - enemyRelXpos
+        temp0 = temp6 and 0xFF
     }
     //> ChkFOfs: cmp #$59                 ;if difference of coordinates within a certain range,
     //> bcc VAHandl              ;continue by handling vertical adder
@@ -10130,26 +16124,40 @@ fun drawfirebarCollision() {
         //> bcs AddVA                ;if carry was set, skip this part
         if ((memory[0x5].toInt() and 0x01) == 0) {
             //> eor #$ff
-            temp3 = temp0 xor 0xFF
+            temp7 = temp0 xor 0xFF
             //> adc #$01                 ;otherwise get two's compliment of second part
+            temp8 = temp7 + 0x01 + (if ((memory[0x5].toInt() and 0x01) != 0) 1 else 0)
+            temp0 = temp8 and 0xFF
         }
         //> AddVA:   clc                      ;add vertical coordinate relative to screen to
         //> adc Enemy_Rel_YPos       ;the second data, modified or otherwise
+        temp9 = temp0 + enemyRelYpos
+        temp0 = temp9 and 0xFF
     }
     //> SetVFbr: sta Sprite_Y_Position,y  ;store as Y coordinate here
     spriteYPosition[temp1] = temp0
     //> sta $07                  ;also store here for now
     memory[0x7] = temp0.toUByte()
+    // Fall-through tail call to firebarCollision
+    firebarCollision(temp1)
 }
 
 // Decompiled from FirebarCollision
 fun firebarCollision(Y: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp10: Int = 0
+    var temp11: Int = 0
+    var temp12: Int = 0
+    var temp13: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var crouchingFlag by MemoryByte(CrouchingFlag)
     var enemyMovingdir by MemoryByte(Enemy_MovingDir)
     var objectOffset by MemoryByte(ObjectOffset)
@@ -10199,19 +16207,21 @@ fun firebarCollision(Y: Int) {
             //> tya
             //> clc                      ;then add 24 pixels to the player's
             //> adc #$18                 ;vertical coordinate
+            temp3 = temp2 + 0x18
+            temp1 = temp3 and 0xFF
             //> tay
             //> BigJp:   tya                      ;get vertical coordinate, altered or otherwise, from Y
-            temp2 = (temp2 + 0x18) and 0xFF
-            // BigJp / ChkVFBD loop - should execute once per call then break
-            run {  // Using run block instead of while(true) since this is checked per frame
+            temp2 = temp1
+            while (true /* unknown branch JMP */) {
                 //> eor #$ff                 ;skip two's compliment part
-                temp3 = (temp2 + 0x18) and 0xFF xor 0xFF
+                temp4 = temp1 xor 0xFF
                 //> clc                      ;otherwise get two's compliment
                 //> adc #$01
+                temp5 = temp4 + 0x01
+                temp1 = temp5 and 0xFF
                 //> ChkVFBD: cmp #$08                 ;if difference => 8 pixels, skip ahead of this part
                 //> bcs Chk2Ofs
-                temp1 = (temp3 + 0x01) and 0xFF
-                if (!(((temp3 + 0x01) and 0xFF) >= 0x08)) {
+                if (!(temp1 >= 0x08)) {
                     //> lda $06                  ;if firebar on far right on the screen, skip this,
                     temp1 = memory[0x6].toInt()
                     //> cmp #$f0                 ;because, really, what's the point?
@@ -10221,17 +16231,22 @@ fun firebarCollision(Y: Int) {
                         temp1 = spriteXPosition[4]
                         //> clc
                         //> adc #$04                 ;add four pixels
+                        temp6 = temp1 + 0x04
+                        temp1 = temp6 and 0xFF
                         //> sta $04                  ;store here
-                        memory[0x4] = ((temp1 + 0x04) and 0xFF).toUByte()
+                        memory[0x4] = temp1.toUByte()
                         //> sec                      ;subtract horizontal coordinate of firebar
                         //> sbc $06                  ;from the X coordinate of player's sprite 1
+                        temp7 = temp1 - memory[0x6].toInt()
+                        temp1 = temp7 and 0xFF
                         //> bpl ChkFBCl              ;if modded X coordinate to the right of firebar
-                        temp1 = (((temp1 + 0x04) and 0xFF) - memory[0x6].toInt()) and 0xFF
-                        if (((((temp1 + 0x04) and 0xFF) - memory[0x6].toInt()) and 0xFF and 0x80) != 0) {
+                        if ((temp7 and 0xFF and 0x80) != 0) {
                             //> eor #$ff                 ;skip two's compliment part
-                            temp4 = temp1 xor 0xFF
+                            temp8 = temp1 xor 0xFF
                             //> clc                      ;otherwise get two's compliment
                             //> adc #$01
+                            temp9 = temp8 + 0x01
+                            temp1 = temp9 and 0xFF
                         }
                         //> ChkFBCl: cmp #$08                 ;if difference < 8 pixels, collision, thus branch
                         //> bcc ChgSDir              ;to process
@@ -10244,24 +16259,22 @@ fun firebarCollision(Y: Int) {
                 //> cmp #$02                 ;branch to increment OAM offset and leave, no collision
                 //> beq NoColFB
                 if (temp1 != 0x02) {
-                    // FBCLoop: Loop to check collision at different Y offsets
-                    // Breaks when (temp1 - $07) is positive (player lower than firebar)
-                    var loopCount = 0
-                    while (loopCount < 10) {  // Safety limit
+                    while (true) {
                         //> FBCLoop: sec                      ;subtract vertical position of firebar
                         //> sbc $07                  ;from the vertical coordinate of the player
-                        val diff = (temp1 - memory[0x7].toInt()) and 0xFF
+                        temp10 = temp1 - memory[0x7].toInt()
+                        temp1 = temp10 and 0xFF
                         //> bpl ChkVFBD              ;if player lower on the screen than firebar,
-                        if ((diff and 0x80) == 0) break  // Positive = break to outer loop
                         //> ldy $05                  ;otherwise get temp here and use as offset
                         temp2 = memory[0x5].toInt()
                         //> lda Player_Y_Position
                         temp1 = playerYPosition
                         //> clc
                         //> adc FirebarYPos,y        ;add value loaded with offset to player's vertical coordinate
+                        temp11 = temp1 + firebarYPos[temp2]
+                        temp1 = temp11 and 0xFF
                         //> inc $05                  ;then increment temp and jump back
                         memory[0x5] = ((memory[0x5].toInt() + 1) and 0xFF).toUByte()
-                        loopCount++
                         //> jmp FBCLoop
                     }
                 } else {
@@ -10269,8 +16282,10 @@ fun firebarCollision(Y: Int) {
                     temp1 = pull()
                     //> clc                      ;add four to it and save
                     //> adc #$04
+                    temp12 = temp1 + 0x04
+                    temp1 = temp12 and 0xFF
                     //> sta $06
-                    memory[0x6] = ((temp1 + 0x04) and 0xFF).toUByte()
+                    memory[0x6] = temp1.toUByte()
                     //> ldx ObjectOffset         ;get enemy object buffer offset and leave
                     //> rts
                     return
@@ -10281,15 +16296,15 @@ fun firebarCollision(Y: Int) {
             temp1 = memory[0x4].toInt()
             //> cmp $06                  ;is greater than horizontal coordinate of firebar
             //> bcs SetSDir              ;then do not alter movement direction
-            temp5 = 0x01
+            temp13 = 0x01
             if (!(temp1 >= memory[0x6].toInt())) {
                 //> inx                      ;otherwise increment it
-                temp5 = (temp5 + 1) and 0xFF
+                temp13 = (temp13 + 1) and 0xFF
             }
             //> SetSDir: stx Enemy_MovingDir      ;store movement direction here
-            enemyMovingdir = temp5
+            enemyMovingdir = temp13
             //> ldx #$00
-            temp5 = 0x00
+            temp13 = 0x00
             //> lda $00                  ;save value written to $00 to stack
             temp1 = memory[0x0].toInt()
             //> pha
@@ -10308,10 +16323,15 @@ fun firebarCollision(Y: Int) {
 fun getFirebarPosition(A: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp10: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     val firebarMirrorData by MemoryByteIndexed(FirebarMirrorData)
     val firebarPosLookupTbl by MemoryByteIndexed(FirebarPosLookupTbl)
     val firebarTblOffsets by MemoryByteIndexed(FirebarTblOffsets)
@@ -10328,6 +16348,8 @@ fun getFirebarPosition(A: Int) {
         temp2 = temp1 xor 0x0F
         //> clc
         //> adc #$01
+        temp3 = temp2 + 0x01
+        temp1 = temp3 and 0xFF
     }
     //> GetHAdder: sta $01                    ;store result, modified or not, here
     memory[0x1] = temp1.toUByte()
@@ -10336,9 +16358,11 @@ fun getFirebarPosition(A: Int) {
     temp1 = firebarTblOffsets[memory[0x0].toInt()]
     //> clc
     //> adc $01                    ;add oscillated high byte of spinstate
+    temp4 = temp1 + memory[0x1].toInt()
+    temp1 = temp4 and 0xFF
     //> tay                        ;to offset here and use as new offset
     //> lda FirebarPosLookupTbl,y  ;get data here and store as horizontal adder
-    temp1 = firebarPosLookupTbl[(temp1 + memory[0x1].toInt()) and 0xFF]
+    temp1 = firebarPosLookupTbl[temp1]
     //> sta $01
     memory[0x1] = temp1.toUByte()
     //> pla                        ;pull whatever was in A from the stack
@@ -10347,29 +16371,35 @@ fun getFirebarPosition(A: Int) {
     push(temp1)
     //> clc
     //> adc #$08                   ;add eight this time, to get vertical adder
+    temp5 = temp1 + 0x08
+    temp1 = temp5 and 0xFF
     //> and #%00001111             ;mask out high nybble
-    temp3 = (temp1 + 0x08) and 0xFF and 0x0F
+    temp6 = temp1 and 0x0F
     //> cmp #$09                   ;if lower than $09, branch ahead
     //> bcc GetVAdder
-    temp1 = temp3
-    temp4 = (temp1 + memory[0x1].toInt()) and 0xFF
-    if (temp3 >= 0x09) {
+    temp1 = temp6
+    temp7 = temp1
+    if (temp6 >= 0x09) {
         //> eor #%00001111             ;otherwise get two's compliment
-        temp5 = temp1 xor 0x0F
+        temp8 = temp1 xor 0x0F
         //> clc
         //> adc #$01
+        temp9 = temp8 + 0x01
+        temp1 = temp9 and 0xFF
     }
     //> GetVAdder: sta $02                    ;store result here
     memory[0x2] = temp1.toUByte()
     //> ldy $00
-    temp4 = memory[0x0].toInt()
+    temp7 = memory[0x0].toInt()
     //> lda FirebarTblOffsets,y    ;load offset to firebar position data again
-    temp1 = firebarTblOffsets[temp4]
+    temp1 = firebarTblOffsets[temp7]
     //> clc
     //> adc $02                    ;this time add value in $02 to offset here and use as offset
+    temp10 = temp1 + memory[0x2].toInt()
+    temp1 = temp10 and 0xFF
     //> tay
     //> lda FirebarPosLookupTbl,y  ;get data here and store as vertica adder
-    temp1 = firebarPosLookupTbl[(temp1 + memory[0x2].toInt()) and 0xFF]
+    temp1 = firebarPosLookupTbl[temp1]
     //> sta $02
     memory[0x2] = temp1.toUByte()
     //> pla                        ;pull out whatever was in A one last time
@@ -10389,12 +16419,194 @@ fun getFirebarPosition(A: Int) {
     return
 }
 
+// Decompiled from MoveFlyingCheepCheep
+fun moveFlyingCheepCheep(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    val enemySprattrib by MemoryByteIndexed(Enemy_SprAttrib)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyYMoveforce by MemoryByteIndexed(Enemy_Y_MoveForce)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val flyCCBPriority by MemoryByteIndexed(FlyCCBPriority)
+    val pRandomSubtracter by MemoryByteIndexed(PRandomSubtracter)
+    //> MoveFlyingCheepCheep:
+    //> lda Enemy_State,x          ;check cheep-cheep's enemy state
+    //> and #%00100000             ;for d5 set
+    temp0 = enemyState[X] and 0x20
+    //> beq FlyCC                  ;branch to continue code if not set
+    temp1 = temp0
+    if (temp0 != 0) {
+        //> lda #$00
+        temp1 = 0x00
+        //> sta Enemy_SprAttrib,x      ;otherwise clear sprite attributes
+        enemySprattrib[X] = temp1
+        //> jmp MoveJ_EnemyVertically  ;and jump to move defeated cheep-cheep downwards
+    }
+    //> FlyCC:  jsr MoveEnemyHorizontally  ;move cheep-cheep horizontally based on speed and force
+    moveEnemyHorizontally(X)
+    //> ldy #$0d                   ;set vertical movement amount
+    //> lda #$05                   ;set maximum speed
+    temp1 = 0x05
+    //> jsr SetXMoveAmt            ;branch to impose gravity on flying cheep-cheep
+    setXMoveAmt(X, 0x0D)
+    //> lda Enemy_Y_MoveForce,x
+    temp1 = enemyYMoveforce[X]
+    //> lsr                        ;get vertical movement force and
+    temp1 = temp1 shr 1
+    //> lsr                        ;move high nybble to low
+    temp1 = temp1 shr 1
+    //> lsr
+    temp1 = temp1 shr 1
+    //> lsr
+    temp1 = temp1 shr 1
+    //> tay                        ;save as offset (note this tends to go into reach of code)
+    //> lda Enemy_Y_Position,x     ;get vertical position
+    temp1 = enemyYPosition[X]
+    //> sec                        ;subtract pseudorandom value based on offset from position
+    //> sbc PRandomSubtracter,y
+    temp2 = temp1 - pRandomSubtracter[temp1]
+    temp1 = temp2 and 0xFF
+    //> bpl AddCCF                  ;if result within top half of screen, skip this part
+    temp3 = temp1
+    if ((temp2 and 0xFF and 0x80) != 0) {
+        //> eor #$ff
+        temp4 = temp1 xor 0xFF
+        //> clc                        ;otherwise get two's compliment
+        //> adc #$01
+        temp5 = temp4 + 0x01
+        temp1 = temp5 and 0xFF
+    }
+    //> AddCCF: cmp #$08                   ;if result or two's compliment greater than eight,
+    //> bcs BPGet                  ;skip to the end without changing movement force
+    if (!(temp1 >= 0x08)) {
+        //> lda Enemy_Y_MoveForce,x
+        temp1 = enemyYMoveforce[X]
+        //> clc
+        //> adc #$10                   ;otherwise add to it
+        temp6 = temp1 + 0x10
+        temp1 = temp6 and 0xFF
+        //> sta Enemy_Y_MoveForce,x
+        enemyYMoveforce[X] = temp1
+        //> lsr                        ;move high nybble to low again
+        temp1 = temp1 shr 1
+        //> lsr
+        temp1 = temp1 shr 1
+        //> lsr
+        temp1 = temp1 shr 1
+        //> lsr
+        temp1 = temp1 shr 1
+        //> tay
+    }
+    //> BPGet:  lda FlyCCBPriority,y       ;load bg priority data and store (this is very likely
+    temp1 = flyCCBPriority[temp3]
+    //> sta Enemy_SprAttrib,x      ;broken or residual code, value is overwritten before
+    enemySprattrib[X] = temp1
+    //> rts                        ;drawing it next frame), then leave
+    return
+}
+
+// Decompiled from MoveLakitu
+fun moveLakitu(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var enemyFrenzyBuffer by MemoryByte(EnemyFrenzyBuffer)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val lakituDiffAdj by MemoryByteIndexed(LakituDiffAdj)
+    val lakituMoveDirection by MemoryByteIndexed(LakituMoveDirection)
+    val lakituMoveSpeed by MemoryByteIndexed(LakituMoveSpeed)
+    //> MoveLakitu:
+    //> lda Enemy_State,x          ;check lakitu's enemy state
+    //> and #%00100000             ;for d5 set
+    temp0 = enemyState[X] and 0x20
+    //> beq ChkLS                  ;if not set, continue with code
+    temp1 = temp0
+    if (temp0 != 0) {
+        //> jmp MoveD_EnemyVertically  ;otherwise jump to move defeated lakitu downwards
+    }
+    //> ChkLS:   lda Enemy_State,x          ;if lakitu's enemy state not set at all,
+    temp1 = enemyState[X]
+    //> beq Fr12S                  ;go ahead and continue with code
+    if (temp1 != 0) {
+        //> lda #$00
+        temp1 = 0x00
+        //> sta LakituMoveDirection,x  ;otherwise initialize moving direction to move to left
+        lakituMoveDirection[X] = temp1
+        //> sta EnemyFrenzyBuffer      ;initialize frenzy buffer
+        enemyFrenzyBuffer = temp1
+        //> lda #$10
+        temp1 = 0x10
+        //> bne SetLSpd                ;load horizontal speed and do unconditional branch
+        if (temp1 == 0) {
+        }
+    }
+    //> Fr12S:   lda #Spiny
+    temp1 = Spiny
+    //> sta EnemyFrenzyBuffer      ;set spiny identifier in frenzy buffer
+    enemyFrenzyBuffer = temp1
+    //> ldy #$02
+    temp2 = 0x02
+    do {
+        //> LdLDa:   lda LakituDiffAdj,y        ;load values
+        temp1 = lakituDiffAdj[temp2]
+        //> sta $0001,y                ;store in zero page
+        memory[0x1 + temp2] = temp1.toUByte()
+        //> dey
+        temp2 = (temp2 - 1) and 0xFF
+        //> bpl LdLDa                  ;do this until all values are stired
+    } while ((temp2 and 0x80) == 0)
+    //> jsr PlayerLakituDiff       ;execute sub to set speed and create spinys
+    playerLakituDiff(X)
+    //> SetLSpd: sta LakituMoveSpeed,x      ;set movement speed returned from sub
+    lakituMoveSpeed[X] = temp1
+    //> ldy #$01                   ;set moving direction to right by default
+    temp2 = 0x01
+    //> lda LakituMoveDirection,x
+    temp1 = lakituMoveDirection[X]
+    //> and #$01                   ;get LSB of moving direction
+    temp3 = temp1 and 0x01
+    //> bne SetLMov                ;if set, branch to the end to use moving direction
+    if (!(temp3 == 0)) {
+        //  goto SetLMov
+        return
+    }
+    temp1 = temp3
+    if (temp3 == 0) {
+        //> lda LakituMoveSpeed,x
+        temp1 = lakituMoveSpeed[X]
+        //> eor #$ff                   ;get two's compliment of moving speed
+        temp4 = temp1 xor 0xFF
+        //> clc
+        //> adc #$01
+        temp5 = temp4 + 0x01
+        temp1 = temp5 and 0xFF
+        //> sta LakituMoveSpeed,x      ;store as new moving speed
+        lakituMoveSpeed[X] = temp1
+        //> iny                        ;increment moving direction to left
+        temp2 = (temp2 + 1) and 0xFF
+    }
+    //> SetLMov: sty Enemy_MovingDir,x      ;store moving direction
+    enemyMovingdir[X] = temp2
+    //> jmp MoveEnemyHorizontally  ;move lakitu horizontally
+}
+
 // Decompiled from PlayerLakituDiff
 fun playerLakituDiff(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     var playerXSpeed by MemoryByte(Player_X_Speed)
     var scrollAmount by MemoryByte(ScrollAmount)
     val enemyId by MemoryByteIndexed(Enemy_ID)
@@ -10415,38 +16627,39 @@ fun playerLakituDiff(X: Int) {
         temp1 = memory[0x0].toInt() xor 0xFF
         //> clc
         //> adc #$01                   ;store two's compliment as horizontal difference
+        temp2 = temp1 + 0x01
         //> sta $00
-        memory[0x0] = ((temp1 + 0x01) and 0xFF).toUByte()
+        memory[0x0] = (temp2 and 0xFF).toUByte()
     }
     //> ChkLakDif: lda $00                    ;get low byte of horizontal difference
     //> cmp #$3c                   ;if within a certain distance of player, branch
     //> bcc ChkPSpeed
-    temp2 = memory[0x0].toInt()
+    temp3 = memory[0x0].toInt()
     if (memory[0x0].toInt() >= 0x3C) {
         //> lda #$3c                   ;otherwise set maximum distance
-        temp2 = 0x3C
+        temp3 = 0x3C
         //> sta $00
-        memory[0x0] = temp2.toUByte()
+        memory[0x0] = temp3.toUByte()
         //> lda Enemy_ID,x             ;check if lakitu is in our current enemy slot
-        temp2 = enemyId[X]
+        temp3 = enemyId[X]
         //> cmp #Lakitu
         //> bne ChkPSpeed              ;if not, branch elsewhere
-        if (temp2 == Lakitu) {
+        if (temp3 == Lakitu) {
             //> tya                        ;compare contents of Y, now in A
             //> cmp LakituMoveDirection,x  ;to what is being used as horizontal movement direction
             //> beq ChkPSpeed              ;if moving toward the player, branch, do not alter
-            temp2 = temp0
+            temp3 = temp0
             if (temp0 != lakituMoveDirection[X]) {
                 //> lda LakituMoveDirection,x  ;if moving to the left beyond maximum distance,
-                temp2 = lakituMoveDirection[X]
+                temp3 = lakituMoveDirection[X]
                 //> beq SetLMovD               ;branch and alter without delay
-                if (temp2 != 0) {
+                if (temp3 != 0) {
                     //> dec LakituMoveSpeed,x      ;decrement horizontal speed
                     lakituMoveSpeed[X] = (lakituMoveSpeed[X] - 1) and 0xFF
                     //> lda LakituMoveSpeed,x      ;if horizontal speed not yet at zero, branch to leave
-                    temp2 = lakituMoveSpeed[X]
+                    temp3 = lakituMoveSpeed[X]
                     //> bne ExMoveLak
-                    if (temp2 == 0) {
+                    if (temp3 == 0) {
                     } else {
                         //> ExMoveLak: rts                        ;leave!!!
                         return
@@ -10459,72 +16672,656 @@ fun playerLakituDiff(X: Int) {
         }
     }
     //> ChkPSpeed: lda $00
-    temp2 = memory[0x0].toInt()
+    temp3 = memory[0x0].toInt()
     //> and #%00111100             ;mask out all but four bits in the middle
-    temp3 = temp2 and 0x3C
+    temp4 = temp3 and 0x3C
     //> lsr                        ;divide masked difference by four
-    temp3 = temp3 shr 1
+    temp4 = temp4 shr 1
     //> lsr
-    temp3 = temp3 shr 1
+    temp4 = temp4 shr 1
     //> sta $00                    ;store as new value
-    memory[0x0] = temp3.toUByte()
+    memory[0x0] = temp4.toUByte()
     //> ldy #$00                   ;init offset
     temp0 = 0x00
     //> lda Player_X_Speed
-    temp2 = playerXSpeed
+    temp3 = playerXSpeed
     //> beq SubDifAdj              ;if player not moving horizontally, branch
-    if (temp2 != 0) {
+    if (temp3 != 0) {
         //> lda ScrollAmount
-        temp2 = scrollAmount
+        temp3 = scrollAmount
         //> beq SubDifAdj              ;if scroll speed not set, branch to same place
-        if (temp2 != 0) {
+        if (temp3 != 0) {
             //> iny                        ;otherwise increment offset
             temp0 = (temp0 + 1) and 0xFF
             //> lda Player_X_Speed
-            temp2 = playerXSpeed
+            temp3 = playerXSpeed
             //> cmp #$19                   ;if player not running, branch
             //> bcc ChkSpinyO
-            if (temp2 >= 0x19) {
+            if (temp3 >= 0x19) {
                 //> lda ScrollAmount
-                temp2 = scrollAmount
+                temp3 = scrollAmount
                 //> cmp #$02                   ;if scroll speed below a certain amount, branch
                 //> bcc ChkSpinyO              ;to same place
-                if (temp2 >= 0x02) {
+                if (temp3 >= 0x02) {
                     //> iny                        ;otherwise increment once more
                     temp0 = (temp0 + 1) and 0xFF
                 }
             }
             //> ChkSpinyO: lda Enemy_ID,x             ;check for spiny object
-            temp2 = enemyId[X]
+            temp3 = enemyId[X]
             //> cmp #Spiny
             //> bne ChkEmySpd              ;branch if not found
-            if (temp2 == Spiny) {
+            if (temp3 == Spiny) {
                 //> lda Player_X_Speed         ;if player not moving, skip this part
-                temp2 = playerXSpeed
+                temp3 = playerXSpeed
                 //> bne SubDifAdj
-                if (temp2 == 0) {
+                if (temp3 == 0) {
                 }
             }
             //> ChkEmySpd: lda Enemy_Y_Speed,x        ;check vertical speed
-            temp2 = enemyYSpeed[X]
+            temp3 = enemyYSpeed[X]
             //> bne SubDifAdj              ;branch if nonzero
-            if (temp2 == 0) {
+            if (temp3 == 0) {
                 //> ldy #$00                   ;otherwise reinit offset
                 temp0 = 0x00
             }
         }
     }
     //> SubDifAdj: lda $0001,y                ;get one of three saved values from earlier
-    temp2 = memory[0x1 + temp0].toInt()
+    temp3 = memory[0x1 + temp0].toInt()
     //> ldy $00                    ;get saved horizontal difference
     temp0 = memory[0x0].toInt()
     do {
         //> SPixelLak: sec                        ;subtract one for each pixel of horizontal difference
         //> sbc #$01                   ;from one of three saved values
+        temp5 = temp3 - 0x01
+        temp3 = temp5 and 0xFF
         //> dey
         temp0 = (temp0 - 1) and 0xFF
         //> bpl SPixelLak              ;branch until all pixels are subtracted, to adjust difference
     } while ((temp0 and 0x80) == 0)
+}
+
+// Decompiled from BridgeCollapse
+fun bridgeCollapse() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var bowserBodyControls by MemoryByte(BowserBodyControls)
+    var bowserFeetCounter by MemoryByte(BowserFeetCounter)
+    var bowserfrontOffset by MemoryByte(BowserFront_Offset)
+    var bowserGfxFlag by MemoryByte(BowserGfxFlag)
+    var bridgeCollapseOffset by MemoryByte(BridgeCollapseOffset)
+    var duplicateobjOffset by MemoryByte(DuplicateObj_Offset)
+    var eventMusicQueue by MemoryByte(EventMusicQueue)
+    var noiseSoundQueue by MemoryByte(NoiseSoundQueue)
+    var objectOffset by MemoryByte(ObjectOffset)
+    var opermodeTask by MemoryByte(OperMode_Task)
+    var square2SoundQueue by MemoryByte(Square2SoundQueue)
+    var vramBuffer1Offset by MemoryByte(VRAM_Buffer1_Offset)
+    val bridgeCollapseData by MemoryByteIndexed(BridgeCollapseData)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    //> BridgeCollapse:
+    //> ldx BowserFront_Offset    ;get enemy offset for bowser
+    //> lda Enemy_ID,x            ;check enemy object identifier for bowser
+    //> cmp #Bowser               ;if not found, branch ahead,
+    //> bne SetM2                 ;metatile removal not necessary
+    if (!(enemyId[bowserfrontOffset] - Bowser == 0)) {
+        //  goto SetM2
+        return
+    }
+    temp0 = enemyId[bowserfrontOffset]
+    temp1 = bowserfrontOffset
+    if (enemyId[bowserfrontOffset] == Bowser) {
+        //> stx ObjectOffset          ;store as enemy offset here
+        objectOffset = temp1
+        //> lda Enemy_State,x         ;if bowser in normal state, skip all of this
+        temp0 = enemyState[temp1]
+        //> beq RemoveBridge
+        if (temp0 != 0) {
+            //> and #%01000000            ;if bowser's state has d6 clear, skip to silence music
+            temp2 = temp0 and 0x40
+            //> beq SetM2
+            if (temp2 == 0) {
+                //  goto SetM2
+                return
+            }
+            temp0 = temp2
+            if (temp2 != 0) {
+                //> lda Enemy_Y_Position,x    ;check bowser's vertical coordinate
+                temp0 = enemyYPosition[temp1]
+                //> cmp #$e0                  ;if bowser not yet low enough, skip this part ahead
+                //> bcc MoveD_Bowser
+                if (!(temp0 >= 0xE0)) {
+                    //  goto MoveD_Bowser
+                    return
+                }
+                if (temp0 >= 0xE0) {
+                }
+            }
+        }
+    }
+    //> SetM2: lda #Silence              ;silence music
+    temp0 = Silence
+    //> sta EventMusicQueue
+    eventMusicQueue = temp0
+    //> inc OperMode_Task         ;move onto next secondary mode in autoctrl mode
+    opermodeTask = (opermodeTask + 1) and 0xFF
+    //> jmp KillAllEnemies        ;jump to empty all enemy slots and then leave
+    //> MoveD_Bowser:
+    //> jsr MoveEnemySlowVert     ;do a sub to move bowser downwards
+    moveEnemySlowVert()
+    //> jmp BowserGfxHandler      ;jump to draw bowser's front and rear, then leave
+    //> RemoveBridge:
+    //> dec BowserFeetCounter     ;decrement timer to control bowser's feet
+    bowserFeetCounter = (bowserFeetCounter - 1) and 0xFF
+    //> bne NoBFall               ;if not expired, skip all of this
+    if (!(bowserFeetCounter == 0)) {
+        //  goto NoBFall
+        return
+    }
+    if (bowserFeetCounter == 0) {
+        //> lda #$04
+        temp0 = 0x04
+        //> sta BowserFeetCounter     ;otherwise, set timer now
+        bowserFeetCounter = temp0
+        //> lda BowserBodyControls
+        temp0 = bowserBodyControls
+        //> eor #$01                  ;invert bit to control bowser's feet
+        temp3 = temp0 xor 0x01
+        //> sta BowserBodyControls
+        bowserBodyControls = temp3
+        //> lda #$22                  ;put high byte of name table address here for now
+        temp0 = 0x22
+        //> sta $05
+        memory[0x5] = temp0.toUByte()
+        //> ldy BridgeCollapseOffset  ;get bridge collapse offset here
+        //> lda BridgeCollapseData,y  ;load low byte of name table address and store here
+        temp0 = bridgeCollapseData[bridgeCollapseOffset]
+        //> sta $04
+        memory[0x4] = temp0.toUByte()
+        //> ldy VRAM_Buffer1_Offset   ;increment vram buffer offset
+        //> iny
+        vramBuffer1Offset = (vramBuffer1Offset + 1) and 0xFF
+        //> ldx #$0c                  ;set offset for tile data for sub to draw blank metatile
+        temp1 = 0x0C
+        //> jsr RemBridge             ;do sub here to remove bowser's bridge metatiles
+        remBridge(temp1, vramBuffer1Offset)
+        //> ldx ObjectOffset          ;get enemy offset
+        temp1 = objectOffset
+        //> jsr MoveVOffset           ;set new vram buffer offset
+        moveVOffset(vramBuffer1Offset)
+        //> lda #Sfx_Blast            ;load the fireworks/gunfire sound into the square 2 sfx
+        temp0 = Sfx_Blast
+        //> sta Square2SoundQueue     ;queue while at the same time loading the brick
+        square2SoundQueue = temp0
+        //> lda #Sfx_BrickShatter     ;shatter sound into the noise sfx queue thus
+        temp0 = Sfx_BrickShatter
+        //> sta NoiseSoundQueue       ;producing the unique sound of the bridge collapsing
+        noiseSoundQueue = temp0
+        //> inc BridgeCollapseOffset  ;increment bridge collapse offset
+        bridgeCollapseOffset = (bridgeCollapseOffset + 1) and 0xFF
+        //> lda BridgeCollapseOffset
+        temp0 = bridgeCollapseOffset
+        //> cmp #$0f                  ;if bridge collapse offset has not yet reached
+        //> bne NoBFall               ;the end, go ahead and skip this part
+        if (!(temp0 - 0x0F == 0)) {
+            //  goto NoBFall
+            return
+        }
+        temp4 = vramBuffer1Offset
+        if (temp0 == 0x0F) {
+            //> jsr InitVStf              ;initialize whatever vertical speed bowser has
+            initVStf(temp1)
+            //> lda #%01000000
+            temp0 = 0x40
+            //> sta Enemy_State,x         ;set bowser's state to one of defeated states (d6 set)
+            enemyState[temp1] = temp0
+            //> lda #Sfx_BowserFall
+            temp0 = Sfx_BowserFall
+            //> sta Square2SoundQueue     ;play bowser defeat sound
+            square2SoundQueue = temp0
+        }
+    }
+    //> NoBFall: jmp BowserGfxHandler      ;jump to code that draws bowser
+    //> BowserGfxHandler:
+    //> jsr ProcessBowserHalf    ;do a sub here to process bowser's front
+    processBowserHalf(temp1)
+    //> ldy #$10                 ;load default value here to position bowser's rear
+    temp4 = 0x10
+    //> lda Enemy_MovingDir,x    ;check moving direction
+    temp0 = enemyMovingdir[temp1]
+    //> lsr
+    temp0 = temp0 shr 1
+    //> bcc CopyFToR             ;if moving left, use default
+    if ((temp0 and 0x01) != 0) {
+        //> ldy #$f0                 ;otherwise load alternate positioning value here
+        temp4 = 0xF0
+    }
+    //> CopyFToR: tya                      ;move bowser's rear object position value to A
+    //> clc
+    //> adc Enemy_X_Position,x   ;add to bowser's front object horizontal coordinate
+    temp5 = temp4 + enemyXPosition[temp1]
+    temp0 = temp5 and 0xFF
+    //> ldy DuplicateObj_Offset  ;get bowser's rear object offset
+    temp4 = duplicateobjOffset
+    //> sta Enemy_X_Position,y   ;store A as bowser's rear horizontal coordinate
+    enemyXPosition[temp4] = temp0
+    //> lda Enemy_Y_Position,x
+    temp0 = enemyYPosition[temp1]
+    //> clc                      ;add eight pixels to bowser's front object
+    //> adc #$08                 ;vertical coordinate and store as vertical coordinate
+    temp6 = temp0 + 0x08
+    temp0 = temp6 and 0xFF
+    //> sta Enemy_Y_Position,y   ;for bowser's rear
+    enemyYPosition[temp4] = temp0
+    //> lda Enemy_State,x
+    temp0 = enemyState[temp1]
+    //> sta Enemy_State,y        ;copy enemy state directly from front to rear
+    enemyState[temp4] = temp0
+    //> lda Enemy_MovingDir,x
+    temp0 = enemyMovingdir[temp1]
+    //> sta Enemy_MovingDir,y    ;copy moving direction also
+    enemyMovingdir[temp4] = temp0
+    //> lda ObjectOffset         ;save enemy object offset of front to stack
+    temp0 = objectOffset
+    //> pha
+    push(temp0)
+    //> ldx DuplicateObj_Offset  ;put enemy object offset of rear as current
+    temp1 = duplicateobjOffset
+    //> stx ObjectOffset
+    objectOffset = temp1
+    //> lda #Bowser              ;set bowser's enemy identifier
+    temp0 = Bowser
+    //> sta Enemy_ID,x           ;store in bowser's rear object
+    enemyId[temp1] = temp0
+    //> jsr ProcessBowserHalf    ;do a sub here to process bowser's rear
+    processBowserHalf(temp1)
+    //> pla
+    temp0 = pull()
+    //> sta ObjectOffset         ;get original enemy object offset
+    objectOffset = temp0
+    //> tax
+    //> lda #$00                 ;nullify bowser's front/rear graphics flag
+    temp0 = 0x00
+    //> sta BowserGfxFlag
+    bowserGfxFlag = temp0
+    //> ExBGfxH:  rts                      ;leave!
+    return
+}
+
+// Decompiled from RunBowser
+fun runBowser(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp10: Int = 0
+    var temp11: Int = 0
+    var temp12: Int = 0
+    var temp13: Int = 0
+    var temp14: Int = 0
+    var temp15: Int = 0
+    var temp16: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
+    var bowserBodyControls by MemoryByte(BowserBodyControls)
+    var bowserFeetCounter by MemoryByte(BowserFeetCounter)
+    var bowserFireBreathTimer by MemoryByte(BowserFireBreathTimer)
+    var bowserGfxFlag by MemoryByte(BowserGfxFlag)
+    var bowserMovementSpeed by MemoryByte(BowserMovementSpeed)
+    var bowserOrigXPos by MemoryByte(BowserOrigXPos)
+    var duplicateobjOffset by MemoryByte(DuplicateObj_Offset)
+    var enemyFrenzyBuffer by MemoryByte(EnemyFrenzyBuffer)
+    var frameCounter by MemoryByte(FrameCounter)
+    var maxRangeFromOrigin by MemoryByte(MaxRangeFromOrigin)
+    var objectOffset by MemoryByte(ObjectOffset)
+    var secondaryHardMode by MemoryByte(SecondaryHardMode)
+    var timerControl by MemoryByte(TimerControl)
+    var worldNumber by MemoryByte(WorldNumber)
+    val enemyFrameTimer by MemoryByteIndexed(EnemyFrameTimer)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val enemyYSpeed by MemoryByteIndexed(Enemy_Y_Speed)
+    val pRandomRange by MemoryByteIndexed(PRandomRange)
+    val pseudoRandomBitReg by MemoryByteIndexed(PseudoRandomBitReg)
+    //> MoveD_Bowser:
+    //> jsr MoveEnemySlowVert     ;do a sub to move bowser downwards
+    moveEnemySlowVert()
+    //> jmp BowserGfxHandler      ;jump to draw bowser's front and rear, then leave
+    //> RunBowser:
+    //> lda Enemy_State,x       ;if d5 in enemy state is not set
+    //> and #%00100000          ;then branch elsewhere to run bowser
+    temp0 = enemyState[X] and 0x20
+    //> beq BowserControl
+    temp1 = temp0
+    if (temp0 != 0) {
+        //> lda Enemy_Y_Position,x  ;otherwise check vertical position
+        temp1 = enemyYPosition[X]
+        //> cmp #$e0                ;if above a certain point, branch to move defeated bowser
+        //> bcc MoveD_Bowser        ;otherwise proceed to KillAllEnemies
+        if (!(temp1 >= 0xE0)) {
+            //  goto MoveD_Bowser
+            return
+        }
+    }
+    //> BowserControl:
+    //> lda #$00
+    temp1 = 0x00
+    //> sta EnemyFrenzyBuffer      ;empty frenzy buffer
+    enemyFrenzyBuffer = temp1
+    //> lda TimerControl           ;if master timer control not set,
+    temp1 = timerControl
+    //> beq ChkMouth               ;skip jump and execute code here
+    if (temp1 != 0) {
+    } else {
+        //> ChkMouth:  lda BowserBodyControls     ;check bowser's mouth
+        temp1 = bowserBodyControls
+        //> bpl FeetTmr                ;if bit clear, go ahead with code here
+        if ((temp1 and 0x80) != 0) {
+        } else {
+            //> FeetTmr:   dec BowserFeetCounter      ;decrement timer to control bowser's feet
+            bowserFeetCounter = (bowserFeetCounter - 1) and 0xFF
+            //> bne ResetMDr               ;if not expired, skip this part
+            if (bowserFeetCounter == 0) {
+                //> lda #$20                   ;otherwise, reset timer
+                temp1 = 0x20
+                //> sta BowserFeetCounter
+                bowserFeetCounter = temp1
+                //> lda BowserBodyControls     ;and invert bit used
+                temp1 = bowserBodyControls
+                //> eor #%00000001             ;to control bowser's feet
+                temp2 = temp1 xor 0x01
+                //> sta BowserBodyControls
+                bowserBodyControls = temp2
+            }
+            //> ResetMDr:  lda FrameCounter           ;check frame counter
+            temp1 = frameCounter
+            //> and #%00001111             ;if not on every sixteenth frame, skip
+            temp3 = temp1 and 0x0F
+            //> bne B_FaceP                ;ahead to continue code
+            temp1 = temp3
+            if (temp3 == 0) {
+                //> lda #$02                   ;otherwise reset moving/facing direction every
+                temp1 = 0x02
+                //> sta Enemy_MovingDir,x      ;sixteen frames
+                enemyMovingdir[X] = temp1
+            }
+            //> B_FaceP:   lda EnemyFrameTimer,x      ;if timer set here expired,
+            temp1 = enemyFrameTimer[X]
+            //> beq GetPRCmp               ;branch to next section
+            if (temp1 != 0) {
+                //> jsr PlayerEnemyDiff        ;get horizontal difference between player and bowser,
+                playerEnemyDiff(X)
+                //> bpl GetPRCmp               ;and branch if bowser to the right of the player
+                if ((temp1 and 0x80) != 0) {
+                    //> lda #$01
+                    temp1 = 0x01
+                    //> sta Enemy_MovingDir,x      ;set bowser to move and face to the right
+                    enemyMovingdir[X] = temp1
+                    //> lda #$02
+                    temp1 = 0x02
+                    //> sta BowserMovementSpeed    ;set movement speed
+                    bowserMovementSpeed = temp1
+                    //> lda #$20
+                    temp1 = 0x20
+                    //> sta EnemyFrameTimer,x      ;set timer here
+                    enemyFrameTimer[X] = temp1
+                    //> sta BowserFireBreathTimer  ;set timer used for bowser's flame
+                    bowserFireBreathTimer = temp1
+                    //> lda Enemy_X_Position,x
+                    temp1 = enemyXPosition[X]
+                    //> cmp #$c8                   ;if bowser to the right past a certain point,
+                    //> bcs HammerChk              ;skip ahead to some other section
+                    if (!(temp1 >= 0xC8)) {
+                    }
+                }
+            }
+            //> GetPRCmp:  lda FrameCounter           ;get frame counter
+            temp1 = frameCounter
+            //> and #%00000011
+            temp4 = temp1 and 0x03
+            //> bne HammerChk              ;execute this code every fourth frame, otherwise branch
+            temp1 = temp4
+            if (temp4 == 0) {
+                //> lda Enemy_X_Position,x
+                temp1 = enemyXPosition[X]
+                //> cmp BowserOrigXPos         ;if bowser not at original horizontal position,
+                //> bne GetDToO                ;branch to skip this part
+                if (temp1 == bowserOrigXPos) {
+                    //> lda PseudoRandomBitReg,x
+                    temp1 = pseudoRandomBitReg[X]
+                    //> and #%00000011             ;get pseudorandom offset
+                    temp5 = temp1 and 0x03
+                    //> tay
+                    //> lda PRandomRange,y         ;load value using pseudorandom offset
+                    temp1 = pRandomRange[temp5]
+                    //> sta MaxRangeFromOrigin     ;and store here
+                    maxRangeFromOrigin = temp1
+                }
+                //> GetDToO:   lda Enemy_X_Position,x
+                temp1 = enemyXPosition[X]
+                //> clc                        ;add movement speed to bowser's horizontal
+                //> adc BowserMovementSpeed    ;coordinate and save as new horizontal position
+                temp6 = temp1 + bowserMovementSpeed
+                temp1 = temp6 and 0xFF
+                //> sta Enemy_X_Position,x
+                enemyXPosition[X] = temp1
+                //> ldy Enemy_MovingDir,x
+                //> cpy #$01                   ;if bowser moving and facing to the right, skip ahead
+                //> beq HammerChk
+                temp7 = enemyMovingdir[X]
+                if (enemyMovingdir[X] != 0x01) {
+                    //> ldy #$ff                   ;set default movement speed here (move left)
+                    temp7 = 0xFF
+                    //> sec                        ;get difference of current vs. original
+                    //> sbc BowserOrigXPos         ;horizontal position
+                    temp8 = temp1 - bowserOrigXPos
+                    temp1 = temp8 and 0xFF
+                    //> bpl CompDToO               ;if current position to the right of original, skip ahead
+                    if ((temp8 and 0xFF and 0x80) != 0) {
+                        //> eor #$ff
+                        temp9 = temp1 xor 0xFF
+                        //> clc                        ;get two's compliment
+                        //> adc #$01
+                        temp10 = temp9 + 0x01
+                        temp1 = temp10 and 0xFF
+                        //> ldy #$01                   ;set alternate movement speed here (move right)
+                        temp7 = 0x01
+                    }
+                    //> CompDToO:  cmp MaxRangeFromOrigin     ;compare difference with pseudorandom value
+                    //> bcc HammerChk              ;if difference < pseudorandom value, leave speed alone
+                    if (temp1 >= maxRangeFromOrigin) {
+                        //> sty BowserMovementSpeed    ;otherwise change bowser's movement speed
+                        bowserMovementSpeed = temp7
+                    }
+                }
+            }
+        }
+        //> HammerChk: lda EnemyFrameTimer,x      ;if timer set here not expired yet, skip ahead to
+        temp1 = enemyFrameTimer[X]
+        //> bne MakeBJump              ;some other section of code
+        if (temp1 == 0) {
+            //> jsr MoveEnemySlowVert      ;otherwise start by moving bowser downwards
+            moveEnemySlowVert()
+            //> lda WorldNumber            ;check world number
+            temp1 = worldNumber
+            //> cmp #World6
+            //> bcc SetHmrTmr              ;if world 1-5, skip this part (not time to throw hammers yet)
+            if (temp1 >= World6) {
+                //> lda FrameCounter
+                temp1 = frameCounter
+                //> and #%00000011             ;check to see if it's time to execute sub
+                temp11 = temp1 and 0x03
+                //> bne SetHmrTmr              ;if not, skip sub, otherwise
+                temp1 = temp11
+                if (temp11 == 0) {
+                    //> jsr SpawnHammerObj         ;execute sub on every fourth frame to spawn misc object (hammer)
+                    spawnHammerObj()
+                }
+            }
+            //> SetHmrTmr: lda Enemy_Y_Position,x     ;get current vertical position
+            temp1 = enemyYPosition[X]
+            //> cmp #$80                   ;if still above a certain point
+            //> bcc ChkFireB               ;then skip to world number check for flames
+            if (temp1 >= 0x80) {
+                //> lda PseudoRandomBitReg,x
+                temp1 = pseudoRandomBitReg[X]
+                //> and #%00000011             ;get pseudorandom offset
+                temp12 = temp1 and 0x03
+                //> tay
+                //> lda PRandomRange,y         ;get value using pseudorandom offset
+                temp1 = pRandomRange[temp12]
+                //> sta EnemyFrameTimer,x      ;set for timer here
+                enemyFrameTimer[X] = temp1
+            }
+        }
+    }
+    //> SkipToFB:  jmp ChkFireB               ;jump to execute flames code
+    //> MakeBJump: cmp #$01                   ;if timer not yet about to expire,
+    //> bne ChkFireB               ;skip ahead to next part
+    if (temp1 == 0x01) {
+        //> dec Enemy_Y_Position,x     ;otherwise decrement vertical coordinate
+        enemyYPosition[X] = (enemyYPosition[X] - 1) and 0xFF
+        //> jsr InitVStf               ;initialize movement amount
+        initVStf(X)
+        //> lda #$fe
+        temp1 = 0xFE
+        //> sta Enemy_Y_Speed,x        ;set vertical speed to move bowser upwards
+        enemyYSpeed[X] = temp1
+    }
+    do {
+        //> ChkFireB:  lda WorldNumber            ;check world number here
+        temp1 = worldNumber
+        //> cmp #World8                ;world 8?
+        //> beq SpawnFBr               ;if so, execute this part here
+        if (temp1 != World8) {
+            //> cmp #World6                ;world 6-7?
+            //> bcs BowserGfxHandler       ;if so, skip this part here
+            if (temp1 >= World6) {
+                //  goto BowserGfxHandler
+                return
+            }
+            if (!(temp1 >= World6)) {
+            }
+        }
+        //> SpawnFBr:  lda BowserFireBreathTimer  ;check timer here
+        temp1 = bowserFireBreathTimer
+        //> bne BowserGfxHandler       ;if not expired yet, skip all of this
+        if (!(temp1 == 0)) {
+            //  goto BowserGfxHandler
+            return
+        }
+        if (temp1 == 0) {
+            //> lda #$20
+            temp1 = 0x20
+            //> sta BowserFireBreathTimer  ;set timer here
+            bowserFireBreathTimer = temp1
+            //> lda BowserBodyControls
+            temp1 = bowserBodyControls
+            //> eor #%10000000             ;invert bowser's mouth bit to open
+            temp13 = temp1 xor 0x80
+            //> sta BowserBodyControls     ;and close bowser's mouth
+            bowserBodyControls = temp13
+            //> bmi ChkFireB               ;if bowser's mouth open, loop back
+        }
+    } while (flagN)
+    //> jsr SetFlameTimer          ;get timing for bowser's flame
+    setFlameTimer()
+    //> ldy SecondaryHardMode
+    temp7 = secondaryHardMode
+    //> beq SetFBTmr               ;if secondary hard mode flag not set, skip this
+    if (temp7 != 0) {
+        //> sec
+        //> sbc #$10                   ;otherwise subtract from value in A
+        temp14 = temp1 - 0x10
+        temp1 = temp14 and 0xFF
+    }
+    //> SetFBTmr:  sta BowserFireBreathTimer  ;set value as timer here
+    bowserFireBreathTimer = temp1
+    //> lda #BowserFlame           ;put bowser's flame identifier
+    temp1 = BowserFlame
+    //> sta EnemyFrenzyBuffer      ;in enemy frenzy buffer
+    enemyFrenzyBuffer = temp1
+    //> ;--------------------------------
+    //> BowserGfxHandler:
+    //> jsr ProcessBowserHalf    ;do a sub here to process bowser's front
+    processBowserHalf(X)
+    //> ldy #$10                 ;load default value here to position bowser's rear
+    temp7 = 0x10
+    //> lda Enemy_MovingDir,x    ;check moving direction
+    temp1 = enemyMovingdir[X]
+    //> lsr
+    temp1 = temp1 shr 1
+    //> bcc CopyFToR             ;if moving left, use default
+    if ((temp1 and 0x01) != 0) {
+        //> ldy #$f0                 ;otherwise load alternate positioning value here
+        temp7 = 0xF0
+    }
+    //> CopyFToR: tya                      ;move bowser's rear object position value to A
+    //> clc
+    //> adc Enemy_X_Position,x   ;add to bowser's front object horizontal coordinate
+    temp15 = temp7 + enemyXPosition[X]
+    temp1 = temp15 and 0xFF
+    //> ldy DuplicateObj_Offset  ;get bowser's rear object offset
+    temp7 = duplicateobjOffset
+    //> sta Enemy_X_Position,y   ;store A as bowser's rear horizontal coordinate
+    enemyXPosition[temp7] = temp1
+    //> lda Enemy_Y_Position,x
+    temp1 = enemyYPosition[X]
+    //> clc                      ;add eight pixels to bowser's front object
+    //> adc #$08                 ;vertical coordinate and store as vertical coordinate
+    temp16 = temp1 + 0x08
+    temp1 = temp16 and 0xFF
+    //> sta Enemy_Y_Position,y   ;for bowser's rear
+    enemyYPosition[temp7] = temp1
+    //> lda Enemy_State,x
+    temp1 = enemyState[X]
+    //> sta Enemy_State,y        ;copy enemy state directly from front to rear
+    enemyState[temp7] = temp1
+    //> lda Enemy_MovingDir,x
+    temp1 = enemyMovingdir[X]
+    //> sta Enemy_MovingDir,y    ;copy moving direction also
+    enemyMovingdir[temp7] = temp1
+    //> lda ObjectOffset         ;save enemy object offset of front to stack
+    temp1 = objectOffset
+    //> pha
+    push(temp1)
+    //> ldx DuplicateObj_Offset  ;put enemy object offset of rear as current
+    //> stx ObjectOffset
+    objectOffset = duplicateobjOffset
+    //> lda #Bowser              ;set bowser's enemy identifier
+    temp1 = Bowser
+    //> sta Enemy_ID,x           ;store in bowser's rear object
+    enemyId[duplicateobjOffset] = temp1
+    //> jsr ProcessBowserHalf    ;do a sub here to process bowser's rear
+    processBowserHalf(duplicateobjOffset)
+    //> pla
+    temp1 = pull()
+    //> sta ObjectOffset         ;get original enemy object offset
+    objectOffset = temp1
+    //> tax
+    //> lda #$00                 ;nullify bowser's front/rear graphics flag
+    temp1 = 0x00
+    //> sta BowserGfxFlag
+    bowserGfxFlag = temp1
+    //> ExBGfxH:  rts                      ;leave!
+    return
 }
 
 // Decompiled from KillAllEnemies
@@ -10552,6 +17349,8 @@ fun killAllEnemies(A: Int) {
 
 // Decompiled from ProcessBowserHalf
 fun processBowserHalf(X: Int) {
+    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
+    val enemyState by MemoryByteIndexed(Enemy_State)
     //> ExBGfxH:  rts                      ;leave!
     return
 }
@@ -10577,7 +17376,286 @@ fun setFlameTimer(): Int {
 
 // Decompiled from ProcBowserFlame
 fun procBowserFlame(X: Int) {
+    val bowserFlamePRandomOfs by MemoryByteIndexed(BowserFlamePRandomOfs)
+    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
+    val enemySprdataoffset by MemoryByteIndexed(Enemy_SprDataOffset)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyXMoveforce by MemoryByteIndexed(Enemy_X_MoveForce)
+    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
+    val enemyYMoveforce by MemoryByteIndexed(Enemy_Y_MoveForce)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val flameYPosData by MemoryByteIndexed(FlameYPosData)
+    val spriteAttributes by MemoryByteIndexed(Sprite_Attributes)
+    val spriteTilenumber by MemoryByteIndexed(Sprite_Tilenumber)
+    val spriteXPosition by MemoryByteIndexed(Sprite_X_Position)
+    val spriteYPosition by MemoryByteIndexed(Sprite_Y_Position)
     //> ExFl: rts
+    return
+}
+
+// Decompiled from RunFireworks
+fun runFireworks(X: Int) {
+    var temp0: Int = 0
+    var enemyRelXpos by MemoryByte(Enemy_Rel_XPos)
+    var enemyRelYpos by MemoryByte(Enemy_Rel_YPos)
+    var fireballRelXpos by MemoryByte(Fireball_Rel_XPos)
+    var fireballRelYpos by MemoryByte(Fireball_Rel_YPos)
+    val digitModifier by MemoryByteIndexed(DigitModifier)
+    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
+    val enemySprdataoffset by MemoryByteIndexed(Enemy_SprDataOffset)
+    val explosionGfxCounter by MemoryByteIndexed(ExplosionGfxCounter)
+    val explosionTimerCounter by MemoryByteIndexed(ExplosionTimerCounter)
+    //> RunFireworks:
+    //> dec ExplosionTimerCounter,x ;decrement explosion timing counter here
+    explosionTimerCounter[X] = (explosionTimerCounter[X] - 1) and 0xFF
+    //> bne SetupExpl               ;if not expired, skip this part
+    if (explosionTimerCounter[X] == 0) {
+        //> lda #$08
+        //> sta ExplosionTimerCounter,x ;reset counter
+        explosionTimerCounter[X] = 0x08
+        //> inc ExplosionGfxCounter,x   ;increment explosion graphics counter
+        explosionGfxCounter[X] = (explosionGfxCounter[X] + 1) and 0xFF
+        //> lda ExplosionGfxCounter,x
+        //> cmp #$03                    ;check explosion graphics counter
+        //> bcs FireworksSoundScore     ;if at a certain point, branch to kill this object
+        if (explosionGfxCounter[X] >= 0x03) {
+            //  goto FireworksSoundScore
+            return
+        }
+        temp0 = explosionGfxCounter[X]
+        if (!(explosionGfxCounter[X] >= 0x03)) {
+        }
+    }
+    //> SetupExpl: jsr RelativeEnemyPosition   ;get relative coordinates of explosion
+    relativeEnemyPosition()
+    //> lda Enemy_Rel_YPos          ;copy relative coordinates
+    temp0 = enemyRelYpos
+    //> sta Fireball_Rel_YPos       ;from the enemy object to the fireball object
+    fireballRelYpos = temp0
+    //> lda Enemy_Rel_XPos          ;first vertical, then horizontal
+    temp0 = enemyRelXpos
+    //> sta Fireball_Rel_XPos
+    fireballRelXpos = temp0
+    //> ldy Enemy_SprDataOffset,x   ;get OAM data offset
+    //> lda ExplosionGfxCounter,x   ;get explosion graphics counter
+    temp0 = explosionGfxCounter[X]
+    //> jsr DrawExplosion_Fireworks ;do a sub to draw the explosion then leave
+    drawexplosionFireworks(temp0, enemySprdataoffset[X])
+    //> rts
+    return
+}
+
+// Decompiled from RunStarFlagObj
+fun runStarFlagObj() {
+    var enemyFrenzyBuffer by MemoryByte(EnemyFrenzyBuffer)
+    var starFlagTaskControl by MemoryByte(StarFlagTaskControl)
+    //> RunStarFlagObj:
+    //> lda #$00                 ;initialize enemy frenzy buffer
+    //> sta EnemyFrenzyBuffer
+    enemyFrenzyBuffer = 0x00
+    //> lda StarFlagTaskControl  ;check star flag object task number here
+    //> cmp #$05                 ;if greater than 5, branch to exit
+    //> bcs StarFlagExit
+    if (starFlagTaskControl >= 0x05) {
+        //  goto StarFlagExit
+        return
+    } else {
+        //> jsr JumpEngine           ;otherwise jump to appropriate sub
+        when (starFlagTaskControl) {
+            0 -> {
+                starFlagExit()
+            }
+            1 -> {
+                gameTimerFireworks(X)
+            }
+            2 -> {
+                awardGameTimerPoints()
+            }
+            3 -> {
+                raiseFlagSetoffFWorks(X)
+            }
+            4 -> {
+                delayToAreaEnd(X)
+            }
+            else -> {
+                // Unknown JumpEngine index
+            }
+        }
+        return
+    }
+}
+
+// Decompiled from GameTimerFireworks
+fun gameTimerFireworks(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var fireworksCounter by MemoryByte(FireworksCounter)
+    var starFlagTaskControl by MemoryByte(StarFlagTaskControl)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val gameTimerDisplay by MemoryByteIndexed(GameTimerDisplay)
+    //> GameTimerFireworks:
+    //> ldy #$05               ;set default state for star flag object
+    //> lda GameTimerDisplay+2 ;get game timer's last digit
+    //> cmp #$01
+    //> beq SetFWC             ;if last digit of game timer set to 1, skip ahead
+    temp0 = gameTimerDisplay[2]
+    temp1 = 0x05
+    if (gameTimerDisplay[2] != 0x01) {
+        //> ldy #$03               ;otherwise load new value for state
+        temp1 = 0x03
+        //> cmp #$03
+        //> beq SetFWC             ;if last digit of game timer set to 3, skip ahead
+        if (temp0 != 0x03) {
+            //> ldy #$00               ;otherwise load one more potential value for state
+            temp1 = 0x00
+            //> cmp #$06
+            //> beq SetFWC             ;if last digit of game timer set to 6, skip ahead
+            if (temp0 != 0x06) {
+                //> lda #$ff               ;otherwise set value for no fireworks
+                temp0 = 0xFF
+            }
+        }
+    }
+    //> SetFWC: sta FireworksCounter   ;set fireworks counter here
+    fireworksCounter = temp0
+    //> sty Enemy_State,x      ;set whatever state we have in star flag object
+    enemyState[X] = temp1
+    //> IncrementSFTask1:
+    //> inc StarFlagTaskControl  ;increment star flag object task number
+    starFlagTaskControl = (starFlagTaskControl + 1) and 0xFF
+    // Fall-through tail call to awardGameTimerPoints
+    awardGameTimerPoints()
+}
+
+// Decompiled from StarFlagExit
+fun starFlagExit() {
+    //> StarFlagExit:
+    //> rts                      ;leave
+    return
+}
+
+// Decompiled from AwardGameTimerPoints
+fun awardGameTimerPoints() {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var currentPlayer by MemoryByte(CurrentPlayer)
+    var frameCounter by MemoryByte(FrameCounter)
+    var square2SoundQueue by MemoryByte(Square2SoundQueue)
+    var starFlagTaskControl by MemoryByte(StarFlagTaskControl)
+    val digitModifier by MemoryByteIndexed(DigitModifier)
+    val gameTimerDisplay by MemoryByteIndexed(GameTimerDisplay)
+    //> IncrementSFTask1:
+    //> inc StarFlagTaskControl  ;increment star flag object task number
+    starFlagTaskControl = (starFlagTaskControl + 1) and 0xFF
+    do {
+        //> AwardGameTimerPoints:
+        //> lda GameTimerDisplay   ;check all game timer digits for any intervals left
+        //> ora GameTimerDisplay+1
+        temp0 = gameTimerDisplay[0] or gameTimerDisplay[1]
+        //> ora GameTimerDisplay+2
+        temp1 = temp0 or gameTimerDisplay[2]
+        //> beq IncrementSFTask1   ;if no time left on game timer at all, branch to next task
+    } while (temp1 == 0)
+    //> lda FrameCounter
+    //> and #%00000100         ;check frame counter for d2 set (skip ahead
+    temp2 = frameCounter and 0x04
+    //> beq NoTTick            ;for four frames every four frames) branch if not set
+    temp3 = temp2
+    if (temp2 != 0) {
+        //> lda #Sfx_TimerTick
+        temp3 = Sfx_TimerTick
+        //> sta Square2SoundQueue  ;load timer tick sound
+        square2SoundQueue = temp3
+    }
+    //> NoTTick: ldy #$23               ;set offset here to subtract from game timer's last digit
+    //> lda #$ff               ;set adder here to $ff, or -1, to subtract one
+    temp3 = 0xFF
+    //> sta DigitModifier+5    ;from the last digit of the game timer
+    digitModifier[5] = temp3
+    //> jsr DigitsMathRoutine  ;subtract digit
+    digitsMathRoutine(0x23)
+    //> lda #$05               ;set now to add 50 points
+    temp3 = 0x05
+    //> sta DigitModifier+5    ;per game timer interval subtracted
+    digitModifier[5] = temp3
+    //> EndAreaPoints:
+    //> ldy #$0b               ;load offset for mario's score by default
+    //> lda CurrentPlayer      ;check player on the screen
+    temp3 = currentPlayer
+    //> beq ELPGive            ;if mario, do not change
+    if (temp3 == 0) {
+        //  goto ELPGive
+        return
+    }
+    temp4 = 0x0B
+    if (temp3 != 0) {
+        //> ldy #$11               ;otherwise load offset for luigi's score
+        temp4 = 0x11
+    }
+    //> ELPGive: jsr DigitsMathRoutine  ;award 50 points per game timer interval
+    digitsMathRoutine(temp4)
+    //> lda CurrentPlayer      ;get player on the screen (or 500 points per
+    temp3 = currentPlayer
+    //> asl                    ;fireworks explosion if branched here from there)
+    temp3 = (temp3 shl 1) and 0xFF
+    //> asl                    ;shift to high nybble
+    temp3 = (temp3 shl 1) and 0xFF
+    //> asl
+    temp3 = (temp3 shl 1) and 0xFF
+    //> asl
+    temp3 = (temp3 shl 1) and 0xFF
+    //> ora #%00000100         ;add four to set nybble for game timer
+    temp5 = temp3 or 0x04
+    //> jmp UpdateNumber       ;jump to print the new score and game timer
+    // Fall-through tail call to starFlagExit
+    starFlagExit()
+}
+
+// Decompiled from RaiseFlagSetoffFWorks
+fun raiseFlagSetoffFWorks(X: Int) {
+    var temp0: Int = 0
+    var enemyFrenzyBuffer by MemoryByte(EnemyFrenzyBuffer)
+    var fireworksCounter by MemoryByte(FireworksCounter)
+    var starFlagTaskControl by MemoryByte(StarFlagTaskControl)
+    val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    //> RaiseFlagSetoffFWorks:
+    //> lda Enemy_Y_Position,x  ;check star flag's vertical position
+    //> cmp #$72                ;against preset value
+    //> bcc SetoffF             ;if star flag higher vertically, branch to other code
+    temp0 = enemyYPosition[X]
+    if (enemyYPosition[X] >= 0x72) {
+        //> dec Enemy_Y_Position,x  ;otherwise, raise star flag by one pixel
+        enemyYPosition[X] = (enemyYPosition[X] - 1) and 0xFF
+        //> jmp DrawStarFlag        ;and skip this part here
+    }
+    //> SetoffF: lda FireworksCounter    ;check fireworks counter
+    temp0 = fireworksCounter
+    //> beq DrawFlagSetTimer    ;if no fireworks left to go off, skip this part
+    if (temp0 != 0) {
+        //> bmi DrawFlagSetTimer    ;if no fireworks set to go off, skip this part
+        if ((temp0 and 0x80) == 0) {
+            //> lda #Fireworks
+            temp0 = Fireworks
+            //> sta EnemyFrenzyBuffer   ;otherwise set fireworks object in frenzy queue
+            enemyFrenzyBuffer = temp0
+        }
+    }
+    //> DrawFlagSetTimer:
+    //> jsr DrawStarFlag          ;do sub to draw star flag
+    drawStarFlag(X)
+    //> lda #$06
+    temp0 = 0x06
+    //> sta EnemyIntervalTimer,x  ;set interval timer here
+    enemyIntervalTimer[X] = temp0
+    //> IncrementSFTask2:
+    //> inc StarFlagTaskControl   ;move onto next task
+    starFlagTaskControl = (starFlagTaskControl + 1) and 0xFF
+    //> rts
     return
 }
 
@@ -10585,6 +17663,8 @@ fun procBowserFlame(X: Int) {
 fun drawStarFlag(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
     var enemyRelXpos by MemoryByte(Enemy_Rel_XPos)
     var enemyRelYpos by MemoryByte(Enemy_Rel_YPos)
     var objectOffset by MemoryByte(ObjectOffset)
@@ -10607,8 +17687,9 @@ fun drawStarFlag(X: Int) {
         //> DSFLoop: lda Enemy_Rel_YPos         ;get relative vertical coordinate
         //> clc
         //> adc StarFlagYPosAdder,x    ;add Y coordinate adder data
+        temp2 = enemyRelYpos + starFlagYPosAdder[temp0]
         //> sta Sprite_Y_Position,y    ;store as Y coordinate
-        spriteYPosition[temp1] = (enemyRelYpos + starFlagYPosAdder[temp0]) and 0xFF
+        spriteYPosition[temp1] = temp2 and 0xFF
         //> lda StarFlagTileData,x     ;get tile number
         //> sta Sprite_Tilenumber,y    ;store as tile number
         spriteTilenumber[temp1] = starFlagTileData[temp0]
@@ -10618,8 +17699,9 @@ fun drawStarFlag(X: Int) {
         //> lda Enemy_Rel_XPos         ;get relative horizontal coordinate
         //> clc
         //> adc StarFlagXPosAdder,x    ;add X coordinate adder data
+        temp3 = enemyRelXpos + starFlagXPosAdder[temp0]
         //> sta Sprite_X_Position,y    ;store as X coordinate
-        spriteXPosition[temp1] = (enemyRelXpos + starFlagXPosAdder[temp0]) and 0xFF
+        spriteXPosition[temp1] = temp3 and 0xFF
         //> iny
         temp1 = (temp1 + 1) and 0xFF
         //> iny                        ;increment OAM data offset four bytes
@@ -10638,9 +17720,154 @@ fun drawStarFlag(X: Int) {
     return
 }
 
+// Decompiled from DelayToAreaEnd
+fun delayToAreaEnd(X: Int) {
+    var starFlagTaskControl by MemoryByte(StarFlagTaskControl)
+    val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
+    //> IncrementSFTask2:
+    //> inc StarFlagTaskControl   ;move onto next task
+    starFlagTaskControl = (starFlagTaskControl + 1) and 0xFF
+    //> rts
+    return
+}
+
+// Decompiled from MovePiranhaPlant
+fun movePiranhaPlant(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var frameCounter by MemoryByte(FrameCounter)
+    var timerControl by MemoryByte(TimerControl)
+    val enemyFrameTimer by MemoryByteIndexed(EnemyFrameTimer)
+    val enemySprattrib by MemoryByteIndexed(Enemy_SprAttrib)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val piranhaPlantDownYPos by MemoryByteIndexed(PiranhaPlantDownYPos)
+    val piranhaPlantUpYPos by MemoryByteIndexed(PiranhaPlantUpYPos)
+    val piranhaplantMoveflag by MemoryByteIndexed(PiranhaPlant_MoveFlag)
+    val piranhaplantYSpeed by MemoryByteIndexed(PiranhaPlant_Y_Speed)
+    //> MovePiranhaPlant:
+    //> lda Enemy_State,x           ;check enemy state
+    //> bne PutinPipe               ;if set at all, branch to leave
+    temp0 = enemyState[X]
+    if (enemyState[X] == 0) {
+        //> lda EnemyFrameTimer,x       ;check enemy's timer here
+        temp0 = enemyFrameTimer[X]
+        //> bne PutinPipe               ;branch to end if not yet expired
+        if (temp0 == 0) {
+            //> lda PiranhaPlant_MoveFlag,x ;check movement flag
+            temp0 = piranhaplantMoveflag[X]
+            //> bne SetupToMovePPlant       ;if moving, skip to part ahead
+            if (temp0 == 0) {
+                //> lda PiranhaPlant_Y_Speed,x  ;if currently rising, branch
+                temp0 = piranhaplantYSpeed[X]
+                //> bmi ReversePlantSpeed       ;to move enemy upwards out of pipe
+                if ((temp0 and 0x80) == 0) {
+                    //> jsr PlayerEnemyDiff         ;get horizontal difference between player and
+                    playerEnemyDiff(X)
+                    //> bpl ChkPlayerNearPipe       ;piranha plant, and branch if enemy to right of player
+                    if ((temp0 and 0x80) != 0) {
+                        //> lda $00                     ;otherwise get saved horizontal difference
+                        temp0 = memory[0x0].toInt()
+                        //> eor #$ff
+                        temp1 = temp0 xor 0xFF
+                        //> clc                         ;and change to two's compliment
+                        //> adc #$01
+                        temp2 = temp1 + 0x01
+                        temp0 = temp2 and 0xFF
+                        //> sta $00                     ;save as new horizontal difference
+                        memory[0x0] = temp0.toUByte()
+                    }
+                    //> ChkPlayerNearPipe:
+                    //> lda $00                     ;get saved horizontal difference
+                    temp0 = memory[0x0].toInt()
+                    //> cmp #$21
+                    //> bcc PutinPipe               ;if player within a certain distance, branch to leave
+                    if (temp0 >= 0x21) {
+                    } else {
+                        //> PutinPipe:
+                        //> lda #%00100000              ;set background priority bit in sprite
+                        temp0 = 0x20
+                        //> sta Enemy_SprAttrib,x       ;attributes to give illusion of being inside pipe
+                        enemySprattrib[X] = temp0
+                        //> rts                         ;then leave
+                        return
+                    }
+                }
+                //> ReversePlantSpeed:
+                //> lda PiranhaPlant_Y_Speed,x  ;get vertical speed
+                temp0 = piranhaplantYSpeed[X]
+                //> eor #$ff
+                temp3 = temp0 xor 0xFF
+                //> clc                         ;change to two's compliment
+                //> adc #$01
+                temp4 = temp3 + 0x01
+                temp0 = temp4 and 0xFF
+                //> sta PiranhaPlant_Y_Speed,x  ;save as new vertical speed
+                piranhaplantYSpeed[X] = temp0
+                //> inc PiranhaPlant_MoveFlag,x ;increment to set movement flag
+                piranhaplantMoveflag[X] = (piranhaplantMoveflag[X] + 1) and 0xFF
+            }
+            //> SetupToMovePPlant:
+            //> lda PiranhaPlantDownYPos,x  ;get original vertical coordinate (lowest point)
+            temp0 = piranhaPlantDownYPos[X]
+            //> ldy PiranhaPlant_Y_Speed,x  ;get vertical speed
+            //> bpl RiseFallPiranhaPlant    ;branch if moving downwards
+            temp5 = piranhaplantYSpeed[X]
+            if ((piranhaplantYSpeed[X] and 0x80) != 0) {
+                //> lda PiranhaPlantUpYPos,x    ;otherwise get other vertical coordinate (highest point)
+                temp0 = piranhaPlantUpYPos[X]
+            }
+            //> RiseFallPiranhaPlant:
+            //> sta $00                     ;save vertical coordinate here
+            memory[0x0] = temp0.toUByte()
+            //> lda FrameCounter            ;get frame counter
+            temp0 = frameCounter
+            //> lsr
+            temp0 = temp0 shr 1
+            //> bcc PutinPipe               ;branch to leave if d0 set (execute code every other frame)
+            if ((temp0 and 0x01) != 0) {
+                //> lda TimerControl            ;get master timer control
+                temp0 = timerControl
+                //> bne PutinPipe               ;branch to leave if set (likely not necessary)
+                if (temp0 == 0) {
+                    //> lda Enemy_Y_Position,x      ;get current vertical coordinate
+                    temp0 = enemyYPosition[X]
+                    //> clc
+                    //> adc PiranhaPlant_Y_Speed,x  ;add vertical speed to move up or down
+                    temp6 = temp0 + piranhaplantYSpeed[X]
+                    temp0 = temp6 and 0xFF
+                    //> sta Enemy_Y_Position,x      ;save as new vertical coordinate
+                    enemyYPosition[X] = temp0
+                    //> cmp $00                     ;compare against low or high coordinate
+                    //> bne PutinPipe               ;branch to leave if not yet reached
+                    if (temp0 == memory[0x0].toInt()) {
+                        //> lda #$00
+                        temp0 = 0x00
+                        //> sta PiranhaPlant_MoveFlag,x ;otherwise clear movement flag
+                        piranhaplantMoveflag[X] = temp0
+                        //> lda #$40
+                        temp0 = 0x40
+                        //> sta EnemyFrameTimer,x       ;set timer to delay piranha plant movement
+                        enemyFrameTimer[X] = temp0
+                    }
+                }
+            }
+        }
+    }
+}
+
 // Decompiled from FirebarSpin
 fun firebarSpin(A: Int, X: Int): Int {
     var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
     val firebarSpinDirection by MemoryByteIndexed(FirebarSpinDirection)
     val firebarspinstateHigh by MemoryByteIndexed(FirebarSpinState_High)
     val firebarspinstateLow by MemoryByteIndexed(FirebarSpinState_Low)
@@ -10656,11 +17883,15 @@ fun firebarSpin(A: Int, X: Int): Int {
         temp0 = firebarspinstateLow[X]
         //> clc                         ;add spinning speed to what would normally be
         //> adc $07                     ;the horizontal speed
+        temp1 = temp0 + memory[0x7].toInt()
+        temp0 = temp1 and 0xFF
         //> sta FirebarSpinState_Low,x
-        firebarspinstateLow[X] = (temp0 + memory[0x7].toInt()) and 0xFF
+        firebarspinstateLow[X] = temp0
         //> lda FirebarSpinState_High,x ;add carry to what would normally be the vertical speed
         temp0 = firebarspinstateHigh[X]
         //> adc #$00
+        temp2 = temp0 + (if (temp1 > 0xFF) 1 else 0)
+        temp0 = temp2 and 0xFF
         //> rts
         return A
     } else {
@@ -10670,20 +17901,27 @@ fun firebarSpin(A: Int, X: Int): Int {
         temp0 = firebarspinstateLow[X]
         //> sec                         ;subtract spinning speed to what would normally be
         //> sbc $07                     ;the horizontal speed
+        temp3 = temp0 - memory[0x7].toInt()
+        temp0 = temp3 and 0xFF
         //> sta FirebarSpinState_Low,x
-        firebarspinstateLow[X] = (temp0 - memory[0x7].toInt()) and 0xFF
+        firebarspinstateLow[X] = temp0
         //> lda FirebarSpinState_High,x ;add carry to what would normally be the vertical speed
         temp0 = firebarspinstateHigh[X]
         //> sbc #$00
+        temp4 = temp0 - (if (temp3 >= 0) 0 else 1)
+        temp0 = temp4 and 0xFF
         //> rts
         return A
     }
+    return A
 }
 
-// Decompiled from SetupPlatformRope
-fun setupPlatformRope(A: Int, Y: Int) {
+// Decompiled from BalancePlatform
+fun balancePlatform(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp10: Int = 0
+    var temp11: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
@@ -10691,6 +17929,359 @@ fun setupPlatformRope(A: Int, Y: Int) {
     var temp6: Int = 0
     var temp7: Int = 0
     var temp8: Int = 0
+    var temp9: Int = 0
+    var objectOffset by MemoryByte(ObjectOffset)
+    var playerRelXpos by MemoryByte(Player_Rel_XPos)
+    var playerYPosition by MemoryByte(Player_Y_Position)
+    var vramBuffer1Offset by MemoryByte(VRAM_Buffer1_Offset)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
+    val enemyYMoveforce by MemoryByteIndexed(Enemy_Y_MoveForce)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val enemyYSpeed by MemoryByteIndexed(Enemy_Y_Speed)
+    val floateynumXPos by MemoryByteIndexed(FloateyNum_X_Pos)
+    val floateynumYPos by MemoryByteIndexed(FloateyNum_Y_Pos)
+    val platformCollisionFlag by MemoryByteIndexed(PlatformCollisionFlag)
+    val vramBuffer1 by MemoryByteIndexed(VRAM_Buffer1)
+    //> BalancePlatform:
+    //> lda Enemy_Y_HighPos,x       ;check high byte of vertical position
+    //> cmp #$03
+    //> bne DoBPl
+    temp0 = enemyYHighpos[X]
+    if (enemyYHighpos[X] == 0x03) {
+        //> jmp EraseEnemyObject        ;if far below screen, kill the object
+    }
+    //> DoBPl: lda Enemy_State,x           ;get object's state (set to $ff or other platform offset)
+    temp0 = enemyState[X]
+    //> bpl CheckBalPlatform        ;if doing other balance platform, branch to leave
+    if ((temp0 and 0x80) != 0) {
+        //> rts
+        return
+    } else {
+        //> CheckBalPlatform:
+        //> tay                         ;save offset from state as Y
+        //> lda PlatformCollisionFlag,x ;get collision flag of platform
+        temp0 = platformCollisionFlag[X]
+        //> sta $00                     ;store here
+        memory[0x0] = temp0.toUByte()
+        //> lda Enemy_MovingDir,x       ;get moving direction
+        temp0 = enemyMovingdir[X]
+        //> beq ChkForFall
+        temp1 = temp0
+        if (temp0 != 0) {
+        } else {
+            //> ChkForFall:
+            //> lda #$2d                    ;check if platform is above a certain point
+            temp0 = 0x2D
+            //> cmp Enemy_Y_Position,x
+            //> bcc ChkOtherForFall         ;if not, branch elsewhere
+            if (temp0 >= enemyYPosition[X]) {
+                //> cpy $00                     ;if collision flag is set to same value as
+                //> beq MakePlatformFall        ;enemy state, branch to make platforms fall
+                if (temp1 == memory[0x0].toInt()) {
+                    //  goto MakePlatformFall
+                    return
+                }
+                if (temp1 != memory[0x0].toInt()) {
+                    //> clc
+                    //> adc #$02                    ;otherwise add 2 pixels to vertical position
+                    temp2 = temp0 + 0x02
+                    temp0 = temp2 and 0xFF
+                    //> sta Enemy_Y_Position,x      ;of current platform and branch elsewhere
+                    enemyYPosition[X] = temp0
+                    //> jmp StopPlatforms           ;to make platforms stop
+                }
+            } else {
+                //> ChkOtherForFall:
+                //> cmp Enemy_Y_Position,y      ;check if other platform is above a certain point
+                //> bcc ChkToMoveBalPlat        ;if not, branch elsewhere
+                if (temp0 >= enemyYPosition[temp1]) {
+                    //> cpx $00                     ;if collision flag is set to same value as
+                    //> beq MakePlatformFall        ;enemy state, branch to make platforms fall
+                    if (X == memory[0x0].toInt()) {
+                        //  goto MakePlatformFall
+                        return
+                    }
+                    //> clc
+                    //> adc #$02                    ;otherwise add 2 pixels to vertical position
+                    temp3 = temp0 + 0x02
+                    temp0 = temp3 and 0xFF
+                    //> sta Enemy_Y_Position,y      ;of other platform and branch elsewhere
+                    enemyYPosition[temp1] = temp0
+                    //> jmp StopPlatforms           ;jump to stop movement and do not return
+                }
+                //> ChkToMoveBalPlat:
+                //> lda Enemy_Y_Position,x      ;save vertical position to stack
+                temp0 = enemyYPosition[X]
+                //> pha
+                push(temp0)
+                //> lda PlatformCollisionFlag,x ;get collision flag
+                temp0 = platformCollisionFlag[X]
+                //> bpl ColFlg                  ;branch if collision
+                if ((temp0 and 0x80) != 0) {
+                    //> lda Enemy_Y_MoveForce,x
+                    temp0 = enemyYMoveforce[X]
+                    //> clc                         ;add $05 to contents of moveforce, whatever they be
+                    //> adc #$05
+                    temp4 = temp0 + 0x05
+                    temp0 = temp4 and 0xFF
+                    //> sta $00                     ;store here
+                    memory[0x0] = temp0.toUByte()
+                    //> lda Enemy_Y_Speed,x
+                    temp0 = enemyYSpeed[X]
+                    //> adc #$00                    ;add carry to vertical speed
+                    temp5 = temp0 + (if (temp4 > 0xFF) 1 else 0)
+                    temp0 = temp5 and 0xFF
+                    //> bmi PlatDn                  ;branch if moving downwards
+                    if ((temp5 and 0xFF and 0x80) == 0) {
+                        //> bne PlatUp                  ;branch elsewhere if moving upwards
+                        if (!((temp5 and 0xFF) == 0)) {
+                            //  goto PlatUp
+                            return
+                        }
+                        if ((temp5 and 0xFF) == 0) {
+                            //> lda $00
+                            temp0 = memory[0x0].toInt()
+                            //> cmp #$0b                    ;check if there's still a little force left
+                            //> bcc PlatSt                  ;if not enough, branch to stop movement
+                            if (!(temp0 >= 0x0B)) {
+                                //  goto PlatSt
+                                return
+                            }
+                            if (temp0 >= 0x0B) {
+                                //> bcs PlatUp                  ;otherwise keep branch to move upwards
+                                if (temp0 >= 0x0B) {
+                                    //  goto PlatUp
+                                    return
+                                }
+                                if (!(temp0 >= 0x0B)) {
+                                }
+                            }
+                        }
+                    }
+                }
+                //> ColFlg: cmp ObjectOffset            ;if collision flag matches
+                //> beq PlatDn                  ;current enemy object offset, branch
+                if (temp0 != objectOffset) {
+                    //> PlatUp: jsr MovePlatformUp          ;do a sub to move upwards
+                    movePlatformUp(X)
+                    //> jmp DoOtherPlatform         ;jump ahead to remaining code
+                    //> PlatSt: jsr StopPlatforms           ;do a sub to stop movement
+                    stopPlatforms(temp0, temp1)
+                    //> jmp DoOtherPlatform         ;jump ahead to remaining code
+                } else {
+                    //> PlatDn: jsr MovePlatformDown        ;do a sub to move downwards
+                    movePlatformDown()
+                }
+                //> DoOtherPlatform:
+                //> ldy Enemy_State,x           ;get offset of other platform
+                temp1 = enemyState[X]
+                //> pla                         ;get old vertical coordinate from stack
+                temp0 = pull()
+                //> sec
+                //> sbc Enemy_Y_Position,x      ;get difference of old vs. new coordinate
+                temp6 = temp0 - enemyYPosition[X]
+                temp0 = temp6 and 0xFF
+                //> clc
+                //> adc Enemy_Y_Position,y      ;add difference to vertical coordinate of other
+                temp7 = temp0 + enemyYPosition[temp1]
+                temp0 = temp7 and 0xFF
+                //> sta Enemy_Y_Position,y      ;platform to move it in the opposite direction
+                enemyYPosition[temp1] = temp0
+                //> lda PlatformCollisionFlag,x ;if no collision, skip this part here
+                temp0 = platformCollisionFlag[X]
+                //> bmi DrawEraseRope
+                if ((temp0 and 0x80) == 0) {
+                    //> tax                         ;put offset which collision occurred here
+                    //> jsr PositionPlayerOnVPlat   ;and use it to position player accordingly
+                    positionPlayerOnVPlat(temp0)
+                }
+                //> DrawEraseRope:
+                //> ldy ObjectOffset            ;get enemy object offset
+                temp1 = objectOffset
+                //> lda Enemy_Y_Speed,y         ;check to see if current platform is
+                temp0 = enemyYSpeed[temp1]
+                //> ora Enemy_Y_MoveForce,y     ;moving at all
+                temp8 = temp0 or enemyYMoveforce[temp1]
+                //> beq ExitRp                  ;if not, skip all of this and branch to leave
+                temp0 = temp8
+                if (temp8 != 0) {
+                    //> ldx VRAM_Buffer1_Offset     ;get vram buffer offset
+                    //> cpx #$20                    ;if offset beyond a certain point, go ahead
+                    //> bcs ExitRp                  ;and skip this, branch to leave
+                    temp9 = vramBuffer1Offset
+                    if (!(vramBuffer1Offset >= 0x20)) {
+                        //> lda Enemy_Y_Speed,y
+                        temp0 = enemyYSpeed[temp1]
+                        //> pha                         ;save two copies of vertical speed to stack
+                        push(temp0)
+                        //> pha
+                        push(temp0)
+                        //> jsr SetupPlatformRope       ;do a sub to figure out where to put new bg tiles
+                        setupPlatformRope(temp0, temp1)
+                        //> lda $01                     ;write name table address to vram buffer
+                        temp0 = memory[0x1].toInt()
+                        //> sta VRAM_Buffer1,x          ;first the high byte, then the low
+                        vramBuffer1[temp9] = temp0
+                        //> lda $00
+                        temp0 = memory[0x0].toInt()
+                        //> sta VRAM_Buffer1+1,x
+                        vramBuffer1[1 + temp9] = temp0
+                        //> lda #$02                    ;set length for 2 bytes
+                        temp0 = 0x02
+                        //> sta VRAM_Buffer1+2,x
+                        vramBuffer1[2 + temp9] = temp0
+                        //> lda Enemy_Y_Speed,y         ;if platform moving upwards, branch
+                        temp0 = enemyYSpeed[temp1]
+                        //> bmi EraseR1                 ;to do something else
+                        if ((temp0 and 0x80) == 0) {
+                            //> lda #$a2
+                            temp0 = 0xA2
+                            //> sta VRAM_Buffer1+3,x        ;otherwise put tile numbers for left
+                            vramBuffer1[3 + temp9] = temp0
+                            //> lda #$a3                    ;and right sides of rope in vram buffer
+                            temp0 = 0xA3
+                            //> sta VRAM_Buffer1+4,x
+                            vramBuffer1[4 + temp9] = temp0
+                            //> jmp OtherRope               ;jump to skip this part
+                        } else {
+                            //> EraseR1: lda #$24                    ;put blank tiles in vram buffer
+                            temp0 = 0x24
+                            //> sta VRAM_Buffer1+3,x        ;to erase rope
+                            vramBuffer1[3 + temp9] = temp0
+                            //> sta VRAM_Buffer1+4,x
+                            vramBuffer1[4 + temp9] = temp0
+                        }
+                        //> OtherRope:
+                        //> lda Enemy_State,y           ;get offset of other platform from state
+                        temp0 = enemyState[temp1]
+                        //> tay                         ;use as Y here
+                        //> pla                         ;pull second copy of vertical speed from stack
+                        temp0 = pull()
+                        //> eor #$ff                    ;invert bits to reverse speed
+                        temp10 = temp0 xor 0xFF
+                        //> jsr SetupPlatformRope       ;do sub again to figure out where to put bg tiles
+                        setupPlatformRope(temp10, temp0)
+                        //> lda $01                     ;write name table address to vram buffer
+                        temp0 = memory[0x1].toInt()
+                        //> sta VRAM_Buffer1+5,x        ;this time we're doing putting tiles for
+                        vramBuffer1[5 + temp9] = temp0
+                        //> lda $00                     ;the other platform
+                        temp0 = memory[0x0].toInt()
+                        //> sta VRAM_Buffer1+6,x
+                        vramBuffer1[6 + temp9] = temp0
+                        //> lda #$02
+                        temp0 = 0x02
+                        //> sta VRAM_Buffer1+7,x        ;set length again for 2 bytes
+                        vramBuffer1[7 + temp9] = temp0
+                        //> pla                         ;pull first copy of vertical speed from stack
+                        temp0 = pull()
+                        //> bpl EraseR2                 ;if moving upwards (note inversion earlier), skip this
+                        temp1 = temp0
+                        if ((temp0 and 0x80) != 0) {
+                            //> lda #$a2
+                            temp0 = 0xA2
+                            //> sta VRAM_Buffer1+8,x        ;otherwise put tile numbers for left
+                            vramBuffer1[8 + temp9] = temp0
+                            //> lda #$a3                    ;and right sides of rope in vram
+                            temp0 = 0xA3
+                            //> sta VRAM_Buffer1+9,x        ;transfer buffer
+                            vramBuffer1[9 + temp9] = temp0
+                            //> jmp EndRp                   ;jump to skip this part
+                        } else {
+                            //> EraseR2: lda #$24                    ;put blank tiles in vram buffer
+                            temp0 = 0x24
+                            //> sta VRAM_Buffer1+8,x        ;to erase rope
+                            vramBuffer1[8 + temp9] = temp0
+                            //> sta VRAM_Buffer1+9,x
+                            vramBuffer1[9 + temp9] = temp0
+                        }
+                        //> EndRp:   lda #$00                    ;put null terminator at the end
+                        temp0 = 0x00
+                        //> sta VRAM_Buffer1+10,x
+                        vramBuffer1[10 + temp9] = temp0
+                        //> lda VRAM_Buffer1_Offset     ;add ten bytes to the vram buffer offset
+                        temp0 = vramBuffer1Offset
+                        //> clc                         ;and store
+                        //> adc #10
+                        temp11 = temp0 + 0x0A
+                        temp0 = temp11 and 0xFF
+                        //> sta VRAM_Buffer1_Offset
+                        vramBuffer1Offset = temp0
+                    }
+                }
+                //> ExitRp:  ldx ObjectOffset            ;get enemy object buffer offset and leave
+                temp9 = objectOffset
+                //> rts
+                return
+            }
+            //> InitPlatformFall:
+            //> tya                        ;move offset of other platform from Y to X
+            //> tax
+            //> jsr GetEnemyOffscreenBits  ;get offscreen bits
+            getEnemyOffscreenBits(temp1)
+            //> lda #$06
+            temp0 = 0x06
+            //> jsr SetupFloateyNumber     ;award 1000 points to player
+            setupFloateyNumber(temp0, temp1)
+            //> lda Player_Rel_XPos
+            temp0 = playerRelXpos
+            //> sta FloateyNum_X_Pos,x     ;put floatey number coordinates where player is
+            floateynumXPos[temp1] = temp0
+            //> lda Player_Y_Position
+            temp0 = playerYPosition
+            //> sta FloateyNum_Y_Pos,x
+            floateynumYPos[temp1] = temp0
+            //> lda #$01                   ;set moving direction as flag for
+            temp0 = 0x01
+            //> sta Enemy_MovingDir,x      ;falling platforms
+            enemyMovingdir[temp1] = temp0
+        }
+    }
+    //> PlatformFall:
+    //> tya                         ;save offset for other platform to stack
+    //> pha
+    push(temp1)
+    //> jsr MoveFallingPlatform     ;make current platform fall
+    moveFallingPlatform()
+    //> pla
+    temp0 = pull()
+    //> tax                         ;pull offset from stack and save to X
+    //> jsr MoveFallingPlatform     ;make other platform fall
+    moveFallingPlatform()
+    //> ldx ObjectOffset
+    temp9 = objectOffset
+    //> lda PlatformCollisionFlag,x ;if player not standing on either platform,
+    temp0 = platformCollisionFlag[temp9]
+    //> bmi ExPF                    ;skip this part
+    if ((temp0 and 0x80) == 0) {
+        //> tax                         ;transfer collision flag offset as offset to X
+        //> jsr PositionPlayerOnVPlat   ;and position player appropriately
+        positionPlayerOnVPlat(temp0)
+    }
+    //> ExPF: ldx ObjectOffset            ;get enemy object buffer offset and leave
+    temp9 = objectOffset
+    //> rts
+    return
+}
+
+// Decompiled from SetupPlatformRope
+fun setupPlatformRope(A: Int, Y: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp10: Int = 0
+    var temp11: Int = 0
+    var temp12: Int = 0
+    var temp13: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var secondaryHardMode by MemoryByte(SecondaryHardMode)
     var vramBuffer1Offset by MemoryByte(VRAM_Buffer1_Offset)
     val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
@@ -10702,92 +18293,101 @@ fun setupPlatformRope(A: Int, Y: Int) {
     //> lda Enemy_X_Position,y  ;get horizontal coordinate
     //> clc
     //> adc #$08                ;add eight pixels
+    temp0 = enemyXPosition[Y] + 0x08
     //> ldx SecondaryHardMode   ;if secondary hard mode flag set,
     //> bne GetLRp              ;use coordinate as-is
-    temp0 = (enemyXPosition[Y] + 0x08) and 0xFF
-    temp1 = secondaryHardMode
+    temp1 = temp0 and 0xFF
+    temp2 = secondaryHardMode
     if (secondaryHardMode == 0) {
         //> clc
         //> adc #$10                ;otherwise add sixteen more pixels
+        temp3 = temp1 + 0x10
+        temp1 = temp3 and 0xFF
     }
     //> GetLRp: pha                     ;save modified horizontal coordinate to stack
-    push(temp0)
+    push(temp1)
     //> lda Enemy_PageLoc,y
-    temp0 = enemyPageloc[Y]
+    temp1 = enemyPageloc[Y]
     //> adc #$00                ;add carry to page location
+    temp4 = temp1
+    temp1 = temp4 and 0xFF
     //> sta $02                 ;and save here
-    memory[0x2] = ((temp0) and 0xFF).toUByte()
+    memory[0x2] = temp1.toUByte()
     //> pla                     ;pull modified horizontal coordinate
-    temp0 = pull()
+    temp1 = pull()
     //> and #%11110000          ;from the stack, mask out low nybble
-    temp2 = temp0 and 0xF0
+    temp5 = temp1 and 0xF0
     //> lsr                     ;and shift three bits to the right
-    temp2 = temp2 shr 1
+    temp5 = temp5 shr 1
     //> lsr
-    temp2 = temp2 shr 1
+    temp5 = temp5 shr 1
     //> lsr
-    temp2 = temp2 shr 1
+    temp5 = temp5 shr 1
     //> sta $00                 ;store result here as part of name table low byte
-    memory[0x0] = temp2.toUByte()
+    memory[0x0] = temp5.toUByte()
     //> ldx Enemy_Y_Position,y  ;get vertical coordinate
-    temp1 = enemyYPosition[Y]
+    temp2 = enemyYPosition[Y]
     //> pla                     ;get second/third copy of vertical speed from stack
-    temp0 = pull()
+    temp1 = pull()
     //> bpl GetHRp              ;skip this part if moving downwards or not at all
-    if ((temp0 and 0x80) != 0) {
+    if ((temp1 and 0x80) != 0) {
         //> txa
         //> clc
         //> adc #$08                ;add eight to vertical coordinate and
+        temp6 = temp2 + 0x08
+        temp1 = temp6 and 0xFF
         //> tax                     ;save as X
     }
     //> GetHRp: txa                     ;move vertical coordinate to A
     //> ldx VRAM_Buffer1_Offset ;get vram buffer offset
-    temp1 = vramBuffer1Offset
+    temp2 = vramBuffer1Offset
     //> asl
-    temp1 = (temp1 shl 1) and 0xFF
+    temp2 = (temp2 shl 1) and 0xFF
     //> rol                     ;rotate d7 to d0 and d6 into carry
-    temp1 = (temp1 shl 1) and 0xFE or if ((temp1 and 0x80) != 0) 1 else 0
+    temp2 = (temp2 shl 1) and 0xFE or if ((temp2 and 0x80) != 0) 1 else 0
     //> pha                     ;save modified vertical coordinate to stack
-    push(temp1)
+    push(temp2)
     //> rol                     ;rotate carry to d0, thus d7 and d6 are at 2 LSB
-    temp1 = (temp1 shl 1) and 0xFE or if ((temp1 and 0x80) != 0) 1 else 0
+    temp2 = (temp2 shl 1) and 0xFE or if ((temp2 and 0x80) != 0) 1 else 0
     //> and #%00000011          ;mask out all bits but d7 and d6, then set
-    temp3 = temp1 and 0x03
+    temp7 = temp2 and 0x03
     //> ora #%00100000          ;d5 to get appropriate high byte of name table
-    temp4 = temp3 or 0x20
+    temp8 = temp7 or 0x20
     //> sta $01                 ;address, then store
-    memory[0x1] = temp4.toUByte()
+    memory[0x1] = temp8.toUByte()
     //> lda $02                 ;get saved page location from earlier
-    temp0 = memory[0x2].toInt()
+    temp1 = memory[0x2].toInt()
     //> and #$01                ;mask out all but LSB
-    temp5 = temp0 and 0x01
+    temp9 = temp1 and 0x01
     //> asl
-    temp5 = (temp5 shl 1) and 0xFF
+    temp9 = (temp9 shl 1) and 0xFF
     //> asl                     ;shift twice to the left and save with the
-    temp5 = (temp5 shl 1) and 0xFF
+    temp9 = (temp9 shl 1) and 0xFF
     //> ora $01                 ;rest of the bits of the high byte, to get
-    temp6 = temp5 or memory[0x1].toInt()
+    temp10 = temp9 or memory[0x1].toInt()
     //> sta $01                 ;the proper name table and the right place on it
-    memory[0x1] = temp6.toUByte()
+    memory[0x1] = temp10.toUByte()
     //> pla                     ;get modified vertical coordinate from stack
-    temp0 = pull()
+    temp1 = pull()
     //> and #%11100000          ;mask out low nybble and LSB of high nybble
-    temp7 = temp0 and 0xE0
+    temp11 = temp1 and 0xE0
     //> clc
     //> adc $00                 ;add to horizontal part saved here
+    temp12 = temp11 + memory[0x0].toInt()
+    temp1 = temp12 and 0xFF
     //> sta $00                 ;save as name table low byte
-    memory[0x0] = ((temp7 + memory[0x0].toInt()) and 0xFF).toUByte()
+    memory[0x0] = temp1.toUByte()
     //> lda Enemy_Y_Position,y
-    temp0 = enemyYPosition[Y]
+    temp1 = enemyYPosition[Y]
     //> cmp #$e8                ;if vertical position not below the
     //> bcc ExPRp               ;bottom of the screen, we're done, branch to leave
-    if (temp0 >= 0xE8) {
+    if (temp1 >= 0xE8) {
         //> lda $00
-        temp0 = memory[0x0].toInt()
+        temp1 = memory[0x0].toInt()
         //> and #%10111111          ;mask out d6 of low byte of name table address
-        temp8 = temp0 and 0xBF
+        temp13 = temp1 and 0xBF
         //> sta $00
-        memory[0x0] = temp8.toUByte()
+        memory[0x0] = temp13.toUByte()
     }
     //> ExPRp:  rts                     ;leave!
     return
@@ -10809,11 +18409,102 @@ fun stopPlatforms(A: Int, Y: Int) {
     return
 }
 
+// Decompiled from YMovingPlatform
+fun yMovingPlatform(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var frameCounter by MemoryByte(FrameCounter)
+    val enemyYmfDummy by MemoryByteIndexed(Enemy_YMF_Dummy)
+    val enemyYMoveforce by MemoryByteIndexed(Enemy_Y_MoveForce)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val enemyYSpeed by MemoryByteIndexed(Enemy_Y_Speed)
+    val platformCollisionFlag by MemoryByteIndexed(PlatformCollisionFlag)
+    val yPlatformCenterYPos by MemoryByteIndexed(YPlatformCenterYPos)
+    val yPlatformTopYPos by MemoryByteIndexed(YPlatformTopYPos)
+    //> YMovingPlatform:
+    //> lda Enemy_Y_Speed,x          ;if platform moving up or down, skip ahead to
+    //> ora Enemy_Y_MoveForce,x      ;check on other position
+    temp0 = enemyYSpeed[X] or enemyYMoveforce[X]
+    //> bne ChkYCenterPos
+    temp1 = temp0
+    if (temp0 == 0) {
+        //> sta Enemy_YMF_Dummy,x        ;initialize dummy variable
+        enemyYmfDummy[X] = temp1
+        //> lda Enemy_Y_Position,x
+        temp1 = enemyYPosition[X]
+        //> cmp YPlatformTopYPos,x       ;if current vertical position => top position, branch
+        //> bcs ChkYCenterPos            ;ahead of all this
+        if (!(temp1 >= yPlatformTopYPos[X])) {
+            //> lda FrameCounter
+            temp1 = frameCounter
+            //> and #%00000111               ;check for every eighth frame
+            temp2 = temp1 and 0x07
+            //> bne SkipIY
+            if (!(temp2 == 0)) {
+                //  goto SkipIY
+                return
+            }
+            temp1 = temp2
+            if (temp2 == 0) {
+                //> inc Enemy_Y_Position,x       ;increase vertical position every eighth frame
+                enemyYPosition[X] = (enemyYPosition[X] + 1) and 0xFF
+            }
+        }
+    } else {
+        //> ChkYCenterPos:
+        //> lda Enemy_Y_Position,x       ;if current vertical position < central position, branch
+        temp1 = enemyYPosition[X]
+        //> cmp YPlatformCenterYPos,x    ;to slow ascent/move downwards
+        //> bcc YMDown
+        if (temp1 >= yPlatformCenterYPos[X]) {
+            //> jsr MovePlatformUp           ;otherwise start slowing descent/moving upwards
+            movePlatformUp(X)
+            //> jmp ChkYPCollision
+        } else {
+            //> YMDown: jsr MovePlatformDown         ;start slowing ascent/moving downwards
+            movePlatformDown()
+        }
+    }
+    //> ChkYPCollision:
+    //> lda PlatformCollisionFlag,x  ;if collision flag not set here, branch
+    temp1 = platformCollisionFlag[X]
+    //> bmi ExYPl                    ;to leave
+    if ((temp1 and 0x80) == 0) {
+        //> jsr PositionPlayerOnVPlat    ;otherwise position player appropriately
+        positionPlayerOnVPlat(X)
+    }
+    //> ExYPl: rts                          ;leave
+    return
+}
+
+// Decompiled from XMovingPlatform
+fun xMovingPlatform(X: Int) {
+    var temp0: Int = 0
+    val platformCollisionFlag by MemoryByteIndexed(PlatformCollisionFlag)
+    //> XMovingPlatform:
+    //> lda #$0e                     ;load preset maximum value for secondary counter
+    //> jsr XMoveCntr_Platform       ;do a sub to increment counters for movement
+    xmovecntrPlatform(0x0E, X)
+    //> jsr MoveWithXMCntrs          ;do a sub to move platform accordingly, and return value
+    moveWithXMCntrs(X)
+    //> lda PlatformCollisionFlag,x  ;if no collision with player,
+    //> bmi ExXMP                    ;branch ahead to leave
+    temp0 = platformCollisionFlag[X]
+    if ((platformCollisionFlag[X] and 0x80) == 0) {
+    }
+    //> ExXMP:   rts                       ;and we are done here
+    return
+}
+
 // Decompiled from PositionPlayerOnHPlat
 fun positionPlayerOnHPlat() {
     var X: Int = 0
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
     var platformXScroll by MemoryByte(Platform_X_Scroll)
     var playerPageloc by MemoryByte(Player_PageLoc)
     var playerXPosition by MemoryByte(Player_X_Position)
@@ -10821,26 +18512,90 @@ fun positionPlayerOnHPlat() {
     //> lda Player_X_Position
     //> clc                       ;add saved value from second subroutine to
     //> adc $00                   ;current player's position to position
+    temp0 = playerXPosition + memory[0x0].toInt()
     //> sta Player_X_Position     ;player accordingly in horizontal position
-    playerXPosition = (playerXPosition + memory[0x0].toInt()) and 0xFF
+    playerXPosition = temp0 and 0xFF
     //> lda Player_PageLoc        ;get player's page location
     //> ldy $00                   ;check to see if saved value here is positive or negative
     //> bmi PPHSubt               ;if negative, branch to subtract
-    temp0 = playerPageloc
-    temp1 = memory[0x0].toInt()
+    temp1 = playerPageloc
+    temp2 = memory[0x0].toInt()
     if ((memory[0x0].toInt() and 0x80) == 0) {
         //> adc #$00                  ;otherwise add carry to page location
+        temp3 = temp1 + (if (temp0 > 0xFF) 1 else 0)
+        temp1 = temp3 and 0xFF
         //> jmp SetPVar               ;jump to skip subtraction
     } else {
         //> PPHSubt: sbc #$00                  ;subtract borrow from page location
+        temp4 = temp1 - (if (temp0 > 0xFF) 0 else 1)
+        temp1 = temp4 and 0xFF
     }
     //> SetPVar: sta Player_PageLoc        ;save result to player's page location
-    playerPageloc = temp0
+    playerPageloc = temp1
     //> sty Platform_X_Scroll     ;put saved value from second sub here to be used later
-    platformXScroll = temp1
+    platformXScroll = temp2
     //> jsr PositionPlayerOnVPlat ;position player vertically and appropriately
     positionPlayerOnVPlat(X)
     //> ExXMP:   rts                       ;and we are done here
+    return
+}
+
+// Decompiled from DropPlatform
+fun dropPlatform(X: Int) {
+    var temp0: Int = 0
+    val platformCollisionFlag by MemoryByteIndexed(PlatformCollisionFlag)
+    //> DropPlatform:
+    //> lda PlatformCollisionFlag,x  ;if no collision between platform and player
+    //> bmi ExDPl                    ;occurred, just leave without moving anything
+    temp0 = platformCollisionFlag[X]
+    if ((platformCollisionFlag[X] and 0x80) == 0) {
+        //> jsr MoveDropPlatform         ;otherwise do a sub to move platform down very quickly
+        moveDropPlatform()
+        //> jsr PositionPlayerOnVPlat    ;do a sub to position player appropriately
+        positionPlayerOnVPlat(X)
+    }
+    //> ExDPl: rts                          ;leave
+    return
+}
+
+// Decompiled from RightPlatform
+fun rightPlatform(A: Int, X: Int) {
+    var temp0: Int = 0
+    val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
+    val platformCollisionFlag by MemoryByteIndexed(PlatformCollisionFlag)
+    //> RightPlatform:
+    //> jsr MoveEnemyHorizontally     ;move platform with current horizontal speed, if any
+    moveEnemyHorizontally(X)
+    //> sta $00                       ;store saved value here (residual code)
+    memory[0x0] = A.toUByte()
+    //> lda PlatformCollisionFlag,x   ;check collision flag, if no collision between player
+    //> bmi ExRPl                     ;and platform, branch ahead, leave speed unaltered
+    temp0 = platformCollisionFlag[X]
+    if ((platformCollisionFlag[X] and 0x80) == 0) {
+        //> lda #$10
+        temp0 = 0x10
+        //> sta Enemy_X_Speed,x           ;otherwise set new speed (gets moving if motionless)
+        enemyXSpeed[X] = temp0
+        //> jsr PositionPlayerOnHPlat     ;use saved value from earlier sub to position player
+        positionPlayerOnHPlat()
+    }
+    //> ExRPl: rts                           ;then leave
+    return
+}
+
+// Decompiled from MoveLargeLiftPlat
+fun moveLargeLiftPlat(X: Int) {
+    var temp0: Int = 0
+    val platformCollisionFlag by MemoryByteIndexed(PlatformCollisionFlag)
+    //> ChkYPCollision:
+    //> lda PlatformCollisionFlag,x  ;if collision flag not set here, branch
+    //> bmi ExYPl                    ;to leave
+    temp0 = platformCollisionFlag[X]
+    if ((platformCollisionFlag[X] and 0x80) == 0) {
+        //> jsr PositionPlayerOnVPlat    ;otherwise position player appropriately
+        positionPlayerOnVPlat(X)
+    }
+    //> ExYPl: rts                          ;leave
     return
 }
 
@@ -10867,6 +18622,8 @@ fun moveSmallPlatform(X: Int) {
 // Decompiled from MoveLiftPlatforms
 fun moveLiftPlatforms(X: Int) {
     var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
     var timerControl by MemoryByte(TimerControl)
     val enemyYmfDummy by MemoryByteIndexed(Enemy_YMF_Dummy)
     val enemyYMoveforce by MemoryByteIndexed(Enemy_Y_MoveForce)
@@ -10885,13 +18642,17 @@ fun moveLiftPlatforms(X: Int) {
         temp0 = enemyYmfDummy[X]
         //> clc                      ;add contents of movement amount to whatever's here
         //> adc Enemy_Y_MoveForce,x
+        temp1 = temp0 + enemyYMoveforce[X]
+        temp0 = temp1 and 0xFF
         //> sta Enemy_YMF_Dummy,x
-        enemyYmfDummy[X] = (temp0 + enemyYMoveforce[X]) and 0xFF
+        enemyYmfDummy[X] = temp0
         //> lda Enemy_Y_Position,x   ;add whatever vertical speed is set to current
         temp0 = enemyYPosition[X]
         //> adc Enemy_Y_Speed,x      ;vertical position plus carry to move up or down
+        temp2 = temp0 + enemyYSpeed[X] + (if (temp1 > 0xFF) 1 else 0)
+        temp0 = temp2 and 0xFF
         //> sta Enemy_Y_Position,x   ;and then leave
-        enemyYPosition[X] = (temp0 + enemyYSpeed[X] + (if (temp0 + enemyYMoveforce[X] > 0xFF) 1 else 0)) and 0xFF
+        enemyYPosition[X] = temp0
         //> rts
         return
     } else {
@@ -10904,6 +18665,13 @@ fun moveLiftPlatforms(X: Int) {
 fun offscreenBoundsCheck(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
     var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
     var screenleftXPos by MemoryByte(ScreenLeft_X_Pos)
     var screenrightPageloc by MemoryByte(ScreenRight_PageLoc)
@@ -10931,42 +18699,54 @@ fun offscreenBoundsCheck(X: Int) {
             }
         }
         //> LimitB:   adc #$38                ;add 56 pixels to coordinate if hammer bro or piranha plant
+        temp2 = temp0 + 0x38
+        temp0 = temp2 and 0xFF
         //> ExtendLB: sbc #$48                ;subtract 72 pixels regardless of enemy object
+        temp3 = temp0 - 0x48 - (if (temp2 > 0xFF) 0 else 1)
+        temp0 = temp3 and 0xFF
         //> sta $01                 ;store result here
-        memory[0x1] = ((((temp0 + 0x38) and 0xFF) - 0x48 - (if (temp0 + 0x38 > 0xFF) 0 else 1)) and 0xFF).toUByte()
+        memory[0x1] = temp0.toUByte()
         //> lda ScreenLeft_PageLoc
         temp0 = screenleftPageloc
         //> sbc #$00                ;subtract borrow from page location of left side
+        temp4 = temp0 - (if (temp3 >= 0) 0 else 1)
+        temp0 = temp4 and 0xFF
         //> sta $00                 ;store result here
-        memory[0x0] = ((temp0 - (if (((temp0 + 0x38) and 0xFF) - 0x48 - (if (temp0 + 0x38 > 0xFF) 0 else 1) >= 0) 0 else 1)) and 0xFF).toUByte()
+        memory[0x0] = temp0.toUByte()
         //> lda ScreenRight_X_Pos   ;add 72 pixels to the right side horizontal coordinate
         temp0 = screenrightXPos
         //> adc #$48
+        temp5 = temp0 + 0x48 + (if (temp4 >= 0) 1 else 0)
+        temp0 = temp5 and 0xFF
         //> sta $03                 ;store result here
-        memory[0x3] = ((temp0 + 0x48 + (if (temp0 - (if (((temp0 + 0x38) and 0xFF) - 0x48 - (if (temp0 + 0x38 > 0xFF) 0 else 1) >= 0) 0 else 1) >= 0) 1 else 0)) and 0xFF).toUByte()
+        memory[0x3] = temp0.toUByte()
         //> lda ScreenRight_PageLoc
         temp0 = screenrightPageloc
         //> adc #$00                ;then add the carry to the page location
+        temp6 = temp0 + (if (temp5 > 0xFF) 1 else 0)
+        temp0 = temp6 and 0xFF
         //> sta $02                 ;and store result here
-        memory[0x2] = ((temp0 + (if (temp0 + 0x48 + (if (temp0 - (if (((temp0 + 0x38) and 0xFF) - 0x48 - (if (temp0 + 0x38 > 0xFF) 0 else 1) >= 0) 0 else 1) >= 0) 1 else 0) > 0xFF) 1 else 0)) and 0xFF).toUByte()
+        memory[0x2] = temp0.toUByte()
         //> lda Enemy_X_Position,x  ;compare horizontal coordinate of the enemy object
         temp0 = enemyXPosition[X]
         //> cmp $01                 ;to modified horizontal left edge coordinate to get carry
         //> lda Enemy_PageLoc,x
         temp0 = enemyPageloc[X]
         //> sbc $00                 ;then subtract it from the page coordinate of the enemy object
+        temp7 = temp0 - memory[0x0].toInt() - (if (temp0 >= memory[0x1].toInt()) 0 else 1)
+        temp0 = temp7 and 0xFF
         //> bmi TooFar              ;if enemy object is too far left, branch to erase it
-        temp0 = (temp0 - memory[0x0].toInt() - (if (temp0 >= memory[0x1].toInt()) 0 else 1)) and 0xFF
-        if (((temp0 - memory[0x0].toInt() - if (temp0 >= memory[0x1].toInt()) 0 else 1) and 0xFF and 0x80) == 0) {
+        if ((temp7 and 0xFF and 0x80) == 0) {
             //> lda Enemy_X_Position,x  ;compare horizontal coordinate of the enemy object
             temp0 = enemyXPosition[X]
             //> cmp $03                 ;to modified horizontal right edge coordinate to get carry
             //> lda Enemy_PageLoc,x
             temp0 = enemyPageloc[X]
             //> sbc $02                 ;then subtract it from the page coordinate of the enemy object
+            temp8 = temp0 - memory[0x2].toInt() - (if (temp0 >= memory[0x3].toInt()) 0 else 1)
+            temp0 = temp8 and 0xFF
             //> bmi ExScrnBd            ;if enemy object is on the screen, leave, do not erase enemy
-            temp0 = (temp0 - memory[0x2].toInt() - (if (temp0 >= memory[0x3].toInt()) 0 else 1)) and 0xFF
-            if (((temp0 - memory[0x2].toInt() - if (temp0 >= memory[0x3].toInt()) 0 else 1) and 0xFF and 0x80) == 0) {
+            if ((temp8 and 0xFF and 0x80) == 0) {
                 //> lda Enemy_State,x       ;if at this point, enemy is offscreen to the right, so check
                 temp0 = enemyState[X]
                 //> cmp #HammerBro          ;if in state used by spiny's egg, do not erase
@@ -11006,6 +18786,8 @@ fun fireballEnemyCollision(X: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     var frameCounter by MemoryByte(FrameCounter)
     var objectOffset by MemoryByte(ObjectOffset)
     val enemyOffscrBitsMasked by MemoryByteIndexed(EnemyOffscrBitsMasked)
@@ -11035,93 +18817,97 @@ fun fireballEnemyCollision(X: Int) {
                 X = (X shl 1) and 0xFF
                 //> clc
                 //> adc #$1c              ;then add $1c or 28 bytes to it
+                temp1 = X + 0x1C
+                temp0 = temp1 and 0xFF
                 //> tay                   ;to use fireball's bounding box coordinates
                 //> ldx #$04
-                temp1 = 0x04
-                temp2 = (X + 0x1C) and 0xFF
-                while ((temp1 and 0x80) == 0) {
-                    //> lda Enemy_Flag,x            ;check to see if buffer flag is set
-                    temp0 = enemyFlag[temp1]
-                    //> beq NoFToECol               ;if not, skip to next enemy slot
-                    if (temp0 != 0) {
-                        //> lda Enemy_ID,x              ;check enemy identifier
-                        temp0 = enemyId[temp1]
-                        //> cmp #$24
-                        //> bcc GoombaDie               ;if < $24, branch to check further
-                        if (temp0 >= 0x24) {
-                            //> cmp #$2b
-                            //> bcc NoFToECol               ;if in range $24-$2a, skip to next enemy slot
-                            if (temp0 >= 0x2B) {
+                temp2 = 0x04
+                temp3 = temp0
+                do {
+                    //> FireballEnemyCDLoop:
+                    //> stx $01                     ;store enemy object offset here
+                    memory[0x1] = temp2.toUByte()
+                    //> tya
+                    //> pha                         ;push fireball offset to the stack
+                    push(temp3)
+                    //> lda Enemy_State,x
+                    temp0 = enemyState[temp2]
+                    //> and #%00100000              ;check to see if d5 is set in enemy state
+                    temp4 = temp0 and 0x20
+                    //> bne NoFToECol               ;if so, skip to next enemy slot
+                    temp0 = temp4
+                    if (temp4 == 0) {
+                        //> lda Enemy_Flag,x            ;check to see if buffer flag is set
+                        temp0 = enemyFlag[temp2]
+                        //> beq NoFToECol               ;if not, skip to next enemy slot
+                        if (temp0 != 0) {
+                            //> lda Enemy_ID,x              ;check enemy identifier
+                            temp0 = enemyId[temp2]
+                            //> cmp #$24
+                            //> bcc GoombaDie               ;if < $24, branch to check further
+                            if (temp0 >= 0x24) {
+                                //> cmp #$2b
+                                //> bcc NoFToECol               ;if in range $24-$2a, skip to next enemy slot
+                                if (temp0 >= 0x2B) {
+                                }
                             }
-                        }
-                        //> GoombaDie: cmp #Goomba                 ;check for goomba identifier
-                        //> bne NotGoomba               ;if not found, continue with code
-                        if (temp0 == Goomba) {
-                            //> lda Enemy_State,x           ;otherwise check for defeated state
-                            temp0 = enemyState[temp1]
-                            //> cmp #$02                    ;if stomped or otherwise defeated,
-                            //> bcs NoFToECol               ;skip to next enemy slot
-                            if (!(temp0 >= 0x02)) {
+                            //> GoombaDie: cmp #Goomba                 ;check for goomba identifier
+                            //> bne NotGoomba               ;if not found, continue with code
+                            if (temp0 == Goomba) {
+                                //> lda Enemy_State,x           ;otherwise check for defeated state
+                                temp0 = enemyState[temp2]
+                                //> cmp #$02                    ;if stomped or otherwise defeated,
+                                //> bcs NoFToECol               ;skip to next enemy slot
+                                if (!(temp0 >= 0x02)) {
+                                }
                             }
-                        }
-                        //> NotGoomba: lda EnemyOffscrBitsMasked,x ;if any masked offscreen bits set,
-                        temp0 = enemyOffscrBitsMasked[temp1]
-                        //> bne NoFToECol               ;skip to next enemy slot
-                        if (temp0 == 0) {
-                            //> txa
-                            //> asl                         ;otherwise multiply enemy offset by four
-                            temp1 = (temp1 shl 1) and 0xFF
-                            //> asl
-                            temp1 = (temp1 shl 1) and 0xFF
-                            //> clc
-                            //> adc #$04                    ;add 4 bytes to it
-                            //> tax                         ;to use enemy's bounding box coordinates
-                            //> jsr SprObjectCollisionCore  ;do fireball-to-enemy collision detection
-                            sprObjectCollisionCore((temp1 + 0x04) and 0xFF, temp2)
-                            //> ldx ObjectOffset            ;return fireball's original offset
-                            temp1 = objectOffset
-                            //> bcc NoFToECol               ;if carry clear, no collision, thus do next enemy slot
-                            temp0 = (temp1 + 0x04) and 0xFF
-                            if (temp1 + 0x04 > 0xFF) {
-                                //> lda #%10000000
-                                temp0 = 0x80
-                                //> sta Fireball_State,x        ;set d7 in enemy state
-                                fireballState[temp1] = temp0
-                                //> ldx $01                     ;get enemy offset
-                                temp1 = memory[0x1].toInt()
-                                //> jsr HandleEnemyFBallCol     ;jump to handle fireball to enemy collision
-                                handleEnemyFBallCol()
+                            //> NotGoomba: lda EnemyOffscrBitsMasked,x ;if any masked offscreen bits set,
+                            temp0 = enemyOffscrBitsMasked[temp2]
+                            //> bne NoFToECol               ;skip to next enemy slot
+                            if (temp0 == 0) {
+                                //> txa
+                                //> asl                         ;otherwise multiply enemy offset by four
+                                temp2 = (temp2 shl 1) and 0xFF
+                                //> asl
+                                temp2 = (temp2 shl 1) and 0xFF
+                                //> clc
+                                //> adc #$04                    ;add 4 bytes to it
+                                temp5 = temp2 + 0x04
+                                temp0 = temp5 and 0xFF
+                                //> tax                         ;to use enemy's bounding box coordinates
+                                //> jsr SprObjectCollisionCore  ;do fireball-to-enemy collision detection
+                                sprObjectCollisionCore(temp0, temp3)
+                                //> ldx ObjectOffset            ;return fireball's original offset
+                                temp2 = objectOffset
+                                //> bcc NoFToECol               ;if carry clear, no collision, thus do next enemy slot
+                                if (temp5 > 0xFF) {
+                                    //> lda #%10000000
+                                    temp0 = 0x80
+                                    //> sta Fireball_State,x        ;set d7 in enemy state
+                                    fireballState[temp2] = temp0
+                                    //> ldx $01                     ;get enemy offset
+                                    temp2 = memory[0x1].toInt()
+                                    //> jsr HandleEnemyFBallCol     ;jump to handle fireball to enemy collision
+                                    handleEnemyFBallCol()
+                                }
                             }
                         }
                     }
-                    do {
-                        //> FireballEnemyCDLoop:
-                        //> stx $01                     ;store enemy object offset here
-                        memory[0x1] = temp1.toUByte()
-                        //> tya
-                        //> pha                         ;push fireball offset to the stack
-                        push(temp2)
-                        //> lda Enemy_State,x
-                        temp0 = enemyState[temp1]
-                        //> and #%00100000              ;check to see if d5 is set in enemy state
-                        temp3 = temp0 and 0x20
-                        //> bne NoFToECol               ;if so, skip to next enemy slot
-                        //> NoFToECol: pla                         ;pull fireball offset from stack
-                        temp0 = pull()
-                        //> tay                         ;put it in Y
-                        //> ldx $01                     ;get enemy object offset
-                        temp1 = memory[0x1].toInt()
-                        //> dex                         ;decrement it
-                        temp1 = (temp1 - 1) and 0xFF
-                        //> bpl FireballEnemyCDLoop     ;loop back until collision detection done on all enemies
-                    } while ((temp1 and 0x80) == 0)
-                }
+                    //> NoFToECol: pla                         ;pull fireball offset from stack
+                    temp0 = pull()
+                    //> tay                         ;put it in Y
+                    //> ldx $01                     ;get enemy object offset
+                    temp2 = memory[0x1].toInt()
+                    //> dex                         ;decrement it
+                    temp2 = (temp2 - 1) and 0xFF
+                    //> bpl FireballEnemyCDLoop     ;loop back until collision detection done on all enemies
+                } while ((temp2 and 0x80) == 0)
             }
         }
     }
     //> ExitFBallEnemy:
     //> ldx ObjectOffset                 ;get original fireball offset and leave
-    temp1 = objectOffset
+    temp2 = objectOffset
     //> rts
     return
 }
@@ -11183,11 +18969,11 @@ fun handleEnemyFBallCol() {
             //> dec BowserHitPoints        ;decrement bowser's hit points
             bowserHitPoints = (bowserHitPoints - 1) and 0xFF
             //> bne ExHCF                  ;if bowser still has hit points, branch to leave
-            if (!(((bowserHitPoints - 1) and 0xFF) == 0)) {
+            if (!(bowserHitPoints == 0)) {
                 //  goto ExHCF
                 return
             }
-            if (((bowserHitPoints - 1) and 0xFF) == 0) {
+            if (bowserHitPoints == 0) {
                 //> jsr InitVStf               ;otherwise do sub to init vertical speed and movement force
                 initVStf(temp1)
                 //> sta Enemy_X_Speed,x        ;initialize horizontal speed
@@ -11267,6 +19053,8 @@ fun handleEnemyFBallCol() {
             }
         }
     }
+    // Fall-through tail call to shellOrBlockDefeat
+    shellOrBlockDefeat(temp1)
 }
 
 // Decompiled from ShellOrBlockDefeat
@@ -11275,6 +19063,7 @@ fun shellOrBlockDefeat(X: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
     var square1SoundQueue by MemoryByte(Square1SoundQueue)
     val enemyId by MemoryByteIndexed(Enemy_ID)
     val enemyState by MemoryByteIndexed(Enemy_State)
@@ -11288,25 +19077,27 @@ fun shellOrBlockDefeat(X: Int) {
         //> lda Enemy_Y_Position,x
         temp0 = enemyYPosition[X]
         //> adc #$18                  ;add 24 pixels to enemy object's vertical position
+        temp1 = temp0 + 0x18 + (if (enemyId[X] >= PiranhaPlant) 1 else 0)
+        temp0 = temp1 and 0xFF
         //> sta Enemy_Y_Position,x
-        enemyYPosition[X] = (temp0 + 0x18 + (if (enemyId[X] >= PiranhaPlant) 1 else 0)) and 0xFF
+        enemyYPosition[X] = temp0
     }
     //> StnE: jsr ChkToStunEnemies      ;do yet another sub
     chkToStunEnemies(temp0, X)
     //> lda Enemy_State,x
     temp0 = enemyState[X]
     //> and #%00011111            ;mask out 2 MSB of enemy object's state
-    temp1 = temp0 and 0x1F
+    temp2 = temp0 and 0x1F
     //> ora #%00100000            ;set d5 to defeat enemy and save as new state
-    temp2 = temp1 or 0x20
+    temp3 = temp2 or 0x20
     //> sta Enemy_State,x
-    enemyState[X] = temp2
+    enemyState[X] = temp3
     //> lda #$02                  ;award 200 points by default
     temp0 = 0x02
     //> ldy Enemy_ID,x            ;check for hammer bro
     //> cpy #HammerBro
     //> bne GoombaPoints          ;branch if not found
-    temp3 = enemyId[X]
+    temp4 = enemyId[X]
     if (enemyId[X] == HammerBro) {
         //> lda #$06                  ;award 1000 points for hammer bro
         temp0 = 0x06
@@ -11314,7 +19105,7 @@ fun shellOrBlockDefeat(X: Int) {
     //> GoombaPoints:
     //> cpy #Goomba               ;check for goomba
     //> bne EnemySmackScore       ;branch if not found
-    if (temp3 == Goomba) {
+    if (temp4 == Goomba) {
         //> lda #$01                  ;award 100 points for goomba
         temp0 = 0x01
     }
@@ -11337,6 +19128,8 @@ fun playerHammerCollision(X: Int) {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var frameCounter by MemoryByte(FrameCounter)
     var miscOffscreenbits by MemoryByte(Misc_OffscreenBits)
     var objectOffset by MemoryByte(ObjectOffset)
@@ -11365,31 +19158,34 @@ fun playerHammerCollision(X: Int) {
             X = (X shl 1) and 0xFF
             //> clc
             //> adc #$24                  ;add 36 or $24 bytes to get proper offset
+            temp2 = X + 0x24
+            temp0 = temp2 and 0xFF
             //> tay                       ;for misc object bounding box coordinates
             //> jsr PlayerCollisionCore   ;do player-to-hammer collision detection
             playerCollisionCore()
             //> ldx ObjectOffset          ;get misc object offset
             //> bcc ClHCol                ;if no collision, then branch
-            temp0 = (X + 0x24) and 0xFF
-            temp2 = objectOffset
-            temp3 = (X + 0x24) and 0xFF
-            if (X + 0x24 > 0xFF) {
+            temp3 = objectOffset
+            temp4 = temp0
+            if (temp2 > 0xFF) {
                 //> lda Misc_Collision_Flag,x ;otherwise read collision flag
-                temp0 = miscCollisionFlag[temp2]
+                temp0 = miscCollisionFlag[temp3]
                 //> bne ExPHC                 ;if collision flag already set, branch to leave
                 if (temp0 == 0) {
                     //> lda #$01
                     temp0 = 0x01
                     //> sta Misc_Collision_Flag,x ;otherwise set collision flag now
-                    miscCollisionFlag[temp2] = temp0
+                    miscCollisionFlag[temp3] = temp0
                     //> lda Misc_X_Speed,x
-                    temp0 = miscXSpeed[temp2]
+                    temp0 = miscXSpeed[temp3]
                     //> eor #$ff                  ;get two's compliment of
-                    temp4 = temp0 xor 0xFF
+                    temp5 = temp0 xor 0xFF
                     //> clc                       ;hammer's horizontal speed
                     //> adc #$01
+                    temp6 = temp5 + 0x01
+                    temp0 = temp6 and 0xFF
                     //> sta Misc_X_Speed,x        ;set to send hammer flying the opposite direction
-                    miscXSpeed[temp2] = (temp4 + 0x01) and 0xFF
+                    miscXSpeed[temp3] = temp0
                     //> lda StarInvincibleTimer   ;if star mario invincibility timer set,
                     temp0 = starInvincibleTimer
                     //> bne ExPHC                 ;branch to leave
@@ -11404,7 +19200,7 @@ fun playerHammerCollision(X: Int) {
             //> ClHCol: lda #$00                  ;clear collision flag
             temp0 = 0x00
             //> sta Misc_Collision_Flag,x
-            miscCollisionFlag[temp2] = temp0
+            miscCollisionFlag[temp3] = temp0
         }
     }
 }
@@ -11424,10 +19220,17 @@ fun playerEnemyCollision(X: Int) {
     var powerUpType by MemoryByte(PowerUpType)
     var square2SoundQueue by MemoryByte(Square2SoundQueue)
     var starInvincibleTimer by MemoryByte(StarInvincibleTimer)
+    val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
     val enemyOffscrBitsMasked by MemoryByteIndexed(EnemyOffscrBitsMasked)
     val enemyCollisionbits by MemoryByteIndexed(Enemy_CollisionBits)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
     val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
     val floateynumControl by MemoryByteIndexed(FloateyNum_Control)
+    val kickedShellPtsData by MemoryByteIndexed(KickedShellPtsData)
+    val kickedShellXSpdData by MemoryByteIndexed(KickedShellXSpdData)
     //> HandlePowerUpCollision:
     //> jsr EraseEnemyObject    ;erase the power-up object
     eraseEnemyObject(X)
@@ -11580,10 +19383,13 @@ fun forceInjury(A: Int) {
     var playerXSpeed by MemoryByte(Player_X_Speed)
     var playerYSpeed by MemoryByte(Player_Y_Speed)
     var square1SoundQueue by MemoryByte(Square1SoundQueue)
+    val demotedKoopaXSpdData by MemoryByteIndexed(DemotedKoopaXSpdData)
+    val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
     val enemyId by MemoryByteIndexed(Enemy_ID)
     val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
     val enemyState by MemoryByteIndexed(Enemy_State)
     val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
+    val revivalRateData by MemoryByteIndexed(RevivalRateData)
     val stompedEnemyPtsData by MemoryByteIndexed(StompedEnemyPtsData)
     //> ForceInjury:
     //> ldx PlayerStatus          ;check player's status
@@ -11602,25 +19408,21 @@ fun forceInjury(A: Int) {
         getPlayerColors()
         //> lda #$0a                  ;set subroutine to run on next frame
         //> SetKRout: ldy #$01                  ;set new player state
-        // SetKRout code would set GameEngineSubroutine = 0x0a and Player_State = 1
-        // For now, just return since this path shrinks the player
-        return
-    } else {
-        // KillPlayer: (playerStatus == 0, small Mario)
+    }
+    do {
+        //> KillPlayer:
         //> stx Player_X_Speed   ;halt player's horizontal movement by initializing speed
-        playerXSpeed = temp0  // temp0 is playerStatus = 0
+        playerXSpeed = temp0
         //> inx
-        temp0 = (temp0 + 1) and 0xFF  // temp0 = 1
+        temp0 = (temp0 + 1) and 0xFF
         //> stx EventMusicQueue  ;set event music queue to death music
-        eventMusicQueue = temp0  // death music = 1
+        eventMusicQueue = temp0
         //> lda #$fc
         //> sta Player_Y_Speed   ;set new vertical speed
         playerYSpeed = 0xFC
         //> lda #$0b             ;set subroutine to run on next frame
-        //> bne SetKRout         ;unconditional branch to SetKRout
-        // SetKRout code would set GameEngineSubroutine = 0x0b and Player_State = 1
-        return
-    }
+        //> bne SetKRout         ;branch to set player's state and other things
+    } while (0x0B != 0)
     //> StompedEnemyPtsData:
     //> .db $02, $06, $05, $06
     //> EnemyStomped:
@@ -11778,6 +19580,13 @@ fun setupFloateyNumber(A: Int, X: Int) {
 
 // Decompiled from EnemiesCollision
 fun enemiesCollision(X: Int, Y: Int) {
+    val clearBitsMask by MemoryByteIndexed(ClearBitsMask)
+    val enemyOffscrBitsMasked by MemoryByteIndexed(EnemyOffscrBitsMasked)
+    val enemyCollisionbits by MemoryByteIndexed(Enemy_CollisionBits)
+    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val setBitsMask by MemoryByteIndexed(SetBitsMask)
     //> ExSFN: rts
     return
 }
@@ -11787,6 +19596,7 @@ fun procEnemyCollisions(X: Int, Y: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     val enemyId by MemoryByteIndexed(Enemy_ID)
     val enemyState by MemoryByteIndexed(Enemy_State)
@@ -11834,9 +19644,11 @@ fun procEnemyCollisions(X: Int, Y: Int) {
                 temp2 = shellChainCounter[objectOffset]
                 //> clc
                 //> adc #$04                 ;add four to get appropriate point offset
+                temp3 = temp2 + 0x04
+                temp2 = temp3 and 0xFF
                 //> ldx $01
                 //> jsr SetupFloateyNumber   ;award appropriate number of points for second enemy
-                setupFloateyNumber((temp2 + 0x04) and 0xFF, memory[0x1].toInt())
+                setupFloateyNumber(temp2, memory[0x1].toInt())
                 //> ldx ObjectOffset         ;load original offset of first enemy
                 //> inc ShellChainCounter,x  ;increment chain counter for additional enemies
                 shellChainCounter[objectOffset] = (shellChainCounter[objectOffset] + 1) and 0xFF
@@ -11917,11 +19729,19 @@ fun largePlatformCollision(X: Int) {
     platformCollisionFlag[X] = 0xFF
     //> lda TimerControl             ;check master timer control
     //> bne ExLPC                    ;if set, branch to leave
+    if (!(timerControl == 0)) {
+        //  goto ExLPC
+        return
+    }
     temp0 = timerControl
     if (timerControl == 0) {
         //> lda Enemy_State,x            ;if d7 set in object state,
         temp0 = enemyState[X]
         //> bmi ExLPC                    ;branch to leave
+        if ((temp0 and 0x80) != 0) {
+            //  goto ExLPC
+            return
+        }
         if ((temp0 and 0x80) == 0) {
             //> lda Enemy_ID,x
             temp0 = enemyId[X]
@@ -11955,10 +19775,6 @@ fun chkforplayercLargep(X: Int) {
     //> jsr CheckPlayerVertical      ;figure out if player is below a certain point
     checkPlayerVertical()
     //> bcs ExLPC                    ;or offscreen, branch to leave if true
-    if (flagC) {
-        //  goto ExLPC
-        return
-    }
     if (!flagC) {
         //> txa
         //> jsr GetEnemyBoundBoxOfsArg   ;get bounding box offset in Y
@@ -11975,10 +19791,6 @@ fun chkforplayercLargep(X: Int) {
         temp0 = pull()
         //> tax
         //> bcc ExLPC                    ;if no collision, branch to leave
-        if (!(flagC)) {
-            //  goto ExLPC
-            return
-        }
         temp1 = temp0
         temp2 = temp0
         if (flagC) {
@@ -11996,6 +19808,7 @@ fun chkforplayercLargep(X: Int) {
 fun smallPlatformCollision(X: Int, Y: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     var timerControl by MemoryByte(TimerControl)
     val boundingboxDrYpos by MemoryByteIndexed(BoundingBox_DR_YPos)
@@ -12016,7 +19829,7 @@ fun smallPlatformCollision(X: Int, Y: Int) {
             temp0 = 0x02
             //> sta $00                      ;load counter here for 2 bounding boxes
             memory[0x0] = temp0.toUByte()
-            while (((memory[0x0].toInt() - 1) and 0xFF) != 0) {
+            while (memory[0x0].toInt() != 0) {
                 //> lda BoundingBox_UL_YPos,y  ;check top of platform's bounding box for being
                 temp0 = boundingboxUlYpos[Y]
                 //> cmp #$20                   ;above a specific point
@@ -12028,31 +19841,26 @@ fun smallPlatformCollision(X: Int, Y: Int) {
                     if (!(temp0 >= 0x20)) {
                     }
                 }
-                do {
-                    //> ChkSmallPlatLoop:
-                    //> ldx ObjectOffset           ;get enemy object offset
-                    //> jsr GetEnemyBoundBoxOfs    ;get bounding box offset in Y
-                    getEnemyBoundBoxOfs()
-                    //> and #%00000010             ;if d1 of offscreen lower nybble bits was set
-                    temp1 = temp0 and 0x02
-                    //> bne ExSPC                  ;then branch to leave
-                    //> MoveBoundBox:
-                    //> lda BoundingBox_UL_YPos,y  ;move bounding box vertical coordinates
-                    temp0 = boundingboxUlYpos[Y]
-                    //> clc                        ;128 pixels downwards
-                    //> adc #$80
-                    //> sta BoundingBox_UL_YPos,y
-                    boundingboxUlYpos[Y] = (temp0 + 0x80) and 0xFF
-                    //> lda BoundingBox_DR_YPos,y
-                    temp0 = boundingboxDrYpos[Y]
-                    //> clc
-                    //> adc #$80
-                    //> sta BoundingBox_DR_YPos,y
-                    boundingboxDrYpos[Y] = (temp0 + 0x80) and 0xFF
-                    //> dec $00                    ;decrement counter we set earlier
-                    memory[0x0] = ((memory[0x0].toInt() - 1) and 0xFF).toUByte()
-                    //> bne ChkSmallPlatLoop       ;loop back until both bounding boxes are checked
-                } while (((memory[0x0].toInt() - 1) and 0xFF) != 0)
+                //> MoveBoundBox:
+                //> lda BoundingBox_UL_YPos,y  ;move bounding box vertical coordinates
+                temp0 = boundingboxUlYpos[Y]
+                //> clc                        ;128 pixels downwards
+                //> adc #$80
+                temp1 = temp0 + 0x80
+                temp0 = temp1 and 0xFF
+                //> sta BoundingBox_UL_YPos,y
+                boundingboxUlYpos[Y] = temp0
+                //> lda BoundingBox_DR_YPos,y
+                temp0 = boundingboxDrYpos[Y]
+                //> clc
+                //> adc #$80
+                temp2 = temp0 + 0x80
+                temp0 = temp2 and 0xFF
+                //> sta BoundingBox_DR_YPos,y
+                boundingboxDrYpos[Y] = temp0
+                //> dec $00                    ;decrement counter we set earlier
+                memory[0x0] = ((memory[0x0].toInt() - 1) and 0xFF).toUByte()
+                //> bne ChkSmallPlatLoop       ;loop back until both bounding boxes are checked
             }
         }
     }
@@ -12065,6 +19873,10 @@ fun smallPlatformCollision(X: Int, Y: Int) {
 fun procLPlatCollisions(X: Int, Y: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     var playerState by MemoryByte(Player_State)
     var playerYSpeed by MemoryByte(Player_Y_Speed)
@@ -12078,81 +19890,85 @@ fun procLPlatCollisions(X: Int, Y: Int) {
     //> lda BoundingBox_DR_YPos,y    ;get difference by subtracting the top
     //> sec                          ;of the player's bounding box from the bottom
     //> sbc BoundingBox_UL_YPos      ;of the platform's bounding box
+    temp0 = boundingboxDrYpos[Y] - boundingboxUlYpos[0]
     //> cmp #$04                     ;if difference too large or negative,
     //> bcs ChkForTopCollision       ;branch, do not alter vertical speed of player
-    temp0 = (boundingboxDrYpos[Y] - boundingboxUlYpos) and 0xFF
-    if (!(((boundingboxDrYpos[Y] - boundingboxUlYpos) and 0xFF) >= 0x04)) {
+    temp1 = temp0 and 0xFF
+    if (!((temp0 and 0xFF) >= 0x04)) {
         //> lda Player_Y_Speed           ;check to see if player's vertical speed is moving down
-        temp0 = playerYSpeed
+        temp1 = playerYSpeed
         //> bpl ChkForTopCollision       ;if so, don't mess with it
-        if ((temp0 and 0x80) != 0) {
+        if ((temp1 and 0x80) != 0) {
             //> lda #$01                     ;otherwise, set vertical
-            temp0 = 0x01
+            temp1 = 0x01
             //> sta Player_Y_Speed           ;speed of player to kill jump
-            playerYSpeed = temp0
+            playerYSpeed = temp1
         }
     }
     //> ChkForTopCollision:
     //> lda BoundingBox_DR_YPos      ;get difference by subtracting the top
-    temp0 = boundingboxDrYpos[0]
+    temp1 = boundingboxDrYpos[0]
     //> sec                          ;of the platform's bounding box from the bottom
     //> sbc BoundingBox_UL_YPos,y    ;of the player's bounding box
+    temp2 = temp1 - boundingboxUlYpos[Y]
+    temp1 = temp2 and 0xFF
     //> cmp #$06
     //> bcs PlatformSideCollisions   ;if difference not close enough, skip all of this
-    temp0 = (temp0 - boundingboxUlYpos[Y]) and 0xFF
-    if (!(((temp0 - boundingboxUlYpos[Y]) and 0xFF) >= 0x06)) {
+    if (!(temp1 >= 0x06)) {
         //> lda Player_Y_Speed
-        temp0 = playerYSpeed
+        temp1 = playerYSpeed
         //> bmi PlatformSideCollisions   ;if player's vertical speed moving upwards, skip this
-        if ((temp0 and 0x80) == 0) {
+        if ((temp1 and 0x80) == 0) {
             //> lda $00                      ;get saved bounding box counter from earlier
-            temp0 = memory[0x0].toInt()
+            temp1 = memory[0x0].toInt()
             //> ldy Enemy_ID,x
             //> cpy #$2b                     ;if either of the two small platform objects are found,
             //> beq SetCollisionFlag         ;regardless of which one, branch to use bounding box counter
-            temp1 = enemyId[X]
+            temp3 = enemyId[X]
             if (enemyId[X] != 0x2B) {
                 //> cpy #$2c                     ;as contents of collision flag
                 //> beq SetCollisionFlag
-                if (temp1 != 0x2C) {
+                if (temp3 != 0x2C) {
                     //> txa                          ;otherwise use enemy object buffer offset
                 }
             }
             //> SetCollisionFlag:
             //> ldx ObjectOffset             ;get enemy object buffer offset
             //> sta PlatformCollisionFlag,x  ;save either bounding box counter or enemy offset here
-            platformCollisionFlag[objectOffset] = temp0
+            platformCollisionFlag[objectOffset] = temp1
             //> lda #$00
-            temp0 = 0x00
+            temp1 = 0x00
             //> sta Player_State             ;set player state to normal then leave
-            playerState = temp0
+            playerState = temp1
             //> rts
             return
         }
     }
     //> PlatformSideCollisions:
     //> lda #$01                   ;set value here to indicate possible horizontal
-    temp0 = 0x01
+    temp1 = 0x01
     //> sta $00                    ;collision on left side of platform
-    memory[0x0] = temp0.toUByte()
+    memory[0x0] = temp1.toUByte()
     //> lda BoundingBox_DR_XPos    ;get difference by subtracting platform's left edge
-    temp0 = boundingboxDrXpos[0]
+    temp1 = boundingboxDrXpos[0]
     //> sec                        ;from player's right edge
     //> sbc BoundingBox_UL_XPos,y
+    temp4 = temp1 - boundingboxUlXpos[temp3]
+    temp1 = temp4 and 0xFF
     //> cmp #$08                   ;if difference close enough, skip all of this
     //> bcc SideC
-    temp0 = (temp0 - boundingboxUlXpos[temp1]) and 0xFF
-    if (((temp0 - boundingboxUlXpos[temp1]) and 0xFF) >= 0x08) {
+    if (temp1 >= 0x08) {
         //> inc $00                    ;otherwise increment value set here for right side collision
         memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
         //> lda BoundingBox_DR_XPos,y  ;get difference by subtracting player's left edge
-        temp0 = boundingboxDrXpos[temp1]
+        temp1 = boundingboxDrXpos[temp3]
         //> clc                        ;from platform's right edge
         //> sbc BoundingBox_UL_XPos
+        temp5 = temp1 - boundingboxUlXpos[0] - 1
+        temp1 = temp5 and 0xFF
         //> cmp #$09                   ;if difference not close enough, skip subroutine
         //> bcs NoSideC                ;and instead branch to leave (no collision)
-        temp0 = (temp0 - boundingboxUlXpos[0] - 1) and 0xFF
-        if (!(((temp0 - boundingboxUlXpos[0] - 1) and 0xFF) >= 0x09)) {
+        if (!(temp1 >= 0x09)) {
         } else {
             //> NoSideC: ldx ObjectOffset           ;return with enemy object buffer offset
             //> rts
@@ -12165,6 +19981,7 @@ fun procLPlatCollisions(X: Int, Y: Int) {
 
 // Decompiled from PositionPlayerOnS_Plat
 fun positionplayeronsPlat(A: Int, X: Int) {
+    var temp0: Int = 0
     val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
     val playerPosSPlatData by MemoryByteIndexed(PlayerPosSPlatData)
     //> PositionPlayerOnS_Plat:
@@ -12172,13 +19989,18 @@ fun positionplayeronsPlat(A: Int, X: Int) {
     //> lda Enemy_Y_Position,x     ;for offset
     //> clc                        ;add positioning data using offset to the vertical
     //> adc PlayerPosSPlatData-1,y ;coordinate
+    temp0 = enemyYPosition[X] + playerPosSPlatData[-1 + A]
     //> .db $2c                    ;BIT instruction opcode
+    // Fall-through tail call to positionPlayerOnVPlat
+    positionPlayerOnVPlat(X)
 }
 
 // Decompiled from PositionPlayerOnVPlat
 fun positionPlayerOnVPlat(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
     var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
     var playerYHighpos by MemoryByte(Player_Y_HighPos)
     var playerYMoveforce by MemoryByte(Player_Y_MoveForce)
@@ -12201,12 +20023,16 @@ fun positionPlayerOnVPlat(X: Int) {
         if (temp1 == 0x01) {
             //> sec                       ;subtract 32 pixels from vertical coordinate
             //> sbc #$20                  ;for the player object's height
+            temp2 = temp0 - 0x20
+            temp0 = temp2 and 0xFF
             //> sta Player_Y_Position     ;save as player's new vertical coordinate
-            playerYPosition = (temp0 - 0x20) and 0xFF
+            playerYPosition = temp0
             //> tya
             //> sbc #$00                  ;subtract borrow and store as player's
+            temp3 = temp1 - (if (temp2 >= 0) 0 else 1)
+            temp0 = temp3 and 0xFF
             //> sta Player_Y_HighPos      ;new vertical high byte
-            playerYHighpos = (temp1 - (if (temp0 - 0x20 >= 0) 0 else 1)) and 0xFF
+            playerYHighpos = temp0
             //> lda #$00
             temp0 = 0x00
             //> sta Player_Y_Speed        ;initialize vertical speed and low byte of force
@@ -12252,13 +20078,16 @@ fun getEnemyBoundBoxOfs(): Int {
     var objectOffset by MemoryByte(ObjectOffset)
     //> GetEnemyBoundBoxOfs:
     //> lda ObjectOffset         ;get enemy object buffer offset
-    return objectOffset  // FIX: Return the loaded value
+    // Fall-through tail call to getEnemyBoundBoxOfsArg
+    getEnemyBoundBoxOfsArg(objectOffset)
+    return A
 }
 
 // Decompiled from GetEnemyBoundBoxOfsArg
 fun getEnemyBoundBoxOfsArg(A: Int) {
     var A: Int = A
     var temp0: Int = 0
+    var temp1: Int = 0
     var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
     //> GetEnemyBoundBoxOfsArg:
     //> asl                      ;multiply A by four, then add four
@@ -12267,10 +20096,11 @@ fun getEnemyBoundBoxOfsArg(A: Int) {
     A = (A shl 1) and 0xFF
     //> clc
     //> adc #$04
+    temp0 = A + 0x04
     //> tay                      ;send to Y
     //> lda Enemy_OffscreenBits  ;get offscreen bits for enemy object
     //> and #%00001111           ;save low nybble
-    temp0 = enemyOffscreenbits and 0x0F
+    temp1 = enemyOffscreenbits and 0x0F
     //> cmp #%00001111           ;check for all bits set
     //> rts
     return
@@ -12287,6 +20117,12 @@ fun playerBGCollision() {
     var playerYHighpos by MemoryByte(Player_Y_HighPos)
     var playerYPosition by MemoryByte(Player_Y_Position)
     var swimmingFlag by MemoryByte(SwimmingFlag)
+    val areaChangeTimerData by MemoryByteIndexed(AreaChangeTimerData)
+    val blockBufferAdderData by MemoryByteIndexed(BlockBufferAdderData)
+    val climbPLocAdder by MemoryByteIndexed(ClimbPLocAdder)
+    val climbXPosAdder by MemoryByteIndexed(ClimbXPosAdder)
+    val flagpoleYPosData by MemoryByteIndexed(FlagpoleYPosData)
+    val playerBGUpperExtent by MemoryByteIndexed(PlayerBGUpperExtent)
     //> PlayerBGCollision:
     //> lda DisableCollisionDet   ;if collision detection disabled flag set,
     //> bne ExPBGCol              ;branch to leave
@@ -12541,6 +20377,8 @@ fun impedePlayerMove() {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var playerCollisionbits by MemoryByte(Player_CollisionBits)
     var playerPageloc by MemoryByte(Player_PageLoc)
     var playerXPosition by MemoryByte(Player_X_Position)
@@ -12604,13 +20442,17 @@ fun impedePlayerMove() {
     memory[0x0] = temp2.toUByte()
     //> clc
     //> adc Player_X_Position     ;add contents of A to player's horizontal
+    temp5 = temp1 + playerXPosition
+    temp1 = temp5 and 0xFF
     //> sta Player_X_Position     ;position to move player left or right
-    playerXPosition = (temp1 + playerXPosition) and 0xFF
+    playerXPosition = temp1
     //> lda Player_PageLoc
     temp1 = playerPageloc
     //> adc $00                   ;add high bits and carry to
+    temp6 = temp1 + memory[0x0].toInt() + (if (temp5 > 0xFF) 1 else 0)
+    temp1 = temp6 and 0xFF
     //> sta Player_PageLoc        ;page location if necessary
-    playerPageloc = (temp1 + memory[0x0].toInt() + (if (temp1 + playerXPosition > 0xFF) 1 else 0)) and 0xFF
+    playerPageloc = temp1
 }
 
 // Decompiled from CheckForSolidMTiles
@@ -12678,6 +20520,14 @@ fun getMTileAttrib(A: Int): Int {
 
 // Decompiled from EnemyToBGCollisionDet
 fun enemyToBGCollisionDet(X: Int) {
+    val enemyBGCStateData by MemoryByteIndexed(EnemyBGCStateData)
+    val enemyFrameTimer by MemoryByteIndexed(EnemyFrameTimer)
+    val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
+    val enemyState by MemoryByteIndexed(Enemy_State)
+    val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
     //> ExEBG: rts            ;leave
     return
 }
@@ -12714,6 +20564,8 @@ fun chkToStunEnemies(A: Int, X: Int) {
     temp0 = A and 0x01
     //> sta Enemy_ID,x             ;into green or red koopa troopa to demote them
     enemyId[X] = temp0
+    // Fall-through tail call to setStun
+    setStun(X)
 }
 
 // Decompiled from SetStun
@@ -12804,6 +20656,7 @@ fun chkforbumpHammerbroj(X: Int) {
     var secondaryHardMode by MemoryByte(SecondaryHardMode)
     val enemyFrameTimer by MemoryByteIndexed(EnemyFrameTimer)
     val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
     val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
     val enemyState by MemoryByteIndexed(Enemy_State)
     val enemyXSpeed by MemoryByteIndexed(Enemy_X_Speed)
@@ -12895,6 +20748,8 @@ fun chkforbumpHammerbroj(X: Int) {
 
 // Decompiled from PlayerEnemyDiff
 fun playerEnemyDiff(X: Int) {
+    var temp0: Int = 0
+    var temp1: Int = 0
     var playerPageloc by MemoryByte(Player_PageLoc)
     var playerXPosition by MemoryByte(Player_X_Position)
     val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
@@ -12903,10 +20758,12 @@ fun playerEnemyDiff(X: Int) {
     //> lda Enemy_X_Position,x  ;get distance between enemy object's
     //> sec                     ;horizontal coordinate and the player's
     //> sbc Player_X_Position   ;horizontal coordinate
+    temp0 = enemyXPosition[X] - playerXPosition
     //> sta $00                 ;and store here
-    memory[0x0] = ((enemyXPosition[X] - playerXPosition) and 0xFF).toUByte()
+    memory[0x0] = (temp0 and 0xFF).toUByte()
     //> lda Enemy_PageLoc,x
     //> sbc Player_PageLoc      ;subtract borrow, then leave
+    temp1 = enemyPageloc[X] - playerPageloc - (if (temp0 >= 0) 0 else 1)
     //> rts
     return
 }
@@ -12932,11 +20789,13 @@ fun enemyLanding(X: Int) {
 
 // Decompiled from SubtEnemyYPos
 fun subtEnemyYPos(X: Int) {
+    var temp0: Int = 0
     val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
     //> SubtEnemyYPos:
     //> lda Enemy_Y_Position,x  ;add 62 pixels to enemy object's
     //> clc                     ;vertical coordinate
     //> adc #$3e
+    temp0 = enemyYPosition[X] + 0x3E
     //> cmp #$44                ;compare against a certain range
     //> rts                     ;and leave with flags set for conditional branch
     return
@@ -12948,6 +20807,7 @@ fun enemyJump(X: Int) {
     var temp1: Int = 0
     val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
     val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
+    val enemyYSpeed by MemoryByteIndexed(Enemy_Y_Speed)
     //> DoEnemySideCheck:
     //> lda Enemy_Y_Position,x     ;if enemy within status bar, branch to leave
     //> cmp #$20                   ;because there's nothing there that impedes movement
@@ -12960,34 +20820,34 @@ fun enemyJump(X: Int) {
         //> sta $eb                    ;OAM data offset
         memory[0xEB] = temp0.toUByte()
         temp1 = 0x16
-        while (!(temp1 >= 0x18)) {
-            //> lda #$01                   ;set flag in A for save horizontal coordinate
-            temp0 = 0x01
-            //> jsr BlockBufferChk_Enemy   ;find block to left or right of enemy object
-            blockbufferchkEnemy(temp0, X)
-            //> beq NextSdeC               ;if nothing found, branch
-            if (temp0 != 0) {
-                //> jsr ChkForNonSolids        ;check for non-solid blocks
-                chkForNonSolids(temp0)
-                //> bne ChkForBump_HammerBroJ  ;branch if not found
-                if (!(temp0 == 0)) {
-                    //  goto ChkForBump_HammerBroJ
-                    return
+        do {
+            //> SdeCLoop: lda $eb                    ;check value
+            temp0 = memory[0xEB].toInt()
+            //> cmp Enemy_MovingDir,x      ;compare value against moving direction
+            //> bne NextSdeC               ;branch if different and do not seek block there
+            if (temp0 == enemyMovingdir[X]) {
+                //> lda #$01                   ;set flag in A for save horizontal coordinate
+                temp0 = 0x01
+                //> jsr BlockBufferChk_Enemy   ;find block to left or right of enemy object
+                blockbufferchkEnemy(temp0, X)
+                //> beq NextSdeC               ;if nothing found, branch
+                if (temp0 != 0) {
+                    //> jsr ChkForNonSolids        ;check for non-solid blocks
+                    chkForNonSolids(temp0)
+                    //> bne ChkForBump_HammerBroJ  ;branch if not found
+                    if (!(temp0 == 0)) {
+                        //  goto ChkForBump_HammerBroJ
+                        return
+                    }
                 }
             }
-            do {
-                //> SdeCLoop: lda $eb                    ;check value
-                temp0 = memory[0xEB].toInt()
-                //> cmp Enemy_MovingDir,x      ;compare value against moving direction
-                //> bne NextSdeC               ;branch if different and do not seek block there
-                //> NextSdeC: dec $eb                    ;move to the next direction
-                memory[0xEB] = ((memory[0xEB].toInt() - 1) and 0xFF).toUByte()
-                //> iny
-                temp1 = (temp1 + 1) and 0xFF
-                //> cpy #$18                   ;increment Y, loop only if Y < $18, thus we check
-                //> bcc SdeCLoop               ;enemy ($00, $14) and ($10, $14) pixel coordinates
-            } while (!(temp1 >= 0x18))
-        }
+            //> NextSdeC: dec $eb                    ;move to the next direction
+            memory[0xEB] = ((memory[0xEB].toInt() - 1) and 0xFF).toUByte()
+            //> iny
+            temp1 = (temp1 + 1) and 0xFF
+            //> cpy #$18                   ;increment Y, loop only if Y < $18, thus we check
+            //> bcc SdeCLoop               ;enemy ($00, $14) and ($10, $14) pixel coordinates
+        } while (!(temp1 >= 0x18))
     }
     //> ExESdeC:  rts
     return
@@ -13116,6 +20976,10 @@ fun getFireballBoundBox(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
     var screenleftXPos by MemoryByte(ScreenLeft_X_Pos)
@@ -13127,6 +20991,7 @@ fun getFireballBoundBox(X: Int) {
     //> txa         ;add seven bytes to offset
     //> clc         ;to use in routines as offset for fireball
     //> adc #$07
+    temp0 = X + 0x07
     //> tax
     //> ldy #$02    ;set offset for relative coordinates
     //> bne FBallB  ;unconditional branch
@@ -13134,80 +20999,85 @@ fun getFireballBoundBox(X: Int) {
         //  goto FBallB
         return
     }
-    temp0 = (X + 0x07) and 0xFF
-    temp1 = (X + 0x07) and 0xFF
-    temp2 = 0x02
+    temp1 = temp0 and 0xFF
+    temp2 = temp0 and 0xFF
+    temp3 = 0x02
     if (0x02 == 0) {
     }
     //> FBallB: jsr BoundingBoxCore       ;get bounding box coordinates
-    boundingBoxCore(temp1, temp2)
+    boundingBoxCore(temp2, temp3)
     //> jmp CheckRightScreenBBox  ;jump to handle any offscreen coordinates
     //> CheckRightScreenBBox:
     //> lda ScreenLeft_X_Pos       ;add 128 pixels to left side of screen
-    temp0 = screenleftXPos
+    temp1 = screenleftXPos
     //> clc                        ;and store as horizontal coordinate of middle
     //> adc #$80
+    temp4 = temp1 + 0x80
+    temp1 = temp4 and 0xFF
     //> sta $02
-    memory[0x2] = ((temp0 + 0x80) and 0xFF).toUByte()
+    memory[0x2] = temp1.toUByte()
     //> lda ScreenLeft_PageLoc     ;add carry to page location of left side of screen
-    temp0 = screenleftPageloc
+    temp1 = screenleftPageloc
     //> adc #$00                   ;and store as page location of middle
+    temp5 = temp1 + (if (temp4 > 0xFF) 1 else 0)
+    temp1 = temp5 and 0xFF
     //> sta $01
-    memory[0x1] = ((temp0 + (if (temp0 + 0x80 > 0xFF) 1 else 0)) and 0xFF).toUByte()
+    memory[0x1] = temp1.toUByte()
     //> lda SprObject_X_Position,x ;get horizontal coordinate
-    temp0 = sprobjectXPosition[temp1]
+    temp1 = sprobjectXPosition[temp2]
     //> cmp $02                    ;compare against middle horizontal coordinate
     //> lda SprObject_PageLoc,x    ;get page location
-    temp0 = sprobjectPageloc[temp1]
+    temp1 = sprobjectPageloc[temp2]
     //> sbc $01                    ;subtract from middle page location
+    temp6 = temp1 - memory[0x1].toInt() - (if (temp1 >= memory[0x2].toInt()) 0 else 1)
+    temp1 = temp6 and 0xFF
     //> bcc CheckLeftScreenBBox    ;if object is on the left side of the screen, branch
-    temp0 = (temp0 - memory[0x1].toInt() - (if (temp0 >= memory[0x2].toInt()) 0 else 1)) and 0xFF
-    if ((temp0 - memory[0x1].toInt() - (if (temp0 >= memory[0x2].toInt()) 0 else 1)) >= 0) {
+    if (temp6 >= 0) {
         //> lda BoundingBox_DR_XPos,y  ;check right-side edge of bounding box for offscreen
-        temp0 = boundingboxDrXpos[temp2]
+        temp1 = boundingboxDrXpos[temp3]
         //> bmi NoOfs                  ;coordinates, branch if still on the screen
-        if ((temp0 and 0x80) == 0) {
+        if ((temp1 and 0x80) == 0) {
             //> lda #$ff                   ;load offscreen value here to use on one or both horizontal sides
-            temp0 = 0xFF
+            temp1 = 0xFF
             //> ldx BoundingBox_UL_XPos,y  ;check left-side edge of bounding box for offscreen
-            temp1 = boundingboxUlXpos[temp2]
+            temp2 = boundingboxUlXpos[temp3]
             //> bmi SORte                  ;coordinates, and branch if still on the screen
-            if ((temp1 and 0x80) == 0) {
+            if ((temp2 and 0x80) == 0) {
                 //> sta BoundingBox_UL_XPos,y  ;store offscreen value for left side
-                boundingboxUlXpos[temp2] = temp0
+                boundingboxUlXpos[temp3] = temp1
             }
             //> SORte: sta BoundingBox_DR_XPos,y  ;store offscreen value for right side
-            boundingboxDrXpos[temp2] = temp0
+            boundingboxDrXpos[temp3] = temp1
         }
         //> NoOfs: ldx ObjectOffset           ;get object offset and leave
-        temp1 = objectOffset
+        temp2 = objectOffset
         //> rts
         return
     } else {
         //> CheckLeftScreenBBox:
         //> lda BoundingBox_UL_XPos,y  ;check left-side edge of bounding box for offscreen
-        temp0 = boundingboxUlXpos[temp2]
+        temp1 = boundingboxUlXpos[temp3]
         //> bpl NoOfs2                 ;coordinates, and branch if still on the screen
-        if ((temp0 and 0x80) != 0) {
+        if ((temp1 and 0x80) != 0) {
             //> cmp #$a0                   ;check to see if left-side edge is in the middle of the
             //> bcc NoOfs2                 ;screen or really offscreen, and branch if still on
-            if (temp0 >= 0xA0) {
+            if (temp1 >= 0xA0) {
                 //> lda #$00
-                temp0 = 0x00
+                temp1 = 0x00
                 //> ldx BoundingBox_DR_XPos,y  ;check right-side edge of bounding box for offscreen
-                temp1 = boundingboxDrXpos[temp2]
+                temp2 = boundingboxDrXpos[temp3]
                 //> bpl SOLft                  ;coordinates, branch if still onscreen
-                if ((temp1 and 0x80) != 0) {
+                if ((temp2 and 0x80) != 0) {
                     //> sta BoundingBox_DR_XPos,y  ;store offscreen value for right side
-                    boundingboxDrXpos[temp2] = temp0
+                    boundingboxDrXpos[temp3] = temp1
                 }
                 //> SOLft:  sta BoundingBox_UL_XPos,y  ;store offscreen value for left side
-                boundingboxUlXpos[temp2] = temp0
+                boundingboxUlXpos[temp3] = temp1
             }
         }
     }
     //> NoOfs2: ldx ObjectOffset           ;get object offset and leave
-    temp1 = objectOffset
+    temp2 = objectOffset
     //> rts
     return
 }
@@ -13217,6 +21087,10 @@ fun getMiscBoundBox(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
     var screenleftXPos by MemoryByte(ScreenLeft_X_Pos)
@@ -13228,75 +21102,79 @@ fun getMiscBoundBox(X: Int) {
     //> txa                       ;add nine bytes to offset
     //> clc                       ;to use in routines as offset for misc object
     //> adc #$09
+    temp0 = X + 0x09
     //> tax
     //> ldy #$06                  ;set offset for relative coordinates
     //> FBallB: jsr BoundingBoxCore       ;get bounding box coordinates
-    boundingBoxCore((X + 0x09) and 0xFF, 0x06)
+    boundingBoxCore(temp0 and 0xFF, 0x06)
     //> jmp CheckRightScreenBBox  ;jump to handle any offscreen coordinates
     //> CheckRightScreenBBox:
     //> lda ScreenLeft_X_Pos       ;add 128 pixels to left side of screen
     //> clc                        ;and store as horizontal coordinate of middle
     //> adc #$80
+    temp1 = screenleftXPos + 0x80
     //> sta $02
-    memory[0x2] = ((screenleftXPos + 0x80) and 0xFF).toUByte()
+    memory[0x2] = (temp1 and 0xFF).toUByte()
     //> lda ScreenLeft_PageLoc     ;add carry to page location of left side of screen
     //> adc #$00                   ;and store as page location of middle
+    temp2 = screenleftPageloc + (if (temp1 > 0xFF) 1 else 0)
     //> sta $01
-    memory[0x1] = ((screenleftPageloc + (if (screenleftXPos + 0x80 > 0xFF) 1 else 0)) and 0xFF).toUByte()
+    memory[0x1] = (temp2 and 0xFF).toUByte()
     //> lda SprObject_X_Position,x ;get horizontal coordinate
     //> cmp $02                    ;compare against middle horizontal coordinate
     //> lda SprObject_PageLoc,x    ;get page location
     //> sbc $01                    ;subtract from middle page location
+    temp3 = sprobjectPageloc[temp0 and 0xFF] - memory[0x1].toInt() - (if (sprobjectXPosition[temp0 and 0xFF] >= memory[0x2].toInt()) 0 else 1)
     //> bcc CheckLeftScreenBBox    ;if object is on the left side of the screen, branch
-    temp0 = (sprobjectPageloc[(X + 0x09) and 0xFF] - memory[0x1].toInt() - (if (sprobjectXPosition[(X + 0x09) and 0xFF] >= memory[0x2].toInt()) 0 else 1)) and 0xFF
-    temp1 = (X + 0x09) and 0xFF
-    temp2 = 0x06
-    if ((sprobjectPageloc[(X + 0x09) and 0xFF] - memory[0x1].toInt() - (if (sprobjectXPosition[(X + 0x09) and 0xFF] >= memory[0x2].toInt()) 0 else 1)) >= 0) {
+    temp4 = temp3 and 0xFF
+    temp5 = temp0 and 0xFF
+    temp6 = 0x06
+    if (temp3 >= 0) {
         //> lda BoundingBox_DR_XPos,y  ;check right-side edge of bounding box for offscreen
-        temp0 = boundingboxDrXpos[temp2]
+        temp4 = boundingboxDrXpos[temp6]
         //> bmi NoOfs                  ;coordinates, branch if still on the screen
-        if ((temp0 and 0x80) == 0) {
+        if ((temp4 and 0x80) == 0) {
             //> lda #$ff                   ;load offscreen value here to use on one or both horizontal sides
-            temp0 = 0xFF
+            temp4 = 0xFF
             //> ldx BoundingBox_UL_XPos,y  ;check left-side edge of bounding box for offscreen
-            temp1 = boundingboxUlXpos[temp2]
+            temp5 = boundingboxUlXpos[temp6]
             //> bmi SORte                  ;coordinates, and branch if still on the screen
-            if ((temp1 and 0x80) == 0) {
+            if ((temp5 and 0x80) == 0) {
                 //> sta BoundingBox_UL_XPos,y  ;store offscreen value for left side
-                boundingboxUlXpos[temp2] = temp0
+                boundingboxUlXpos[temp6] = temp4
             }
             //> SORte: sta BoundingBox_DR_XPos,y  ;store offscreen value for right side
-            boundingboxDrXpos[temp2] = temp0
+            boundingboxDrXpos[temp6] = temp4
         }
         //> NoOfs: ldx ObjectOffset           ;get object offset and leave
-        temp1 = objectOffset
+        temp5 = objectOffset
         //> rts
         return
     } else {
         //> CheckLeftScreenBBox:
         //> lda BoundingBox_UL_XPos,y  ;check left-side edge of bounding box for offscreen
-        temp0 = boundingboxUlXpos[temp2]
+        temp4 = boundingboxUlXpos[temp6]
         //> bpl NoOfs2                 ;coordinates, and branch if still on the screen
-        if ((temp0 and 0x80) != 0) {
+        if ((temp4 and 0x80) != 0) {
             //> cmp #$a0                   ;check to see if left-side edge is in the middle of the
             //> bcc NoOfs2                 ;screen or really offscreen, and branch if still on
-            if (temp0 >= 0xA0) {
+            if (temp4 >= 0xA0) {
                 //> lda #$00
-                temp0 = 0x00
+                temp4 = 0x00
                 //> ldx BoundingBox_DR_XPos,y  ;check right-side edge of bounding box for offscreen
-                temp1 = boundingboxDrXpos[temp2]
+                temp5 = boundingboxDrXpos[temp6]
                 //> bpl SOLft                  ;coordinates, branch if still onscreen
-                if ((temp1 and 0x80) != 0) {
+                if ((temp5 and 0x80) != 0) {
                     //> sta BoundingBox_DR_XPos,y  ;store offscreen value for right side
-                    boundingboxDrXpos[temp2] = temp0
+                    boundingboxDrXpos[temp6] = temp4
                 }
                 //> SOLft:  sta BoundingBox_UL_XPos,y  ;store offscreen value for left side
-                boundingboxUlXpos[temp2] = temp0
+                boundingboxUlXpos[temp6] = temp4
             }
         }
     }
     //> NoOfs2: ldx ObjectOffset           ;get object offset and leave
-    temp1 = objectOffset
+    temp5 = objectOffset
     //> rts
     return
 }
@@ -13306,9 +21184,15 @@ fun getEnemyBoundBox(X: Int) {
     var X: Int = X
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp10: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
     var objectOffset by MemoryByte(ObjectOffset)
     var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
@@ -13331,41 +21215,45 @@ fun getEnemyBoundBox(X: Int) {
     //> lda Enemy_X_Position,x      ;get enemy object position relative
     //> sec                         ;to the left side of the screen
     //> sbc ScreenLeft_X_Pos
+    temp0 = enemyXPosition[X] - screenleftXPos
     //> sta $01                     ;store here
-    memory[0x1] = ((enemyXPosition[X] - screenleftXPos) and 0xFF).toUByte()
+    memory[0x1] = (temp0 and 0xFF).toUByte()
     //> lda Enemy_PageLoc,x         ;subtract borrow from current page location
     //> sbc ScreenLeft_PageLoc      ;of left side
+    temp1 = enemyPageloc[X] - screenleftPageloc - (if (temp0 >= 0) 0 else 1)
     //> bmi CMBits                  ;if enemy object is beyond left edge, branch
-    temp0 = (enemyPageloc[X] - screenleftPageloc - (if (enemyXPosition[X] - screenleftXPos >= 0) 0 else 1)) and 0xFF
-    temp1 = 0x44
-    if (((enemyPageloc[X] - screenleftPageloc - if (enemyXPosition[X] - screenleftXPos >= 0) 0 else 1) and 0xFF and 0x80) == 0) {
+    temp2 = temp1 and 0xFF
+    temp3 = 0x44
+    if ((temp1 and 0xFF and 0x80) == 0) {
         //> ora $01
-        temp2 = temp0 or memory[0x1].toInt()
+        temp4 = temp2 or memory[0x1].toInt()
         //> beq CMBits                  ;if precisely at the left edge, branch
-        temp0 = temp2
-        if (temp2 != 0) {
+        temp2 = temp4
+        if (temp4 != 0) {
             //> ldy $00                     ;if to the right of left edge, use value in $00 for A
-            temp1 = memory[0x0].toInt()
+            temp3 = memory[0x0].toInt()
         }
     }
     //> CMBits: tya                         ;otherwise use contents of Y
     //> and Enemy_OffscreenBits     ;preserve bitwise whatever's in here
-    temp3 = temp1 and enemyOffscreenbits
+    temp5 = temp3 and enemyOffscreenbits
     //> sta EnemyOffscrBitsMasked,x ;save masked offscreen bits here
-    enemyOffscrBitsMasked[X] = temp3
+    enemyOffscrBitsMasked[X] = temp5
     //> bne MoveBoundBoxOffscreen   ;if anything set here, branch
-    temp0 = temp3
-    if (temp3 == 0) {
+    temp2 = temp5
+    if (temp5 == 0) {
         //> jmp SetupEOffsetFBBox       ;otherwise, do something else
         //> SetupEOffsetFBBox:
         //> txa                        ;add 1 to offset to properly address
         //> clc                        ;the enemy object memory locations
         //> adc #$01
+        temp6 = X + 0x01
+        temp2 = temp6 and 0xFF
         //> tax
         //> ldy #$01                   ;load 1 as offset here, same reason
-        temp1 = 0x01
+        temp3 = 0x01
         //> jsr BoundingBoxCore        ;do a sub to get the coordinates of the bounding box
-        boundingBoxCore((X + 0x01) and 0xFF, temp1)
+        boundingBoxCore(temp2, temp3)
         //> jmp CheckRightScreenBBox   ;jump to handle offscreen coordinates of bounding box
     } else {
         //> MoveBoundBoxOffscreen:
@@ -13376,84 +21264,89 @@ fun getEnemyBoundBox(X: Int) {
         X = (X shl 1) and 0xFF
         //> tay                            ;use as offset here
         //> lda #$ff
-        temp0 = 0xFF
+        temp2 = 0xFF
         //> sta EnemyBoundingBoxCoord,y    ;load value into four locations here and leave
-        enemyBoundingBoxCoord[X] = temp0
+        enemyBoundingBoxCoord[X] = temp2
         //> sta EnemyBoundingBoxCoord+1,y
-        enemyBoundingBoxCoord[1 + X] = temp0
+        enemyBoundingBoxCoord[1 + X] = temp2
         //> sta EnemyBoundingBoxCoord+2,y
-        enemyBoundingBoxCoord[2 + X] = temp0
+        enemyBoundingBoxCoord[2 + X] = temp2
         //> sta EnemyBoundingBoxCoord+3,y
-        enemyBoundingBoxCoord[3 + X] = temp0
+        enemyBoundingBoxCoord[3 + X] = temp2
         //> rts
         return
     }
     //> CheckRightScreenBBox:
     //> lda ScreenLeft_X_Pos       ;add 128 pixels to left side of screen
-    temp0 = screenleftXPos
+    temp2 = screenleftXPos
     //> clc                        ;and store as horizontal coordinate of middle
     //> adc #$80
+    temp7 = temp2 + 0x80
+    temp2 = temp7 and 0xFF
     //> sta $02
-    memory[0x2] = ((temp0 + 0x80) and 0xFF).toUByte()
+    memory[0x2] = temp2.toUByte()
     //> lda ScreenLeft_PageLoc     ;add carry to page location of left side of screen
-    temp0 = screenleftPageloc
+    temp2 = screenleftPageloc
     //> adc #$00                   ;and store as page location of middle
+    temp8 = temp2 + (if (temp7 > 0xFF) 1 else 0)
+    temp2 = temp8 and 0xFF
     //> sta $01
-    memory[0x1] = ((temp0 + (if (temp0 + 0x80 > 0xFF) 1 else 0)) and 0xFF).toUByte()
+    memory[0x1] = temp2.toUByte()
     //> lda SprObject_X_Position,x ;get horizontal coordinate
-    temp0 = sprobjectXPosition[X]
+    temp2 = sprobjectXPosition[X]
     //> cmp $02                    ;compare against middle horizontal coordinate
     //> lda SprObject_PageLoc,x    ;get page location
-    temp0 = sprobjectPageloc[X]
+    temp2 = sprobjectPageloc[X]
     //> sbc $01                    ;subtract from middle page location
+    temp9 = temp2 - memory[0x1].toInt() - (if (temp2 >= memory[0x2].toInt()) 0 else 1)
+    temp2 = temp9 and 0xFF
     //> bcc CheckLeftScreenBBox    ;if object is on the left side of the screen, branch
-    temp0 = (temp0 - memory[0x1].toInt() - (if (temp0 >= memory[0x2].toInt()) 0 else 1)) and 0xFF
-    if ((temp0 - memory[0x1].toInt() - (if (temp0 >= memory[0x2].toInt()) 0 else 1)) >= 0) {
+    if (temp9 >= 0) {
         //> lda BoundingBox_DR_XPos,y  ;check right-side edge of bounding box for offscreen
-        temp0 = boundingboxDrXpos[temp1]
+        temp2 = boundingboxDrXpos[temp3]
         //> bmi NoOfs                  ;coordinates, branch if still on the screen
-        if ((temp0 and 0x80) == 0) {
+        if ((temp2 and 0x80) == 0) {
             //> lda #$ff                   ;load offscreen value here to use on one or both horizontal sides
-            temp0 = 0xFF
+            temp2 = 0xFF
             //> ldx BoundingBox_UL_XPos,y  ;check left-side edge of bounding box for offscreen
             //> bmi SORte                  ;coordinates, and branch if still on the screen
-            temp4 = boundingboxUlXpos[temp1]
-            if ((boundingboxUlXpos[temp1] and 0x80) == 0) {
+            temp10 = boundingboxUlXpos[temp3]
+            if ((boundingboxUlXpos[temp3] and 0x80) == 0) {
                 //> sta BoundingBox_UL_XPos,y  ;store offscreen value for left side
-                boundingboxUlXpos[temp1] = temp0
+                boundingboxUlXpos[temp3] = temp2
             }
             //> SORte: sta BoundingBox_DR_XPos,y  ;store offscreen value for right side
-            boundingboxDrXpos[temp1] = temp0
+            boundingboxDrXpos[temp3] = temp2
         }
         //> NoOfs: ldx ObjectOffset           ;get object offset and leave
-        temp4 = objectOffset
+        temp10 = objectOffset
         //> rts
         return
     } else {
         //> CheckLeftScreenBBox:
         //> lda BoundingBox_UL_XPos,y  ;check left-side edge of bounding box for offscreen
-        temp0 = boundingboxUlXpos[temp1]
+        temp2 = boundingboxUlXpos[temp3]
         //> bpl NoOfs2                 ;coordinates, and branch if still on the screen
-        if ((temp0 and 0x80) != 0) {
+        if ((temp2 and 0x80) != 0) {
             //> cmp #$a0                   ;check to see if left-side edge is in the middle of the
             //> bcc NoOfs2                 ;screen or really offscreen, and branch if still on
-            if (temp0 >= 0xA0) {
+            if (temp2 >= 0xA0) {
                 //> lda #$00
-                temp0 = 0x00
+                temp2 = 0x00
                 //> ldx BoundingBox_DR_XPos,y  ;check right-side edge of bounding box for offscreen
-                temp4 = boundingboxDrXpos[temp1]
+                temp10 = boundingboxDrXpos[temp3]
                 //> bpl SOLft                  ;coordinates, branch if still onscreen
-                if ((temp4 and 0x80) != 0) {
+                if ((temp10 and 0x80) != 0) {
                     //> sta BoundingBox_DR_XPos,y  ;store offscreen value for right side
-                    boundingboxDrXpos[temp1] = temp0
+                    boundingboxDrXpos[temp3] = temp2
                 }
                 //> SOLft:  sta BoundingBox_UL_XPos,y  ;store offscreen value for left side
-                boundingboxUlXpos[temp1] = temp0
+                boundingboxUlXpos[temp3] = temp2
             }
         }
     }
     //> NoOfs2: ldx ObjectOffset           ;get object offset and leave
-    temp4 = objectOffset
+    temp10 = objectOffset
     //> rts
     return
 }
@@ -13463,9 +21356,15 @@ fun smallPlatformBoundBox(X: Int) {
     var X: Int = X
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp10: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
     var objectOffset by MemoryByte(ObjectOffset)
     var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
@@ -13487,41 +21386,45 @@ fun smallPlatformBoundBox(X: Int) {
     //> lda Enemy_X_Position,x      ;get enemy object position relative
     //> sec                         ;to the left side of the screen
     //> sbc ScreenLeft_X_Pos
+    temp0 = enemyXPosition[X] - screenleftXPos
     //> sta $01                     ;store here
-    memory[0x1] = ((enemyXPosition[X] - screenleftXPos) and 0xFF).toUByte()
+    memory[0x1] = (temp0 and 0xFF).toUByte()
     //> lda Enemy_PageLoc,x         ;subtract borrow from current page location
     //> sbc ScreenLeft_PageLoc      ;of left side
+    temp1 = enemyPageloc[X] - screenleftPageloc - (if (temp0 >= 0) 0 else 1)
     //> bmi CMBits                  ;if enemy object is beyond left edge, branch
-    temp0 = (enemyPageloc[X] - screenleftPageloc - (if (enemyXPosition[X] - screenleftXPos >= 0) 0 else 1)) and 0xFF
-    temp1 = 0x04
-    if (((enemyPageloc[X] - screenleftPageloc - if (enemyXPosition[X] - screenleftXPos >= 0) 0 else 1) and 0xFF and 0x80) == 0) {
+    temp2 = temp1 and 0xFF
+    temp3 = 0x04
+    if ((temp1 and 0xFF and 0x80) == 0) {
         //> ora $01
-        temp2 = temp0 or memory[0x1].toInt()
+        temp4 = temp2 or memory[0x1].toInt()
         //> beq CMBits                  ;if precisely at the left edge, branch
-        temp0 = temp2
-        if (temp2 != 0) {
+        temp2 = temp4
+        if (temp4 != 0) {
             //> ldy $00                     ;if to the right of left edge, use value in $00 for A
-            temp1 = memory[0x0].toInt()
+            temp3 = memory[0x0].toInt()
         }
     }
     //> CMBits: tya                         ;otherwise use contents of Y
     //> and Enemy_OffscreenBits     ;preserve bitwise whatever's in here
-    temp3 = temp1 and enemyOffscreenbits
+    temp5 = temp3 and enemyOffscreenbits
     //> sta EnemyOffscrBitsMasked,x ;save masked offscreen bits here
-    enemyOffscrBitsMasked[X] = temp3
+    enemyOffscrBitsMasked[X] = temp5
     //> bne MoveBoundBoxOffscreen   ;if anything set here, branch
-    temp0 = temp3
-    if (temp3 == 0) {
+    temp2 = temp5
+    if (temp5 == 0) {
         //> jmp SetupEOffsetFBBox       ;otherwise, do something else
         //> SetupEOffsetFBBox:
         //> txa                        ;add 1 to offset to properly address
         //> clc                        ;the enemy object memory locations
         //> adc #$01
+        temp6 = X + 0x01
+        temp2 = temp6 and 0xFF
         //> tax
         //> ldy #$01                   ;load 1 as offset here, same reason
-        temp1 = 0x01
+        temp3 = 0x01
         //> jsr BoundingBoxCore        ;do a sub to get the coordinates of the bounding box
-        boundingBoxCore((X + 0x01) and 0xFF, temp1)
+        boundingBoxCore(temp2, temp3)
         //> jmp CheckRightScreenBBox   ;jump to handle offscreen coordinates of bounding box
     } else {
         //> MoveBoundBoxOffscreen:
@@ -13532,84 +21435,89 @@ fun smallPlatformBoundBox(X: Int) {
         X = (X shl 1) and 0xFF
         //> tay                            ;use as offset here
         //> lda #$ff
-        temp0 = 0xFF
+        temp2 = 0xFF
         //> sta EnemyBoundingBoxCoord,y    ;load value into four locations here and leave
-        enemyBoundingBoxCoord[X] = temp0
+        enemyBoundingBoxCoord[X] = temp2
         //> sta EnemyBoundingBoxCoord+1,y
-        enemyBoundingBoxCoord[1 + X] = temp0
+        enemyBoundingBoxCoord[1 + X] = temp2
         //> sta EnemyBoundingBoxCoord+2,y
-        enemyBoundingBoxCoord[2 + X] = temp0
+        enemyBoundingBoxCoord[2 + X] = temp2
         //> sta EnemyBoundingBoxCoord+3,y
-        enemyBoundingBoxCoord[3 + X] = temp0
+        enemyBoundingBoxCoord[3 + X] = temp2
         //> rts
         return
     }
     //> CheckRightScreenBBox:
     //> lda ScreenLeft_X_Pos       ;add 128 pixels to left side of screen
-    temp0 = screenleftXPos
+    temp2 = screenleftXPos
     //> clc                        ;and store as horizontal coordinate of middle
     //> adc #$80
+    temp7 = temp2 + 0x80
+    temp2 = temp7 and 0xFF
     //> sta $02
-    memory[0x2] = ((temp0 + 0x80) and 0xFF).toUByte()
+    memory[0x2] = temp2.toUByte()
     //> lda ScreenLeft_PageLoc     ;add carry to page location of left side of screen
-    temp0 = screenleftPageloc
+    temp2 = screenleftPageloc
     //> adc #$00                   ;and store as page location of middle
+    temp8 = temp2 + (if (temp7 > 0xFF) 1 else 0)
+    temp2 = temp8 and 0xFF
     //> sta $01
-    memory[0x1] = ((temp0 + (if (temp0 + 0x80 > 0xFF) 1 else 0)) and 0xFF).toUByte()
+    memory[0x1] = temp2.toUByte()
     //> lda SprObject_X_Position,x ;get horizontal coordinate
-    temp0 = sprobjectXPosition[X]
+    temp2 = sprobjectXPosition[X]
     //> cmp $02                    ;compare against middle horizontal coordinate
     //> lda SprObject_PageLoc,x    ;get page location
-    temp0 = sprobjectPageloc[X]
+    temp2 = sprobjectPageloc[X]
     //> sbc $01                    ;subtract from middle page location
+    temp9 = temp2 - memory[0x1].toInt() - (if (temp2 >= memory[0x2].toInt()) 0 else 1)
+    temp2 = temp9 and 0xFF
     //> bcc CheckLeftScreenBBox    ;if object is on the left side of the screen, branch
-    temp0 = (temp0 - memory[0x1].toInt() - (if (temp0 >= memory[0x2].toInt()) 0 else 1)) and 0xFF
-    if ((temp0 - memory[0x1].toInt() - (if (temp0 >= memory[0x2].toInt()) 0 else 1)) >= 0) {
+    if (temp9 >= 0) {
         //> lda BoundingBox_DR_XPos,y  ;check right-side edge of bounding box for offscreen
-        temp0 = boundingboxDrXpos[temp1]
+        temp2 = boundingboxDrXpos[temp3]
         //> bmi NoOfs                  ;coordinates, branch if still on the screen
-        if ((temp0 and 0x80) == 0) {
+        if ((temp2 and 0x80) == 0) {
             //> lda #$ff                   ;load offscreen value here to use on one or both horizontal sides
-            temp0 = 0xFF
+            temp2 = 0xFF
             //> ldx BoundingBox_UL_XPos,y  ;check left-side edge of bounding box for offscreen
             //> bmi SORte                  ;coordinates, and branch if still on the screen
-            temp4 = boundingboxUlXpos[temp1]
-            if ((boundingboxUlXpos[temp1] and 0x80) == 0) {
+            temp10 = boundingboxUlXpos[temp3]
+            if ((boundingboxUlXpos[temp3] and 0x80) == 0) {
                 //> sta BoundingBox_UL_XPos,y  ;store offscreen value for left side
-                boundingboxUlXpos[temp1] = temp0
+                boundingboxUlXpos[temp3] = temp2
             }
             //> SORte: sta BoundingBox_DR_XPos,y  ;store offscreen value for right side
-            boundingboxDrXpos[temp1] = temp0
+            boundingboxDrXpos[temp3] = temp2
         }
         //> NoOfs: ldx ObjectOffset           ;get object offset and leave
-        temp4 = objectOffset
+        temp10 = objectOffset
         //> rts
         return
     } else {
         //> CheckLeftScreenBBox:
         //> lda BoundingBox_UL_XPos,y  ;check left-side edge of bounding box for offscreen
-        temp0 = boundingboxUlXpos[temp1]
+        temp2 = boundingboxUlXpos[temp3]
         //> bpl NoOfs2                 ;coordinates, and branch if still on the screen
-        if ((temp0 and 0x80) != 0) {
+        if ((temp2 and 0x80) != 0) {
             //> cmp #$a0                   ;check to see if left-side edge is in the middle of the
             //> bcc NoOfs2                 ;screen or really offscreen, and branch if still on
-            if (temp0 >= 0xA0) {
+            if (temp2 >= 0xA0) {
                 //> lda #$00
-                temp0 = 0x00
+                temp2 = 0x00
                 //> ldx BoundingBox_DR_XPos,y  ;check right-side edge of bounding box for offscreen
-                temp4 = boundingboxDrXpos[temp1]
+                temp10 = boundingboxDrXpos[temp3]
                 //> bpl SOLft                  ;coordinates, branch if still onscreen
-                if ((temp4 and 0x80) != 0) {
+                if ((temp10 and 0x80) != 0) {
                     //> sta BoundingBox_DR_XPos,y  ;store offscreen value for right side
-                    boundingboxDrXpos[temp1] = temp0
+                    boundingboxDrXpos[temp3] = temp2
                 }
                 //> SOLft:  sta BoundingBox_UL_XPos,y  ;store offscreen value for left side
-                boundingboxUlXpos[temp1] = temp0
+                boundingboxUlXpos[temp3] = temp2
             }
         }
     }
     //> NoOfs2: ldx ObjectOffset           ;get object offset and leave
-    temp4 = objectOffset
+    temp10 = objectOffset
     //> rts
     return
 }
@@ -13620,6 +21528,10 @@ fun largePlatformBoundBox(A: Int, X: Int) {
     var Y: Int = 0
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     var screenleftPageloc by MemoryByte(ScreenLeft_PageLoc)
     var screenleftXPos by MemoryByte(ScreenLeft_X_Pos)
@@ -13646,10 +21558,11 @@ fun largePlatformBoundBox(A: Int, X: Int) {
         //> txa                        ;add 1 to offset to properly address
         //> clc                        ;the enemy object memory locations
         //> adc #$01
+        temp0 = X + 0x01
         //> tax
         //> ldy #$01                   ;load 1 as offset here, same reason
         //> jsr BoundingBoxCore        ;do a sub to get the coordinates of the bounding box
-        boundingBoxCore((X + 0x01) and 0xFF, 0x01)
+        boundingBoxCore(temp0 and 0xFF, 0x01)
         //> jmp CheckRightScreenBBox   ;jump to handle offscreen coordinates of bounding box
     } else {
         //> MoveBoundBoxOffscreen:
@@ -13675,64 +21588,67 @@ fun largePlatformBoundBox(A: Int, X: Int) {
     //> lda ScreenLeft_X_Pos       ;add 128 pixels to left side of screen
     //> clc                        ;and store as horizontal coordinate of middle
     //> adc #$80
+    temp1 = screenleftXPos + 0x80
     //> sta $02
-    memory[0x2] = ((screenleftXPos + 0x80) and 0xFF).toUByte()
+    memory[0x2] = (temp1 and 0xFF).toUByte()
     //> lda ScreenLeft_PageLoc     ;add carry to page location of left side of screen
     //> adc #$00                   ;and store as page location of middle
+    temp2 = screenleftPageloc + (if (temp1 > 0xFF) 1 else 0)
     //> sta $01
-    memory[0x1] = ((screenleftPageloc + (if (screenleftXPos + 0x80 > 0xFF) 1 else 0)) and 0xFF).toUByte()
+    memory[0x1] = (temp2 and 0xFF).toUByte()
     //> lda SprObject_X_Position,x ;get horizontal coordinate
     //> cmp $02                    ;compare against middle horizontal coordinate
     //> lda SprObject_PageLoc,x    ;get page location
     //> sbc $01                    ;subtract from middle page location
+    temp3 = sprobjectPageloc[X] - memory[0x1].toInt() - (if (sprobjectXPosition[X] >= memory[0x2].toInt()) 0 else 1)
     //> bcc CheckLeftScreenBBox    ;if object is on the left side of the screen, branch
-    temp0 = (sprobjectPageloc[X] - memory[0x1].toInt() - (if (sprobjectXPosition[X] >= memory[0x2].toInt()) 0 else 1)) and 0xFF
-    if ((sprobjectPageloc[X] - memory[0x1].toInt() - (if (sprobjectXPosition[X] >= memory[0x2].toInt()) 0 else 1)) >= 0) {
+    temp4 = temp3 and 0xFF
+    if (temp3 >= 0) {
         //> lda BoundingBox_DR_XPos,y  ;check right-side edge of bounding box for offscreen
-        temp0 = boundingboxDrXpos[Y]
+        temp4 = boundingboxDrXpos[Y]
         //> bmi NoOfs                  ;coordinates, branch if still on the screen
-        if ((temp0 and 0x80) == 0) {
+        if ((temp4 and 0x80) == 0) {
             //> lda #$ff                   ;load offscreen value here to use on one or both horizontal sides
-            temp0 = 0xFF
+            temp4 = 0xFF
             //> ldx BoundingBox_UL_XPos,y  ;check left-side edge of bounding box for offscreen
             //> bmi SORte                  ;coordinates, and branch if still on the screen
-            temp1 = boundingboxUlXpos[Y]
+            temp5 = boundingboxUlXpos[Y]
             if ((boundingboxUlXpos[Y] and 0x80) == 0) {
                 //> sta BoundingBox_UL_XPos,y  ;store offscreen value for left side
-                boundingboxUlXpos[Y] = temp0
+                boundingboxUlXpos[Y] = temp4
             }
             //> SORte: sta BoundingBox_DR_XPos,y  ;store offscreen value for right side
-            boundingboxDrXpos[Y] = temp0
+            boundingboxDrXpos[Y] = temp4
         }
         //> NoOfs: ldx ObjectOffset           ;get object offset and leave
-        temp1 = objectOffset
+        temp5 = objectOffset
         //> rts
         return
     } else {
         //> CheckLeftScreenBBox:
         //> lda BoundingBox_UL_XPos,y  ;check left-side edge of bounding box for offscreen
-        temp0 = boundingboxUlXpos[Y]
+        temp4 = boundingboxUlXpos[Y]
         //> bpl NoOfs2                 ;coordinates, and branch if still on the screen
-        if ((temp0 and 0x80) != 0) {
+        if ((temp4 and 0x80) != 0) {
             //> cmp #$a0                   ;check to see if left-side edge is in the middle of the
             //> bcc NoOfs2                 ;screen or really offscreen, and branch if still on
-            if (temp0 >= 0xA0) {
+            if (temp4 >= 0xA0) {
                 //> lda #$00
-                temp0 = 0x00
+                temp4 = 0x00
                 //> ldx BoundingBox_DR_XPos,y  ;check right-side edge of bounding box for offscreen
-                temp1 = boundingboxDrXpos[Y]
+                temp5 = boundingboxDrXpos[Y]
                 //> bpl SOLft                  ;coordinates, branch if still onscreen
-                if ((temp1 and 0x80) != 0) {
+                if ((temp5 and 0x80) != 0) {
                     //> sta BoundingBox_DR_XPos,y  ;store offscreen value for right side
-                    boundingboxDrXpos[Y] = temp0
+                    boundingboxDrXpos[Y] = temp4
                 }
                 //> SOLft:  sta BoundingBox_UL_XPos,y  ;store offscreen value for left side
-                boundingboxUlXpos[Y] = temp0
+                boundingboxUlXpos[Y] = temp4
             }
         }
     }
     //> NoOfs2: ldx ObjectOffset           ;get object offset and leave
-    temp1 = objectOffset
+    temp5 = objectOffset
     //> rts
     return
 }
@@ -13742,6 +21658,10 @@ fun boundingBoxCore(X: Int, Y: Int) {
     var X: Int = X
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     val boundBoxCtrlData by MemoryByteIndexed(BoundBoxCtrlData)
     val boundingboxLrCorner by MemoryByteIndexed(BoundingBox_LR_Corner)
     val boundingboxUlCorner by MemoryByteIndexed(BoundingBox_UL_Corner)
@@ -13772,33 +21692,37 @@ fun boundingBoxCore(X: Int, Y: Int) {
     //> lda $01                     ;add the first number in the bounding box data to the
     //> clc                         ;relative horizontal coordinate using enemy object offset
     //> adc BoundBoxCtrlData,x      ;and store somewhere using same offset * 4
+    temp0 = memory[0x1].toInt() + boundBoxCtrlData[(((sprobjBoundboxctrl[X] shl 1) and 0xFF) shl 1) and 0xFF]
     //> sta BoundingBox_UL_Corner,y ;store here
-    boundingboxUlCorner[X] = (memory[0x1].toInt() + boundBoxCtrlData[(((sprobjBoundboxctrl[X] shl 1) and 0xFF) shl 1) and 0xFF]) and 0xFF
+    boundingboxUlCorner[X] = temp0 and 0xFF
     //> lda $01
     //> clc
     //> adc BoundBoxCtrlData+2,x    ;add the third number in the bounding box data to the
+    temp1 = memory[0x1].toInt() + boundBoxCtrlData[2 + ((((sprobjBoundboxctrl[X] shl 1) and 0xFF) shl 1) and 0xFF)]
     //> sta BoundingBox_LR_Corner,y ;relative horizontal coordinate and store
-    boundingboxLrCorner[X] = (memory[0x1].toInt() + boundBoxCtrlData[2 + ((((sprobjBoundboxctrl[X] shl 1) and 0xFF) shl 1) and 0xFF)]) and 0xFF
+    boundingboxLrCorner[X] = temp1 and 0xFF
     //> inx                         ;increment both offsets
-    temp0 = (((sprobjBoundboxctrl[X] shl 1) and 0xFF) shl 1) and 0xFF
-    temp0 = (temp0 + 1) and 0xFF
+    temp2 = (((sprobjBoundboxctrl[X] shl 1) and 0xFF) shl 1) and 0xFF
+    temp2 = (temp2 + 1) and 0xFF
     //> iny
     X = (X + 1) and 0xFF
     //> lda $02                     ;add the second number to the relative vertical coordinate
     //> clc                         ;using incremented offset and store using the other
     //> adc BoundBoxCtrlData,x      ;incremented offset
+    temp3 = memory[0x2].toInt() + boundBoxCtrlData[temp2]
     //> sta BoundingBox_UL_Corner,y
-    boundingboxUlCorner[X] = (memory[0x2].toInt() + boundBoxCtrlData[temp0]) and 0xFF
+    boundingboxUlCorner[X] = temp3 and 0xFF
     //> lda $02
     //> clc
     //> adc BoundBoxCtrlData+2,x    ;add the fourth number to the relative vertical coordinate
+    temp4 = memory[0x2].toInt() + boundBoxCtrlData[2 + temp2]
     //> sta BoundingBox_LR_Corner,y ;and store
-    boundingboxLrCorner[X] = (memory[0x2].toInt() + boundBoxCtrlData[2 + temp0]) and 0xFF
+    boundingboxLrCorner[X] = temp4 and 0xFF
     //> pla                         ;get original offset loaded into $00 * y from stack
-    temp1 = pull()
+    temp5 = pull()
     //> tay                         ;use as Y
     //> ldx $00                     ;get original offset and use as X again
-    temp0 = memory[0x0].toInt()
+    temp2 = memory[0x0].toInt()
     //> rts
     return
 }
@@ -13807,6 +21731,8 @@ fun boundingBoxCore(X: Int, Y: Int) {
 fun playerCollisionCore() {
     //> PlayerCollisionCore:
     //> ldx #$00     ;initialize X to use player's bounding box for comparison
+    // Fall-through tail call to sprObjectCollisionCore
+    sprObjectCollisionCore(0x00, Y)
 }
 
 // Decompiled from SprObjectCollisionCore
@@ -13913,6 +21839,7 @@ fun sprObjectCollisionCore(X: Int, Y: Int) {
 fun blockbufferchkEnemy(A: Int, X: Int) {
     var Y: Int = 0
     var temp0: Int = 0
+    var temp1: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     //> BlockBufferChk_Enemy:
     //> pha        ;save contents of A to stack
@@ -13920,12 +21847,13 @@ fun blockbufferchkEnemy(A: Int, X: Int) {
     //> txa
     //> clc        ;add 1 to X to run sub with enemy offset in mind
     //> adc #$01
+    temp0 = X + 0x01
     //> tax
     //> pla        ;pull A from stack and jump elsewhere
-    temp0 = pull()
+    temp1 = pull()
     //> jmp BBChk_E
     //> BBChk_E: jsr BlockBufferCollision  ;do collision detection subroutine for sprite object
-    blockBufferCollision(temp0, (X + 0x01) and 0xFF, Y)
+    blockBufferCollision(temp1, temp0 and 0xFF, Y)
     //> ldx ObjectOffset          ;get object offset
     //> cmp #$00                  ;check to see if object bumped into anything
     //> rts
@@ -13934,16 +21862,18 @@ fun blockbufferchkEnemy(A: Int, X: Int) {
 
 // Decompiled from BlockBufferChk_FBall
 fun blockbufferchkFball(X: Int) {
+    var temp0: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     //> BlockBufferChk_FBall:
     //> ldy #$1a                  ;set offset for block buffer adder data
     //> txa
     //> clc
     //> adc #$07                  ;add seven bytes to use
+    temp0 = X + 0x07
     //> tax
     //> ResJmpM: lda #$00                  ;set A to return vertical coordinate
     //> BBChk_E: jsr BlockBufferCollision  ;do collision detection subroutine for sprite object
-    blockBufferCollision(0x00, (X + 0x07) and 0xFF, 0x1A)
+    blockBufferCollision(0x00, temp0 and 0xFF, 0x1A)
     //> ldx ObjectOffset          ;get object offset
     //> cmp #$00                  ;check to see if object bumped into anything
     //> rts
@@ -13956,6 +21886,8 @@ fun blockbuffercolliFeet(Y: Int) {
     //> BlockBufferColli_Feet:
     //> iny            ;if branched here, increment to next set of adders
     Y = (Y + 1) and 0xFF
+    // Fall-through tail call to blockbuffercolliHead
+    blockbuffercolliHead()
 }
 
 // Decompiled from BlockBufferColli_Head
@@ -13963,6 +21895,8 @@ fun blockbuffercolliHead() {
     //> BlockBufferColli_Head:
     //> lda #$00       ;set flag to return vertical coordinate
     //> .db $2c        ;BIT instruction opcode
+    // Fall-through tail call to blockbuffercolliSide
+    blockbuffercolliSide()
 }
 
 // Decompiled from BlockBufferColli_Side
@@ -13970,17 +21904,23 @@ fun blockbuffercolliSide() {
     //> BlockBufferColli_Side:
     //> lda #$01       ;set flag to return horizontal coordinate
     //> ldx #$00       ;set offset for player object
+    // Fall-through tail call to blockBufferCollision
+    blockBufferCollision(0x01, 0x00, Y)
 }
 
 // Decompiled from BlockBufferCollision
 fun blockBufferCollision(A: Int, X: Int, Y: Int): Int {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp10: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
     var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     val blockbufferXAdder by MemoryByteIndexed(BlockBuffer_X_Adder)
     val blockbufferYAdder by MemoryByteIndexed(BlockBuffer_Y_Adder)
     val sprobjectPageloc by MemoryByteIndexed(SprObject_PageLoc)
@@ -13994,60 +21934,64 @@ fun blockBufferCollision(A: Int, X: Int, Y: Int): Int {
     //> lda BlockBuffer_X_Adder,y   ;add horizontal coordinate
     //> clc                         ;of object to value obtained using Y as offset
     //> adc SprObject_X_Position,x
+    temp0 = blockbufferXAdder[Y] + sprobjectXPosition[X]
     //> sta $05                     ;store here
-    memory[0x5] = ((blockbufferXAdder[Y] + sprobjectXPosition[X]) and 0xFF).toUByte()
+    memory[0x5] = (temp0 and 0xFF).toUByte()
     //> lda SprObject_PageLoc,x
     //> adc #$00                    ;add carry to page location
+    temp1 = sprobjectPageloc[X] + (if (temp0 > 0xFF) 1 else 0)
     //> and #$01                    ;get LSB, mask out all other bits
-    temp0 = (sprobjectPageloc[X] + (if (blockbufferXAdder[Y] + sprobjectXPosition[X] > 0xFF) 1 else 0)) and 0xFF and 0x01
+    temp2 = temp1 and 0xFF and 0x01
     //> lsr                         ;move to carry
-    temp0 = temp0 shr 1
+    temp2 = temp2 shr 1
     //> ora $05                     ;get stored value
-    temp1 = temp0 or memory[0x5].toInt()
+    temp3 = temp2 or memory[0x5].toInt()
     //> ror                         ;rotate carry to MSB of A
-    temp1 = temp1 shr 1 or if ((temp0 and 0x01) != 0) 0x80 else 0
+    temp3 = temp3 shr 1 or if ((temp2 and 0x01) != 0) 0x80 else 0
     //> lsr                         ;and effectively move high nybble to
-    temp1 = temp1 shr 1
+    temp3 = temp3 shr 1
     //> lsr                         ;lower, LSB which became MSB will be
-    temp1 = temp1 shr 1
+    temp3 = temp3 shr 1
     //> lsr                         ;d4 at this point
-    temp1 = temp1 shr 1
+    temp3 = temp3 shr 1
     //> jsr GetBlockBufferAddr      ;get address of block buffer into $06, $07
-    getBlockBufferAddr(temp1)
+    getBlockBufferAddr(temp3)
     //> ldy $04                     ;get old contents of Y
     //> lda SprObject_Y_Position,x  ;get vertical coordinate of object
     //> clc
     //> adc BlockBuffer_Y_Adder,y   ;add it to value obtained using Y as offset
+    temp4 = sprobjectYPosition[X] + blockbufferYAdder[memory[0x4].toInt()]
     //> and #%11110000              ;mask out low nybble
-    temp2 = (sprobjectYPosition[X] + blockbufferYAdder[memory[0x4].toInt()]) and 0xFF and 0xF0
+    temp5 = temp4 and 0xFF and 0xF0
     //> sec
     //> sbc #$20                    ;subtract 32 pixels for the status bar
+    temp6 = temp5 - 0x20
     //> sta $02                     ;store result here
-    memory[0x2] = ((temp2 - 0x20) and 0xFF).toUByte()
+    memory[0x2] = (temp6 and 0xFF).toUByte()
     //> tay                         ;use as offset for block buffer
     //> lda ($06),y                 ;check current content of block buffer
     //> sta $03                     ;and store here
-    memory[0x3] = memory[readWord(0x6) + ((temp2 - 0x20) and 0xFF)].toInt().toUByte()
+    memory[0x3] = memory[readWord(0x6) + (temp6 and 0xFF)].toInt().toUByte()
     //> ldy $04                     ;get old contents of Y again
     //> pla                         ;pull A from stack
-    temp3 = pull()
+    temp7 = pull()
     //> bne RetXC                   ;if A = 1, branch
-    temp4 = temp3
-    temp5 = memory[0x4].toInt()
-    if (temp3 == 0) {
+    temp8 = temp7
+    temp9 = memory[0x4].toInt()
+    if (temp7 == 0) {
         //> lda SprObject_Y_Position,x  ;if A = 0, load vertical coordinate
-        temp4 = sprobjectYPosition[X]
+        temp8 = sprobjectYPosition[X]
         //> jmp RetYC                   ;and jump
     } else {
         //> RetXC: lda SprObject_X_Position,x  ;otherwise load horizontal coordinate
-        temp4 = sprobjectXPosition[X]
+        temp8 = sprobjectXPosition[X]
     }
     //> RetYC: and #%00001111              ;and mask out high nybble
-    temp6 = temp4 and 0x0F
+    temp10 = temp8 and 0x0F
     //> sta $04                     ;store masked out result here
-    memory[0x4] = temp6.toUByte()
+    memory[0x4] = temp10.toUByte()
     //> lda $03                     ;get saved content of block buffer
-    temp4 = memory[0x3].toInt()
+    temp8 = memory[0x3].toInt()
     //> rts                         ;and leave
     return A
 }
@@ -14058,6 +22002,9 @@ fun drawVine(Y: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var enemyRelXpos by MemoryByte(Enemy_Rel_XPos)
     var enemyRelYpos by MemoryByte(Enemy_Rel_YPos)
     var vinestartYPosition by MemoryByte(VineStart_Y_Position)
@@ -14074,12 +22021,13 @@ fun drawVine(Y: Int) {
     //> lda Enemy_Rel_YPos         ;get relative vertical coordinate
     //> clc
     //> adc VineYPosAdder,y        ;add value using offset in Y to get value
+    temp0 = enemyRelYpos + vineYPosAdder[Y]
     //> ldx VineObjOffset,y        ;get offset to vine
     //> ldy Enemy_SprDataOffset,x  ;get sprite data offset
     //> sty $02                    ;store sprite data offset here
     memory[0x2] = (enemySprdataoffset[vineObjOffset[Y]] and 0xFF).toUByte()
     //> jsr SixSpriteStacker       ;stack six sprites on top of each other vertically
-    sixSpriteStacker((enemyRelYpos + vineYPosAdder[Y]) and 0xFF, enemySprdataoffset[vineObjOffset[Y]])
+    sixSpriteStacker(temp0 and 0xFF, enemySprdataoffset[vineObjOffset[Y]])
     //> lda Enemy_Rel_XPos         ;get relative horizontal coordinate
     //> sta Sprite_X_Position,y    ;store in first, third and fifth sprites
     spriteXPosition[enemySprdataoffset[vineObjOffset[Y]]] = enemyRelXpos
@@ -14089,12 +22037,13 @@ fun drawVine(Y: Int) {
     spriteXPosition[16 + enemySprdataoffset[vineObjOffset[Y]]] = enemyRelXpos
     //> clc
     //> adc #$06                   ;add six pixels to second, fourth and sixth sprites
+    temp1 = enemyRelXpos + 0x06
     //> sta Sprite_X_Position+4,y  ;to give characteristic staggered vine shape to
-    spriteXPosition[4 + enemySprdataoffset[vineObjOffset[Y]]] = (enemyRelXpos + 0x06) and 0xFF
+    spriteXPosition[4 + enemySprdataoffset[vineObjOffset[Y]]] = temp1 and 0xFF
     //> sta Sprite_X_Position+12,y ;our vertical stack of sprites
-    spriteXPosition[12 + enemySprdataoffset[vineObjOffset[Y]]] = (enemyRelXpos + 0x06) and 0xFF
+    spriteXPosition[12 + enemySprdataoffset[vineObjOffset[Y]]] = temp1 and 0xFF
     //> sta Sprite_X_Position+20,y
-    spriteXPosition[20 + enemySprdataoffset[vineObjOffset[Y]]] = (enemyRelXpos + 0x06) and 0xFF
+    spriteXPosition[20 + enemySprdataoffset[vineObjOffset[Y]]] = temp1 and 0xFF
     //> lda #%00100001             ;set bg priority and palette attribute bits
     //> sta Sprite_Attributes,y    ;set in first, third and fifth sprites
     spriteAttributes[enemySprdataoffset[vineObjOffset[Y]]] = 0x21
@@ -14103,73 +22052,75 @@ fun drawVine(Y: Int) {
     //> sta Sprite_Attributes+16,y
     spriteAttributes[16 + enemySprdataoffset[vineObjOffset[Y]]] = 0x21
     //> ora #%01000000             ;additionally, set horizontal flip bit
-    temp0 = 0x21 or 0x40
+    temp2 = 0x21 or 0x40
     //> sta Sprite_Attributes+4,y  ;for second, fourth and sixth sprites
-    spriteAttributes[4 + enemySprdataoffset[vineObjOffset[Y]]] = temp0
+    spriteAttributes[4 + enemySprdataoffset[vineObjOffset[Y]]] = temp2
     //> sta Sprite_Attributes+12,y
-    spriteAttributes[12 + enemySprdataoffset[vineObjOffset[Y]]] = temp0
+    spriteAttributes[12 + enemySprdataoffset[vineObjOffset[Y]]] = temp2
     //> sta Sprite_Attributes+20,y
-    spriteAttributes[20 + enemySprdataoffset[vineObjOffset[Y]]] = temp0
+    spriteAttributes[20 + enemySprdataoffset[vineObjOffset[Y]]] = temp2
     //> ldx #$05                   ;set tiles for six sprites
-    temp1 = 0x05
-    temp2 = enemySprdataoffset[vineObjOffset[Y]]
+    temp3 = 0x05
+    temp4 = enemySprdataoffset[vineObjOffset[Y]]
     do {
         //> VineTL:  lda #$e1                   ;set tile number for sprite
         //> sta Sprite_Tilenumber,y
-        spriteTilenumber[temp2] = 0xE1
+        spriteTilenumber[temp4] = 0xE1
         //> iny                        ;move offset to next sprite data
-        temp2 = (temp2 + 1) and 0xFF
+        temp4 = (temp4 + 1) and 0xFF
         //> iny
-        temp2 = (temp2 + 1) and 0xFF
+        temp4 = (temp4 + 1) and 0xFF
         //> iny
-        temp2 = (temp2 + 1) and 0xFF
+        temp4 = (temp4 + 1) and 0xFF
         //> iny
-        temp2 = (temp2 + 1) and 0xFF
+        temp4 = (temp4 + 1) and 0xFF
         //> dex                        ;move onto next sprite
-        temp1 = (temp1 - 1) and 0xFF
+        temp3 = (temp3 - 1) and 0xFF
         //> bpl VineTL                 ;loop until all sprites are done
-    } while ((temp1 and 0x80) == 0)
+    } while ((temp3 and 0x80) == 0)
     //> ldy $02                    ;get original offset
-    temp2 = memory[0x2].toInt()
+    temp4 = memory[0x2].toInt()
     //> lda $00                    ;get offset to vine adding data
     //> bne SkpVTop                ;if offset not zero, skip this part
-    temp3 = memory[0x0].toInt()
+    temp5 = memory[0x0].toInt()
     if (memory[0x0].toInt() == 0) {
         //> lda #$e0
-        temp3 = 0xE0
+        temp5 = 0xE0
         //> sta Sprite_Tilenumber,y    ;set other tile number for top of vine
-        spriteTilenumber[temp2] = temp3
+        spriteTilenumber[temp4] = temp5
     }
     //> SkpVTop: ldx #$00                   ;start with the first sprite again
-    temp1 = 0x00
-    while (temp1 != 0x06) {
-        //> lda #$f8
-        temp3 = 0xF8
-        //> sta Sprite_Y_Position,y    ;otherwise move sprite offscreen
-        spriteYPosition[temp2] = temp3
-        do {
-            //> ChkFTop: lda VineStart_Y_Position   ;get original starting vertical coordinate
-            temp3 = vinestartYPosition
-            //> sec
-            //> sbc Sprite_Y_Position,y    ;subtract top-most sprite's Y coordinate
-            //> cmp #$64                   ;if two coordinates are less than 100/$64 pixels
-            //> bcc NextVSp                ;apart, skip this to leave sprite alone
-            //> NextVSp: iny                        ;move offset to next OAM data
-            temp2 = (temp2 + 1) and 0xFF
-            //> iny
-            temp2 = (temp2 + 1) and 0xFF
-            //> iny
-            temp2 = (temp2 + 1) and 0xFF
-            //> iny
-            temp2 = (temp2 + 1) and 0xFF
-            //> inx                        ;move onto next sprite
-            temp1 = (temp1 + 1) and 0xFF
-            //> cpx #$06                   ;do this until all sprites are checked
-            //> bne ChkFTop
-        } while (temp1 != 0x06)
-    }
+    temp3 = 0x00
+    do {
+        //> ChkFTop: lda VineStart_Y_Position   ;get original starting vertical coordinate
+        temp5 = vinestartYPosition
+        //> sec
+        //> sbc Sprite_Y_Position,y    ;subtract top-most sprite's Y coordinate
+        temp6 = temp5 - spriteYPosition[temp4]
+        temp5 = temp6 and 0xFF
+        //> cmp #$64                   ;if two coordinates are less than 100/$64 pixels
+        //> bcc NextVSp                ;apart, skip this to leave sprite alone
+        if (temp5 >= 0x64) {
+            //> lda #$f8
+            temp5 = 0xF8
+            //> sta Sprite_Y_Position,y    ;otherwise move sprite offscreen
+            spriteYPosition[temp4] = temp5
+        }
+        //> NextVSp: iny                        ;move offset to next OAM data
+        temp4 = (temp4 + 1) and 0xFF
+        //> iny
+        temp4 = (temp4 + 1) and 0xFF
+        //> iny
+        temp4 = (temp4 + 1) and 0xFF
+        //> iny
+        temp4 = (temp4 + 1) and 0xFF
+        //> inx                        ;move onto next sprite
+        temp3 = (temp3 + 1) and 0xFF
+        //> cpx #$06                   ;do this until all sprites are checked
+        //> bne ChkFTop
+    } while (temp3 != 0x06)
     //> ldy $00                    ;return offset set earlier
-    temp2 = memory[0x0].toInt()
+    temp4 = memory[0x0].toInt()
     //> rts
     return
 }
@@ -14178,6 +22129,7 @@ fun drawVine(Y: Int) {
 fun sixSpriteStacker(A: Int, Y: Int) {
     var Y: Int = Y
     var temp0: Int = 0
+    var temp1: Int = 0
     val spriteData by MemoryByteIndexed(Sprite_Data)
     //> SixSpriteStacker:
     //> ldx #$06           ;do six sprites
@@ -14187,6 +22139,7 @@ fun sixSpriteStacker(A: Int, Y: Int) {
         spriteData[Y] = A
         //> clc
         //> adc #$08           ;add eight pixels
+        temp1 = A + 0x08
         //> iny
         Y = (Y + 1) and 0xFF
         //> iny                ;move offset four bytes forward
@@ -14212,6 +22165,10 @@ fun drawHammer(X: Int) {
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var frameCounter by MemoryByte(FrameCounter)
     var miscOffscreenbits by MemoryByte(Misc_OffscreenBits)
     var miscRelXpos by MemoryByte(Misc_Rel_XPos)
@@ -14266,22 +22223,30 @@ fun drawHammer(X: Int) {
     temp0 = miscRelYpos
     //> clc
     //> adc FirstSprYPos,x          ;add first sprite vertical adder based on offset
+    temp5 = temp0 + firstSprYPos[temp3]
+    temp0 = temp5 and 0xFF
     //> sta Sprite_Y_Position,y     ;store as sprite Y coordinate for first sprite
-    spriteYPosition[temp1] = (temp0 + firstSprYPos[temp3]) and 0xFF
+    spriteYPosition[temp1] = temp0
     //> clc
     //> adc SecondSprYPos,x         ;add second sprite vertical adder based on offset
+    temp6 = temp0 + secondSprYPos[temp3]
+    temp0 = temp6 and 0xFF
     //> sta Sprite_Y_Position+4,y   ;store as sprite Y coordinate for second sprite
-    spriteYPosition[4 + temp1] = (((temp0 + firstSprYPos[temp3]) and 0xFF) + secondSprYPos[temp3]) and 0xFF
+    spriteYPosition[4 + temp1] = temp0
     //> lda Misc_Rel_XPos           ;get relative horizontal coordinate
     temp0 = miscRelXpos
     //> clc
     //> adc FirstSprXPos,x          ;add first sprite horizontal adder based on offset
+    temp7 = temp0 + firstSprXPos[temp3]
+    temp0 = temp7 and 0xFF
     //> sta Sprite_X_Position,y     ;store as sprite X coordinate for first sprite
-    spriteXPosition[temp1] = (temp0 + firstSprXPos[temp3]) and 0xFF
+    spriteXPosition[temp1] = temp0
     //> clc
     //> adc SecondSprXPos,x         ;add second sprite horizontal adder based on offset
+    temp8 = temp0 + secondSprXPos[temp3]
+    temp0 = temp8 and 0xFF
     //> sta Sprite_X_Position+4,y   ;store as sprite X coordinate for second sprite
-    spriteXPosition[4 + temp1] = (((temp0 + firstSprXPos[temp3]) and 0xFF) + secondSprXPos[temp3]) and 0xFF
+    spriteXPosition[4 + temp1] = temp0
     //> lda FirstSprTilenum,x
     temp0 = firstSprTilenum[temp3]
     //> sta Sprite_Tilenumber,y     ;get and store tile number of first sprite
@@ -14301,10 +22266,10 @@ fun drawHammer(X: Int) {
     //> lda Misc_OffscreenBits
     temp0 = miscOffscreenbits
     //> and #%11111100              ;check offscreen bits
-    temp5 = temp0 and 0xFC
+    temp9 = temp0 and 0xFC
     //> beq NoHOffscr               ;if all bits clear, leave object alone
-    temp0 = temp5
-    if (temp5 != 0) {
+    temp0 = temp9
+    if (temp9 != 0) {
         //> lda #$00
         temp0 = 0x00
         //> sta Misc_State,x            ;otherwise nullify misc object state
@@ -14324,6 +22289,10 @@ fun flagpoleGfxHandler(X: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
     var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
     var enemyRelXpos by MemoryByte(Enemy_Rel_XPos)
     var flagpoleCollisionYPos by MemoryByte(FlagpoleCollisionYPos)
@@ -14344,20 +22313,23 @@ fun flagpoleGfxHandler(X: Int) {
     spriteXPosition[enemySprdataoffset[X]] = enemyRelXpos
     //> clc
     //> adc #$08                       ;add eight pixels and store
+    temp0 = enemyRelXpos + 0x08
     //> sta Sprite_X_Position+4,y      ;as X coordinate for second and third sprites
-    spriteXPosition[4 + enemySprdataoffset[X]] = (enemyRelXpos + 0x08) and 0xFF
+    spriteXPosition[4 + enemySprdataoffset[X]] = temp0 and 0xFF
     //> sta Sprite_X_Position+8,y
-    spriteXPosition[8 + enemySprdataoffset[X]] = (enemyRelXpos + 0x08) and 0xFF
+    spriteXPosition[8 + enemySprdataoffset[X]] = temp0 and 0xFF
     //> clc
     //> adc #$0c                       ;add twelve more pixels and
+    temp1 = (temp0 and 0xFF) + 0x0C
     //> sta $05                        ;store here to be used later by floatey number
-    memory[0x5] = ((((enemyRelXpos + 0x08) and 0xFF) + 0x0C) and 0xFF).toUByte()
+    memory[0x5] = (temp1 and 0xFF).toUByte()
     //> lda Enemy_Y_Position,x         ;get vertical coordinate
     //> jsr DumpTwoSpr                 ;and do sub to dump into first and second sprites
     dumpTwoSpr(enemyYPosition[X], enemySprdataoffset[X])
     //> adc #$08                       ;add eight pixels
+    temp2 = enemyYPosition[X] + 0x08 + (if (temp1 > 0xFF) 1 else 0)
     //> sta Sprite_Y_Position+8,y      ;and store into third sprite
-    spriteYPosition[8 + enemySprdataoffset[X]] = (enemyYPosition[X] + 0x08 + (if (((enemyRelXpos + 0x08) and 0xFF) + 0x0C > 0xFF) 1 else 0)) and 0xFF
+    spriteYPosition[8 + enemySprdataoffset[X]] = temp2 and 0xFF
     //> lda FlagpoleFNum_Y_Pos         ;get vertical coordinate for floatey number
     //> sta $02                        ;store it here
     memory[0x2] = flagpolefnumYPos.toUByte()
@@ -14382,39 +22354,45 @@ fun flagpoleGfxHandler(X: Int) {
     spriteTilenumber[4 + enemySprdataoffset[X]] = 0x7F
     //> lda FlagpoleCollisionYPos      ;get vertical coordinate at time of collision
     //> beq ChkFlagOffscreen           ;if zero, branch ahead
-    temp0 = flagpoleCollisionYPos
-    temp1 = enemySprdataoffset[X]
+    temp3 = flagpoleCollisionYPos
+    temp4 = enemySprdataoffset[X]
     if (flagpoleCollisionYPos != 0) {
         //> tya
         //> clc                            ;add 12 bytes to sprite data offset
         //> adc #$0c
+        temp5 = temp4 + 0x0C
+        temp3 = temp5 and 0xFF
         //> tay                            ;put back in Y
         //> lda FlagpoleScore              ;get offset used to award points for touching flagpole
-        temp0 = flagpoleScore
+        temp3 = flagpoleScore
         //> asl                            ;multiply by 2 to get proper offset here
-        temp0 = (temp0 shl 1) and 0xFF
+        temp3 = (temp3 shl 1) and 0xFF
         //> tax
         //> lda FlagpoleScoreNumTiles,x    ;get appropriate tile data
-        temp0 = flagpoleScoreNumTiles[temp0]
+        temp3 = flagpoleScoreNumTiles[temp3]
         //> sta $00
-        memory[0x0] = temp0.toUByte()
+        memory[0x0] = temp3.toUByte()
         //> lda FlagpoleScoreNumTiles+1,x
-        temp0 = flagpoleScoreNumTiles[1 + temp0]
+        temp3 = flagpoleScoreNumTiles[1 + temp3]
         //> jsr DrawOneSpriteRow           ;use it to render floatey number
-        drawOneSpriteRow(temp0, temp0, (temp1 + 0x0C) and 0xFF)
+        drawOneSpriteRow(temp3, temp3, temp3)
     }
     //> ChkFlagOffscreen:
     //> ldx ObjectOffset               ;get object offset for flag
     //> ldy Enemy_SprDataOffset,x      ;get OAM data offset
-    temp1 = enemySprdataoffset[objectOffset]
+    temp4 = enemySprdataoffset[objectOffset]
     //> lda Enemy_OffscreenBits        ;get offscreen bits
-    temp0 = enemyOffscreenbits
+    temp3 = enemyOffscreenbits
     //> and #%00001110                 ;mask out all but d3-d1
-    temp2 = temp0 and 0x0E
+    temp6 = temp3 and 0x0E
     //> beq ExitDumpSpr                ;if none of these bits set, branch to leave
-    temp0 = temp2
-    temp3 = objectOffset
-    if (temp2 != 0) {
+    if (temp6 == 0) {
+        //  goto ExitDumpSpr
+        return
+    }
+    temp3 = temp6
+    temp7 = objectOffset
+    if (temp6 != 0) {
         //> ;-------------------------------------------------------------------------------------
     }
     //> ExitDumpSpr:
@@ -14426,6 +22404,8 @@ fun flagpoleGfxHandler(X: Int) {
 fun moveSixSpritesOffscreen() {
     //> MoveSixSpritesOffscreen:
     //> lda #$f8                  ;set offscreen coordinate if jumping here
+    // Fall-through tail call to dumpSixSpr
+    dumpSixSpr(0xF8, Y)
 }
 
 // Decompiled from DumpSixSpr
@@ -14436,6 +22416,8 @@ fun dumpSixSpr(A: Int, Y: Int) {
     spriteData[20 + Y] = A
     //> sta Sprite_Data+16,y      ;into third row sprites
     spriteData[16 + Y] = A
+    // Fall-through tail call to dumpFourSpr
+    dumpFourSpr(A, Y)
 }
 
 // Decompiled from DumpFourSpr
@@ -14444,6 +22426,8 @@ fun dumpFourSpr(A: Int, Y: Int) {
     //> DumpFourSpr:
     //> sta Sprite_Data+12,y      ;into second row sprites
     spriteData[12 + Y] = A
+    // Fall-through tail call to dumpThreeSpr
+    dumpThreeSpr(A, Y)
 }
 
 // Decompiled from DumpThreeSpr
@@ -14452,6 +22436,8 @@ fun dumpThreeSpr(A: Int, Y: Int) {
     //> DumpThreeSpr:
     //> sta Sprite_Data+8,y
     spriteData[8 + Y] = A
+    // Fall-through tail call to dumpTwoSpr
+    dumpTwoSpr(A, Y)
 }
 
 // Decompiled from DumpTwoSpr
@@ -14645,6 +22631,8 @@ fun jCoinGfxHandler(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
     var frameCounter by MemoryByte(FrameCounter)
     var miscRelXpos by MemoryByte(Misc_Rel_XPos)
     var objectOffset by MemoryByte(ObjectOffset)
@@ -14680,8 +22668,10 @@ fun jCoinGfxHandler(X: Int) {
     spriteXPosition[Y] = temp0
     //> clc
     //> adc #$08                  ;add eight pixels
+    temp1 = temp0 + 0x08
+    temp0 = temp1 and 0xFF
     //> sta Sprite_X_Position+4,y ;store as X coordinate for second sprite
-    spriteXPosition[4 + Y] = (temp0 + 0x08) and 0xFF
+    spriteXPosition[4 + Y] = temp0
     //> lda #$02
     temp0 = 0x02
     //> sta Sprite_Attributes,y   ;store attribute byte in both sprites
@@ -14709,8 +22699,10 @@ fun jCoinGfxHandler(X: Int) {
     spriteYPosition[miscSprdataoffset[X]] = temp0
     //> clc
     //> adc #$08                    ;add eight pixels
+    temp2 = temp0 + 0x08
+    temp0 = temp2 and 0xFF
     //> sta Sprite_Y_Position+4,y   ;store as Y coordinate for second sprite
-    spriteYPosition[4 + miscSprdataoffset[X]] = (temp0 + 0x08) and 0xFF
+    spriteYPosition[4 + miscSprdataoffset[X]] = temp0
     //> lda Misc_Rel_XPos           ;get relative horizontal coordinate
     temp0 = miscRelXpos
     //> sta Sprite_X_Position,y
@@ -14722,25 +22714,25 @@ fun jCoinGfxHandler(X: Int) {
     //> lsr                         ;divide by 2 to alter every other frame
     temp0 = temp0 shr 1
     //> and #%00000011              ;mask out d2-d1
-    temp1 = temp0 and 0x03
+    temp3 = temp0 and 0x03
     //> tax                         ;use as graphical offset
     //> lda JumpingCoinTiles,x      ;load tile number
-    temp0 = jumpingCoinTiles[temp1]
+    temp0 = jumpingCoinTiles[temp3]
     //> iny                         ;increment OAM data offset to write tile numbers
-    temp2 = miscSprdataoffset[X]
-    temp2 = (temp2 + 1) and 0xFF
+    temp4 = miscSprdataoffset[X]
+    temp4 = (temp4 + 1) and 0xFF
     //> jsr DumpTwoSpr              ;do sub to dump tile number into both sprites
-    dumpTwoSpr(temp0, temp2)
+    dumpTwoSpr(temp0, temp4)
     //> dey                         ;decrement to get old offset
-    temp2 = (temp2 - 1) and 0xFF
+    temp4 = (temp4 - 1) and 0xFF
     //> lda #$02
     temp0 = 0x02
     //> sta Sprite_Attributes,y     ;set attribute byte in first sprite
-    spriteAttributes[temp2] = temp0
+    spriteAttributes[temp4] = temp0
     //> lda #$82
     temp0 = 0x82
     //> sta Sprite_Attributes+4,y   ;set attribute byte with vertical flip in second sprite
-    spriteAttributes[4 + temp2] = temp0
+    spriteAttributes[4 + temp4] = temp0
     //> ldx ObjectOffset            ;get misc object offset
     //> ExJCGfx: rts                         ;leave
     return
@@ -14757,6 +22749,7 @@ fun drawPowerUp() {
     var temp6: Int = 0
     var temp7: Int = 0
     var temp8: Int = 0
+    var temp9: Int = 0
     var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
     var enemyRelXpos by MemoryByte(Enemy_Rel_XPos)
     var enemyRelYpos by MemoryByte(Enemy_Rel_YPos)
@@ -14775,17 +22768,18 @@ fun drawPowerUp() {
     //> lda Enemy_Rel_YPos         ;get relative vertical coordinate
     //> clc
     //> adc #$08                   ;add eight pixels
+    temp0 = enemyRelYpos + 0x08
     //> sta $02                    ;store result here
-    memory[0x2] = ((enemyRelYpos + 0x08) and 0xFF).toUByte()
+    memory[0x2] = (temp0 and 0xFF).toUByte()
     //> lda Enemy_Rel_XPos         ;get relative horizontal coordinate
     //> sta $05                    ;store here
     memory[0x5] = enemyRelXpos.toUByte()
     //> ldx PowerUpType            ;get power-up type
     //> lda PowerUpAttributes,x    ;get attribute data for power-up type
     //> ora Enemy_SprAttrib+5      ;add background priority bit if set
-    temp0 = powerUpAttributes[powerUpType] or enemySprattrib[5]
+    temp1 = powerUpAttributes[powerUpType] or enemySprattrib[5]
     //> sta $04                    ;store attributes here
-    memory[0x4] = temp0.toUByte()
+    memory[0x4] = temp1.toUByte()
     //> txa
     //> pha                        ;save power-up type to the stack
     push(powerUpType)
@@ -14799,161 +22793,161 @@ fun drawPowerUp() {
     memory[0x7] = 0x01.toUByte()
     //> sta $03                    ;init d1 of flip control
     memory[0x3] = 0x01.toUByte()
-    temp1 = powerUpType
-    temp2 = enemySprdataoffset[5]
+    temp2 = powerUpType
+    temp3 = enemySprdataoffset[5]
     do {
         //> PUpDrawLoop:
         //> lda PowerUpGfxTable,x      ;load left tile of power-up object
         //> sta $00
-        memory[0x0] = (powerUpGfxTable[temp1] and 0xFF).toUByte()
+        memory[0x0] = (powerUpGfxTable[temp2] and 0xFF).toUByte()
         //> lda PowerUpGfxTable+1,x    ;load right tile
         //> jsr DrawOneSpriteRow       ;branch to draw one row of our power-up object
-        drawOneSpriteRow(powerUpGfxTable[1 + temp1], temp1, temp2)
+        drawOneSpriteRow(powerUpGfxTable[1 + temp2], temp2, temp3)
         //> dec $07                    ;decrement counter
         memory[0x7] = ((memory[0x7].toInt() - 1) and 0xFF).toUByte()
         //> bpl PUpDrawLoop            ;branch until two rows are drawn
-    } while (((memory[0x7].toInt() - 1) and 0xFF and 0x80) == 0)
+    } while ((memory[0x7].toInt() and 0x80) == 0)
     //> ldy Enemy_SprDataOffset+5  ;get sprite data offset again
-    temp2 = enemySprdataoffset[5]
+    temp3 = enemySprdataoffset[5]
     //> pla                        ;pull saved power-up type from the stack
-    temp3 = pull()
+    temp4 = pull()
     //> beq PUpOfs                 ;if regular mushroom, branch, do not change colors or flip
-    if (temp3 == 0) {
+    if (temp4 == 0) {
         //  goto PUpOfs
         return
     }
-    temp4 = temp3
-    if (temp3 != 0) {
+    temp5 = temp4
+    if (temp4 != 0) {
         //> cmp #$03
         //> beq PUpOfs                 ;if 1-up mushroom, branch, do not change colors or flip
-        if (temp4 - 0x03 == 0) {
+        if (temp5 - 0x03 == 0) {
             //  goto PUpOfs
             return
         }
-        if (temp4 != 0x03) {
+        if (temp5 != 0x03) {
             //> sta $00                    ;store power-up type here now
-            memory[0x0] = temp4.toUByte()
+            memory[0x0] = temp5.toUByte()
             //> lda FrameCounter           ;get frame counter
-            temp4 = frameCounter
+            temp5 = frameCounter
             //> lsr                        ;divide by 2 to change colors every two frames
-            temp4 = temp4 shr 1
+            temp5 = temp5 shr 1
             //> and #%00000011             ;mask out all but d1 and d0 (previously d2 and d1)
-            temp5 = temp4 and 0x03
+            temp6 = temp5 and 0x03
             //> ora Enemy_SprAttrib+5      ;add background priority bit if any set
-            temp6 = temp5 or enemySprattrib[5]
+            temp7 = temp6 or enemySprattrib[5]
             //> sta Sprite_Attributes,y    ;set as new palette bits for top left and
-            spriteAttributes[temp2] = temp6
+            spriteAttributes[temp3] = temp7
             //> sta Sprite_Attributes+4,y  ;top right sprites for fire flower and star
-            spriteAttributes[4 + temp2] = temp6
+            spriteAttributes[4 + temp3] = temp7
             //> ldx $00
-            temp1 = memory[0x0].toInt()
+            temp2 = memory[0x0].toInt()
             //> dex                        ;check power-up type for fire flower
-            temp1 = (temp1 - 1) and 0xFF
+            temp2 = (temp2 - 1) and 0xFF
             //> beq FlipPUpRightSide       ;if found, skip this part
-            temp4 = temp6
-            if (temp1 != 0) {
+            temp5 = temp7
+            if (temp2 != 0) {
                 //> sta Sprite_Attributes+8,y  ;otherwise set new palette bits  for bottom left
-                spriteAttributes[8 + temp2] = temp4
+                spriteAttributes[8 + temp3] = temp5
                 //> sta Sprite_Attributes+12,y ;and bottom right sprites as well for star only
-                spriteAttributes[12 + temp2] = temp4
+                spriteAttributes[12 + temp3] = temp5
             }
             //> FlipPUpRightSide:
             //> lda Sprite_Attributes+4,y
-            temp4 = spriteAttributes[4 + temp2]
+            temp5 = spriteAttributes[4 + temp3]
             //> ora #%01000000             ;set horizontal flip bit for top right sprite
-            temp7 = temp4 or 0x40
+            temp8 = temp5 or 0x40
             //> sta Sprite_Attributes+4,y
-            spriteAttributes[4 + temp2] = temp7
+            spriteAttributes[4 + temp3] = temp8
             //> lda Sprite_Attributes+12,y
-            temp4 = spriteAttributes[12 + temp2]
+            temp5 = spriteAttributes[12 + temp3]
             //> ora #%01000000             ;set horizontal flip bit for bottom right sprite
-            temp8 = temp4 or 0x40
+            temp9 = temp5 or 0x40
             //> sta Sprite_Attributes+12,y ;note these are only done for fire flower and star power-ups
-            spriteAttributes[12 + temp2] = temp8
+            spriteAttributes[12 + temp3] = temp9
         }
     }
     //> PUpOfs: jmp SprObjectOffscrChk     ;jump to check to see if power-up is offscreen at all, then leave
     //> SprObjectOffscrChk:
     //> ldx ObjectOffset          ;get enemy buffer offset
-    temp1 = objectOffset
+    temp2 = objectOffset
     //> lda Enemy_OffscreenBits   ;check offscreen information
-    temp4 = enemyOffscreenbits
+    temp5 = enemyOffscreenbits
     //> lsr
-    temp4 = temp4 shr 1
+    temp5 = temp5 shr 1
     //> lsr                       ;shift three times to the right
-    temp4 = temp4 shr 1
+    temp5 = temp5 shr 1
     //> lsr                       ;which puts d2 into carry
-    temp4 = temp4 shr 1
+    temp5 = temp5 shr 1
     //> pha                       ;save to stack
-    push(temp4)
+    push(temp5)
     //> bcc LcChk                 ;branch if not set
-    if ((temp4 and 0x01) != 0) {
+    if ((temp5 and 0x01) != 0) {
         //> lda #$04                  ;set for right column sprites
-        temp4 = 0x04
+        temp5 = 0x04
         //> jsr MoveESprColOffscreen  ;and move them offscreen
-        moveESprColOffscreen(temp4, temp1)
+        moveESprColOffscreen(temp5, temp2)
     }
     //> LcChk:   pla                       ;get from stack
-    temp4 = pull()
+    temp5 = pull()
     //> lsr                       ;move d3 to carry
-    temp4 = temp4 shr 1
+    temp5 = temp5 shr 1
     //> pha                       ;save to stack
-    push(temp4)
+    push(temp5)
     //> bcc Row3C                 ;branch if not set
-    if ((temp4 and 0x01) != 0) {
+    if ((temp5 and 0x01) != 0) {
         //> lda #$00                  ;set for left column sprites,
-        temp4 = 0x00
+        temp5 = 0x00
         //> jsr MoveESprColOffscreen  ;move them offscreen
-        moveESprColOffscreen(temp4, temp1)
+        moveESprColOffscreen(temp5, temp2)
     }
     //> Row3C:   pla                       ;get from stack again
-    temp4 = pull()
+    temp5 = pull()
     //> lsr                       ;move d5 to carry this time
-    temp4 = temp4 shr 1
+    temp5 = temp5 shr 1
     //> lsr
-    temp4 = temp4 shr 1
+    temp5 = temp5 shr 1
     //> pha                       ;save to stack again
-    push(temp4)
+    push(temp5)
     //> bcc Row23C                ;branch if carry not set
-    if ((temp4 and 0x01) != 0) {
+    if ((temp5 and 0x01) != 0) {
         //> lda #$10                  ;set for third row of sprites
-        temp4 = 0x10
+        temp5 = 0x10
         //> jsr MoveESprRowOffscreen  ;and move them offscreen
-        moveESprRowOffscreen(temp4, temp1)
+        moveESprRowOffscreen(temp5, temp2)
     }
     //> Row23C:  pla                       ;get from stack
-    temp4 = pull()
+    temp5 = pull()
     //> lsr                       ;move d6 into carry
-    temp4 = temp4 shr 1
+    temp5 = temp5 shr 1
     //> pha                       ;save to stack
-    push(temp4)
+    push(temp5)
     //> bcc AllRowC
-    if ((temp4 and 0x01) != 0) {
+    if ((temp5 and 0x01) != 0) {
         //> lda #$08                  ;set for second and third rows
-        temp4 = 0x08
+        temp5 = 0x08
         //> jsr MoveESprRowOffscreen  ;move them offscreen
-        moveESprRowOffscreen(temp4, temp1)
+        moveESprRowOffscreen(temp5, temp2)
     }
     //> AllRowC: pla                       ;get from stack once more
-    temp4 = pull()
+    temp5 = pull()
     //> lsr                       ;move d7 into carry
-    temp4 = temp4 shr 1
+    temp5 = temp5 shr 1
     //> bcc ExEGHandler
-    if ((temp4 and 0x01) != 0) {
+    if ((temp5 and 0x01) != 0) {
         //> jsr MoveESprRowOffscreen  ;move all sprites offscreen (A should be 0 by now)
-        moveESprRowOffscreen(temp4, temp1)
+        moveESprRowOffscreen(temp5, temp2)
         //> lda Enemy_ID,x
-        temp4 = enemyId[temp1]
+        temp5 = enemyId[temp2]
         //> cmp #Podoboo              ;check enemy identifier for podoboo
         //> beq ExEGHandler           ;skip this part if found, we do not want to erase podoboo!
-        if (temp4 != Podoboo) {
+        if (temp5 != Podoboo) {
             //> lda Enemy_Y_HighPos,x     ;check high byte of vertical position
-            temp4 = enemyYHighpos[temp1]
+            temp5 = enemyYHighpos[temp2]
             //> cmp #$02                  ;if not yet past the bottom of the screen, branch
             //> bne ExEGHandler
-            if (temp4 == 0x02) {
+            if (temp5 == 0x02) {
                 //> jsr EraseEnemyObject      ;what it says
-                eraseEnemyObject(temp1)
+                eraseEnemyObject(temp2)
             }
         }
     }
@@ -14990,6 +22984,9 @@ fun enemyGfxHandler(X: Int) {
     var temp3: Int = 0
     var temp30: Int = 0
     var temp31: Int = 0
+    var temp32: Int = 0
+    var temp33: Int = 0
+    var temp34: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
     var temp6: Int = 0
@@ -15257,16 +23254,17 @@ fun enemyGfxHandler(X: Int) {
             //  goto DrawBowser
             return
         }
-        // Bowser defeated - subtract 16 from vertical coordinate and flip
-        //> lda $02                 ;subtract 16 pixels from
-        temp0 = memory[0x2].toInt()
-        //> sec                     ;saved vertical coordinate
-        //> sbc #$10
-        //> sta $02
-        memory[0x2] = ((temp0 - 0x10) and 0xFF).toUByte()
-        //> jmp FlipBowserOver      ;jump to set vertical flip flag
-        // FlipBowserOver handled elsewhere - return for now
-        return
+        while (true) {
+            //> lda $02                 ;subtract 16 pixels from
+            temp0 = memory[0x2].toInt()
+            //> sec                     ;saved vertical coordinate
+            //> sbc #$10
+            temp13 = temp0 - 0x10
+            temp0 = temp13 and 0xFF
+            //> sta $02
+            memory[0x2] = temp0.toUByte()
+            //> jmp FlipBowserOver      ;jump to set vertical flip flag
+        }
     }
     //> CheckForSpiny:
     //> cpx #$24               ;check if value loaded is for spiny
@@ -15298,14 +23296,14 @@ fun enemyGfxHandler(X: Int) {
             //> lda $ed
             temp0 = memory[0xED].toInt()
             //> and #%00100000            ;check for d5 set in enemy state
-            temp13 = temp0 and 0x20
+            temp14 = temp0 and 0x20
             //> bne NoLAFr                ;branch if set
-            if (!(temp13 == 0)) {
+            if (!(temp14 == 0)) {
                 //  goto NoLAFr
                 return
             }
-            temp0 = temp13
-            if (temp13 == 0) {
+            temp0 = temp14
+            if (temp14 == 0) {
                 //> lda FrenzyEnemyTimer
                 temp0 = frenzyEnemyTimer
                 //> cmp #$10                  ;check timer to see if we've reached a certain range
@@ -15373,10 +23371,10 @@ fun enemyGfxHandler(X: Int) {
                 //> lda $ed                ;note that this only gets performed if enemy state => $02
                 temp0 = memory[0xED].toInt()
                 //> and #%00100000         ;check saved enemy state for d5 set
-                temp14 = temp0 and 0x20
+                temp15 = temp0 and 0x20
                 //> bne CheckForHammerBro  ;branch if set
-                temp0 = temp14
-                if (temp14 == 0) {
+                temp0 = temp15
+                if (temp15 == 0) {
                     //> ldx #$8a               ;load offset for defeated goomba
                     temp4 = 0x8A
                     //> dec $02                ;set different value and decrement saved vertical position
@@ -15398,10 +23396,10 @@ fun enemyGfxHandler(X: Int) {
         //> beq CheckToAnimateEnemy  ;branch if not in normal enemy state
         if (temp0 != 0) {
             //> and #%00001000
-            temp15 = temp0 and 0x08
+            temp16 = temp0 and 0x08
             //> beq CheckDefeatedState   ;if d3 not set, branch further away
-            temp0 = temp15
-            if (temp15 != 0) {
+            temp0 = temp16
+            if (temp16 != 0) {
                 //> ldx #$b4                 ;otherwise load offset for different frame
                 temp4 = 0xB4
                 //> bne CheckToAnimateEnemy  ;unconditional branch
@@ -15478,10 +23476,10 @@ fun enemyGfxHandler(X: Int) {
                         //> lda FrameCounter            ;load frame counter
                         temp0 = frameCounter
                         //> and EnemyAnimTimingBMask,y  ;mask it (partly residual, one byte not ever used)
-                        temp16 = temp0 and enemyAnimTimingBMask[temp1]
+                        temp17 = temp0 and enemyAnimTimingBMask[temp1]
                         //> bne CheckDefeatedState      ;branch if timing is off
-                        temp0 = temp16
-                        if (temp16 == 0) {
+                        temp0 = temp17
+                        if (temp17 == 0) {
                         }
                     }
                 }
@@ -15492,25 +23490,27 @@ fun enemyGfxHandler(X: Int) {
     //> lda $ed                 ;check saved enemy state
     temp0 = memory[0xED].toInt()
     //> and #%10100000          ;for d7 or d5, or check for timers stopped
-    temp17 = temp0 and 0xA0
+    temp18 = temp0 and 0xA0
     //> ora TimerControl
-    temp18 = temp17 or timerControl
+    temp19 = temp18 or timerControl
     //> bne CheckDefeatedState  ;if either condition true, branch
-    temp0 = temp18
-    if (temp18 == 0) {
+    temp0 = temp19
+    if (temp19 == 0) {
         //> txa
         //> clc
         //> adc #$06                ;add $06 to current enemy offset
+        temp20 = temp4 + 0x06
+        temp0 = temp20 and 0xFF
         //> tax                     ;to animate various enemy objects
     }
     //> CheckDefeatedState:
     //> lda $ed               ;check saved enemy state
     temp0 = memory[0xED].toInt()
     //> and #%00100000        ;for d5 set
-    temp19 = temp0 and 0x20
+    temp21 = temp0 and 0x20
     //> beq DrawEnemyObject   ;branch if not set
-    temp0 = temp19
-    if (temp19 != 0) {
+    temp0 = temp21
+    if (temp21 != 0) {
         //> lda $ef
         temp0 = memory[0xEF].toInt()
         //> cmp #$04              ;check for saved enemy object => $04
@@ -15553,13 +23553,13 @@ fun enemyGfxHandler(X: Int) {
             //> lda Sprite_Attributes,y    ;get attributes of first sprite we dealt with
             temp0 = spriteAttributes[temp1]
             //> ora #%10000000             ;set bit for vertical flip
-            temp20 = temp0 or 0x80
+            temp22 = temp0 or 0x80
             //> iny
             temp1 = (temp1 + 1) and 0xFF
             //> iny                        ;increment two bytes so that we store the vertical flip
             temp1 = (temp1 + 1) and 0xFF
             //> jsr DumpSixSpr             ;in attribute bytes of enemy obj sprite data
-            dumpSixSpr(temp20, temp1)
+            dumpSixSpr(temp22, temp1)
             //> dey
             temp1 = (temp1 - 1) and 0xFF
             //> dey                        ;now go back to the Y coordinate offset
@@ -15581,6 +23581,8 @@ fun enemyGfxHandler(X: Int) {
                         //> txa
                         //> clc
                         //> adc #$08                   ;if not selected objects or => $15, set
+                        temp23 = temp4 + 0x08
+                        temp0 = temp23 and 0xFF
                         //> tax                        ;offset in X for next row
                     }
                 }
@@ -15667,21 +23669,21 @@ fun enemyGfxHandler(X: Int) {
                 //> lda Sprite_Attributes,y     ;load attribute bits of first sprite
                 temp0 = spriteAttributes[temp1]
                 //> and #%10100011
-                temp21 = temp0 and 0xA3
+                temp24 = temp0 and 0xA3
                 //> sta Sprite_Attributes,y     ;save vertical flip, priority, and palette bits
-                spriteAttributes[temp1] = temp21
+                spriteAttributes[temp1] = temp24
                 //> sta Sprite_Attributes+8,y   ;in left sprite column of enemy object OAM data
-                spriteAttributes[8 + temp1] = temp21
+                spriteAttributes[8 + temp1] = temp24
                 //> sta Sprite_Attributes+16,y
-                spriteAttributes[16 + temp1] = temp21
+                spriteAttributes[16 + temp1] = temp24
                 //> ora #%01000000              ;set horizontal flip
-                temp22 = temp21 or 0x40
+                temp25 = temp24 or 0x40
                 //> cpx #$05                    ;check for state used by spiny's egg
                 //> bne EggExc                  ;if alternate state not set to $05, branch
-                temp0 = temp22
+                temp0 = temp25
                 if (temp4 == 0x05) {
                     //> ora #%10000000              ;otherwise set vertical flip
-                    temp23 = temp0 or 0x80
+                    temp26 = temp0 or 0x80
                 }
                 //> EggExc: sta Sprite_Attributes+4,y   ;set bits of right sprite column
                 spriteAttributes[4 + temp1] = temp0
@@ -15695,17 +23697,17 @@ fun enemyGfxHandler(X: Int) {
                     //> lda Sprite_Attributes+8,y   ;get second row left sprite attributes
                     temp0 = spriteAttributes[8 + temp1]
                     //> ora #%10000000
-                    temp24 = temp0 or 0x80
+                    temp27 = temp0 or 0x80
                     //> sta Sprite_Attributes+8,y   ;store bits with vertical flip in
-                    spriteAttributes[8 + temp1] = temp24
+                    spriteAttributes[8 + temp1] = temp27
                     //> sta Sprite_Attributes+16,y  ;second and third row left sprites
-                    spriteAttributes[16 + temp1] = temp24
+                    spriteAttributes[16 + temp1] = temp27
                     //> ora #%01000000
-                    temp25 = temp24 or 0x40
+                    temp28 = temp27 or 0x40
                     //> sta Sprite_Attributes+12,y  ;store with horizontal and vertical flip in
-                    spriteAttributes[12 + temp1] = temp25
+                    spriteAttributes[12 + temp1] = temp28
                     //> sta Sprite_Attributes+20,y  ;second and third row right sprites
-                    spriteAttributes[20 + temp1] = temp25
+                    spriteAttributes[20 + temp1] = temp28
                 }
             }
             //> CheckToMirrorLakitu:
@@ -15721,37 +23723,29 @@ fun enemyGfxHandler(X: Int) {
                     //> lda Sprite_Attributes+16,y  ;save vertical flip and palette bits
                     temp0 = spriteAttributes[16 + temp1]
                     //> and #%10000001              ;in third row left sprite
-                    temp26 = temp0 and 0x81
+                    temp29 = temp0 and 0x81
                     //> sta Sprite_Attributes+16,y
-                    spriteAttributes[16 + temp1] = temp26
+                    spriteAttributes[16 + temp1] = temp29
                     //> lda Sprite_Attributes+20,y  ;set horizontal flip and palette bits
                     temp0 = spriteAttributes[20 + temp1]
                     //> ora #%01000001              ;in third row right sprite
-                    temp27 = temp0 or 0x41
+                    temp30 = temp0 or 0x41
                     //> sta Sprite_Attributes+20,y
-                    spriteAttributes[20 + temp1] = temp27
+                    spriteAttributes[20 + temp1] = temp30
                     //> ldx FrenzyEnemyTimer        ;check timer
                     temp4 = frenzyEnemyTimer
                     //> cpx #$10
                     //> bcs SprObjectOffscrChk      ;branch if timer has not reached a certain range
-                    if (temp4 >= 0x10) {
-                        //  goto SprObjectOffscrChk
-                        return
-                    }
-                    temp0 = temp27
+                    temp0 = temp30
                     if (!(temp4 >= 0x10)) {
                         //> sta Sprite_Attributes+12,y  ;otherwise set same for second row right sprite
                         spriteAttributes[12 + temp1] = temp0
                         //> and #%10000001
-                        temp28 = temp0 and 0x81
+                        temp31 = temp0 and 0x81
                         //> sta Sprite_Attributes+8,y   ;preserve vertical flip and palette bits for left sprite
-                        spriteAttributes[8 + temp1] = temp28
+                        spriteAttributes[8 + temp1] = temp31
                         //> bcc SprObjectOffscrChk      ;unconditional branch
-                        if (!(temp4 >= 0x10)) {
-                            //  goto SprObjectOffscrChk
-                            return
-                        }
-                        temp0 = temp28
+                        temp0 = temp31
                         if (temp4 >= 0x10) {
                         }
                     }
@@ -15759,25 +23753,21 @@ fun enemyGfxHandler(X: Int) {
                 //> NVFLak: lda Sprite_Attributes,y     ;get first row left sprite attributes
                 temp0 = spriteAttributes[temp1]
                 //> and #%10000001
-                temp29 = temp0 and 0x81
+                temp32 = temp0 and 0x81
                 //> sta Sprite_Attributes,y     ;save vertical flip and palette bits
-                spriteAttributes[temp1] = temp29
+                spriteAttributes[temp1] = temp32
                 //> lda Sprite_Attributes+4,y   ;get first row right sprite attributes
                 temp0 = spriteAttributes[4 + temp1]
                 //> ora #%01000001              ;set horizontal flip and palette bits
-                temp30 = temp0 or 0x41
+                temp33 = temp0 or 0x41
                 //> sta Sprite_Attributes+4,y   ;note that vertical flip is left as-is
-                spriteAttributes[4 + temp1] = temp30
+                spriteAttributes[4 + temp1] = temp33
             }
             //> CheckToMirrorJSpring:
             //> lda $ef                     ;check for jumpspring object (any frame)
             temp0 = memory[0xEF].toInt()
             //> cmp #$18
             //> bcc SprObjectOffscrChk      ;branch if not jumpspring object at all
-            if (!(temp0 >= 0x18)) {
-                //  goto SprObjectOffscrChk
-                return
-            }
             if (temp0 >= 0x18) {
                 //> lda #$82
                 temp0 = 0x82
@@ -15786,11 +23776,11 @@ fun enemyGfxHandler(X: Int) {
                 //> sta Sprite_Attributes+16,y  ;second and third row left sprites
                 spriteAttributes[16 + temp1] = temp0
                 //> ora #%01000000
-                temp31 = temp0 or 0x40
+                temp34 = temp0 or 0x40
                 //> sta Sprite_Attributes+12,y  ;set, in addition to those, horizontal flip
-                spriteAttributes[12 + temp1] = temp31
+                spriteAttributes[12 + temp1] = temp34
                 //> sta Sprite_Attributes+20,y  ;for second and third row right sprites
-                spriteAttributes[20 + temp1] = temp31
+                spriteAttributes[20 + temp1] = temp34
             }
         }
     }
@@ -15891,6 +23881,8 @@ fun drawEnemyObjRow(X: Int) {
     //> sta $00
     memory[0x0] = (enemyGraphicsTable[X] and 0xFF).toUByte()
     //> lda EnemyGraphicsTable+1,x
+    // Fall-through tail call to drawOneSpriteRow
+    drawOneSpriteRow(enemyGraphicsTable[1 + X], X, Y)
 }
 
 // Decompiled from DrawOneSpriteRow
@@ -15898,6 +23890,9 @@ fun drawOneSpriteRow(A: Int, X: Int, Y: Int) {
     var X: Int = X
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
     val spriteAttributes by MemoryByteIndexed(Sprite_Attributes)
     val spriteTilenumber by MemoryByteIndexed(Sprite_Tilenumber)
     val spriteXPosition by MemoryByteIndexed(Sprite_X_Position)
@@ -15943,17 +23938,23 @@ fun drawOneSpriteRow(A: Int, X: Int, Y: Int) {
             spriteXPosition[Y] = temp0
             //> clc                        ;add 8 pixels and store another to
             //> adc #$08                   ;put them side by side
+            temp2 = temp0 + 0x08
+            temp0 = temp2 and 0xFF
             //> sta Sprite_X_Position+4,y
-            spriteXPosition[4 + Y] = (temp0 + 0x08) and 0xFF
+            spriteXPosition[4 + Y] = temp0
             //> lda $02                    ;add eight pixels to the next y
             temp0 = memory[0x2].toInt()
             //> clc                        ;coordinate
             //> adc #$08
+            temp3 = temp0 + 0x08
+            temp0 = temp3 and 0xFF
             //> sta $02
-            memory[0x2] = ((temp0 + 0x08) and 0xFF).toUByte()
+            memory[0x2] = temp0.toUByte()
             //> tya                        ;add eight to the offset in Y to
             //> clc                        ;move to the next two sprites
             //> adc #$08
+            temp4 = Y + 0x08
+            temp0 = temp4 and 0xFF
             //> tay
             //> inx                        ;increment offset to return it to the
             X = (X + 1) and 0xFF
@@ -15975,10 +23976,12 @@ fun drawOneSpriteRow(A: Int, X: Int, Y: Int) {
 
 // Decompiled from MoveESprRowOffscreen
 fun moveESprRowOffscreen(A: Int, X: Int) {
+    var temp0: Int = 0
     val enemySprdataoffset by MemoryByteIndexed(Enemy_SprDataOffset)
     //> MoveESprRowOffscreen:
     //> clc                         ;add A to enemy object OAM data offset
     //> adc Enemy_SprDataOffset,x
+    temp0 = A + enemySprdataoffset[X]
     //> tay                         ;use as offset
     //> lda #$f8
     //> jmp DumpTwoSpr              ;move first row of sprites offscreen
@@ -15986,16 +23989,18 @@ fun moveESprRowOffscreen(A: Int, X: Int) {
 
 // Decompiled from MoveESprColOffscreen
 fun moveESprColOffscreen(A: Int, X: Int) {
+    var temp0: Int = 0
     val enemySprdataoffset by MemoryByteIndexed(Enemy_SprDataOffset)
     val spriteData by MemoryByteIndexed(Sprite_Data)
     //> MoveESprColOffscreen:
     //> clc                         ;add A to enemy object OAM data offset
     //> adc Enemy_SprDataOffset,x
+    temp0 = A + enemySprdataoffset[X]
     //> tay                         ;use as offset
     //> jsr MoveColOffscreen        ;move first and second row sprites in column offscreen
-    moveColOffscreen((A + enemySprdataoffset[X]) and 0xFF)
+    moveColOffscreen(temp0 and 0xFF)
     //> sta Sprite_Data+16,y        ;move third row sprite in column offscreen
-    spriteData[16 + ((A + enemySprdataoffset[X]) and 0xFF)] = (A + enemySprdataoffset[X]) and 0xFF
+    spriteData[16 + (temp0 and 0xFF)] = temp0 and 0xFF
     //> rts
     return
 }
@@ -16122,6 +24127,8 @@ fun drawBlock(X: Int) {
     }
     //> PullOfsB:  pla                           ;pull offscreen bits from stack
     temp2 = pull()
+    // Fall-through tail call to chkLeftCo
+    chkLeftCo(temp2)
 }
 
 // Decompiled from ChkLeftCo
@@ -16159,8 +24166,15 @@ fun moveColOffscreen(Y: Int): Int {
 fun drawBrickChunks(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp10: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var blockOffscreenbits by MemoryByte(Block_OffscreenBits)
     var frameCounter by MemoryByte(FrameCounter)
     var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
@@ -16229,14 +24243,22 @@ fun drawBrickChunks(X: Int) {
     temp0 = blockOrigXpos[X]
     //> sec
     //> sbc ScreenLeft_X_Pos       ;subtract coordinate of left side from original coordinate
+    temp4 = temp0 - screenleftXPos
+    temp0 = temp4 and 0xFF
     //> sta $00                    ;store result as relative horizontal coordinate of original
-    memory[0x0] = ((temp0 - screenleftXPos) and 0xFF).toUByte()
+    memory[0x0] = temp0.toUByte()
     //> sec
     //> sbc Block_Rel_XPos         ;get difference of relative positions of original - current
+    temp5 = temp0 - blockRelXpos[0]
+    temp0 = temp5 and 0xFF
     //> adc $00                    ;add original relative position to result
+    temp6 = temp0 + memory[0x0].toInt() + (if (temp5 >= 0) 1 else 0)
+    temp0 = temp6 and 0xFF
     //> adc #$06                   ;plus 6 pixels to position second brick chunk correctly
+    temp7 = temp0 + 0x06 + (if (temp6 > 0xFF) 1 else 0)
+    temp0 = temp7 and 0xFF
     //> sta Sprite_X_Position+4,y  ;save into X coordinate of second sprite
-    spriteXPosition[4 + temp1] = (((((((temp0 - screenleftXPos) and 0xFF) - blockRelXpos) and 0xFF) + memory[0x0].toInt() + (if (((temp0 - screenleftXPos) and 0xFF) - blockRelXpos >= 0) 1 else 0)) and 0xFF) + 0x06 + (if (((((temp0 - screenleftXPos) and 0xFF) - blockRelXpos) and 0xFF) + memory[0x0].toInt() + (if (((temp0 - screenleftXPos) and 0xFF) - blockRelXpos >= 0) 1 else 0) > 0xFF) 1 else 0)) and 0xFF
+    spriteXPosition[4 + temp1] = temp0
     //> lda Block_Rel_YPos+1       ;get second block object's relative vertical coordinate
     temp0 = blockRelYpos[1]
     //> sta Sprite_Y_Position+8,y
@@ -16251,10 +24273,16 @@ fun drawBrickChunks(X: Int) {
     temp0 = memory[0x0].toInt()
     //> sec
     //> sbc Block_Rel_XPos+1       ;get difference of relative positions of original - current
+    temp8 = temp0 - blockRelXpos[1]
+    temp0 = temp8 and 0xFF
     //> adc $00                    ;add original relative position to result
+    temp9 = temp0 + memory[0x0].toInt() + (if (temp8 >= 0) 1 else 0)
+    temp0 = temp9 and 0xFF
     //> adc #$06                   ;plus 6 pixels to position fourth brick chunk correctly
+    temp10 = temp0 + 0x06 + (if (temp9 > 0xFF) 1 else 0)
+    temp0 = temp10 and 0xFF
     //> sta Sprite_X_Position+12,y ;save into X coordinate of fourth sprite
-    spriteXPosition[12 + temp1] = (((((temp0 - blockRelXpos[1]) and 0xFF) + memory[0x0].toInt() + (if (temp0 - blockRelXpos[1] >= 0) 1 else 0)) and 0xFF) + 0x06 + (if (((temp0 - blockRelXpos[1]) and 0xFF) + memory[0x0].toInt() + (if (temp0 - blockRelXpos[1] >= 0) 1 else 0) > 0xFF) 1 else 0)) and 0xFF
+    spriteXPosition[12 + temp1] = temp0
     //> lda Block_OffscreenBits    ;get offscreen bits for block object
     temp0 = blockOffscreenbits
     //> jsr ChkLeftCo              ;do sub to move left half of sprites offscreen if necessary
@@ -16337,6 +24365,10 @@ fun drawFirebar(Y: Int) {
 // Decompiled from DrawExplosion_Fireworks
 fun drawexplosionFireworks(A: Int, Y: Int) {
     var Y: Int = Y
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
     var fireballRelXpos by MemoryByte(Fireball_Rel_XPos)
     var fireballRelYpos by MemoryByte(Fireball_Rel_YPos)
     var objectOffset by MemoryByte(ObjectOffset)
@@ -16357,29 +24389,33 @@ fun drawexplosionFireworks(A: Int, Y: Int) {
     //> lda Fireball_Rel_YPos       ;get relative vertical coordinate
     //> sec                         ;subtract four pixels vertically
     //> sbc #$04                    ;for first and third sprites
+    temp0 = fireballRelYpos - 0x04
     //> sta Sprite_Y_Position,y
-    spriteYPosition[Y] = (fireballRelYpos - 0x04) and 0xFF
+    spriteYPosition[Y] = temp0 and 0xFF
     //> sta Sprite_Y_Position+8,y
-    spriteYPosition[8 + Y] = (fireballRelYpos - 0x04) and 0xFF
+    spriteYPosition[8 + Y] = temp0 and 0xFF
     //> clc                         ;add eight pixels vertically
     //> adc #$08                    ;for second and fourth sprites
+    temp1 = (temp0 and 0xFF) + 0x08
     //> sta Sprite_Y_Position+4,y
-    spriteYPosition[4 + Y] = (((fireballRelYpos - 0x04) and 0xFF) + 0x08) and 0xFF
+    spriteYPosition[4 + Y] = temp1 and 0xFF
     //> sta Sprite_Y_Position+12,y
-    spriteYPosition[12 + Y] = (((fireballRelYpos - 0x04) and 0xFF) + 0x08) and 0xFF
+    spriteYPosition[12 + Y] = temp1 and 0xFF
     //> lda Fireball_Rel_XPos       ;get relative horizontal coordinate
     //> sec                         ;subtract four pixels horizontally
     //> sbc #$04                    ;for first and second sprites
+    temp2 = fireballRelXpos - 0x04
     //> sta Sprite_X_Position,y
-    spriteXPosition[Y] = (fireballRelXpos - 0x04) and 0xFF
+    spriteXPosition[Y] = temp2 and 0xFF
     //> sta Sprite_X_Position+4,y
-    spriteXPosition[4 + Y] = (fireballRelXpos - 0x04) and 0xFF
+    spriteXPosition[4 + Y] = temp2 and 0xFF
     //> clc                         ;add eight pixels horizontally
     //> adc #$08                    ;for third and fourth sprites
+    temp3 = (temp2 and 0xFF) + 0x08
     //> sta Sprite_X_Position+8,y
-    spriteXPosition[8 + Y] = (((fireballRelXpos - 0x04) and 0xFF) + 0x08) and 0xFF
+    spriteXPosition[8 + Y] = temp3 and 0xFF
     //> sta Sprite_X_Position+12,y
-    spriteXPosition[12 + Y] = (((fireballRelXpos - 0x04) and 0xFF) + 0x08) and 0xFF
+    spriteXPosition[12 + Y] = temp3 and 0xFF
     //> lda #$02                    ;set palette attributes for all sprites, but
     //> sta Sprite_Attributes,y     ;set no flip at all for first sprite
     spriteAttributes[Y] = 0x02
@@ -16404,6 +24440,9 @@ fun drawSmallPlatform(X: Int) {
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
     var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
     var enemyRelXpos by MemoryByte(Enemy_Rel_XPos)
     var objectOffset by MemoryByte(ObjectOffset)
@@ -16435,97 +24474,100 @@ fun drawSmallPlatform(X: Int) {
     spriteXPosition[12 + temp0] = enemyRelXpos
     //> clc
     //> adc #$08                    ;add eight pixels
+    temp1 = enemyRelXpos + 0x08
     //> sta Sprite_X_Position+4,y   ;dump into second and fifth sprites
-    spriteXPosition[4 + temp0] = (enemyRelXpos + 0x08) and 0xFF
+    spriteXPosition[4 + temp0] = temp1 and 0xFF
     //> sta Sprite_X_Position+16,y
-    spriteXPosition[16 + temp0] = (enemyRelXpos + 0x08) and 0xFF
+    spriteXPosition[16 + temp0] = temp1 and 0xFF
     //> clc
     //> adc #$08                    ;add eight more pixels
+    temp2 = (temp1 and 0xFF) + 0x08
     //> sta Sprite_X_Position+8,y   ;dump into third and sixth sprites
-    spriteXPosition[8 + temp0] = (((enemyRelXpos + 0x08) and 0xFF) + 0x08) and 0xFF
+    spriteXPosition[8 + temp0] = temp2 and 0xFF
     //> sta Sprite_X_Position+20,y
-    spriteXPosition[20 + temp0] = (((enemyRelXpos + 0x08) and 0xFF) + 0x08) and 0xFF
+    spriteXPosition[20 + temp0] = temp2 and 0xFF
     //> lda Enemy_Y_Position,x      ;get vertical coordinate
     //> tax
     //> pha                         ;save to stack
     push(enemyYPosition[X])
     //> cpx #$20                    ;if vertical coordinate below status bar,
     //> bcs TopSP                   ;do not mess with it
-    temp1 = enemyYPosition[X]
-    temp2 = enemyYPosition[X]
+    temp3 = enemyYPosition[X]
+    temp4 = enemyYPosition[X]
     if (!(enemyYPosition[X] >= 0x20)) {
         //> lda #$f8                    ;otherwise move first three sprites offscreen
-        temp1 = 0xF8
+        temp3 = 0xF8
     }
     //> TopSP: jsr DumpThreeSpr            ;dump vertical coordinate into Y coordinates
-    dumpThreeSpr(temp1, temp0)
+    dumpThreeSpr(temp3, temp0)
     //> pla                         ;pull from stack
-    temp1 = pull()
+    temp3 = pull()
     //> clc
     //> adc #$80                    ;add 128 pixels
+    temp5 = temp3 + 0x80
+    temp3 = temp5 and 0xFF
     //> tax
     //> cpx #$20                    ;if below status bar (taking wrap into account)
     //> bcs BotSP                   ;then do not change altered coordinate
-    temp1 = (temp1 + 0x80) and 0xFF
-    temp2 = (temp1 + 0x80) and 0xFF
-    if (!(((temp1 + 0x80) and 0xFF) >= 0x20)) {
+    temp4 = temp3
+    if (!(temp3 >= 0x20)) {
         //> lda #$f8                    ;otherwise move last three sprites offscreen
-        temp1 = 0xF8
+        temp3 = 0xF8
     }
     //> BotSP: sta Sprite_Y_Position+12,y  ;dump vertical coordinate + 128 pixels
-    spriteYPosition[12 + temp0] = temp1
+    spriteYPosition[12 + temp0] = temp3
     //> sta Sprite_Y_Position+16,y  ;into Y coordinates
-    spriteYPosition[16 + temp0] = temp1
+    spriteYPosition[16 + temp0] = temp3
     //> sta Sprite_Y_Position+20,y
-    spriteYPosition[20 + temp0] = temp1
+    spriteYPosition[20 + temp0] = temp3
     //> lda Enemy_OffscreenBits     ;get offscreen bits
-    temp1 = enemyOffscreenbits
+    temp3 = enemyOffscreenbits
     //> pha                         ;save to stack
-    push(temp1)
+    push(temp3)
     //> and #%00001000              ;check d3
-    temp3 = temp1 and 0x08
+    temp6 = temp3 and 0x08
     //> beq SOfs
-    temp1 = temp3
-    if (temp3 != 0) {
+    temp3 = temp6
+    if (temp6 != 0) {
         //> lda #$f8                    ;if d3 was set, move first and
-        temp1 = 0xF8
+        temp3 = 0xF8
         //> sta Sprite_Y_Position,y     ;fourth sprites offscreen
-        spriteYPosition[temp0] = temp1
+        spriteYPosition[temp0] = temp3
         //> sta Sprite_Y_Position+12,y
-        spriteYPosition[12 + temp0] = temp1
+        spriteYPosition[12 + temp0] = temp3
     }
     //> SOfs:  pla                         ;move out and back into stack
-    temp1 = pull()
+    temp3 = pull()
     //> pha
-    push(temp1)
+    push(temp3)
     //> and #%00000100              ;check d2
-    temp4 = temp1 and 0x04
+    temp7 = temp3 and 0x04
     //> beq SOfs2
-    temp1 = temp4
-    if (temp4 != 0) {
+    temp3 = temp7
+    if (temp7 != 0) {
         //> lda #$f8                    ;if d2 was set, move second and
-        temp1 = 0xF8
+        temp3 = 0xF8
         //> sta Sprite_Y_Position+4,y   ;fifth sprites offscreen
-        spriteYPosition[4 + temp0] = temp1
+        spriteYPosition[4 + temp0] = temp3
         //> sta Sprite_Y_Position+16,y
-        spriteYPosition[16 + temp0] = temp1
+        spriteYPosition[16 + temp0] = temp3
     }
     //> SOfs2: pla                         ;get from stack
-    temp1 = pull()
+    temp3 = pull()
     //> and #%00000010              ;check d1
-    temp5 = temp1 and 0x02
+    temp8 = temp3 and 0x02
     //> beq ExSPl
-    temp1 = temp5
-    if (temp5 != 0) {
+    temp3 = temp8
+    if (temp8 != 0) {
         //> lda #$f8                    ;if d1 was set, move third and
-        temp1 = 0xF8
+        temp3 = 0xF8
         //> sta Sprite_Y_Position+8,y   ;sixth sprites offscreen
-        spriteYPosition[8 + temp0] = temp1
+        spriteYPosition[8 + temp0] = temp3
         //> sta Sprite_Y_Position+20,y
-        spriteYPosition[20 + temp0] = temp1
+        spriteYPosition[20 + temp0] = temp3
     }
     //> ExSPl: ldx ObjectOffset            ;get enemy object offset and leave
-    temp2 = objectOffset
+    temp4 = objectOffset
     //> rts
     return
 }
@@ -16588,6 +24630,8 @@ fun playerGfxHandler() {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var fireballThrowingTimer by MemoryByte(FireballThrowingTimer)
     var frameCounter by MemoryByte(FrameCounter)
     var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
@@ -16775,26 +24819,30 @@ fun playerGfxHandler() {
     temp0 = playerSprdataoffset
     //> clc
     //> adc #$18                      ;add 24 bytes to start at bottom row
+    temp5 = temp0 + 0x18
+    temp0 = temp5 and 0xFF
     //> tay                           ;set as offset here
-    temp2 = (temp0 + 0x18) and 0xFF
-    while ((temp3 and 0x80) == 0) {
-        //> jsr DumpTwoSpr                ;otherwise dump offscreen Y coordinate into sprite data
-        dumpTwoSpr((temp0 + 0x18) and 0xFF, temp2)
-        do {
-            //> PROfsLoop: lda #$f8                      ;load offscreen Y coordinate just in case
-            temp0 = 0xF8
-            //> lsr $00                       ;shift bit into carry
-            memory[0x0] = ((memory[0x0].toInt() shr 1) and 0xFF).toUByte()
-            //> bcc NPROffscr                 ;if bit not set, skip, do not move sprites
-            //> NPROffscr: tya
-            //> sec                           ;subtract eight bytes to do
-            //> sbc #$08                      ;next row up
-            //> tay
-            //> dex                           ;decrement row counter
-            temp3 = (temp3 - 1) and 0xFF
-            //> bpl PROfsLoop                 ;do this until all sprite rows are checked
-        } while ((temp3 and 0x80) == 0)
-    }
+    temp2 = temp0
+    do {
+        //> PROfsLoop: lda #$f8                      ;load offscreen Y coordinate just in case
+        temp0 = 0xF8
+        //> lsr $00                       ;shift bit into carry
+        memory[0x0] = ((memory[0x0].toInt() shr 1) and 0xFF).toUByte()
+        //> bcc NPROffscr                 ;if bit not set, skip, do not move sprites
+        if ((memory[0x0].toInt() and 0x01) != 0) {
+            //> jsr DumpTwoSpr                ;otherwise dump offscreen Y coordinate into sprite data
+            dumpTwoSpr(temp0, temp2)
+        }
+        //> NPROffscr: tya
+        //> sec                           ;subtract eight bytes to do
+        //> sbc #$08                      ;next row up
+        temp6 = temp2 - 0x08
+        temp0 = temp6 and 0xFF
+        //> tay
+        //> dex                           ;decrement row counter
+        temp3 = (temp3 - 1) and 0xFF
+        //> bpl PROfsLoop                 ;do this until all sprite rows are checked
+    } while ((temp3 and 0x80) == 0)
     //> rts                           ;then we are done!
     return
 }
@@ -16805,6 +24853,8 @@ fun findPlayerAction(A: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     var fireballThrowingTimer by MemoryByte(FireballThrowingTimer)
     var leftRightButtons by MemoryByte(Left_Right_Buttons)
     var playerAnimTimer by MemoryByte(PlayerAnimTimer)
@@ -16881,27 +24931,31 @@ fun findPlayerAction(A: Int) {
     temp0 = playerSprdataoffset
     //> clc
     //> adc #$18                      ;add 24 bytes to start at bottom row
+    temp3 = temp0 + 0x18
+    temp0 = temp3 and 0xFF
     //> tay                           ;set as offset here
-    temp3 = 0x03
-    temp1 = (temp0 + 0x18) and 0xFF
-    while ((temp3 and 0x80) == 0) {
-        //> jsr DumpTwoSpr                ;otherwise dump offscreen Y coordinate into sprite data
-        dumpTwoSpr((temp0 + 0x18) and 0xFF, temp1)
-        do {
-            //> PROfsLoop: lda #$f8                      ;load offscreen Y coordinate just in case
-            temp0 = 0xF8
-            //> lsr $00                       ;shift bit into carry
-            memory[0x0] = ((memory[0x0].toInt() shr 1) and 0xFF).toUByte()
-            //> bcc NPROffscr                 ;if bit not set, skip, do not move sprites
-            //> NPROffscr: tya
-            //> sec                           ;subtract eight bytes to do
-            //> sbc #$08                      ;next row up
-            //> tay
-            //> dex                           ;decrement row counter
-            temp3 = (temp3 - 1) and 0xFF
-            //> bpl PROfsLoop                 ;do this until all sprite rows are checked
-        } while ((temp3 and 0x80) == 0)
-    }
+    temp4 = 0x03
+    temp1 = temp0
+    do {
+        //> PROfsLoop: lda #$f8                      ;load offscreen Y coordinate just in case
+        temp0 = 0xF8
+        //> lsr $00                       ;shift bit into carry
+        memory[0x0] = ((memory[0x0].toInt() shr 1) and 0xFF).toUByte()
+        //> bcc NPROffscr                 ;if bit not set, skip, do not move sprites
+        if ((memory[0x0].toInt() and 0x01) != 0) {
+            //> jsr DumpTwoSpr                ;otherwise dump offscreen Y coordinate into sprite data
+            dumpTwoSpr(temp0, temp1)
+        }
+        //> NPROffscr: tya
+        //> sec                           ;subtract eight bytes to do
+        //> sbc #$08                      ;next row up
+        temp5 = temp1 - 0x08
+        temp0 = temp5 and 0xFF
+        //> tay
+        //> dex                           ;decrement row counter
+        temp4 = (temp4 - 1) and 0xFF
+        //> bpl PROfsLoop                 ;do this until all sprite rows are checked
+    } while ((temp4 and 0x80) == 0)
     //> rts                           ;then we are done!
     return
 }
@@ -16965,6 +25019,8 @@ fun renderPlayerSub(A: Int) {
     memory[0x4] = playerSprattrib.toUByte()
     //> ldx PlayerGfxOffset          ;load graphics table offset
     //> ldy Player_SprDataOffset     ;get player's sprite data offset
+    // Fall-through tail call to drawPlayerLoop
+    drawPlayerLoop(playerGfxOffset)
 }
 
 // Decompiled from DrawPlayerLoop
@@ -16982,7 +25038,7 @@ fun drawPlayerLoop(X: Int) {
         //> dec $07                      ;decrement rows of sprites to draw
         memory[0x7] = ((memory[0x7].toInt() - 1) and 0xFF).toUByte()
         //> bne DrawPlayerLoop           ;do this until all rows are drawn
-    } while (((memory[0x7].toInt() - 1) and 0xFF) != 0)
+    } while (memory[0x7].toInt() != 0)
     //> rts
     return
 }
@@ -16994,6 +25050,7 @@ fun processPlayerAction() {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
     var aBButtons by MemoryByte(A_B_Buttons)
     var crouchingFlag by MemoryByte(CrouchingFlag)
     var jumpSwimTimer by MemoryByte(JumpSwimTimer)
@@ -17176,10 +25233,11 @@ fun processPlayerAction() {
         temp0 = playerAnimCtrl
         //> clc                       ;add one to animation frame control
         //> adc #$01
+        temp5 = temp0 + 0x01
+        temp0 = temp5 and 0xFF
         //> cmp $00                   ;compare to upper extent
         //> bcc SetAnimC              ;if frame control + 1 < upper extent, use as next
-        temp0 = (temp0 + 0x01) and 0xFF
-        if (((temp0 + 0x01) and 0xFF) >= memory[0x0].toInt()) {
+        if (temp0 >= memory[0x0].toInt()) {
             //> lda #$00                  ;otherwise initialize frame control
             temp0 = 0x00
         }
@@ -17194,6 +25252,7 @@ fun processPlayerAction() {
 
 // Decompiled from GetCurrentAnimOffset
 fun getCurrentAnimOffset(Y: Int): Int {
+    var temp0: Int = 0
     var playerAnimCtrl by MemoryByte(PlayerAnimCtrl)
     val playerGfxTblOffsets by MemoryByteIndexed(PlayerGfxTblOffsets)
     //> GetCurrentAnimOffset:
@@ -17207,6 +25266,7 @@ fun getCurrentAnimOffset(Y: Int): Int {
     //> asl                        ;to add to our offset
     playerAnimCtrl = (playerAnimCtrl shl 1) and 0xFF
     //> adc PlayerGfxTblOffsets,y  ;add to offset to graphics table
+    temp0 = playerAnimCtrl + playerGfxTblOffsets[Y] + (if ((playerAnimCtrl and 0x80) != 0) 1 else 0)
     //> rts                        ;and return with result in A
     return A
 }
@@ -17214,6 +25274,7 @@ fun getCurrentAnimOffset(Y: Int): Int {
 // Decompiled from GetGfxOffsetAdder
 fun getGfxOffsetAdder(Y: Int) {
     var temp0: Int = 0
+    var temp1: Int = 0
     var playerSize by MemoryByte(PlayerSize)
     //> GetGfxOffsetAdder:
     //> lda PlayerSize  ;get player's size
@@ -17223,6 +25284,8 @@ fun getGfxOffsetAdder(Y: Int) {
         //> tya             ;for big player
         //> clc             ;otherwise add eight bytes to offset
         //> adc #$08        ;for small player
+        temp1 = Y + 0x08
+        temp0 = temp1 and 0xFF
         //> tay
     }
     //> SzOfs:  rts             ;go back
@@ -17235,6 +25298,8 @@ fun handleChangeSize() {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     var frameCounter by MemoryByte(FrameCounter)
     var playerAnimCtrl by MemoryByte(PlayerAnimCtrl)
     var playerChangeSizeFlag by MemoryByte(PlayerChangeSizeFlag)
@@ -17279,6 +25344,8 @@ fun handleChangeSize() {
         //> asl                        ;to add to our offset
         temp1 = (temp1 shl 1) and 0xFF
         //> adc PlayerGfxTblOffsets,y  ;add to offset to graphics table
+        temp3 = temp1 + playerGfxTblOffsets[temp2] + (if ((temp1 and 0x80) != 0) 1 else 0)
+        temp1 = temp3 and 0xFF
         //> rts                        ;and return with result in A
         return
     } else {
@@ -17286,13 +25353,15 @@ fun handleChangeSize() {
         //> tya                          ;add ten bytes to frame control as offset
         //> clc
         //> adc #$0a                     ;this thing apparently uses two of the swimming frames
+        temp4 = temp2 + 0x0A
+        temp1 = temp4 and 0xFF
         //> tax                          ;to draw the player shrinking
         //> ldy #$09                     ;load offset for small player swimming
         temp2 = 0x09
         //> lda ChangeSizeOffsetAdder,x  ;get what would normally be offset adder
-        temp1 = changeSizeOffsetAdder[(temp2 + 0x0A) and 0xFF]
+        temp1 = changeSizeOffsetAdder[temp1]
         //> bne ShrPlF                   ;and branch to use offset if nonzero
-        temp3 = (temp2 + 0x0A) and 0xFF
+        temp5 = temp1
         if (temp1 == 0) {
             //> ldy #$01                     ;otherwise load offset for big player swimming
             temp2 = 0x01
@@ -17462,20 +25531,24 @@ fun relativeBlockPosition(X: Int) {
     //> iny                          ;adjust other and get coordinates for other one
     temp0 = 0x04
     temp0 = (temp0 + 1) and 0xFF
+    // Fall-through tail call to variableObjOfsRelPos
+    variableObjOfsRelPos(0x09, X)
 }
 
 // Decompiled from VariableObjOfsRelPos
 fun variableObjOfsRelPos(A: Int, X: Int) {
     var Y: Int = 0
+    var temp0: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     //> VariableObjOfsRelPos:
     //> stx $00                     ;store value to add to A here
     memory[0x0] = X.toUByte()
     //> clc
     //> adc $00                     ;add A to value stored
+    temp0 = A + memory[0x0].toInt()
     //> tax                         ;use as enemy offset
     //> jsr GetObjRelativePosition
-    getObjRelativePosition((A + memory[0x0].toInt()) and 0xFF, Y)
+    getObjRelativePosition(temp0 and 0xFF, Y)
     //> ldx ObjectOffset            ;reload old object offset and leave
     //> rts
     return
@@ -17483,6 +25556,7 @@ fun variableObjOfsRelPos(A: Int, X: Int) {
 
 // Decompiled from GetObjRelativePosition
 fun getObjRelativePosition(X: Int, Y: Int) {
+    var temp0: Int = 0
     var screenleftXPos by MemoryByte(ScreenLeft_X_Pos)
     val sprobjectRelXpos by MemoryByteIndexed(SprObject_Rel_XPos)
     val sprobjectRelYpos by MemoryByteIndexed(SprObject_Rel_YPos)
@@ -17495,8 +25569,9 @@ fun getObjRelativePosition(X: Int, Y: Int) {
     //> lda SprObject_X_Position,x  ;load horizontal coordinate
     //> sec                         ;subtract left edge coordinate
     //> sbc ScreenLeft_X_Pos
+    temp0 = sprobjectXPosition[X] - screenleftXPos
     //> sta SprObject_Rel_XPos,y    ;store result here
-    sprobjectRelXpos[Y] = (sprobjectXPosition[X] - screenleftXPos) and 0xFF
+    sprobjectRelXpos[Y] = temp0 and 0xFF
     //> rts
     return
 }
@@ -17652,11 +25727,13 @@ fun getMiscOffscreenBits() {
 
 // Decompiled from GetProperObjOffset
 fun getProperObjOffset(X: Int, Y: Int) {
+    var temp0: Int = 0
     val objOffsetData by MemoryByteIndexed(ObjOffsetData)
     //> GetProperObjOffset:
     //> txa                  ;move offset to A
     //> clc
     //> adc ObjOffsetData,y  ;add amount of bytes to offset depending on setting in Y
+    temp0 = X + objOffsetData[Y]
     //> tax                  ;put back in X and leave
     //> rts
     return
@@ -17666,6 +25743,7 @@ fun getProperObjOffset(X: Int, Y: Int) {
 fun getEnemyOffscreenBits(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     val sprobjectOffscrbits by MemoryByteIndexed(SprObject_OffscrBits)
     //> GetEnemyOffscreenBits:
@@ -17677,27 +25755,28 @@ fun getEnemyOffscreenBits(X: Int) {
     memory[0x0] = X.toUByte()
     //> clc           ;add contents of X to A to get
     //> adc $00       ;appropriate offset, then give back to X
+    temp0 = 0x01 + memory[0x0].toInt()
     //> tax
     //> GetOffScreenBitsSet:
     //> tya                         ;save offscreen bits offset to stack for now
     //> pha
     push(0x01)
     //> jsr RunOffscrBitsSubs
-    runOffscrBitsSubs(0x01, (0x01 + memory[0x0].toInt()) and 0xFF)
+    runOffscrBitsSubs(0x01, temp0 and 0xFF)
     //> asl                         ;move low nybble to high nybble
     //> asl
     //> asl
     //> asl
     //> ora $00                     ;mask together with previously saved low nybble
-    temp0 = (((((((0x01 shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF or memory[0x0].toInt()
+    temp1 = (((((((0x01 shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF or memory[0x0].toInt()
     //> sta $00                     ;store both here
-    memory[0x0] = temp0.toUByte()
+    memory[0x0] = temp1.toUByte()
     //> pla                         ;get offscreen bits offset from stack
-    temp1 = pull()
+    temp2 = pull()
     //> tay
     //> lda $00                     ;get value here and store elsewhere
     //> sta SprObject_OffscrBits,y
-    sprobjectOffscrbits[temp1] = memory[0x0].toInt()
+    sprobjectOffscrbits[temp2] = memory[0x0].toInt()
     //> ldx ObjectOffset
     //> rts
     return
@@ -17707,6 +25786,7 @@ fun getEnemyOffscreenBits(X: Int) {
 fun getBlockOffscreenBits(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     val sprobjectOffscrbits by MemoryByteIndexed(SprObject_OffscrBits)
     //> GetBlockOffscreenBits:
@@ -17717,27 +25797,28 @@ fun getBlockOffscreenBits(X: Int) {
     memory[0x0] = X.toUByte()
     //> clc           ;add contents of X to A to get
     //> adc $00       ;appropriate offset, then give back to X
+    temp0 = 0x09 + memory[0x0].toInt()
     //> tax
     //> GetOffScreenBitsSet:
     //> tya                         ;save offscreen bits offset to stack for now
     //> pha
     push(0x04)
     //> jsr RunOffscrBitsSubs
-    runOffscrBitsSubs(0x04, (0x09 + memory[0x0].toInt()) and 0xFF)
+    runOffscrBitsSubs(0x04, temp0 and 0xFF)
     //> asl                         ;move low nybble to high nybble
     //> asl
     //> asl
     //> asl
     //> ora $00                     ;mask together with previously saved low nybble
-    temp0 = (((((((0x04 shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF or memory[0x0].toInt()
+    temp1 = (((((((0x04 shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF or memory[0x0].toInt()
     //> sta $00                     ;store both here
-    memory[0x0] = temp0.toUByte()
+    memory[0x0] = temp1.toUByte()
     //> pla                         ;get offscreen bits offset from stack
-    temp1 = pull()
+    temp2 = pull()
     //> tay
     //> lda $00                     ;get value here and store elsewhere
     //> sta SprObject_OffscrBits,y
-    sprobjectOffscrbits[temp1] = memory[0x0].toInt()
+    sprobjectOffscrbits[temp2] = memory[0x0].toInt()
     //> ldx ObjectOffset
     //> rts
     return
@@ -17746,9 +25827,11 @@ fun getBlockOffscreenBits(X: Int) {
 // Decompiled from RunOffscrBitsSubs
 fun runOffscrBitsSubs(A: Int, X: Int): Int {
     var A: Int = A
-    var temp0: Int = 0  // Y register
-    var temp1: Int = 0  // X register (offset)
-    var bufX: Int = X
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
     val defaultYOnscreenOfs by MemoryByteIndexed(DefaultYOnscreenOfs)
     val highPosUnitData by MemoryByteIndexed(HighPosUnitData)
     val sprobjectYHighpos by MemoryByteIndexed(SprObject_Y_HighPos)
@@ -17756,7 +25839,7 @@ fun runOffscrBitsSubs(A: Int, X: Int): Int {
     val yOffscreenBitsData by MemoryByteIndexed(YOffscreenBitsData)
     //> RunOffscrBitsSubs:
     //> jsr GetXOffscreenBits  ;do subroutine here
-    A = getXOffscreenBits(X)
+    getXOffscreenBits(X)
     //> lsr                    ;move high nybble to low
     A = A shr 1
     //> lsr
@@ -17773,71 +25856,60 @@ fun runOffscrBitsSubs(A: Int, X: Int): Int {
     memory[0x4] = X.toUByte()
     //> ldy #$01                     ;start with top of screen
     temp0 = 0x01
-    bufX = X
-
-    // YOfsLoop: Main loop - Y goes from 1 to 0, then exits
-    YOfsLoop@while (true) {
+    do {
         //> YOfsLoop: lda HighPosUnitData,y        ;load coordinate for edge of vertical unit
-        A = highPosUnitData[temp0]
         //> sec
         //> sbc SprObject_Y_Position,x   ;subtract from vertical coordinate of object
-        val diff = A - sprobjectYPosition[bufX]
+        temp1 = highPosUnitData[temp0] - sprobjectYPosition[X]
         //> sta $07                      ;store here
-        memory[0x7] = (diff and 0xFF).toUByte()
+        memory[0x7] = (temp1 and 0xFF).toUByte()
         //> lda #$01                     ;subtract one from vertical high byte of object
         //> sbc SprObject_Y_HighPos,x
-        val cmpResult = 0x01 - sprobjectYHighpos[bufX] - (if (diff < 0) 1 else 0)
-        A = cmpResult and 0xFF
+        temp2 = 0x01 - sprobjectYHighpos[X] - (if (temp1 >= 0) 0 else 1)
         //> ldx DefaultYOnscreenOfs,y    ;load offset value here
-        temp1 = defaultYOnscreenOfs[temp0]
         //> cmp #$00
         //> bmi YLdBData                 ;if under top of the screen or beyond bottom, branch
-        if ((cmpResult and 0x80) != 0) {
-            // YLdBData: Branch taken when comparison is negative
+        temp3 = temp2 and 0xFF
+        temp4 = defaultYOnscreenOfs[temp0]
+        if (!((temp2 and 0xFF) < 0)) {
             //> ldx DefaultYOnscreenOfs+1,y  ;if not, load alternate offset value here
-            temp1 = defaultYOnscreenOfs[1 + temp0]
+            temp4 = defaultYOnscreenOfs[1 + temp0]
             //> cmp #$01
-            //> bpl YLdBData2                 ;if one vertical unit or more above the screen, branch
-            if (cmpResult >= 1) {
-                // Skip DividePDiff - go directly to load bits
-            } else {
+            //> bpl YLdBData                 ;if one vertical unit or more above the screen, branch
+            if (temp3 - 0x01 < 0) {
                 //> lda #$20                     ;if no branching, load value here and store
+                temp3 = 0x20
                 //> sta $06
-                memory[0x6] = 0x20.toUByte()
+                memory[0x6] = temp3.toUByte()
                 //> lda #$04                     ;load some other value and execute subroutine
+                temp3 = 0x04
                 //> jsr DividePDiff
-                dividePDiff(0x04, temp0)
+                dividePDiff(temp3, temp0)
             }
-            //> YLdBData2: lda YOffscreenBitsData,x     ;get offscreen data bits using offset
-            A = yOffscreenBitsData[temp1]
-            //> ldx $04                      ;reobtain position in buffer
-            bufX = memory[0x4].toInt()
-            //> cmp #$00
-            //> bne ExYOfsBS                 ;if bits not zero, branch to leave
-            if (A != 0) {
-                return A  // ExYOfsBS - bits not zero, exit
-            }
-            // If bits are zero, fall through and continue with YOfsLoop
         }
-        //> dey                          ;otherwise, do bottom of the screen now
-        temp0 = (temp0 - 1) and 0xFF
-        //> bpl YOfsLoop
-        if ((temp0 and 0x80) != 0) {
-            // Y went negative, exit
-            break
+        //> YLdBData: lda YOffscreenBitsData,x     ;get offscreen data bits using offset
+        temp3 = yOffscreenBitsData[temp4]
+        //> ldx $04                      ;reobtain position in buffer
+        temp4 = memory[0x4].toInt()
+        //> cmp #$00
+        //> bne ExYOfsBS                 ;if bits not zero, branch to leave
+        if (temp3 == 0) {
+            //> dey                          ;otherwise, do bottom of the screen now
+            temp0 = (temp0 - 1) and 0xFF
+            //> bpl YOfsLoop
         }
-        // Continue YOfsLoop
-    }
+    } while (!flagN)
     //> ExYOfsBS: rts
     return A
 }
 
 // Decompiled from GetXOffscreenBits
 fun getXOffscreenBits(X: Int): Int {
-    var A: Int = 0
-    var temp0: Int = 0  // Y register
-    var temp1: Int = 0  // X register (offset)
-    var bufX: Int = X
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
     val defaultXOnscreenOfs by MemoryByteIndexed(DefaultXOnscreenOfs)
     val screenedgePageloc by MemoryByteIndexed(ScreenEdge_PageLoc)
     val screenedgeXPos by MemoryByteIndexed(ScreenEdge_X_Pos)
@@ -17849,62 +25921,49 @@ fun getXOffscreenBits(X: Int): Int {
     memory[0x4] = X.toUByte()
     //> ldy #$01                    ;start with right side of screen
     temp0 = 0x01
-    bufX = X
-
-    // XOfsLoop: Main loop - Y goes from 1 to 0, then exits
-    XOfsLoop@while (true) {
+    do {
         //> XOfsLoop: lda ScreenEdge_X_Pos,y      ;get pixel coordinate of edge
-        A = screenedgeXPos[temp0]
         //> sec                         ;get difference between pixel coordinate of edge
         //> sbc SprObject_X_Position,x  ;and pixel coordinate of object position
-        val diff = A - sprobjectXPosition[bufX]
+        temp1 = screenedgeXPos[temp0] - sprobjectXPosition[X]
         //> sta $07                     ;store here
-        memory[0x7] = (diff and 0xFF).toUByte()
+        memory[0x7] = (temp1 and 0xFF).toUByte()
         //> lda ScreenEdge_PageLoc,y    ;get page location of edge
-        A = screenedgePageloc[temp0]
         //> sbc SprObject_PageLoc,x     ;subtract from page location of object position
-        val cmpResult = A - sprobjectPageloc[bufX] - (if (diff < 0) 1 else 0)
-        A = cmpResult and 0xFF
+        temp2 = screenedgePageloc[temp0] - sprobjectPageloc[X] - (if (temp1 >= 0) 0 else 1)
         //> ldx DefaultXOnscreenOfs,y   ;load offset value here
-        temp1 = defaultXOnscreenOfs[temp0]
         //> cmp #$00
         //> bmi XLdBData                ;if beyond right edge or in front of left edge, branch
-        if ((cmpResult and 0x80) != 0) {
-            // XLdBData: Branch taken when comparison is negative
+        temp3 = temp2 and 0xFF
+        temp4 = defaultXOnscreenOfs[temp0]
+        if (!((temp2 and 0xFF) < 0)) {
             //> ldx DefaultXOnscreenOfs+1,y ;if not, load alternate offset value here
-            temp1 = defaultXOnscreenOfs[1 + temp0]
+            temp4 = defaultXOnscreenOfs[1 + temp0]
             //> cmp #$01
-            //> bpl XLdBData2                ;if one page or more to the left of either edge, branch
-            if (cmpResult >= 1) {
-                // Skip DividePDiff - go directly to load bits
-            } else {
+            //> bpl XLdBData                ;if one page or more to the left of either edge, branch
+            if (temp3 - 0x01 < 0) {
                 //> lda #$38                    ;if no branching, load value here and store
+                temp3 = 0x38
                 //> sta $06
-                memory[0x6] = 0x38.toUByte()
+                memory[0x6] = temp3.toUByte()
                 //> lda #$08                    ;load some other value and execute subroutine
+                temp3 = 0x08
                 //> jsr DividePDiff
-                dividePDiff(0x08, temp0)
+                dividePDiff(temp3, temp0)
             }
-            //> XLdBData2: lda XOffscreenBitsData,x    ;get bits here
-            A = xOffscreenBitsData[temp1]
-            //> ldx $04                     ;reobtain position in buffer
-            bufX = memory[0x4].toInt()
-            //> cmp #$00                    ;if bits not zero, branch to leave
-            //> bne ExXOfsBS
-            if (A != 0) {
-                return A  // ExXOfsBS - bits not zero, exit
-            }
-            // If bits are zero, fall through and continue with XOfsLoop (after this we continue the loop)
         }
-        //> dey                         ;otherwise, do left side of screen now
-        temp0 = (temp0 - 1) and 0xFF
-        //> bpl XOfsLoop                ;branch if not already done with left side
-        if ((temp0 and 0x80) != 0) {
-            // Y went negative, exit
-            break
+        //> XLdBData: lda XOffscreenBitsData,x    ;get bits here
+        temp3 = xOffscreenBitsData[temp4]
+        //> ldx $04                     ;reobtain position in buffer
+        temp4 = memory[0x4].toInt()
+        //> cmp #$00                    ;if bits not zero, branch to leave
+        //> bne ExXOfsBS
+        if (temp3 == 0) {
+            //> dey                         ;otherwise, do left side of screen now
+            temp0 = (temp0 - 1) and 0xFF
+            //> bpl XOfsLoop                ;branch if not already done with left side
         }
-        // Continue XOfsLoop
-    }
+    } while (!flagN)
     //> ExXOfsBS: rts
     return A
 }
@@ -17913,6 +25972,7 @@ fun getXOffscreenBits(X: Int): Int {
 fun dividePDiff(A: Int, Y: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
     //> DividePDiff:
     //> sta $05       ;store current value in A here
     memory[0x5] = A.toUByte()
@@ -17934,6 +25994,8 @@ fun dividePDiff(A: Int, Y: Int) {
         temp0 = temp1
         if (!(Y >= 0x01)) {
             //> adc $05       ;if not, add value to difference / 8
+            temp2 = temp0 + memory[0x5].toInt() + (if (Y >= 0x01) 1 else 0)
+            temp0 = temp2 and 0xFF
         }
         //> SetOscrO: tax           ;use as offset
     }
@@ -18057,7 +26119,7 @@ fun soundEngine() {
     //> bne SkipSoundSubroutines
     temp1 = 0x84
     temp2 = 0x7F
-    if (((squ1Sfxlencounter - 1) and 0xFF) == 0) {
+    if (squ1Sfxlencounter == 0) {
         //> lda #$00                  ;disable sound if in pause mode and
         temp0 = 0x00
         //> sta SND_MASTERCTRL_REG    ;not currently playing the pause sfx
@@ -18155,6 +26217,8 @@ fun playSqu1Sfx() {
     //> PlaySqu1Sfx:
     //> jsr Dump_Squ1_Regs     ;do sub to set ctrl regs for square 1, then set frequency regs
     dumpSqu1Regs(X, Y)
+    // Fall-through tail call to setfreqSqu1
+    setfreqSqu1(A)
 }
 
 // Decompiled from SetFreq_Squ1
@@ -18207,6 +26271,8 @@ fun playSqu2Sfx() {
     //> PlaySqu2Sfx:
     //> jsr Dump_Sq2_Regs      ;do sub to set ctrl regs for square 2, then set frequency regs
     dumpSq2Regs(X, Y)
+    // Fall-through tail call to setfreqSqu2
+    setfreqSqu2(A)
 }
 
 // Decompiled from SetFreq_Squ2
@@ -18275,84 +26341,97 @@ fun square1SfxHandler() {
     var square1SoundQueue by MemoryByte(Square1SoundQueue)
     val sndSquare1Reg by MemoryByteIndexed(SND_SQUARE1_REG)
     val swimStompEnvelopeData by MemoryByteIndexed(SwimStompEnvelopeData)
-    while (flagC) {
-        //> PlaySmallJump:
-        //> lda #$26               ;branch here for small mario jumping sound
-        //> bne JumpRegContents
-        temp0 = 0x26
-        if (0x26 == 0) {
-            //> PlayBigJump:
-            //> lda #$18               ;branch here for big mario jumping sound
-            temp0 = 0x18
-        }
-        //> JumpRegContents:
-        //> ldx #$82               ;note that small and big jump borrow each others' reg contents
-        //> ldy #$a7               ;anyway, this loads the first part of mario's jumping sound
-        //> jsr PlaySqu1Sfx
-        playSqu1Sfx()
-        //> lda #$28               ;store length of sfx for both jumping sounds
-        temp0 = 0x28
-        //> sta Squ1_SfxLenCounter ;then continue on here
-        squ1Sfxlencounter = temp0
-        //> ContinueSndJump:
-        //> lda Squ1_SfxLenCounter ;jumping sounds seem to be composed of three parts
-        temp0 = squ1Sfxlencounter
-        //> cmp #$25               ;check for time to play second part yet
-        //> bne N2Prt
-        temp1 = 0x82
-        temp2 = 0xA7
-        if (temp0 == 0x25) {
-            //> ldx #$5f               ;load second part
-            temp1 = 0x5F
-            //> ldy #$f6
-            temp2 = 0xF6
-            //> bne DmpJpFPS           ;unconditional branch
-            if (temp2 == 0) {
+    do {
+        //> PlayFlagpoleSlide:
+        //> lda #$40               ;store length of flagpole sound
+        //> sta Squ1_SfxLenCounter
+        squ1Sfxlencounter = 0x40
+        //> lda #$62               ;load part of reg contents for flagpole sound
+        //> jsr SetFreq_Squ1
+        setfreqSqu1(0x62)
+        //> ldx #$99               ;now load the rest
+        //> bne FPS2nd
+        temp0 = 0x62
+        temp1 = 0x99
+        if (0x99 == 0) {
+            //> PlaySmallJump:
+            //> lda #$26               ;branch here for small mario jumping sound
+            temp0 = 0x26
+            //> bne JumpRegContents
+            if (temp0 == 0) {
+                //> PlayBigJump:
+                //> lda #$18               ;branch here for big mario jumping sound
+                temp0 = 0x18
+            }
+            //> JumpRegContents:
+            //> ldx #$82               ;note that small and big jump borrow each others' reg contents
+            temp1 = 0x82
+            //> ldy #$a7               ;anyway, this loads the first part of mario's jumping sound
+            //> jsr PlaySqu1Sfx
+            playSqu1Sfx()
+            //> lda #$28               ;store length of sfx for both jumping sounds
+            temp0 = 0x28
+            //> sta Squ1_SfxLenCounter ;then continue on here
+            squ1Sfxlencounter = temp0
+            //> ContinueSndJump:
+            //> lda Squ1_SfxLenCounter ;jumping sounds seem to be composed of three parts
+            temp0 = squ1Sfxlencounter
+            //> cmp #$25               ;check for time to play second part yet
+            //> bne N2Prt
+            temp2 = 0xA7
+            if (temp0 == 0x25) {
+                //> ldx #$5f               ;load second part
+                temp1 = 0x5F
+                //> ldy #$f6
+                temp2 = 0xF6
+                //> bne DmpJpFPS           ;unconditional branch
+                if (temp2 == 0) {
+                }
+            }
+            //> N2Prt:    cmp #$20               ;check for third part
+            //> bne DecJpFPS
+            if (temp0 == 0x20) {
+                //> ldx #$48               ;load third part
+                temp1 = 0x48
             }
         }
-        //> N2Prt:    cmp #$20               ;check for third part
-        //> bne DecJpFPS
-        if (temp0 == 0x20) {
-            //> ldx #$48               ;load third part
-            temp1 = 0x48
-            //> FPS2nd:   ldy #$bc               ;the flagpole slide sound shares part of third part
-            temp2 = 0xBC
-            //> DmpJpFPS: jsr Dump_Squ1_Regs
-            dumpSqu1Regs(temp1, temp2)
-            //> bne DecJpFPS           ;unconditional branch outta here
+        //> FPS2nd:   ldy #$bc               ;the flagpole slide sound shares part of third part
+        temp2 = 0xBC
+        //> DmpJpFPS: jsr Dump_Squ1_Regs
+        dumpSqu1Regs(temp1, temp2)
+        //> bne DecJpFPS           ;unconditional branch outta here
+        if (temp2 == 0) {
+            //> PlayFireballThrow:
+            //> lda #$05
+            temp0 = 0x05
+            //> ldy #$99                 ;load reg contents for fireball throw sound
+            temp2 = 0x99
+            //> bne Fthrow               ;unconditional branch
             if (temp2 == 0) {
-                //> PlayFireballThrow:
-                //> lda #$05
-                temp0 = 0x05
-                //> ldy #$99                 ;load reg contents for fireball throw sound
-                temp2 = 0x99
-                //> bne Fthrow               ;unconditional branch
-                if (temp2 == 0) {
-                    //> PlayBump:
-                    //> lda #$0a                ;load length of sfx and reg contents for bump sound
-                    temp0 = 0x0A
-                    //> ldy #$93
-                    temp2 = 0x93
-                }
-                //> Fthrow:   ldx #$9e                ;the fireball sound shares reg contents with the bump sound
-                temp1 = 0x9E
-                //> sta Squ1_SfxLenCounter
-                squ1Sfxlencounter = temp0
-                //> lda #$0c                ;load offset for bump sound
-                temp0 = 0x0C
-                //> jsr PlaySqu1Sfx
-                playSqu1Sfx()
-                //> ContinueBumpThrow:
-                //> lda Squ1_SfxLenCounter  ;check for second part of bump sound
-                temp0 = squ1Sfxlencounter
-                //> cmp #$06
-                //> bne DecJpFPS
-                if (temp0 == 0x06) {
-                    //> lda #$bb                ;load second part directly
-                    temp0 = 0xBB
-                    //> sta SND_SQUARE1_REG+1
-                    sndSquare1Reg[1] = temp0
-                }
+                //> PlayBump:
+                //> lda #$0a                ;load length of sfx and reg contents for bump sound
+                temp0 = 0x0A
+                //> ldy #$93
+                temp2 = 0x93
+            }
+            //> Fthrow:   ldx #$9e                ;the fireball sound shares reg contents with the bump sound
+            temp1 = 0x9E
+            //> sta Squ1_SfxLenCounter
+            squ1Sfxlencounter = temp0
+            //> lda #$0c                ;load offset for bump sound
+            temp0 = 0x0C
+            //> jsr PlaySqu1Sfx
+            playSqu1Sfx()
+            //> ContinueBumpThrow:
+            //> lda Squ1_SfxLenCounter  ;check for second part of bump sound
+            temp0 = squ1Sfxlencounter
+            //> cmp #$06
+            //> bne DecJpFPS
+            if (temp0 == 0x06) {
+                //> lda #$bb                ;load second part directly
+                temp0 = 0xBB
+                //> sta SND_SQUARE1_REG+1
+                sndSquare1Reg[1] = temp0
             }
         }
         //> DecJpFPS: bne BranchToDecLength1  ;unconditional branch
@@ -18430,7 +26509,7 @@ fun square1SfxHandler() {
                 return
             }
         }
-    }
+    } while (flagC)
     //> lsr
     temp0 = temp0 shr 1
     //> bcs DecrementSfx1Length  ;slide flagpole
@@ -18508,7 +26587,7 @@ fun square1SfxHandler() {
     //> dec Squ1_SfxLenCounter    ;decrement length of sfx
     squ1Sfxlencounter = (squ1Sfxlencounter - 1) and 0xFF
     //> bne ExSfx1
-    if (((squ1Sfxlencounter - 1) and 0xFF) == 0) {
+    if (squ1Sfxlencounter == 0) {
     }
     //> ExSfx1: rts
     return
@@ -18552,6 +26631,8 @@ fun square2SfxHandler() {
     var temp2: Int = 0
     var squ2Sfxlencounter by MemoryByte(Squ2_SfxLenCounter)
     var square2SoundBuffer by MemoryByte(Square2SoundBuffer)
+    val extraLifeFreqData by MemoryByteIndexed(ExtraLifeFreqData)
+    val pupVgrowFreqdata by MemoryByteIndexed(PUp_VGrow_FreqData)
     val powerUpGrabFreqData by MemoryByteIndexed(PowerUpGrabFreqData)
     val sndSquare2Reg by MemoryByteIndexed(SND_SQUARE2_REG)
     //> PlayCoinGrab:
@@ -18643,11 +26724,7 @@ fun square2SfxHandler() {
     //> dec Squ2_SfxLenCounter   ;decrement length of sfx
     squ2Sfxlencounter = (squ2Sfxlencounter - 1) and 0xFF
     //> bne ExSfx2
-    if (!(((squ2Sfxlencounter - 1) and 0xFF) == 0)) {
-        //  goto ExSfx2
-        return
-    }
-    if (((squ2Sfxlencounter - 1) and 0xFF) == 0) {
+    if (squ2Sfxlencounter == 0) {
         //> EmptySfx2Buffer:
         //> ldx #$00                ;initialize square 2's sound effects buffer
         temp1 = 0x00
@@ -18663,9 +26740,15 @@ fun noiseSfxHandler() {
     var temp0: Int = 0
     var noiseSoundBuffer by MemoryByte(NoiseSoundBuffer)
     var noiseSfxlencounter by MemoryByte(Noise_SfxLenCounter)
+    val bowserFlameEnvData by MemoryByteIndexed(BowserFlameEnvData)
     val brickShatterEnvData by MemoryByteIndexed(BrickShatterEnvData)
     val brickShatterFreqData by MemoryByteIndexed(BrickShatterFreqData)
+    val musicHeaderData by MemoryByteIndexed(MusicHeaderData)
+    val musicHeaderOffsetData by MemoryByteIndexed(MusicHeaderOffsetData)
     val sndNoiseReg by MemoryByteIndexed(SND_NOISE_REG)
+    val sndSquare1Reg by MemoryByteIndexed(SND_SQUARE1_REG)
+    val sndSquare2Reg by MemoryByteIndexed(SND_SQUARE2_REG)
+    val sndTriangleReg by MemoryByteIndexed(SND_TRIANGLE_REG)
     //> PlayBrickShatter:
     //> lda #$20                 ;load length of brick shatter sound
     //> sta Noise_SfxLenCounter
@@ -18695,7 +26778,7 @@ fun noiseSfxHandler() {
     //> dec Noise_SfxLenCounter  ;decrement length of sfx
     noiseSfxlencounter = (noiseSfxlencounter - 1) and 0xFF
     //> bne ExSfx3
-    if (((noiseSfxlencounter - 1) and 0xFF) == 0) {
+    if (noiseSfxlencounter == 0) {
         //> lda #$f0                 ;if done, stop playing the sfx
         temp0 = 0xF0
         //> sta SND_NOISE_REG
@@ -18744,7 +26827,6 @@ fun musicHandler() {
     var noteLenLookupTblOfs by MemoryByte(NoteLenLookupTblOfs)
     var noteLengthTblAdder by MemoryByte(NoteLengthTblAdder)
     var sndMasterctrlReg by MemoryByte(SND_MASTERCTRL_REG)
-    var sndTriangleReg by MemoryByte(SND_TRIANGLE_REG)
     var squ1Envelopedatactrl by MemoryByte(Squ1_EnvelopeDataCtrl)
     var squ1Notelencounter by MemoryByte(Squ1_NoteLenCounter)
     var squ2Envelopedatactrl by MemoryByte(Squ2_EnvelopeDataCtrl)
@@ -18759,6 +26841,7 @@ fun musicHandler() {
     val sndNoiseReg by MemoryByteIndexed(SND_NOISE_REG)
     val sndSquare1Reg by MemoryByteIndexed(SND_SQUARE1_REG)
     val sndSquare2Reg by MemoryByteIndexed(SND_SQUARE2_REG)
+    val sndTriangleReg by MemoryByteIndexed(SND_TRIANGLE_REG)
     //> ContinueMusic:
     //> jmp HandleSquare2Music  ;if we have music, start with square 2 channel
     //> MusicHandler:
@@ -18926,7 +27009,7 @@ fun musicHandler() {
     squ2Notelencounter = (squ2Notelencounter - 1) and 0xFF
     //> bne MiscSqu2MusicTasks   ;is it time for more data?  if not, branch to end tasks
     temp3 = temp0
-    if (((squ2Notelencounter - 1) and 0xFF) == 0) {
+    if (squ2Notelencounter == 0) {
         //> ldy MusicOffset_Square2  ;increment square 2 music offset and fetch data
         temp3 = musicoffsetSquare2
         //> inc MusicOffset_Square2
@@ -18985,7 +27068,7 @@ fun musicHandler() {
                 //> sta EventMusicBuffer
                 eventMusicBuffer = temp0
                 //> sta SND_TRIANGLE_REG
-                sndTriangleReg = temp0
+                sndTriangleReg[0] = temp0
                 //> lda #$90
                 temp0 = 0x90
                 //> sta SND_SQUARE1_REG
@@ -18995,13 +27078,15 @@ fun musicHandler() {
                 //> rts
                 return
             }
-            // MusicLoopBack: jmp HandleAreaMusicLoopB
-            // Music loop - return for now, handled per frame
-            return
+            while (true) {
+                //> MusicLoopBack:
+                //> jmp HandleAreaMusicLoopB
+            }
         }
-        // VictoryMLoopBack: jmp LoadEventMusic
-        // Victory music loop - return for now, handled per frame
-        return
+        while (true) {
+            //> VictoryMLoopBack:
+            //> jmp LoadEventMusic
+        }
         //> Squ2LengthHandler:
         //> jsr ProcessLengthData    ;store length of note
         processLengthData(temp0)
@@ -19072,29 +27157,19 @@ fun musicHandler() {
         //> dec Squ1_NoteLenCounter    ;decrement square 1 note length
         squ1Notelencounter = (squ1Notelencounter - 1) and 0xFF
         //> bne MiscSqu1MusicTasks     ;is it time for more data?
-        if (((squ1Notelencounter - 1) and 0xFF) == 0) {
+        if (squ1Notelencounter == 0) {
             while (temp0 != 0) {
-                do {
-                    //> FetchSqu1MusicData:
-                    //> ldy MusicOffset_Square1    ;increment square 1 music offset and fetch data
-                    temp3 = musicoffsetSquare1
-                    //> inc MusicOffset_Square1
-                    musicoffsetSquare1 = (musicoffsetSquare1 + 1) and 0xFF
-                    //> lda (MusicData),y
-                    temp0 = memory[readWord(MusicData) + temp3].toInt()
-                    //> bne Squ1NoteHandler        ;if nonzero, then skip this part
-                    //> lda #$83
-                    temp0 = 0x83
-                    //> sta SND_SQUARE1_REG        ;store some data into control regs for square 1
-                    sndSquare1Reg[0] = temp0
-                    //> lda #$94                   ;and fetch another byte of data, used to give
-                    temp0 = 0x94
-                    //> sta SND_SQUARE1_REG+1      ;death music its unique sound
-                    sndSquare1Reg[1] = temp0
-                    //> sta AltRegContentFlag
-                    altRegContentFlag = temp0
-                    //> bne FetchSqu1MusicData     ;unconditional branch
-                } while (temp0 != 0)
+                //> lda #$83
+                temp0 = 0x83
+                //> sta SND_SQUARE1_REG        ;store some data into control regs for square 1
+                sndSquare1Reg[0] = temp0
+                //> lda #$94                   ;and fetch another byte of data, used to give
+                temp0 = 0x94
+                //> sta SND_SQUARE1_REG+1      ;death music its unique sound
+                sndSquare1Reg[1] = temp0
+                //> sta AltRegContentFlag
+                altRegContentFlag = temp0
+                //> bne FetchSqu1MusicData     ;unconditional branch
             }
             //> Squ1NoteHandler:
             //> jsr AlternateLengthHandler
@@ -19163,7 +27238,7 @@ fun musicHandler() {
     //> dec Tri_NoteLenCounter    ;decrement triangle note length
     triNotelencounter = (triNotelencounter - 1) and 0xFF
     //> bne HandleNoiseMusic      ;is it time for more data?
-    if (((triNotelencounter - 1) and 0xFF) == 0) {
+    if (triNotelencounter == 0) {
         //> ldy MusicOffset_Triangle  ;increment square 1 music offset and fetch data
         temp3 = musicoffsetTriangle
         //> inc MusicOffset_Triangle
@@ -19181,7 +27256,7 @@ fun musicHandler() {
                 //> lda #$1f
                 temp0 = 0x1F
                 //> sta SND_TRIANGLE_REG      ;load some default data for triangle control reg
-                sndTriangleReg = temp0
+                sndTriangleReg[0] = temp0
                 //> ldy MusicOffset_Triangle  ;fetch another byte
                 temp3 = musicoffsetTriangle
                 //> inc MusicOffset_Triangle
@@ -19244,7 +27319,7 @@ fun musicHandler() {
         }
         //> LoadTriCtrlReg:
         //> sta SND_TRIANGLE_REG      ;save final contents of A into control reg for triangle
-        sndTriangleReg = temp0
+        sndTriangleReg[0] = temp0
     }
     //> HandleNoiseMusic:
     //> lda AreaMusicBuffer       ;check if playing underground or castle music
@@ -19257,23 +27332,13 @@ fun musicHandler() {
         //> dec Noise_BeatLenCounter  ;decrement noise beat length
         noiseBeatlencounter = (noiseBeatlencounter - 1) and 0xFF
         //> bne ExitMusicHandler      ;is it time for more data?
-        if (((noiseBeatlencounter - 1) and 0xFF) == 0) {
+        if (noiseBeatlencounter == 0) {
             while (temp0 != 0) {
-                do {
-                    //> FetchNoiseBeatData:
-                    //> ldy MusicOffset_Noise       ;increment noise beat offset and fetch data
-                    temp3 = musicoffsetNoise
-                    //> inc MusicOffset_Noise
-                    musicoffsetNoise = (musicoffsetNoise + 1) and 0xFF
-                    //> lda (MusicData),y           ;get noise beat data, if nonzero, branch to handle
-                    temp0 = memory[readWord(MusicData) + temp3].toInt()
-                    //> bne NoiseBeatHandler
-                    //> lda NoiseDataLoopbackOfs    ;if data is zero, reload original noise beat offset
-                    temp0 = noiseDataLoopbackOfs
-                    //> sta MusicOffset_Noise       ;and loopback next time around
-                    musicoffsetNoise = temp0
-                    //> bne FetchNoiseBeatData      ;unconditional branch
-                } while (temp0 != 0)
+                //> lda NoiseDataLoopbackOfs    ;if data is zero, reload original noise beat offset
+                temp0 = noiseDataLoopbackOfs
+                //> sta MusicOffset_Noise       ;and loopback next time around
+                musicoffsetNoise = temp0
+                //> bne FetchNoiseBeatData      ;unconditional branch
             }
             //> NoiseBeatHandler:
             //> jsr AlternateLengthHandler
@@ -19361,12 +27426,16 @@ fun alternateLengthHandler(A: Int): Int {
     A = (A shl 1) and 0xFE or if ((A and 0x80) != 0) 1 else 0
     //> rol
     A = (A shl 1) and 0xFE or if ((A and 0x80) != 0) 1 else 0
-    return A  // FIX: Return the modified value
+    // Fall-through tail call to processLengthData
+    processLengthData(A)
+    return A
 }
 
 // Decompiled from ProcessLengthData
 fun processLengthData(A: Int): Int {
     var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
     var noteLengthTblAdder by MemoryByte(NoteLengthTblAdder)
     val musicLengthLookupTbl by MemoryByteIndexed(MusicLengthLookupTbl)
     //> ProcessLengthData:
@@ -19374,7 +27443,9 @@ fun processLengthData(A: Int): Int {
     temp0 = A and 0x07
     //> clc
     //> adc $f0                     ;add offset loaded from first header byte
+    temp1 = temp0 + memory[0xF0].toInt()
     //> adc NoteLengthTblAdder      ;add extra if time running out music
+    temp2 = (temp1 and 0xFF) + noteLengthTblAdder + (if (temp1 > 0xFF) 1 else 0)
     //> tay
     //> lda MusicLengthLookupTbl,y  ;load length
     //> rts

@@ -227,7 +227,7 @@ class KotlinCodeGenTest {
         romDataFile.bufferedWriter().use { out ->
             out.appendLine("@file:OptIn(ExperimentalUnsignedTypes::class)")
             out.appendLine()
-            out.appendLine("package com.ivieleague.smb")
+            out.appendLine("package com.ivieleague.decompiler6502tokotlin.smb")
             out.appendLine()
             out.appendLine("import com.ivieleague.decompiler6502tokotlin.hand.memory")
             out.appendLine()
@@ -281,7 +281,7 @@ class KotlinCodeGenTest {
         mainFile.bufferedWriter().use { out ->
             out.appendLine("@file:OptIn(ExperimentalUnsignedTypes::class)")
             out.appendLine()
-            out.appendLine("package com.ivieleague.smb")
+            out.appendLine("package com.ivieleague.decompiler6502tokotlin.smb")
             out.appendLine()
             out.appendLine("import com.ivieleague.decompiler6502tokotlin.hand.*")
             out.appendLine()
@@ -321,7 +321,7 @@ class KotlinCodeGenTest {
         constantsFile.bufferedWriter().use { out ->
             out.appendLine("@file:OptIn(ExperimentalUnsignedTypes::class)")
             out.appendLine()
-            out.appendLine("package com.ivieleague.smb")
+            out.appendLine("package com.ivieleague.decompiler6502tokotlin.smb")
             out.appendLine()
             out.appendLine("import com.ivieleague.decompiler6502tokotlin.hand.MemoryByte")
             out.appendLine()
@@ -386,7 +386,7 @@ class KotlinCodeGenTest {
         outFile.bufferedWriter().use { out ->
             out.appendLine("@file:OptIn(ExperimentalUnsignedTypes::class)")
             out.appendLine()
-            out.appendLine("package com.ivieleague.smb")
+            out.appendLine("package com.ivieleague.decompiler6502tokotlin.smb")
             out.appendLine()
             out.appendLine("import com.ivieleague.decompiler6502tokotlin.hand.*")
             out.appendLine()

@@ -370,6 +370,18 @@ fun resetCPU() {
  * Clear all memory to zero.
  */
 fun clearMemory() {
+    // Only clear RAM (0x0000-0x7FFF), preserve ROM area (0x8000+)
+    // This allows ROM data to persist across test runs
+    for (i in 0 until 0x8000) {
+        memory[i] = 0u
+    }
+}
+
+/**
+ * Clear all memory including ROM area.
+ * Use this sparingly - most tests should use clearMemory() instead.
+ */
+fun clearAllMemory() {
     for (i in memory.indices) {
         memory[i] = 0u
     }

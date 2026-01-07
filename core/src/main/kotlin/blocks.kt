@@ -227,8 +227,11 @@ fun List<AssemblyLine>.blockify(): List<AssemblyBlock> {
                         // Bidirectional delegate automatically updates it.enteredFrom
                         pb.fallThroughExit = it
                     }
-                    // Terminal subroutines don't return, so no fallthrough
-                    previousBlock = null
+                    // For JumpEngine, we need to preserve fallthrough to the dispatch table
+                    // so that functionify() can scan the .dw entries to find function targets.
+                    // For other terminal subroutines, no fallthrough.
+                    val targetLabel = (line.instruction.address as? AssemblyAddressing.Direct)?.label
+                    previousBlock = if (targetLabel == "JumpEngine") it else null
                 })
                 currentBlock = ArrayList()
             }

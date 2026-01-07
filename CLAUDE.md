@@ -105,3 +105,56 @@ The parser builds symbol tables tracking:
   - Resolved to addresses in Pass 2 using multi-pass resolution (supports forward references)
   - Added to the symbol table (`labelToAddress`) alongside labels
   - Support hex values, decimal values, indexed addressing (e.g., `Array = $0200,X`), and constant references
+
+## Critical: NMI Timing for Decompiled Code
+
+**See `docs/NMI-TIMING-INSIGHTS.md` for full details.**
+
+Key points for decompiled Kotlin version:
+- NMI handlers can take **1-3 frames** to execute, not always 1
+- `IntervalTimerControl` ($077F) is the reliable timing indicator
+- Different code paths have different cycle costs (2.4 to 2.8 cycles/step)
+- A fixed cycle estimate **cannot work** - the window is too tight
+- TAS replay requires accurate frame skip detection
+- Frame 5 (init) takes 3 frames; level transitions take 2 frames; normal gameplay takes 1 frame
+
+When debugging timing issues: check IntCtrl progression, FrameCounter, OperMode_Task, and RNG values.
+
+## Function State Capture & Testing
+
+**See `docs/DECOMPILER-TESTING-GUIDE.md` for full details.**
+
+The project includes infrastructure to validate decompiled functions against the interpreter:
+
+### Quick Start
+```bash
+# Capture function states from TAS replay (creates test data)
+./gradlew :core:test --tests "CaptureFromTASTest.capture function states from TAS"
+
+# Output files:
+# - local/testgen/captured-tests-happylee-warps.json (raw data)
+# - local/testgen/GeneratedFunctionTests.kt (runnable tests)
+```
+
+### Key Files
+| File | Purpose |
+|------|---------|
+| `core/src/main/kotlin/testgen/FunctionCallTracer.kt` | Captures function input/output states |
+| `core/src/main/kotlin/testgen/TestCaseSelector.kt` | Deduplicates and samples test cases |
+| `core/src/main/kotlin/testgen/KotlinTestGenerator.kt` | Generates Kotlin test code |
+| `core/src/test/kotlin/testgen/CaptureFromTASTest.kt` | Main capture test |
+
+### Workflow for Fixing Decompiled Functions
+1. Run capture to get test data
+2. Pick a frequently-called function from the statistics
+3. Find function in `smbdism.asm` to understand expected behavior
+4. Create a focused test from captured data
+5. Fix the decompiler pass that handles that pattern
+6. Regenerate decompiled code and verify tests pass
+
+### Captured Data Structure
+Each `FunctionCallCapture` contains:
+- `inputState`: CPU registers and flags at function entry
+- `memoryReads`: Memory addresses read (inputs to set up)
+- `outputState`: CPU registers and flags at RTS
+- `memoryWrites`: Memory addresses written (outputs to verify)

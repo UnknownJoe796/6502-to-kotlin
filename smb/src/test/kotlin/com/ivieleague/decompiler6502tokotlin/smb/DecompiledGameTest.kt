@@ -92,19 +92,19 @@ class DecompiledGameTest {
                         println("     ✓ initializeMemory completed")
                     }
                     1 -> {
-                        println("     Calling screenRoutines_real...")
-                        screenRoutines_real()
-                        println("     ✓ screenRoutines_real completed")
+                        println("     Calling screenRoutines...")
+                        screenRoutines()
+                        println("     ✓ screenRoutines completed")
                     }
                     2 -> {
-                        println("     Calling primaryGameSetup_real...")
-                        primaryGameSetup_real()
-                        println("     ✓ primaryGameSetup_real completed")
+                        println("     Calling primaryGameSetup...")
+                        primaryGameSetup()
+                        println("     ✓ primaryGameSetup completed")
                     }
                     3 -> {
-                        println("     Calling gameMenuRoutine_real...")
-                        gameMenuRoutine_real()
-                        println("     ✓ gameMenuRoutine_real completed")
+                        println("     Calling gameMenuRoutine...")
+                        gameMenuRoutine()
+                        println("     ✓ gameMenuRoutine completed")
                     }
                 }
                 println("   Task $task: Completed ✓")

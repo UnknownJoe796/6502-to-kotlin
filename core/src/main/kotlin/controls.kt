@@ -727,6 +727,9 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
     fun AssemblyBlock.isReturnLike(): Boolean =
         this.lastInstructionLine()?.instruction?.op.let { it == AssemblyOp.RTS || it == AssemblyOp.RTI } == true
 
+    // Track loop headers currently being processed to prevent infinite recursion
+    val processingLoopHeaders = mutableSetOf<AssemblyBlock>()
+
     fun buildRange(start: Int, endExclusive: Int): MutableList<ControlNode> {
         val out = mutableListOf<ControlNode>()
         var i = start
@@ -735,7 +738,8 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
             val last = b.lastInstructionLine()
 
             // Natural loop detection: If this block is a loop header, create a LoopNode
-            val naturalLoop = loopByHeader[b]
+            // Skip if this header is already being processed (prevents infinite recursion)
+            val naturalLoop = loopByHeader[b]?.takeIf { b !in processingLoopHeaders }
             if (naturalLoop != null) {
                 // Find the extent of the loop body in the layout
                 val loopBodyBlocks = naturalLoop.body.sortedBy { indexOf[it] ?: Int.MAX_VALUE }
@@ -749,23 +753,18 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
 
                 // Only process as a loop if we haven't already consumed these blocks
                 if (loopStart == i && loopEnd <= endExclusive && !containsOtherLoopHeaders) {
-                    // Recursively analyze the loop body's internal control flow
-                    // Skip the loop header itself and analyze from the next block
-                    val bodyStart = loopStart + 1
-                    val bodyNodes: MutableList<ControlNode> = if (bodyStart < loopEnd) {
-                        buildRange(bodyStart, loopEnd)
-                    } else {
-                        // Single-block loop - just add the header as a block node
-                        mutableListOf(BlockNode(id = nextId++, block = b))
-                    }
-
                     // Determine loop kind based on structure
                     // Key distinction:
-                    // - PreTest (while): Header has conditional that can exit forward OR enter body
-                    // - PostTest (do-while): Header is NOT conditional; back-edge source is conditional
+                    // - PreTest (while): Header has conditional that EXITS the loop
+                    // - PostTest (do-while): Header has no exit condition OR internal conditional only; back-edge source is conditional
                     val headerIsConditional = b.isConditional()
                     val backEdgeSource = naturalLoop.backEdges.firstOrNull()?.first
                     val backEdgeIsConditional = backEdgeSource?.let { it.isConditional() } ?: false
+
+                    // CRITICAL FIX: Check if header's branch target is INSIDE the loop body
+                    // If so, it's an internal conditional (like "skip some code"), not a loop exit test
+                    val headerBranchTargetInLoop = b.branchExit?.let { it in naturalLoop.body } ?: false
+                    val headerHasInternalBranch = headerIsConditional && headerBranchTargetInLoop
 
                     val loopKind = when {
                         // Infinite loop: no conditional, no exits
@@ -773,12 +772,37 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                         // Single-block self-loop with conditional: PostTest (do-while)
                         // Check this FIRST before other heuristics
                         naturalLoop.body.size == 1 && backEdgeSource == b && headerIsConditional -> LoopKind.PostTest
+                        // PostTest: header has internal branch only (not exit test), and back-edge is conditional
+                        // Example: ShuffleLoop has BCC NextSprOffset (internal), and NextSprOffset has BPL ShuffleLoop (back-edge)
+                        headerHasInternalBranch && backEdgeIsConditional -> LoopKind.PostTest
                         // PostTest: header is not conditional, but back-edge source is
                         !headerIsConditional && backEdgeIsConditional -> LoopKind.PostTest
-                        // PreTest: header is conditional with a forward exit
-                        headerIsConditional && naturalLoop.exits.isNotEmpty() -> LoopKind.PreTest
+                        // PreTest: header is conditional with a forward EXIT (not internal branch)
+                        headerIsConditional && !headerBranchTargetInLoop && naturalLoop.exits.isNotEmpty() -> LoopKind.PreTest
                         // Otherwise, assume PreTest (while) as default
                         else -> LoopKind.PreTest
+                    }
+
+                    // Recursively analyze the loop body's internal control flow
+                    // For PostTest loops with internal header branches, INCLUDE the header so its conditional becomes an if-then
+                    // For PreTest loops, skip the header (its condition is the loop condition, already handled)
+                    val bodyStart = if (loopKind == LoopKind.PostTest && headerHasInternalBranch) {
+                        loopStart  // Include header in body analysis
+                    } else {
+                        loopStart + 1  // Skip the loop header itself
+                    }
+
+                    // Mark this header as being processed to prevent infinite recursion
+                    processingLoopHeaders.add(b)
+                    val bodyNodes: MutableList<ControlNode> = try {
+                        if (bodyStart < loopEnd) {
+                            buildRange(bodyStart, loopEnd)
+                        } else {
+                            // Single-block loop - just add the header as a block node
+                            mutableListOf(BlockNode(id = nextId++, block = b))
+                        }
+                    } finally {
+                        processingLoopHeaders.remove(b)
                     }
 
                     // Find the condition block (last block with back-edge)
@@ -1040,6 +1064,12 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                     val loopHeader = layout[brIdx]
                     val exitBlock = ft // fall-through is the exit
 
+                    // CRITICAL FIX: Skip if the loop header is already being processed by natural loop detection
+                    // This prevents creating duplicate nested loops when we're inside a natural loop's body
+                    if (loopHeader in processingLoopHeaders) {
+                        // Don't create a nested loop - this block is part of an outer loop's body
+                        // Fall through to just add as BlockNode
+                    } else {
                     // Check if the "loop header" immediately exits via JMP - if so, this isn't a loop
                     // It's a conditional branch that exits the function (e.g., BEQ NoJump / NoJump: JMP X_Physics)
                     val headerExitsViaJmp = loopHeader.lines.any { line ->
@@ -1092,6 +1122,7 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                     }
                     // Otherwise, let it fall through to be handled as blocks/gotos
                     } // end else (not an immediate JMP exit)
+                    } // end else (loopHeader not in processingLoopHeaders)
                 }
 
                 // Check if fall-through goes backward (branch is exit) - includes self-loops
@@ -1099,6 +1130,11 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                     val loopHeader = layout[ftIdx]
                     val exitBlock = br // branch is the exit
 
+                    // CRITICAL FIX: Skip if the loop header is already being processed by natural loop detection
+                    if (loopHeader in processingLoopHeaders) {
+                        // Don't create a nested loop - this block is part of an outer loop's body
+                        // Fall through to just add as BlockNode
+                    } else {
                     // Same heuristic as above
                     val loopSpan = i - ftIdx + 1
                     val isJumpToFunctionStart = ftIdx == start
@@ -1136,6 +1172,7 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                         continue
                     }
                     // Otherwise, let it fall through
+                    } // end else (loopHeader not in processingLoopHeaders)
                 }
             }
 

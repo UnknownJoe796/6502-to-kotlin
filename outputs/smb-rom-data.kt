@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalUnsignedTypes::class)
 
-package com.ivieleague.smb
+package com.ivieleague.decompiler6502tokotlin.smb
 
 import com.ivieleague.decompiler6502tokotlin.hand.memory
 
