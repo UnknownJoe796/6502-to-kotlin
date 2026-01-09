@@ -69,6 +69,17 @@ class BinaryInterpreter6502(
         return lo or (hi shl 8)
     }
 
+    // Track which addresses we've already set debt for (to avoid re-triggering)
+    private val debtTriggeredAddresses = mutableSetOf<Int>()
+
+    /**
+     * Clear the debt triggered set. Call this at the start of each NMI to allow
+     * re-triggering if the same routine is entered again in a new frame.
+     */
+    fun clearDebtTriggered() {
+        debtTriggeredAddresses.clear()
+    }
+
     /**
      * Execute one instruction and return the number of cycles used.
      * Also checks for pending interrupts at the end (proper 6502 behavior).
@@ -76,7 +87,25 @@ class BinaryInterpreter6502(
     fun step(): Int {
         if (halted) return 0
 
-        val opcode = read(cpu.PC.toInt()).toInt()
+        val pc = cpu.PC.toInt()
+
+        // Check if we're entering a multi-frame routine (regardless of how we got here)
+        // Only trigger once per NMI to avoid stacking debt from loops
+        if (pc !in debtTriggeredAddresses) {
+            frameDebtMap[pc]?.let { framesConsumed ->
+                val skipCount = framesConsumed - 1
+                if (skipCount > 0) {
+                    val oldDebt = frameDebt
+                    frameDebt = maxOf(frameDebt, skipCount)
+                    debtTriggeredAddresses.add(pc)
+                    if (frameDebt > oldDebt) {
+                        println("  [DEBT] PC=0x${pc.toString(16)} triggered $framesConsumed frames consumed, debt now $frameDebt")
+                    }
+                }
+            }
+        }
+
+        val opcode = read(pc).toInt()
         cpu.PC = (cpu.PC.toInt() + 1).toUShort()
 
         val cycles = executeOpcode(opcode)
@@ -672,8 +701,10 @@ class BinaryInterpreter6502(
         pushWord(cpu.PC.toInt())
         jsrHook?.invoke(target, callerPc)
         // Check if this subroutine causes frame debt (takes multiple frames to complete)
-        frameDebtMap[target]?.let { debt ->
-            frameDebt = maxOf(frameDebt, debt)
+        // @FRAMES_CONSUMED: N means N frames total, so skip N-1 subsequent NMIs
+        frameDebtMap[target]?.let { framesConsumed ->
+            val skipCount = framesConsumed - 1  // Skip N-1 frames after this one
+            frameDebt = maxOf(frameDebt, skipCount)
         }
         cpu.PC = target.toUShort()
     }

@@ -2645,7 +2645,9 @@ Sprite0Data:
       .db $18, $ff, $23, $58
 
 ;-------------------------------------------------------------------------------------
-
+; @FRAMES_CONSUMED: 3
+; This routine takes ~68,250 cycles (about 3 frames worth). When called during NMI,
+; the next 2 frames will not receive NMI (frames are consumed without input).
 InitializeGame:
              ldy #$6f              ;clear all memory as in initialization procedure,
              jsr InitializeMemory  ;but this time, clear only as far as $076f
@@ -2657,6 +2659,9 @@ ClrSndLoop:  sta SoundMemory,y     ;clear out memory used
              sta DemoTimer
              jsr LoadAreaPointer
 
+; @FRAMES_CONSUMED: 2
+; This routine takes ~34,700 cycles (about 2 frames worth). When called during NMI,
+; the next frame will not receive NMI (frame is consumed without input).
 InitializeArea:
                ldy #$4b                 ;clear all memory again, only as far as $074b
                jsr InitializeMemory     ;this is only necessary if branching from

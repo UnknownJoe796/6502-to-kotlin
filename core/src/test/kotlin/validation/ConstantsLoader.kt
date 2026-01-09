@@ -14,8 +14,8 @@ object ConstantsLoader {
         val constants = mutableMapOf<String, Int>()
 
         file.readLines().forEach { line ->
-            // Match: const val NAME = 0xADDR (name can include digits)
-            val match = Regex("""const val ([A-Z_0-9]+) = (0x[0-9A-Fa-f]+)""").find(line)
+            // Match: const val NAME = 0xADDR (name can include letters, digits, underscores)
+            val match = Regex("""const val ([A-Za-z_0-9]+) = (0x[0-9A-Fa-f]+)""").find(line)
             if (match != null) {
                 val name = match.groupValues[1]
                 val addr = match.groupValues[2].substring(2).toInt(16)

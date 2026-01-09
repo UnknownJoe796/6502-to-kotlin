@@ -25,8 +25,8 @@ class BulkAutomatedValidation {
         var passCount = 0
         var failCount = 0
 
-        // Preprocess assembly to substitute constants
-        val preprocessed = ConstantsLoader.preprocessAssembly(assemblyCode, constantsFile)
+        // Load constants to provide label resolution
+        val constants = ConstantsLoader.loadConstants(constantsFile)
 
         repeat(testCount) { iteration ->
             // Generate random initial state
@@ -36,12 +36,16 @@ class BulkAutomatedValidation {
 
             // Execute assembly
             val interp = Interpreter6502()
+            // Set label resolver to use the constants map
+            interp.labelResolver = { label ->
+                constants[label] ?: throw IllegalArgumentException("Unknown label: $label")
+            }
             interp.cpu.A = initialA
             interp.cpu.X = initialX
             interp.cpu.Y = initialY
 
             try {
-                val parsed = preprocessed.parseToAssemblyCodeFile()
+                val parsed = assemblyCode.parseToAssemblyCodeFile()
                 for (line in parsed.lines) {
                     line.instruction?.let { instruction ->
                         interp.executeInstruction(instruction)

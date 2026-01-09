@@ -72,6 +72,7 @@ class DecompiledTASTest {
         // Load TAS movie - try multiple locations
         val possiblePaths = listOf(
             "happylee-warps.fm2",
+            "smb/happylee-warps.fm2",
             "../happylee-warps.fm2",
             "../../happylee-warps.fm2"
         )
@@ -177,19 +178,72 @@ class DecompiledTASTest {
                 println("Frame $frame: W${state.world}-${state.level} Mode=${state.operMode} FC=${state.frameCounter} IntCtrl=${state.intervalTimerControl}")
             }
 
+            // Debug: show TAS input around frames 290-310 and 560-580 (pipe entry)
+            if (frame in 290..310 || frame in 560..580) {
+                val tasInput = input.player1
+                println("TAS Frame $frame: Input=${tasInput.toString(16)} (${ControllerInput().buttonsToString(tasInput)})")
+            }
+
             // Debug: show player state and position around key frames
-            if (frame in listOf(42, 43, 44, 45, 50, 100, 150, 200)) {
+            if (frame in listOf(42, 43, 44, 45, 50, 100, 150, 200, 250, 300, 400, 500, 560, 563, 564, 565, 570, 600, 610, 620, 650, 668, 700, 800, 1000, 1500, 1943)) {
                 val playerState = memory[Player_State].toInt()
                 val playerXSpeed = memory[Player_X_Speed].toInt()
                 val playerX = memory[Player_X_Position].toInt()
                 val playerY = memory[Player_Y_Position].toInt()
                 val playerYHigh = memory[Player_Y_HighPos].toInt()
+                val playerPage = memory[Player_PageLoc].toInt()
+                val joypadOverride = memory[JoypadOverride].toInt()
                 val savedJoypad = memory[SavedJoypadBits].toInt()
                 val leftRight = memory[Left_Right_Buttons].toInt()
                 val gameEngSub = memory[GameEngineSubroutine].toInt()
                 val entranceCtrl = memory[PlayerEntranceCtrl].toInt()
                 val altEntrance = memory[AltEntranceControl].toInt()
-                println("Frame $frame: State=$playerState X=$playerX Y=$playerY YHi=$playerYHigh GameEng=$gameEngSub EntrCtrl=$entranceCtrl AltEntr=$altEntrance LR=$leftRight")
+                println("Frame $frame: State=$playerState Page=$playerPage X=$playerX Y=$playerY XSpd=$playerXSpeed JoyOvr=$joypadOverride SavedJoy=$savedJoypad GameEng=$gameEngSub")
+
+                // Show foot metatiles when checking for pipe entry (frame 563 is when Down is pressed)
+                if (frame == 563 || frame == 564) {
+                    val leftFoot = memory[0x01].toInt()
+                    val rightFoot = memory[0x00].toInt()
+                    val upDown = memory[Up_Down_Buttons].toInt()
+                    val savedJoy = memory[SavedJoypadBits].toInt()
+                    val gameEng = memory[GameEngineSubroutine].toInt()
+                    println("  Foot metatiles: Left=${leftFoot.toString(16)} Right=${rightFoot.toString(16)} UpDown=${upDown.toString(16)} SavedJoy=${savedJoy.toString(16)} GameEng=$gameEng")
+
+                    // Check if any pipe metatiles are in Block_Buffer_1
+                    if (frame == 563) {
+                        val pipeMetatiles = mutableListOf<Pair<Int, Int>>()
+                        for (i in 0 until 0xD0) {
+                            val meta = memory[Block_Buffer_1 + i].toInt()
+                            if (meta == 0x10 || meta == 0x11) {
+                                val row = i % 13
+                                val col = i / 13
+                                pipeMetatiles.add(col to row)
+                            }
+                        }
+                        println("  Block_Buffer_1 pipe metatiles (0x10/0x11): $pipeMetatiles")
+                        val warpZone = memory[WarpZoneControl].toInt()
+                        println("  WarpZoneControl: $warpZone")
+                    }
+                }
+
+                // Debug: show MetatileBuffer contents at frame 300 when player is near pipe
+                if (frame == 300) {
+                    println("MetatileBuffer contents at frame 300:")
+                    for (row in 0..12) {
+                        val rowBytes = (0..15).map { col ->
+                            memory[MetatileBuffer + row + col * 13].toInt()
+                        }
+                        println("  Row $row: ${rowBytes.map { it.toString(16).padStart(2, '0') }}")
+                    }
+                    // Also check block buffer areas (Block_Buffer_1 = $0500)
+                    val blockBuff1 = (Block_Buffer_1 until Block_Buffer_1 + 0xD0).map { memory[it].toInt() }
+                    val pipeMetatiles = blockBuff1.count { it == 0x10 || it == 0x11 }
+                    println("Block_Buffer_1: Pipe metatiles (0x10/0x11) found: $pipeMetatiles")
+
+                    // Show non-zero metatiles in block buffer
+                    val nonZeroMeta = blockBuff1.withIndex().filter { it.value != 0 }
+                    println("Non-zero in Block_Buffer_1: ${nonZeroMeta.take(20)}")
+                }
             }
 
             // Check for victory
@@ -213,6 +267,11 @@ class DecompiledTASTest {
         println("OperMode: ${finalState.operMode}")
         println("Lives: ${finalState.lives}")
         println("Player: (${finalState.playerX}, ${finalState.playerY})")
+        println("Milestones reached: $milestoneIndex / ${milestones.size}")
+
+        // Assert game completion
+        assertTrue(beaten, "Game should reach victory (OperMode=2)")
+        assertEquals(10, milestoneIndex, "Should reach all 10 level milestones including 8-4")
     }
 
     @Test

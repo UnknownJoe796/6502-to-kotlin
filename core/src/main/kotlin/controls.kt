@@ -783,6 +783,12 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                         else -> LoopKind.PreTest
                     }
 
+                    // CRITICAL: Handle nested loops with multiple back-edges to the same header
+                    // If this loop has multiple back-edges AND one is a self-loop, split it into inner/outer
+                    val selfLoopEdges = naturalLoop.backEdges.filter { it.first == b }
+                    val otherBackEdges = naturalLoop.backEdges.filter { it.first != b }
+                    val isNestedLoopWithSharedHeader = selfLoopEdges.isNotEmpty() && otherBackEdges.isNotEmpty()
+
                     // Recursively analyze the loop body's internal control flow
                     // For PostTest loops with internal header branches, INCLUDE the header so its conditional becomes an if-then
                     // For PreTest loops, skip the header (its condition is the loop condition, already handled)
@@ -795,7 +801,38 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                     // Mark this header as being processed to prevent infinite recursion
                     processingLoopHeaders.add(b)
                     val bodyNodes: MutableList<ControlNode> = try {
-                        if (bodyStart < loopEnd) {
+                        if (isNestedLoopWithSharedHeader) {
+                            // Special handling for nested loops with shared header:
+                            // Create an inner loop for the self-loop, then add remaining blocks as simple BlockNodes
+                            val innerLoopBody: MutableList<ControlNode> = mutableListOf(BlockNode(id = nextId++, block = b))
+
+                            // Create inner loop (self-loop) with its own condition
+                            val innerCond = Condition(
+                                branchBlock = b,
+                                branchLine = b.lastInstructionLine()!!,
+                                sense = true  // Branch back to header
+                            )
+                            val innerLoop = LoopNode(
+                                id = nextId++,
+                                kind = LoopKind.PostTest,  // Self-loops are typically do-while
+                                header = b,
+                                condition = innerCond,
+                                body = innerLoopBody,
+                                continueTargets = setOf(b),
+                                breakTargets = emptySet()
+                            )
+
+                            // For the rest of the loop body, just wrap blocks as BlockNodes
+                            // Don't recursively analyze to avoid detecting the outer back-edge as a separate loop
+                            val restOfBody = mutableListOf<ControlNode>()
+                            for (k in bodyStart until loopEnd) {
+                                val block = layout[k]
+                                restOfBody.add(BlockNode(id = nextId++, block = block))
+                            }
+
+                            // Combine: inner loop first, then rest
+                            (mutableListOf<ControlNode>(innerLoop) + restOfBody).toMutableList()
+                        } else if (bodyStart < loopEnd) {
                             buildRange(bodyStart, loopEnd)
                         } else {
                             // Single-block loop - just add the header as a block node
@@ -807,10 +844,16 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
 
                     // Find the condition block (last block with back-edge)
                     // For Infinite loops, condition is null
+                    // CRITICAL: For nested loops with shared header, use the NON-self-loop back-edge for the outer condition
                     val cond = if (loopKind == LoopKind.Infinite) {
                         null
                     } else {
-                        val conditionBlock = naturalLoop.backEdges.firstOrNull()?.first ?: b
+                        val conditionBlock = if (isNestedLoopWithSharedHeader) {
+                            // Use the non-self-loop back-edge for the outer loop condition
+                            otherBackEdges.firstOrNull()?.first ?: b
+                        } else {
+                            naturalLoop.backEdges.firstOrNull()?.first ?: b
+                        }
                         // Determine sense: if branch-taken goes to header, sense=true; if fall-through goes to header, sense=false
                         val branchGoesToHeader = conditionBlock.branchExit == b
                         Condition(

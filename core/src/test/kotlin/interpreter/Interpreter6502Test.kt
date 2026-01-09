@@ -700,13 +700,16 @@ class Interpreter6502Test {
     fun testReset() {
         val interp = Interpreter6502()
         interp.cpu.A = 0x42u
-        interp.memory.writeByte(0x1000, 0x55u)
+        // Test RAM address (0x0000-0x07FF) which reset() should clear
+        interp.memory.writeByte(0x0500, 0x55u)
         interp.halted = true
 
         interp.reset()
 
         assertEquals(0u, interp.cpu.A)
-        assertEquals(0u, interp.memory.readByte(0x1000))
+        // RAM follows FCEUX pattern: alternating 4 bytes of 0x00 and 4 bytes of 0xFF
+        // 0x0500 = 1280, (1280 & 0x04) = 0x00, so should be 0x00
+        assertEquals(0x00u, interp.memory.readByte(0x0500))
         assertFalse(interp.halted)
     }
 

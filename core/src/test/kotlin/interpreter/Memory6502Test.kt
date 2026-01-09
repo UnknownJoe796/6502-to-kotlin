@@ -46,13 +46,17 @@ class Memory6502Test {
     @Test
     fun testMemoryReset() {
         val memory = Memory6502()
-        memory.writeByte(0x1000, 0x42u)
-        memory.writeByte(0x2000, 0xFFu)
+        // Write to RAM addresses (0x0000-0x07FF) which reset() should clear
+        memory.writeByte(0x0100, 0x42u)
+        memory.writeByte(0x0600, 0xFFu)
 
         memory.reset()
 
-        assertEquals(0x00u, memory.readByte(0x1000))
-        assertEquals(0x00u, memory.readByte(0x2000))
+        // RAM follows FCEUX pattern: alternating 4 bytes of 0x00 and 4 bytes of 0xFF
+        // 0x0100 = 256, (256 & 0x04) = 0x00, so should be 0x00
+        assertEquals(0x00u, memory.readByte(0x0100))
+        // 0x0600 = 1536, (1536 & 0x04) = 0x00, so should be 0x00
+        assertEquals(0x00u, memory.readByte(0x0600))
     }
 
     @Test

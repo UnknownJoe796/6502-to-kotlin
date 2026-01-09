@@ -245,6 +245,11 @@ class Interpreter6502(
                 ((addressing.value.value.toInt() and 0xFF).toUByte())
             is AssemblyAddressing.ValueUpperSelection ->
                 ((addressing.value.value.toInt() shr 8) and 0xFF).toUByte()
+            is AssemblyAddressing.ConstantReference -> {
+                // Resolve the constant name to its value using labelResolver
+                val value = resolveLabel(addressing.name)
+                (value and 0xFF).toUByte()
+            }
             else -> {
                 val addr = getOperandAddress(addressing!!)
                 memory.readByte(addr)

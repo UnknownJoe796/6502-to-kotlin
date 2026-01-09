@@ -2982,12 +2982,19 @@ fun writeNTAddr(A: Int) {
     //> lda #$24
     temp0 = 0x04
     temp1 = 0xC0
+    // FIXED: Decompiler bug - changed "== 0" to "!= 0" to fix infinite loop
     do {
-        while (temp0 == 0) {
-            //> dex
-            temp0 = (temp0 - 1) and 0xFF
+        while (temp1 != 0) {
+            //> InitNTLoop: sta PPU_DATA
+            ppuData = 0x24
+            //> dey
+            temp1 = (temp1 - 1) and 0xFF
             //> bne InitNTLoop
         }
+        //> dex
+        temp0 = (temp0 - 1) and 0xFF
+        temp1 = 0xC0  // Reset Y for next iteration
+        //> bne InitNTLoop (outer)
     } while (temp0 != 0)
     //> ldy #64                   ;now to clear the attribute table (with zero this time)
     temp1 = 0x40
@@ -4729,12 +4736,6 @@ fun areaParserCore() {
 
 // Decompiled from ProcessAreaData
 fun processAreaData() {
-    var temp0: Int = 0
-    var temp1: Int = 0
-    var temp2: Int = 0
-    var temp3: Int = 0
-    var temp4: Int = 0
-    var temp5: Int = 0
     var areaDataOffset by MemoryByte(AreaDataOffset)
     var areaObjectPageLoc by MemoryByte(AreaObjectPageLoc)
     var areaObjectPageSel by MemoryByte(AreaObjectPageSel)
@@ -4743,140 +4744,124 @@ fun processAreaData() {
     var currentPageLoc by MemoryByte(CurrentPageLoc)
     var objectOffset by MemoryByte(ObjectOffset)
     val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
+
     //> ProcessAreaData:
-    //> ldx #$02                 ;start at the end of area object buffer
-    temp0 = 0x02
     do {
-        //> ProcADLoop: stx ObjectOffset
-        objectOffset = temp0
-        //> lda #$00                 ;reset flag
-        //> sta BehindAreaParserFlag
-        behindAreaParserFlag = 0x00
-        //> ldy AreaDataOffset       ;get offset of area data pointer
-        //> lda (AreaData),y         ;get first byte of area object
-        //> cmp #$fd                 ;if end-of-area, skip all this crap
-        //> beq RdyDecode
-        if (memory[readWord(AreaData) + areaDataOffset].toInt() - 0xFD == 0) {
-            //  goto RdyDecode
-            return
-        }
-        temp1 = memory[readWord(AreaData) + areaDataOffset].toInt()
-        temp2 = areaDataOffset
-        if (memory[readWord(AreaData) + areaDataOffset].toInt() != 0xFD) {
-            //> lda AreaObjectLength,x   ;check area object buffer flag
-            temp1 = areaObjectLength[temp0]
-            //> bpl RdyDecode            ;if buffer not negative, branch, otherwise
-            if (!((temp1 and 0x80) != 0)) {
-                //  goto RdyDecode
-                return
-            }
-            if ((temp1 and 0x80) != 0) {
-                //> iny
-                temp2 = (temp2 + 1) and 0xFF
-                //> lda (AreaData),y         ;get second byte of area object
-                temp1 = memory[readWord(AreaData) + temp2].toInt()
-                //> asl                      ;check for page select bit (d7), branch if not set
-                temp1 = (temp1 shl 1) and 0xFF
-                //> bcc Chk1Row13
-                if ((temp1 and 0x80) != 0) {
-                    //> lda AreaObjectPageSel    ;check page select
-                    temp1 = areaObjectPageSel
-                    //> bne Chk1Row13
-                    if (temp1 == 0) {
-                        //> inc AreaObjectPageSel    ;if not already set, set it now
-                        areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
-                        //> inc AreaObjectPageLoc    ;and increment page location
-                        areaObjectPageLoc = (areaObjectPageLoc + 1) and 0xFF
-                    }
-                }
-                //> Chk1Row13:  dey
-                temp2 = (temp2 - 1) and 0xFF
-                //> lda (AreaData),y         ;reread first byte of level object
-                temp1 = memory[readWord(AreaData) + temp2].toInt()
-                //> and #$0f                 ;mask out high nybble
-                temp3 = temp1 and 0x0F
-                //> cmp #$0d                 ;row 13?
-                //> bne Chk1Row14
-                temp1 = temp3
-                if (temp3 == 0x0D) {
-                    //> iny                      ;if so, reread second byte of level object
-                    temp2 = (temp2 + 1) and 0xFF
-                    //> lda (AreaData),y
-                    temp1 = memory[readWord(AreaData) + temp2].toInt()
-                    //> dey                      ;decrement to get ready to read first byte
-                    temp2 = (temp2 - 1) and 0xFF
-                    //> and #%01000000           ;check for d6 set (if not, object is page control)
-                    temp4 = temp1 and 0x40
-                    //> bne CheckRear
-                    temp1 = temp4
-                    if (temp4 == 0) {
-                        //> lda AreaObjectPageSel    ;if page select is set, do not reread
-                        temp1 = areaObjectPageSel
-                        //> bne CheckRear
-                        if (temp1 == 0) {
-                            //> iny                      ;if d6 not set, reread second byte
-                            temp2 = (temp2 + 1) and 0xFF
-                            //> lda (AreaData),y
-                            temp1 = memory[readWord(AreaData) + temp2].toInt()
-                            //> and #%00011111           ;mask out all but 5 LSB and store in page control
-                            temp5 = temp1 and 0x1F
-                            //> sta AreaObjectPageLoc
-                            areaObjectPageLoc = temp5
-                            //> inc AreaObjectPageSel    ;increment page select
+        //> ldx #$02 - start at the end of area object buffer
+        var X = 0x02
+
+        do {
+            //> ProcADLoop: stx ObjectOffset
+            objectOffset = X
+            //> lda #$00 / sta BehindAreaParserFlag - reset flag
+            behindAreaParserFlag = 0x00
+
+            var gotoRdyDecode = false
+            var gotoSetBehind = false
+            var gotoNextAObj = false
+
+            //> ldy AreaDataOffset / lda (AreaData),y / cmp #$fd
+            val areaDataPtr = readWord(AreaData)
+            val firstByte = memory[areaDataPtr + areaDataOffset].toInt()
+
+            if (firstByte == 0xFD) {
+                //> beq RdyDecode - end of area
+                gotoRdyDecode = true
+            } else {
+                //> lda AreaObjectLength,x / bpl RdyDecode
+                val objLength = areaObjectLength[X]
+                if ((objLength and 0x80) == 0) {
+                    // Buffer not negative - ready to decode
+                    gotoRdyDecode = true
+                } else {
+                    // Buffer is negative - need more processing
+                    //> iny / lda (AreaData),y - get second byte
+                    val secondByte = memory[areaDataPtr + areaDataOffset + 1].toInt()
+
+                    //> asl / bcc Chk1Row13 - check page select bit (d7)
+                    if ((secondByte and 0x80) != 0) {
+                        //> lda AreaObjectPageSel / bne Chk1Row13
+                        if (areaObjectPageSel == 0) {
+                            //> inc AreaObjectPageSel / inc AreaObjectPageLoc
                             areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
+                            areaObjectPageLoc = (areaObjectPageLoc + 1) and 0xFF
+                        }
+                    }
+
+                    //> Chk1Row13: lda (AreaData),y / and #$0f - get row from first byte
+                    val row = firstByte and 0x0F
+
+                    if (row == 0x0D) {
+                        //> Row 13 - check for page control
+                        //> lda (AreaData),y+1 / and #%01000000
+                        if ((secondByte and 0x40) == 0) {
+                            //> d6 not set = page control object
+                            if (areaObjectPageSel == 0) {
+                                //> and #%00011111 / sta AreaObjectPageLoc
+                                areaObjectPageLoc = secondByte and 0x1F
+                                areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
+                            }
                             //> jmp NextAObj
+                            gotoNextAObj = true
+                        }
+                        // else fall through to CheckRear
+                    }
+
+                    if (!gotoNextAObj) {
+                        //> Chk1Row14: cmp #$0e / bne CheckRear
+                        if (row == 0x0E) {
+                            //> lda BackloadingFlag / bne RdyDecode
+                            if (backloadingFlag != 0) {
+                                gotoRdyDecode = true
+                            }
+                            // else fall through to CheckRear
+                        }
+
+                        if (!gotoRdyDecode) {
+                            //> CheckRear: lda AreaObjectPageLoc / cmp CurrentPageLoc / bcc SetBehind
+                            if (areaObjectPageLoc < currentPageLoc) {
+                                gotoSetBehind = true
+                            } else {
+                                // Object is on or ahead of renderer - decode it
+                                gotoRdyDecode = true
+                            }
                         }
                     }
                 }
-                //> Chk1Row14:  cmp #$0e                 ;row 14?
-                //> bne CheckRear
-                if (temp1 == 0x0E) {
-                    //> lda BackloadingFlag      ;check flag for saved page number and branch if set
-                    temp1 = backloadingFlag
-                    //> bne RdyDecode            ;to render the object (otherwise bg might not look right)
-                    if (!(temp1 == 0)) {
-                        //  goto RdyDecode
-                        return
-                    }
-                    if (temp1 == 0) {
-                    }
-                }
-                //> CheckRear:  lda AreaObjectPageLoc    ;check to see if current page of level object is
-                temp1 = areaObjectPageLoc
-                //> cmp CurrentPageLoc       ;behind current page of renderer
-                //> bcc SetBehind            ;if so branch
-                if (temp1 >= currentPageLoc) {
-                }
             }
-        }
-        //> RdyDecode:  jsr DecodeAreaData       ;do sub and do not turn on flag
-        decodeAreaData(temp0)
-        //> jmp ChkLength
-        //> SetBehind:  inc BehindAreaParserFlag ;turn on flag if object is behind renderer
-        behindAreaParserFlag = (behindAreaParserFlag + 1) and 0xFF
-        //> NextAObj:   jsr IncAreaObjOffset     ;increment buffer offset and move on
-        incAreaObjOffset()
-        //> ChkLength:  ldx ObjectOffset         ;get buffer offset
-        temp0 = objectOffset
-        //> lda AreaObjectLength,x   ;check object length for anything stored here
-        temp1 = areaObjectLength[temp0]
-        //> bmi ProcLoopb            ;if not, branch to handle loopback
-        if ((temp1 and 0x80) == 0) {
-            //> dec AreaObjectLength,x   ;otherwise decrement length or get rid of it
-            areaObjectLength[temp0] = (areaObjectLength[temp0] - 1) and 0xFF
-        }
-        //> ProcLoopb:  dex                      ;decrement buffer offset
-        temp0 = (temp0 - 1) and 0xFF
-        //> bpl ProcADLoop           ;and loopback unless exceeded buffer
-    } while ((temp0 and 0x80) == 0)
-    //> lda BehindAreaParserFlag ;check for flag set if objects were behind renderer
-    temp1 = behindAreaParserFlag
-    //> bne ProcessAreaData      ;branch if true to load more level data, otherwise
-    //> lda BackloadingFlag      ;check for flag set if starting right of page $00
-    temp1 = backloadingFlag
-    //> bne ProcessAreaData      ;branch if true to load more level data, otherwise leave
-    //> EndAParse:  rts
-    return
+
+            // Execute the appropriate branch
+            if (gotoRdyDecode) {
+                //> RdyDecode: jsr DecodeAreaData / jmp ChkLength
+                decodeAreaData(X)
+                // Skip SetBehind and NextAObj, go directly to ChkLength
+            } else if (gotoSetBehind) {
+                //> SetBehind: inc BehindAreaParserFlag
+                behindAreaParserFlag = (behindAreaParserFlag + 1) and 0xFF
+                //> Fall through to NextAObj
+                incAreaObjOffset()
+            } else if (gotoNextAObj) {
+                //> NextAObj: jsr IncAreaObjOffset
+                incAreaObjOffset()
+            }
+
+            //> ChkLength: ldx ObjectOffset
+            X = objectOffset
+            //> lda AreaObjectLength,x / bmi ProcLoopb / dec AreaObjectLength,x
+            val lenCheck = areaObjectLength[X]
+            if ((lenCheck and 0x80) == 0) {
+                areaObjectLength[X] = (areaObjectLength[X] - 1) and 0xFF
+            }
+
+            //> ProcLoopb: dex / bpl ProcADLoop
+            X = (X - 1) and 0xFF
+        } while ((X and 0x80) == 0)
+
+        //> lda BehindAreaParserFlag / bne ProcessAreaData
+        //> lda BackloadingFlag / bne ProcessAreaData
+    } while (behindAreaParserFlag != 0 || backloadingFlag != 0)
+
+    //> EndAParse: rts
 }
 
 // Decompiled from IncAreaObjOffset
@@ -4895,12 +4880,204 @@ fun incAreaObjOffset() {
     return
 }
 
-// Decompiled from DecodeAreaData
+// Decompiled from DecodeAreaData - FIX: Implement proper dispatch logic
 fun decodeAreaData(X: Int) {
+    var Y: Int = 0
+    var offset07: Int = 0  // $07 - offset for jump table
+    var objId00: Int = 0   // $00 - object ID
     val areaObjOffsetBuffer by MemoryByteIndexed(AreaObjOffsetBuffer)
     val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
-    //> EndAParse:  rts
-    return
+    var objectOffset by MemoryByte(ObjectOffset)
+    var areaObjectPageLoc by MemoryByte(AreaObjectPageLoc)
+    var currentPageLoc by MemoryByte(CurrentPageLoc)
+    var areaDataOffset by MemoryByte(AreaDataOffset)
+    var backloadingFlag by MemoryByte(BackloadingFlag)
+    var behindAreaParserFlag by MemoryByte(BehindAreaParserFlag)
+    var currentColumnPos by MemoryByte(CurrentColumnPos)
+    var loopCommand by MemoryByte(LoopCommand)
+
+    // Check current buffer flag
+    if ((areaObjectLength[X] and 0x80) == 0) {
+        // Buffer has valid data, get offset from buffer
+        Y = areaObjOffsetBuffer[X]
+    }
+
+    // Chk1stB: load offset of 16 for special row 15
+    var tempX = 0x10
+
+    // Get first byte of level object
+    val areaDataPtr = readWord(AreaData)
+    val firstByte = memory[areaDataPtr + Y].toInt()
+
+    // Check for end of level marker
+    if (firstByte == 0xFD) {
+        return  // EndAParse
+    }
+
+    // Get row from low nibble
+    val row = firstByte and 0x0F
+
+    // Determine offset based on row type
+    when {
+        row == 0x0F -> tempX = 0x10  // Row 15: offset 16
+        row == 0x0C -> tempX = 0x08  // Row 12: offset 8
+        else -> tempX = 0x00         // Default: offset 0
+    }
+
+    // ChkRow14: store offset
+    offset07 = tempX
+    memory[0x07] = offset07.toUByte()
+
+    // Restore X from ObjectOffset
+    val objX = objectOffset
+
+    when {
+        row == 0x0E -> {
+            // Row 14: special case
+            offset07 = 0x00
+            memory[0x07] = 0u
+            objId00 = 0x2E
+            memory[0x00] = objId00.toUByte()
+        }
+        row == 0x0D -> {
+            // Row 13: offset 34 for flagpole, axe, etc.
+            offset07 = 0x22
+            memory[0x07] = 0x22u
+            // Get next byte
+            val secondByte = memory[areaDataPtr + Y + 1].toInt()
+            // Check for page control (d6 clear)
+            if ((secondByte and 0x40) == 0) {
+                return  // LeavePar - page control handled elsewhere
+            }
+            // Check for loop command
+            val masked = secondByte and 0x7F
+            if (masked == 0x4B) {
+                loopCommand = (loopCommand + 1) and 0xFF
+            }
+            // Mask2MSB: mask out d7 and d6
+            objId00 = secondByte and 0x3F
+            memory[0x00] = objId00.toUByte()
+        }
+        row >= 0x0C -> {
+            // SpecObj: rows 12-15 (but not 13 or 14 which were handled above)
+            val secondByte = memory[areaDataPtr + Y + 1].toInt()
+            val d6d4 = (secondByte and 0x70) shr 4
+            objId00 = d6d4
+            memory[0x00] = objId00.toUByte()
+        }
+        else -> {
+            // ChkSRows: rows 0-11 (normal objects)
+            val secondByte = memory[areaDataPtr + Y + 1].toInt()
+            val d6d4 = secondByte and 0x70
+
+            if (d6d4 != 0) {
+                // LrgObj: large object
+                memory[0x00] = d6d4.toUByte()
+
+                // Check for vertical pipe (d6d4 = 0x70)
+                if (d6d4 == 0x70) {
+                    // Check for warp pipe (d3 set)
+                    if ((secondByte and 0x08) != 0) {
+                        objId00 = 0x00  // Warp pipe
+                        memory[0x00] = 0u
+                    } else {
+                        objId00 = d6d4 shr 4  // Decoration pipe
+                        memory[0x00] = objId00.toUByte()
+                    }
+                } else {
+                    objId00 = d6d4 shr 4
+                    memory[0x00] = objId00.toUByte()
+                }
+            } else {
+                // Small object: offset 22 (0x16)
+                offset07 = 0x16
+                memory[0x07] = 0x16u
+                objId00 = secondByte and 0x0F
+                memory[0x00] = objId00.toUByte()
+            }
+        }
+    }
+
+    // Check if we should render the object
+    if ((areaObjectLength[objX] and 0x80) != 0) {
+        // Buffer is negative (first time), check if object is on current page
+        if (areaObjectPageLoc != currentPageLoc) {
+            // Not on current page
+            // Check for row 14 special case
+            val reloadedRow = memory[areaDataPtr + areaDataOffset].toInt() and 0x0F
+            if (reloadedRow != 0x0E) {
+                return  // LeavePar
+            }
+            if (backloadingFlag == 0) {
+                return  // LeavePar
+            }
+        } else {
+            // InitRear: on same page
+            if (backloadingFlag != 0) {
+                // Initialize flags
+                backloadingFlag = 0
+                behindAreaParserFlag = 0
+                objectOffset = 0
+                return
+            }
+            // BackColC: check column
+            val colCheck = (memory[areaDataPtr + areaDataOffset].toInt() and 0xF0) shr 4
+            if (colCheck != currentColumnPos) {
+                return  // LeavePar
+            }
+        }
+
+        // StrAObj: store offset in buffer
+        areaObjOffsetBuffer[objX] = areaDataOffset
+        incAreaObjOffset()
+    }
+
+    // RunAObj: dispatch to object handler
+    val handlerIndex = (memory[0x00].toInt() + memory[0x07].toInt()) and 0xFF
+
+    // Call appropriate handler based on index
+    val handlerY = areaObjOffsetBuffer[objX]
+    when (handlerIndex) {
+        0 -> verticalPipe(objX, handlerY)      // Warp pipe
+        1 -> areaStyleObject()                  // Area style
+        2 -> rowOfBricks()                      // Row of bricks
+        3 -> rowOfSolidBlocks()                 // Row of solid blocks
+        4 -> rowOfCoins()                       // Row of coins
+        5 -> columnOfBricks()                   // Column of bricks
+        6 -> columnOfSolidBlocks()              // Column of solid blocks
+        7 -> verticalPipe(objX, handlerY)      // Decoration pipe
+        8 -> holeEmpty()                        // Hole empty (row 12)
+        9 -> pulleyRopeObject(objX)             // Pulley rope
+        10 -> bridgeHigh()                      // Bridge high
+        11 -> bridgeMiddle()                    // Bridge middle
+        12 -> bridgeLow()                       // Bridge low
+        13 -> holeWater()                       // Hole water
+        14 -> questionblockrowHigh()            // Question block row high
+        15 -> questionblockrowLow()             // Question block row low
+        16 -> endlessRope()                     // Endless rope (row 15)
+        17 -> balancePlatRope(objX)              // Balance platform rope
+        18 -> castleObject(objX, handlerY)      // Castle object
+        19 -> staircaseObject()                 // Staircase
+        20 -> exitPipe()                        // Exit pipe
+        21 -> flagballsResidual()               // Flag balls
+        22 -> questionBlock(handlerY)           // Question block (small, row 0-11)
+        23 -> questionBlock(handlerY)           // Question block coin
+        24 -> questionBlock(handlerY)           // Hidden coin
+        25 -> hidden1UpBlock()                  // Hidden 1-up
+        26 -> brickWithItem(handlerY)           // Brick with power-up
+        27 -> brickWithItem(handlerY)           // Brick with vine
+        28 -> brickWithItem(handlerY)           // Brick with star
+        29 -> brickWithCoins()                  // Brick with coins
+        30 -> brickWithItem(handlerY)           // Brick with 1-up
+        31 -> waterPipe(objX)                   // Water pipe
+        32 -> emptyBlock()                      // Empty block
+        33 -> jumpspring(0, objX)               // Jumpspring
+        34 -> introPipe()                       // Intro pipe (row 13)
+        35 -> flagpoleObject()                  // Flagpole
+        36 -> axeObj()                          // Axe
+        37 -> chainObj()                        // Chain
+        else -> { /* Unknown handler */ }
+    }
 }
 
 // Decompiled from LoopCmdE
@@ -5529,13 +5706,8 @@ fun renderSidewaysPipe(X: Int, Y: Int) {
 
 // Decompiled from VerticalPipe
 fun verticalPipe(X: Int, Y: Int) {
-    var Y: Int = Y
+    var pipeY: Int = Y
     var temp0: Int = 0
-    var temp1: Int = 0
-    var temp2: Int = 0
-    var temp3: Int = 0
-    var temp4: Int = 0
-    var temp5: Int = 0
     var areaNumber by MemoryByte(AreaNumber)
     var currentPageLoc by MemoryByte(CurrentPageLoc)
     var worldNumber by MemoryByte(WorldNumber)
@@ -5548,104 +5720,70 @@ fun verticalPipe(X: Int, Y: Int) {
     val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
     val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
     val verticalPipeData by MemoryByteIndexed(VerticalPipeData)
+
     //> VerticalPipe:
     //> jsr GetPipeHeight
     getPipeHeight(X)
+
     //> lda $00                  ;check to see if value was nullified earlier
     //> beq WarpPipe             ;(if d3, the usage control bit of second byte, was set)
-    temp0 = memory[0x0].toInt()
-    if (memory[0x0].toInt() != 0) {
-        //> iny
-        Y = (Y + 1) and 0xFF
-        //> iny
-        Y = (Y + 1) and 0xFF
-        //> iny
-        Y = (Y + 1) and 0xFF
-        //> iny                      ;add four if usage control bit was not set
-        Y = (Y + 1) and 0xFF
+    // If $00 is not zero (decoration pipe), add 4 to Y index
+    if (memory[0x00].toInt() != 0) {
+        //> iny x4 - add four if usage control bit was not set
+        pipeY = (pipeY + 4) and 0xFF
     }
-    //> WarpPipe: tya                      ;save value in stack
-    //> pha
-    push(Y)
-    //> lda AreaNumber
-    temp0 = areaNumber
-    //> ora WorldNumber          ;if at world 1-1, do not add piranha plant ever
-    temp1 = temp0 or worldNumber
-    //> beq DrawPipe
-    if (temp1 == 0) {
-        //  goto DrawPipe
-        return
-    }
-    temp0 = temp1
-    if (temp1 != 0) {
-        //> ldy AreaObjectLength,x   ;if on second column of pipe, branch
-        //> beq DrawPipe             ;(because we only need to do this once)
-        if (areaObjectLength[X] == 0) {
-            //  goto DrawPipe
-            return
-        }
-        temp2 = areaObjectLength[X]
+
+    //> WarpPipe: tya / pha - save pipe data index for DrawPipe
+    push(pipeY)
+
+    //> lda AreaNumber / ora WorldNumber - if at World 1-1, skip piranha plant
+    val worldArea = areaNumber or worldNumber
+    if (worldArea != 0) {
+        // Not World 1-1 - potentially add piranha plant
+        //> ldy AreaObjectLength,x / beq DrawPipe - only on first column
         if (areaObjectLength[X] != 0) {
-            //> jsr FindEmptyEnemySlot   ;check for an empty moving data buffer space
+            //> jsr FindEmptyEnemySlot
             findEmptyEnemySlot()
-            //> bcs DrawPipe             ;if not found, too many enemies, thus skip
-            if (flagC) {
-                //  goto DrawPipe
-                return
-            }
+            //> bcs DrawPipe - if no slot found, skip piranha
             if (!flagC) {
-                //> jsr GetAreaObjXPosition  ;get horizontal pixel coordinate
-                getAreaObjXPosition()
-                //> clc
-                //> adc #$08                 ;add eight to put the piranha plant in the center
-                temp3 = temp0 + 0x08
-                temp0 = temp3 and 0xFF
-                //> sta Enemy_X_Position,x   ;store as enemy's horizontal coordinate
-                enemyXPosition[X] = temp0
-                //> lda CurrentPageLoc       ;add carry to current page number
-                temp0 = currentPageLoc
-                //> adc #$00
-                temp4 = temp0 + (if (temp3 > 0xFF) 1 else 0)
-                temp0 = temp4 and 0xFF
-                //> sta Enemy_PageLoc,x      ;store as enemy's page coordinate
-                enemyPageloc[X] = temp0
-                //> lda #$01
-                temp0 = 0x01
-                //> sta Enemy_Y_HighPos,x
-                enemyYHighpos[X] = temp0
-                //> sta Enemy_Flag,x         ;activate enemy flag
-                enemyFlag[X] = temp0
-                //> jsr GetAreaObjYPosition  ;get piranha plant's vertical coordinate and store here
-                getAreaObjYPosition()
-                //> sta Enemy_Y_Position,x
-                enemyYPosition[X] = temp0
-                //> lda #PiranhaPlant        ;write piranha plant's value into buffer
-                temp0 = PiranhaPlant
-                //> sta Enemy_ID,x
-                enemyId[X] = temp0
+                //> jsr GetAreaObjXPosition
+                temp0 = getAreaObjXPosition()
+                //> clc / adc #$08
+                val xWithCarry = temp0 + 0x08
+                //> sta Enemy_X_Position,x
+                enemyXPosition[X] = xWithCarry and 0xFF
+                //> lda CurrentPageLoc / adc #$00
+                val pageLoc = currentPageLoc + (if (xWithCarry > 0xFF) 1 else 0)
+                //> sta Enemy_PageLoc,x
+                enemyPageloc[X] = pageLoc and 0xFF
+                //> lda #$01 / sta Enemy_Y_HighPos,x / sta Enemy_Flag,x
+                enemyYHighpos[X] = 0x01
+                enemyFlag[X] = 0x01
+                //> jsr GetAreaObjYPosition / sta Enemy_Y_Position,x
+                val yPos = getAreaObjYPosition()
+                enemyYPosition[X] = yPos
+                //> lda #PiranhaPlant / sta Enemy_ID,x
+                enemyId[X] = PiranhaPlant
                 //> jsr InitPiranhaPlant
                 initPiranhaPlant(X)
             }
         }
     }
-    //> DrawPipe: pla                      ;get value saved earlier and use as Y
-    temp0 = pull()
-    //> tay
-    //> ldx $07                  ;get buffer offset
-    //> lda VerticalPipeData,y   ;draw the appropriate pipe with the Y we loaded earlier
-    temp0 = verticalPipeData[temp0]
-    //> sta MetatileBuffer,x     ;render the top of the pipe
-    metatileBuffer[memory[0x7].toInt()] = temp0
+
+    //> DrawPipe: pla / tay - restore pipe data index
+    val savedY = pull()
+    //> ldx $07 - get buffer offset
+    val bufferX = memory[0x07].toInt()
+    //> lda VerticalPipeData,y / sta MetatileBuffer,x - render pipe top
+    metatileBuffer[bufferX] = verticalPipeData[savedY]
     //> inx
-    temp5 = memory[0x7].toInt()
-    temp5 = (temp5 + 1) and 0xFF
-    //> lda VerticalPipeData+2,y ;render the rest of the pipe
-    temp0 = verticalPipeData[2 + temp0]
-    //> ldy $06                  ;subtract one from length and render the part underneath
-    temp2 = memory[0x6].toInt()
-    //> dey
-    temp2 = (temp2 - 1) and 0xFF
+    val nextX = (bufferX + 1) and 0xFF
+    //> lda VerticalPipeData+2,y - get pipe body tile
+    val pipeBodyTile = verticalPipeData[savedY + 2]
+    //> ldy $06 / dey - get pipe height minus 1
+    val pipeHeight = (memory[0x06].toInt() - 1) and 0xFF
     //> jmp RenderUnderPart
+    renderUnderPart(pipeBodyTile, nextX, pipeHeight)
 }
 
 // Decompiled from GetPipeHeight
@@ -6489,35 +6627,20 @@ fun getLrgObjAttrib(X: Int): Int {
 
 // Decompiled from GetAreaObjXPosition
 fun getAreaObjXPosition(): Int {
-    var currentColumnPos by MemoryByte(CurrentColumnPos)
+    val currentColumnPos by MemoryByte(CurrentColumnPos)
     //> GetAreaObjXPosition:
     //> lda CurrentColumnPos    ;multiply current offset where we're at by 16
-    //> asl                     ;to obtain horizontal pixel coordinate
-    currentColumnPos = (currentColumnPos shl 1) and 0xFF
-    //> asl
-    currentColumnPos = (currentColumnPos shl 1) and 0xFF
-    //> asl
-    currentColumnPos = (currentColumnPos shl 1) and 0xFF
-    //> asl
-    currentColumnPos = (currentColumnPos shl 1) and 0xFF
-    //> rts
-    return A
+    //> asl asl asl asl         ;to obtain horizontal pixel coordinate
+    return (currentColumnPos shl 4) and 0xFF
 }
 
 // Decompiled from GetAreaObjYPosition
 fun getAreaObjYPosition(): Int {
-    var temp0: Int = 0
     //> GetAreaObjYPosition:
     //> lda $07  ;multiply value by 16
-    //> asl
-    //> asl      ;this will give us the proper vertical pixel coordinate
-    //> asl
-    //> asl
-    //> clc
-    //> adc #32  ;add 32 pixels for the status bar
-    temp0 = ((((((((memory[0x7].toInt() shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF) shl 1) and 0xFF) + 0x20
-    //> rts
-    return A
+    //> asl asl asl asl ;this will give us the proper vertical pixel coordinate
+    //> clc / adc #32  ;add 32 pixels for the status bar
+    return ((memory[0x07].toInt() shl 4) + 0x20) and 0xFF
 }
 
 // Decompiled from GetBlockBufferAddr
@@ -6560,27 +6683,35 @@ fun loadAreaPointer(A: Int) {
     var areaPointer by MemoryByte(AreaPointer)
     //> LoadAreaPointer:
     //> jsr FindAreaPointer  ;find it and store it here
-    findAreaPointer()
+    val foundPointer = findAreaPointer()  // FIX: Capture return value
     //> sta AreaPointer
-    areaPointer = A
+    areaPointer = foundPointer  // FIX: Use returned value, not parameter
     // Fall-through tail call to getAreaType
-    getAreaType(A)
+    getAreaType(foundPointer)  // FIX: Use returned value
 }
 
 // Decompiled from GetAreaType
 fun getAreaType(A: Int): Int {
     var temp0: Int = 0
+    var carry: Int = 0  // FIX: Track carry flag for ROL operations
     var areaType by MemoryByte(AreaType)
     //> GetAreaType: and #%01100000       ;mask out all but d6 and d5
     temp0 = A and 0x60
     //> asl
+    carry = (temp0 shr 7) and 1  // FIX: ASL sets carry from bit 7
     temp0 = (temp0 shl 1) and 0xFF
     //> rol
-    temp0 = (temp0 shl 1) and 0xFE or if ((temp0 and 0x80) != 0) 1 else 0
+    val newCarry1 = (temp0 shr 7) and 1  // FIX: Save bit 7 before shifting
+    temp0 = ((temp0 shl 1) and 0xFE) or carry  // FIX: Old carry goes into bit 0
+    carry = newCarry1
     //> rol
-    temp0 = (temp0 shl 1) and 0xFE or if ((temp0 and 0x80) != 0) 1 else 0
+    val newCarry2 = (temp0 shr 7) and 1
+    temp0 = ((temp0 shl 1) and 0xFE) or carry
+    carry = newCarry2
     //> rol                  ;make %0xx00000 into %000000xx
-    temp0 = (temp0 shl 1) and 0xFE or if ((temp0 and 0x80) != 0) 1 else 0
+    val newCarry3 = (temp0 shr 7) and 1
+    temp0 = ((temp0 shl 1) and 0xFE) or carry
+    carry = newCarry3
     //> sta AreaType         ;save 2 MSB as area type
     areaType = temp0
     //> rts
@@ -6603,7 +6734,7 @@ fun findAreaPointer(): Int {
     //> tay
     //> lda AreaAddrOffsets,y  ;from there we have our area pointer
     //> rts
-    return A
+    return areaAddrOffsets[temp0 and 0xFF]  // FIX: Return actual computed area pointer
 }
 
 // Decompiled from GetAreaDataAddrs
@@ -6655,7 +6786,7 @@ fun getAreaDataAddrs() {
     //> lda EnemyAddrHOffsets,y  ;load base value with 2 altered MSB,
     //> clc                      ;then add base value to 5 LSB, result
     //> adc AreaAddrsLOffset     ;becomes offset for level data
-    temp1 = enemyAddrHOffsets[areaPointer] + areaAddrsLOffset
+    temp1 = enemyAddrHOffsets[areaType] + areaAddrsLOffset  // FIX: Use areaType, not areaPointer
     //> tay
     //> lda EnemyDataAddrLow,y   ;use offset to load pointer
     //> sta EnemyDataLow
@@ -7365,7 +7496,15 @@ fun playerEntrance() {
         //> cpy #$30                  ;point, nullify controller bits and continue
         //> bcc AutoControlPlayer     ;with player movement code, do not return
         if (!(playerYPosition >= 0x30)) {
-            //  goto AutoControlPlayer
+            // FIX: AutoControlPlayer path - set JoypadOverride and go to PlayerRdy
+            // The original assembly branches FORWARD to AutoControlPlayer, then falls through to PlayerRdy
+            joypadOverride = temp0  // temp0 = 0 from above
+            // Fall through to PlayerRdy
+            gameEngineSubroutine = 0x08
+            playerFacingDir = 0x01
+            altEntranceControl = 0
+            disableCollisionDet = 0
+            joypadOverride = 0
             return
         }
         //> lda PlayerEntranceCtrl    ;check player entry bits from header
@@ -25893,12 +26032,13 @@ fun runOffscrBitsSubs(A: Int, X: Int): Int {
         temp4 = memory[0x4].toInt()
         //> cmp #$00
         //> bne ExYOfsBS                 ;if bits not zero, branch to leave
-        if (temp3 == 0) {
-            //> dey                          ;otherwise, do bottom of the screen now
-            temp0 = (temp0 - 1) and 0xFF
-            //> bpl YOfsLoop
+        if (temp3 != 0) {
+            break  // Exit loop - bne ExYOfsBS
         }
-    } while (!flagN)
+        //> dey                          ;otherwise, do bottom of the screen now
+        temp0 = (temp0 - 1) and 0xFF
+        //> bpl YOfsLoop
+    } while ((temp0 and 0x80) == 0)  // Continue while N flag clear (positive)
     //> ExYOfsBS: rts
     return A
 }
@@ -25958,12 +26098,13 @@ fun getXOffscreenBits(X: Int): Int {
         temp4 = memory[0x4].toInt()
         //> cmp #$00                    ;if bits not zero, branch to leave
         //> bne ExXOfsBS
-        if (temp3 == 0) {
-            //> dey                         ;otherwise, do left side of screen now
-            temp0 = (temp0 - 1) and 0xFF
-            //> bpl XOfsLoop                ;branch if not already done with left side
+        if (temp3 != 0) {
+            break  // Exit loop - bne ExXOfsBS
         }
-    } while (!flagN)
+        //> dey                         ;otherwise, do left side of screen now
+        temp0 = (temp0 - 1) and 0xFF
+        //> bpl XOfsLoop                ;branch if not already done with left side
+    } while ((temp0 and 0x80) == 0)  // Continue while N flag clear (positive)
     //> ExXOfsBS: rts
     return A
 }

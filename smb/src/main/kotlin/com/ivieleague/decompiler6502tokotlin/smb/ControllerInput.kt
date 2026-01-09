@@ -17,16 +17,16 @@ package com.ivieleague.decompiler6502tokotlin.smb
  * Games write 1 then 0 to $4016 to strobe, then read 8 times.
  */
 class ControllerInput {
-    // Button bit masks (SMB bit order - reversed from standard NES)
+    // Button bit masks (Standard NES bit order)
     companion object {
-        const val A = 0x80      // Bit 7
-        const val B = 0x40      // Bit 6
-        const val SELECT = 0x20 // Bit 5
-        const val START = 0x10  // Bit 4
-        const val UP = 0x08     // Bit 3
-        const val DOWN = 0x04   // Bit 2
-        const val LEFT = 0x02   // Bit 1
-        const val RIGHT = 0x01  // Bit 0
+        const val A = 0x01      // Bit 0
+        const val B = 0x02      // Bit 1
+        const val SELECT = 0x04 // Bit 2
+        const val START = 0x08  // Bit 3
+        const val UP = 0x10     // Bit 4
+        const val DOWN = 0x20   // Bit 5
+        const val LEFT = 0x40   // Bit 6
+        const val RIGHT = 0x80  // Bit 7
     }
     
     // Current button state for each controller (0-1)
@@ -44,38 +44,36 @@ class ControllerInput {
             buttonState[controller] = buttons and 0xFF
         }
     }
-    
+
     /**
      * Write to $4016 (controller strobe)
+     *
+     * Like real NES hardware and the interpreter, strobe HIGH latches the button state.
      */
     fun writeStrobe(value: UByte) {
         val newStrobe = (value.toInt() and 0x01) != 0
-        if (strobeState && !newStrobe) {
-            // Falling edge: latch button state into shift registers
+        if (newStrobe) {
+            // Strobe HIGH: latch button state into shift registers (matches interpreter)
             shiftRegister[0] = buttonState[0]
             shiftRegister[1] = buttonState[1]
         }
         strobeState = newStrobe
     }
-    
+
     /**
      * Read from $4016 (player 1) or $4017 (player 2)
      *
-     * Returns bits in serial order: A first (from bit 7), Right last (from bit 0).
-     * This matches how NES hardware presents controller data, and SMB's
-     * ReadPortBits uses ROL to reassemble back to: A=bit7, Right=bit0.
+     * Returns bits LSB first: A, B, Select, Start, Up, Down, Left, Right
+     * This matches real NES hardware and the interpreter's SimpleController.
      */
     fun readController(address: Int): UByte {
         val controller = if (address == 0x4016) 0 else 1
 
-        if (strobeState) {
-            // During strobe, always return current A button state (bit 7)
-            return ((buttonState[controller] shr 7) and 0x01).toUByte()
+        // Return next bit from shift register (LSB first, shift right - matches interpreter)
+        val bit = shiftRegister[controller] and 0x01
+        if (!strobeState) {
+            shiftRegister[controller] = shiftRegister[controller] shr 1
         }
-
-        // Return next bit from shift register (MSB first: A, B, Select, Start, Up, Down, Left, Right)
-        val bit = (shiftRegister[controller] shr 7) and 0x01
-        shiftRegister[controller] = (shiftRegister[controller] shl 1) and 0xFF
 
         return bit.toUByte()
     }
@@ -145,16 +143,18 @@ class ControllerInput {
      * Maps to SMB bit order: Right=bit0, Left=bit1, Down=bit2, Up=bit3, Start=bit4, Select=bit5, B=bit6, A=bit7
      */
     fun parseFceuxFormat(input: String): Int {
+        // FM2 format: R L D U T S B A (positions 0-7)
+        // Standard NES bit order: A=0, B=1, Select=2, Start=3, Up=4, Down=5, Left=6, Right=7
         var buttons = 0
         if (input.length >= 8) {
-            if (input[0] != '.') buttons = buttons or RIGHT   // 0x01
-            if (input[1] != '.') buttons = buttons or LEFT    // 0x02
-            if (input[2] != '.') buttons = buttons or DOWN    // 0x04
-            if (input[3] != '.') buttons = buttons or UP      // 0x08
-            if (input[4] != '.') buttons = buttons or START   // 0x10
-            if (input[5] != '.') buttons = buttons or SELECT  // 0x20
-            if (input[6] != '.') buttons = buttons or B       // 0x40
-            if (input[7] != '.') buttons = buttons or A       // 0x80
+            if (input[0] != '.') buttons = buttons or 0x80  // R -> bit 7
+            if (input[1] != '.') buttons = buttons or 0x40  // L -> bit 6
+            if (input[2] != '.') buttons = buttons or 0x20  // D -> bit 5
+            if (input[3] != '.') buttons = buttons or 0x10  // U -> bit 4
+            if (input[4] != '.') buttons = buttons or 0x08  // T (Start) -> bit 3
+            if (input[5] != '.') buttons = buttons or 0x04  // S (Select) -> bit 2
+            if (input[6] != '.') buttons = buttons or 0x02  // B -> bit 1
+            if (input[7] != '.') buttons = buttons or 0x01  // A -> bit 0
         }
         return buttons
     }

@@ -86,7 +86,18 @@ class SMBRuntime {
         isFirstFrame = true
         skippedNmiCount = 0
     }
-    
+
+    /**
+     * Disable NMI skipping.
+     * Use this when loading state from interpreter to avoid skip logic mismatch.
+     */
+    fun disableNmiSkip() {
+        nmisToSkip = 0
+        isFirstFrame = false
+        prevTask = memory[OperMode_Task].toInt()
+        prevMode = memory[OperMode].toInt()
+    }
+
     /**
      * Hook for memory reads - intercepts PPU and controller reads
      */

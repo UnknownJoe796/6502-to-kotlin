@@ -28,10 +28,14 @@ class PPUStub {
     
     // Internal state
     private var vblankFlag: Boolean = false
+    private var sprite0HitFlag: Boolean = false  // Sprite 0 hit detection (bit 6 of PPUSTATUS)
     private var ppuAddrLatch: Boolean = false  // false = high byte, true = low byte
     private var ppuScrollLatch: Boolean = false  // false = X scroll, true = Y scroll
     private var scrollX: UByte = 0u
     private var scrollY: UByte = 0u
+
+    // Simulate PPU rendering progression for sprite 0 hit timing
+    private var ppuStatusReadsSinceVBlank: Int = 0
     
     // VRAM (8KB for name tables + pattern tables)
     private val vram = UByteArray(0x4000)
@@ -49,9 +53,20 @@ class PPUStub {
     fun readRegister(address: Int): UByte {
         return when (address and 0x2007) {
             0x2002 -> {
+                // Simulate sprite 0 hit becoming available after a few PPU_STATUS reads
+                // This simulates the PPU rendering progressing while code waits in busy loops
+                if (!sprite0HitFlag) {
+                    ppuStatusReadsSinceVBlank++
+                    // After a few reads (simulating scanlines progressing), set sprite 0 hit
+                    if (ppuStatusReadsSinceVBlank >= 3) {
+                        sprite0HitFlag = true
+                        ppuStatus = (ppuStatus.toInt() or 0x40).toUByte()  // Set sprite 0 hit (bit 6)
+                    }
+                }
+
                 // PPUSTATUS - reading clears VBlank flag and resets address latch
                 val status = ppuStatus
-                ppuStatus = (ppuStatus.toInt() and 0x7F).toUByte()  // Clear VBlank
+                ppuStatus = (ppuStatus.toInt() and 0x7F).toUByte()  // Clear VBlank (bit 7)
                 vblankFlag = false
                 ppuAddrLatch = false
                 ppuScrollLatch = false
@@ -132,19 +147,34 @@ class PPUStub {
     
     /**
      * Begin VBlank period (called at end of visible frame)
-     * Sets the VBlank flag in PPUSTATUS
+     * Sets the VBlank flag in PPUSTATUS and clears sprite 0 hit
      */
     fun beginVBlank() {
         vblankFlag = true
-        ppuStatus = (ppuStatus.toInt() or 0x80).toUByte()
+        ppuStatus = (ppuStatus.toInt() or 0x80).toUByte()  // Set VBlank (bit 7)
+
+        // Clear sprite 0 hit at start of VBlank (bit 6)
+        sprite0HitFlag = false
+        ppuStatus = (ppuStatus.toInt() and 0xBF).toUByte()
+
+        // Reset read counter for sprite 0 hit simulation
+        ppuStatusReadsSinceVBlank = 0
     }
-    
+
     /**
      * End VBlank period (called at start of new frame)
+     * Sets sprite 0 hit flag to simulate detection during rendering
      */
     fun endVBlank() {
         vblankFlag = false
-        ppuStatus = (ppuStatus.toInt() and 0x7F).toUByte()
+        ppuStatus = (ppuStatus.toInt() and 0x7F).toUByte()  // Clear VBlank (bit 7)
+
+        // Set sprite 0 hit flag when rendering begins
+        // In real hardware this happens when sprite 0 overlaps background
+        // For TAS validation, we always set it (sprite 0 is always present)
+        sprite0HitFlag = true
+        ppuStatus = (ppuStatus.toInt() or 0x40).toUByte()  // Set sprite 0 hit (bit 6)
+
         frameCount++
     }
     
@@ -175,6 +205,8 @@ class PPUStub {
         scrollX = 0u
         scrollY = 0u
         vblankFlag = false
+        sprite0HitFlag = false
+        ppuStatusReadsSinceVBlank = 0
         frameCount = 0
         vram.fill(0u)
         oam.fill(0u)
