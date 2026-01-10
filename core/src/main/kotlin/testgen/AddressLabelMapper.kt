@@ -15,7 +15,8 @@ import java.io.File
  */
 class AddressLabelMapper private constructor(
     private val labelToAddress: Map<String, Int>,
-    private val addressToLabel: Map<Int, String>
+    private val addressToLabel: Map<Int, String>,
+    private val jsrTargetLabels: Set<String> = emptySet()
 ) {
     /**
      * Get the label name for a given address.
@@ -39,7 +40,7 @@ class AddressLabelMapper private constructor(
     }
 
     /**
-     * Get all labels that are function entry points (called by JSR).
+     * Get all labels (including internal labels).
      */
     fun getFunctionLabels(): Set<String> = labelToAddress.keys
 
@@ -47,6 +48,29 @@ class AddressLabelMapper private constructor(
      * Get all addresses that have labels.
      */
     fun getAllAddresses(): Set<Int> = addressToLabel.keys
+
+    /**
+     * Check if an address is a true function entry point (target of JSR instruction).
+     */
+    fun isJsrTarget(address: Int): Boolean {
+        val label = addressToLabel[address] ?: return false
+        return label in jsrTargetLabels
+    }
+
+    /**
+     * Check if a label is a true function entry point (target of JSR instruction).
+     */
+    fun isJsrTargetLabel(label: String): Boolean = label in jsrTargetLabels
+
+    /**
+     * Get all labels that are JSR targets (true function entry points).
+     */
+    fun getJsrTargetLabels(): Set<String> = jsrTargetLabels
+
+    /**
+     * Get all addresses that are JSR targets (true function entry points).
+     */
+    fun getJsrTargetAddresses(): Set<Int> = jsrTargetLabels.mapNotNull { labelToAddress[it] }.toSet()
 
     companion object {
         /**
@@ -69,17 +93,27 @@ class AddressLabelMapper private constructor(
             val labelToAddress = mutableMapOf<String, Int>()
             val addressToLabel = mutableMapOf<Int, String>()
             val constants = mutableMapOf<String, Int>()  // For zero-page detection
+            val jsrTargetLabels = mutableSetOf<String>()
 
             // Use the existing parser
             val codeFile = text.parseToAssemblyCodeFile()
 
-            // First pass: collect all constants
+            // First pass: collect all constants and JSR targets
             for (line in codeFile.lines) {
                 val constant = line.constant
                 if (constant != null) {
                     val value = parseConstantValue(constant.value)
                     if (value != null) {
                         constants[constant.name] = value
+                    }
+                }
+
+                // Collect JSR targets
+                val instr = line.instruction
+                if (instr != null && instr.op == AssemblyOp.JSR) {
+                    val addr = instr.address
+                    if (addr is AssemblyAddressing.Direct) {
+                        jsrTargetLabels.add(addr.label)
                     }
                 }
             }
@@ -124,7 +158,7 @@ class AddressLabelMapper private constructor(
                 currentAddress += size
             }
 
-            return AddressLabelMapper(labelToAddress, addressToLabel)
+            return AddressLabelMapper(labelToAddress, addressToLabel, jsrTargetLabels)
         }
 
         /**
@@ -137,6 +171,9 @@ class AddressLabelMapper private constructor(
                 is AssemblyAddressing.ValueLowerSelection -> parseConstantValue(value.value)?.and(0xFF)
                 is AssemblyAddressing.ValueUpperSelection -> parseConstantValue(value.value)?.shr(8)?.and(0xFF)
                 is AssemblyAddressing.ConstantReference -> null  // Can't resolve references
+                // by Claude - Added new hi/lo constant reference types (can't resolve without context)
+                is AssemblyAddressing.ConstantReferenceLower -> null
+                is AssemblyAddressing.ConstantReferenceUpper -> null
             }
         }
 
@@ -153,7 +190,10 @@ class AddressLabelMapper private constructor(
                 is AssemblyAddressing.ShortValue,
                 is AssemblyAddressing.ValueLowerSelection,
                 is AssemblyAddressing.ValueUpperSelection,
-                is AssemblyAddressing.ConstantReference -> 2
+                is AssemblyAddressing.ConstantReference,
+                // by Claude - Added new hi/lo constant reference types
+                is AssemblyAddressing.ConstantReferenceLower,
+                is AssemblyAddressing.ConstantReferenceUpper -> 2
 
                 // Direct addressing - depends on whether zero page or not
                 is AssemblyAddressing.Direct -> {
@@ -166,12 +206,17 @@ class AddressLabelMapper private constructor(
                     if (isZeroPageLabel(addr.label, constants)) 2 else 3
                 }
 
-                // Indexed modes - same logic
+                // by Claude - Fixed: DirectX/DirectY zero-page availability depends on instruction
+                // Zero-page,X is supported by: ORA, AND, EOR, ADC, STA, LDA, CMP, SBC, ASL, ROL, LSR, ROR, DEC, INC, STY, LDY
+                // Zero-page,Y is ONLY supported by: LDX, STX
                 is AssemblyAddressing.DirectX -> {
+                    // Most common instructions support zero-page,X
                     if (isZeroPageLabel(instr.address.label, constants)) 2 else 3
                 }
                 is AssemblyAddressing.DirectY -> {
-                    if (isZeroPageLabel(instr.address.label, constants)) 2 else 3
+                    // Only LDX and STX support zero-page,Y. All others are absolute,Y (3 bytes)
+                    val supportsZpY = instr.op == AssemblyOp.LDX || instr.op == AssemblyOp.STX
+                    if (supportsZpY && isZeroPageLabel(instr.address.label, constants)) 2 else 3
                 }
 
                 // Indirect modes - always use zero-page base
@@ -213,6 +258,65 @@ class AddressLabelMapper private constructor(
             val result = label.first().lowercaseChar() + label.drop(1)
             // Replace invalid chars with underscore
             return result.map { if (it.isLetterOrDigit() || it == '_') it else '_' }.joinToString("")
+        }
+
+        /**
+         * Known function signatures for ROM verification.
+         * Maps label names to their expected first few bytes.
+         * Format: label -> list of expected opcode bytes
+         */
+        private val knownSignatures = mapOf(
+            // Key offscreen/sprite functions
+            "DividePDiff" to listOf(0x85, 0x05, 0xA5, 0x07, 0xC5, 0x06), // sta $05, lda $07, cmp $06
+            "GetOffScreenBitsSet" to listOf(0x98, 0x48, 0x20), // tya, pha, jsr
+            "GetXOffscreenBits" to listOf(0x86, 0x04, 0xA0, 0x01), // stx $04, ldy #$01
+            "GetYOffscreenBits" to listOf(0x86, 0x04, 0xA0, 0x01), // stx $04, ldy #$01
+            // Core game functions
+            "InitializeGame" to listOf(0xA0, 0x6F, 0x20), // ldy #$6f, jsr
+            "GameCoreRoutine" to listOf(0xAE), // ldx CurrentPlayer (abs)
+            "NonMaskableInterrupt" to listOf(0xAD, 0x15, 0x40), // lda $4015
+            "Start" to listOf(0x78, 0xD8, 0xA9), // sei, cld, lda
+        )
+
+        /**
+         * Search ROM for a known function signature near the expected address.
+         * Returns the corrected address if found, or null if not found.
+         *
+         * @param label The function label to search for
+         * @param expectedAddr The address from AddressLabelMapper
+         * @param romData The ROM data (with iNES header)
+         * @param searchRange How many bytes to search in each direction (default 150)
+         * @return The corrected address, or the original if no signature or not found
+         */
+        fun verifyAddressWithRom(
+            label: String,
+            expectedAddr: Int,
+            romData: ByteArray,
+            searchRange: Int = 150
+        ): Int {
+            val signature = knownSignatures[label] ?: return expectedAddr
+            val prgOffset = 16 // iNES header size
+
+            val romOffset = expectedAddr - 0x8000 + prgOffset
+            val searchStart = maxOf(prgOffset, romOffset - searchRange)
+            val searchEnd = minOf(romData.size - signature.size, romOffset + searchRange)
+
+            // First check if the expected address already matches
+            if (romOffset >= prgOffset && romOffset + signature.size < romData.size) {
+                if (signature.indices.all { (romData[romOffset + it].toInt() and 0xFF) == signature[it] }) {
+                    return expectedAddr // Already correct
+                }
+            }
+
+            // Search nearby for the signature
+            for (offset in searchStart..searchEnd) {
+                if (signature.indices.all { (romData[offset + it].toInt() and 0xFF) == signature[it] }) {
+                    val correctedAddr = offset - prgOffset + 0x8000
+                    return correctedAddr
+                }
+            }
+
+            return expectedAddr // Not found, return original
         }
     }
 }

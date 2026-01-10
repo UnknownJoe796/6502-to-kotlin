@@ -727,6 +727,21 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
     fun AssemblyBlock.isReturnLike(): Boolean =
         this.lastInstructionLine()?.instruction?.op.let { it == AssemblyOp.RTS || it == AssemblyOp.RTI } == true
 
+    // by Claude - check if block exits the current function via JMP to external function (tail call)
+    fun AssemblyBlock.isExitViaJmp(): Boolean {
+        if (!isUnconditionalJmp()) return false
+        val target = branchExit ?: return false
+        // Exit if target is in a different function (tail call)
+        // If target.function is null, it means target is in a function not yet processed
+        // In that case, it's definitely a different function (external call)
+        val targetFn = target.function
+        return targetFn == null || targetFn != this.function
+    }
+
+    // by Claude - combined check for any kind of function exit
+    fun AssemblyBlock.isExitLike(): Boolean =
+        isReturnLike() || isExitViaJmp()
+
     // Track loop headers currently being processed to prevent infinite recursion
     val processingLoopHeaders = mutableSetOf<AssemblyBlock>()
 
@@ -752,7 +767,9 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                 }
 
                 // Only process as a loop if we haven't already consumed these blocks
-                if (loopStart == i && loopEnd <= endExclusive && !containsOtherLoopHeaders) {
+                // by Claude - removed !containsOtherLoopHeaders check that was causing nested loops to be skipped
+                // The processingLoopHeaders set already prevents infinite recursion
+                if (loopStart == i && loopEnd <= endExclusive) {
                     // Determine loop kind based on structure
                     // Key distinction:
                     // - PreTest (while): Header has conditional that EXITS the loop
@@ -1047,11 +1064,15 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                     val branchTargetBlock = if (hasOutOfRangeBranch) layout[brIdx] else layout[constrainedBrIdx]
                     val branchTargetIdx = indexOf[branchTargetBlock] ?: brIdx
 
-                    // Check if branch target returns (ends execution) AND is an alternative path
-                    // Only treat as else if the branch target is NOT where the then-branch naturally ends
-                    // (i.e., it's a separate code path, not a join point)
-                    val branchTargetReturns = branchTargetBlock.isReturnLike()
-                    val isAlternativePath = branchTargetIdx != effectiveThenEnd
+                    // Check if branch target returns (ends execution)
+                    // by Claude - use isExitLike to also catch JMP to external function (tail call)
+                    val branchTargetReturns = branchTargetBlock.isExitLike()
+
+                    // by Claude - isAlternativePath should check if branch target is truly a SEPARATE path
+                    // not just whether indices match. If branchTarget exits (via RTS or JMP to external),
+                    // it's definitely an alternative path, not a reconvergence.
+                    // The old check (branchTargetIdx != effectiveThenEnd) was always false for in-range branches.
+                    val isAlternativePath = branchTargetReturns // if it exits, it's an alternative path
 
                     if (branchTargetReturns && isAlternativePath) {
                         // The branch target is an alternative path that returns, not a reconvergence point
@@ -1059,7 +1080,8 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                         // Find how many blocks after the branch target also return (part of else path)
                         var elseEnd = branchTargetIdx + 1
                         // Don't extend else beyond endExclusive for the outer scope
-                        while (elseEnd < layout.size && layout[elseEnd].isReturnLike()) {
+                        // by Claude - use isExitLike to also catch JMP to external function (tail call)
+                        while (elseEnd < layout.size && layout[elseEnd].isExitLike()) {
                             elseEnd++
                         }
                         val elseNodes = buildRange(branchTargetIdx, minOf(elseEnd, layout.size))

@@ -709,7 +709,7 @@ INC DisableScreenFlag         ; set flag to disable screen output               
 LDA Mirror_PPU_CTRL_REG1                                                                            ; 
 ORA #%10000000                ; enable NMIs                                                         ; 
 JSR WritePPUReg1                                                                                    ; 
-EndlessLoop:  JMP EndlessLoop ; endless loop, need I say more?                                      ;  B
+EndlessLoop:  JMP EndlessLoop ; endless loop, need I say more?                                      ; fun():  B
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                               ; $00 - vram buffer address table low, also used for pseudorandom bit ; 
@@ -930,10 +930,10 @@ OperModeExecutionTree:                                                          
 LDA OperMode                  ; this is the heart of the entire program,                            ; 
 JSR JumpEngine                ; most of what goes on starts here                                    ; 
                                                                                                     ;  B
-DATA: Expr(expr=TitleScreenMode)                                                                    ; 
-DATA: Expr(expr=GameMode)                                                                           ; 
-DATA: Expr(expr=VictoryMode)                                                                        ; 
-DATA: Expr(expr=GameOverMode)                                                                       ; 
+DATA: Expr(expr=TitleScreenMode), Expr(expr=)                                                       ; 
+DATA: Expr(expr=GameMode), Expr(expr=)                                                              ; 
+DATA: Expr(expr=VictoryMode), Expr(expr=)                                                           ; 
+DATA: Expr(expr=GameOverMode), Expr(expr=)                                                          ; 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
@@ -941,7 +941,7 @@ MoveAllSpritesOffscreen:                                                        
 LDY #$00                      ; this routine moves all sprites off the screen                       ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-MoveSpritesOffscreen:                                                                               ; fun():  B
+MoveSpritesOffscreen:                                                                               ;  B
 LDY #$04                      ; this routine moves all but sprite 0                                 ; 
 LDA #$f8                      ; off the screen                                                      ; 
 SprInitLoop:  STA Sprite_Y_Position,Y; write 248 into OAM data's Y coordinate                       ;  B
@@ -958,10 +958,10 @@ TitleScreenMode:                                                                
 LDA OperMode_Task                                                                                   ; 
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
-DATA: Expr(expr=InitializeGame)                                                                     ; 
-DATA: Expr(expr=ScreenRoutines)                                                                     ; 
-DATA: Expr(expr=PrimaryGameSetup)                                                                   ; 
-DATA: Expr(expr=GameMenuRoutine)                                                                    ; 
+DATA: Expr(expr=InitializeGame), Expr(expr=)                                                        ; 
+DATA: Expr(expr=ScreenRoutines), Expr(expr=)                                                        ; 
+DATA: Expr(expr=PrimaryGameSetup), Expr(expr=)                                                      ; 
+DATA: Expr(expr=GameMenuRoutine), Expr(expr=)                                                       ; 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
@@ -1019,9 +1019,9 @@ BMI UpdateShroom                                                                
 LDY WorldNumber               ; get world number from variable and increment for                    ;  B
 INY                           ; proper display, and put in blank byte before                        ; 
 STY VRAM_Buffer1+3            ; null terminator                                                     ; 
-NullJoypad:  LDA #$00         ; clear joypad bits for player 1                                      ;  B
+NullJoypad:  LDA #$00         ; clear joypad bits for player 1                                      ; fun():  B
 STA SavedJoypad1Bits                                                                                ; 
-RunDemo:  JSR GameCoreRoutine ; run game engine                                                     ;  B
+RunDemo:  JSR GameCoreRoutine ; run game engine                                                     ; fun():  B
 LDA GameEngineSubroutine      ; check to see if we're running lose life routine                     ; 
 CMP #$06                                                                                            ; 
 BNE ExitMenu                  ; if not, do not do all the resetting below                           ; 
@@ -1031,7 +1031,7 @@ STA OperMode_Task             ; screen output                                   
 STA Sprite0HitDetectFlag                                                                            ; 
 INC DisableScreenFlag                                                                               ; 
 RTS                                                                                                 ; 
-ChkContinue:  LDY DemoTimer   ; if timer for demo has expired, reset modes                          ;  B
+ChkContinue:  LDY DemoTimer   ; if timer for demo has expired, reset modes                          ; fun(A):  B
 BEQ ResetTitle                                                                                      ; 
 ASL                           ; check to see if A button was also pushed                            ;  B
 BCC StartWorld1               ; if not, don't load continue function's world number                 ; 
@@ -1123,11 +1123,11 @@ VictoryModeSubroutines:                                                         
 LDA OperMode_Task                                                                                   ; 
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
-DATA: Expr(expr=BridgeCollapse)                                                                     ; 
-DATA: Expr(expr=SetupVictoryMode)                                                                   ; 
-DATA: Expr(expr=PlayerVictoryWalk)                                                                  ; 
-DATA: Expr(expr=PrintVictoryMessages)                                                               ; 
-DATA: Expr(expr=PlayerEndWorld)                                                                     ; 
+DATA: Expr(expr=BridgeCollapse), Expr(expr=)                                                        ; 
+DATA: Expr(expr=SetupVictoryMode), Expr(expr=)                                                      ; 
+DATA: Expr(expr=PlayerVictoryWalk), Expr(expr=)                                                     ; 
+DATA: Expr(expr=PrintVictoryMessages), Expr(expr=)                                                  ; 
+DATA: Expr(expr=PlayerEndWorld), Expr(expr=)                                                        ; 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
@@ -1189,7 +1189,7 @@ SBC #$01                      ; otherwise subtract one                          
 JMP ThankPlayer               ; and skip to next part                                               ; 
 MRetainerMsg:  CMP #$02       ; check primary message counter                                       ;  B
 BCC IncMsgCounter             ; if not at 2 yet (world 1-7 only), branch                            ; 
-ThankPlayer:  TAY             ; put primary message counter into Y                                  ;  B
+ThankPlayer:  TAY             ; put primary message counter into Y                                  ; fun(A):  B
 BNE SecondPartMsg             ; if counter nonzero, skip this part, do not print first message      ; 
 LDA CurrentPlayer             ; otherwise get player currently on the screen                        ;  B
 BEQ EvalForMusic              ; if mario, branch                                                    ; 
@@ -1362,21 +1362,21 @@ ScreenRoutines:                                                                 
 LDA ScreenRoutineTask         ; run one of the following subroutines                                ; 
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
-DATA: Expr(expr=InitScreen)                                                                         ; 
-DATA: Expr(expr=SetupIntermediate)                                                                  ; 
-DATA: Expr(expr=WriteTopStatusLine)                                                                 ; 
-DATA: Expr(expr=WriteBottomStatusLine)                                                              ; 
-DATA: Expr(expr=DisplayTimeUp)                                                                      ; 
-DATA: Expr(expr=ResetSpritesAndScreenTimer)                                                         ; 
-DATA: Expr(expr=DisplayIntermediate)                                                                ; 
-DATA: Expr(expr=ResetSpritesAndScreenTimer)                                                         ; 
-DATA: Expr(expr=AreaParserTaskControl)                                                              ; 
-DATA: Expr(expr=GetAreaPalette)                                                                     ; 
-DATA: Expr(expr=GetBackgroundColor)                                                                 ; 
-DATA: Expr(expr=GetAlternatePalette1)                                                               ; 
-DATA: Expr(expr=DrawTitleScreen)                                                                    ; 
-DATA: Expr(expr=ClearBuffersDrawIcon)                                                               ; 
-DATA: Expr(expr=WriteTopScore)                                                                      ; 
+DATA: Expr(expr=InitScreen), Expr(expr=)                                                            ; 
+DATA: Expr(expr=SetupIntermediate), Expr(expr=)                                                     ; 
+DATA: Expr(expr=WriteTopStatusLine), Expr(expr=)                                                    ; 
+DATA: Expr(expr=WriteBottomStatusLine), Expr(expr=)                                                 ; 
+DATA: Expr(expr=DisplayTimeUp), Expr(expr=)                                                         ; 
+DATA: Expr(expr=ResetSpritesAndScreenTimer), Expr(expr=)                                            ; 
+DATA: Expr(expr=DisplayIntermediate), Expr(expr=)                                                   ; 
+DATA: Expr(expr=ResetSpritesAndScreenTimer), Expr(expr=)                                            ; 
+DATA: Expr(expr=AreaParserTaskControl), Expr(expr=)                                                 ; 
+DATA: Expr(expr=GetAreaPalette), Expr(expr=)                                                        ; 
+DATA: Expr(expr=GetBackgroundColor), Expr(expr=)                                                    ; 
+DATA: Expr(expr=GetAlternatePalette1), Expr(expr=)                                                  ; 
+DATA: Expr(expr=DrawTitleScreen), Expr(expr=)                                                       ; 
+DATA: Expr(expr=ClearBuffersDrawIcon), Expr(expr=)                                                  ; 
+DATA: Expr(expr=WriteTopScore), Expr(expr=)                                                         ; 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
@@ -1414,7 +1414,7 @@ DATA: ByteValue(value=1), ByteValue(value=2), ByteValue(value=3), ByteValue(valu
 GetAreaPalette:                                                                                     ; fun():  B
 LDY AreaType                  ; select appropriate palette to load                                  ; 
 LDX AreaPalette,Y             ; based on area type                                                  ; 
-SetVRAMAddr_A:  STX VRAM_Buffer_AddrCtrl; store offset into buffer control                          ;  B
+SetVRAMAddr_A:  STX VRAM_Buffer_AddrCtrl; store offset into buffer control                          ; fun(X):  B
 NextSubtask:  JMP IncSubtask  ; move onto next task                                                 ;  B
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
@@ -1474,7 +1474,7 @@ STA VRAM_Buffer1+7,X                                                            
 TXA                           ; move the buffer pointer ahead 7 bytes                               ; 
 CLC                           ; in case we want to write anything else later                        ; 
 ADC #$07                                                                                            ; 
-SetVRAMOffset:  STA VRAM_Buffer1_Offset; store as new vram buffer offset                            ;  B
+SetVRAMOffset:  STA VRAM_Buffer1_Offset; store as new vram buffer offset                            ; fun(A):  B
 RTS                                                                                                 ; 
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
@@ -1484,7 +1484,7 @@ LDA AreaStyle                 ; check for mushroom level style                  
 CMP #$01                                                                                            ; 
 BNE NoAltPal                                                                                        ; 
 LDA #$0b                      ; if found, load appropriate palette                                  ;  B
-SetVRAMAddr_B:  STA VRAM_Buffer_AddrCtrl                                                            ;  B
+SetVRAMAddr_B:  STA VRAM_Buffer_AddrCtrl                                                            ; fun(A):  B
 NoAltPal:  JMP IncSubtask     ; now onto the next task                                              ;  B
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
@@ -1551,7 +1551,7 @@ LDA DisableIntermediate       ; if this flag is set, skip intermediate lives dis
 BNE NoInter                   ; and jump to specific task, otherwise                                ; 
 PlayerInter:  JSR DrawPlayer_Intermediate; put player in appropriate place for                      ;  B
 LDA #$01                      ; lives display, then output lives display to buffer                  ; 
-OutputInter:  JSR WriteGameText                                                                     ;  B
+OutputInter:  JSR WriteGameText                                                                     ; fun():  B
 JSR ResetScreenTimer                                                                                ; 
 LDA #$00                                                                                            ; 
 STA DisableScreenFlag         ; reenable screen output                                              ; 
@@ -1587,9 +1587,9 @@ RTS                                                                             
 DrawTitleScreen:                                                                                    ; fun():  B
 LDA OperMode                  ; are we in title screen mode?                                        ; 
 BNE IncModeTask_B             ; if not, exit                                                        ; 
-LDA                           ; load address $1ec0 into                                             ;  B
+LDA #>TitleScreenDataOffset   ; load address $1ec0 into                                             ;  B
 STA PPU_ADDRESS               ; the vram address register                                           ; 
-LDA                                                                                                 ; 
+LDA #<TitleScreenDataOffset                                                                         ; 
 STA PPU_ADDRESS                                                                                     ; 
 LDA #$03                      ; put address $0300 into                                              ; 
 STA $01                       ; the indirect at $00                                                 ; 
@@ -1620,7 +1620,7 @@ TScrClear:  STA VRAM_Buffer1-1,X                                                
 DEX                                                                                                 ; 
 BNE TScrClear                                                                                       ; 
 JSR DrawMushroomIcon          ; draw player select icon                                             ;  B
-IncSubtask:  INC ScreenRoutineTask; move onto next task                                             ;  B
+IncSubtask:  INC ScreenRoutineTask; move onto next task                                             ; fun():  B
 RTS                                                                                                 ; 
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
@@ -1628,7 +1628,7 @@ RTS                                                                             
 WriteTopScore:                                                                                      ; fun():  B
 LDA #$fa                      ; run display routine to display top score on title                   ; 
 JSR UpdateNumber                                                                                    ; 
-IncModeTask_B:  INC OperMode_Task; move onto next mode                                              ;  B
+IncModeTask_B:  INC OperMode_Task; move onto next mode                                              ; fun():  B
 RTS                                                                                                 ; 
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
@@ -1861,7 +1861,7 @@ JMP SetAttrib                                                                   
 LLeft:  LSR $03               ; shift attribute bits 2 to the right                                 ;  B
 LSR $03                       ; thus in d5-d4 for lower left square                                 ; 
 NextMTRow:  INC $04           ; move onto next attribute row                                        ;  B
-SetAttrib:  LDA AttributeBuffer,Y; get previously saved bits from before                            ;  B
+SetAttrib:  LDA AttributeBuffer,Y; get previously saved bits from before                            ; fun(Y$03$00$01$04$05):  B
 ORA $03                       ; if any, and put new bits, if any, onto                              ; 
 STA AttributeBuffer,Y         ; the old, and store                                                  ; 
 INC $00                       ; increment vram buffer offset by 2                                   ; 
@@ -1934,7 +1934,7 @@ CPX #$07                      ; if we're at the end yet                         
 BCC AttribLoop                                                                                      ; 
 STA VRAM_Buffer2,Y            ; put null terminator at the end                                      ;  B
 STY VRAM_Buffer2_Offset       ; store offset in case we want to do any more                         ; 
-SetVRAMCtrl:  LDA #$06                                                                              ;  B
+SetVRAMCtrl:  LDA #$06                                                                              ; fun():  B
 STA VRAM_Buffer_AddrCtrl      ; set buffer to $0341 and leave                                       ; 
 RTS                                                                                                 ; 
                                                                                                     ;  B
@@ -2591,7 +2591,7 @@ ADC DisplayDigits,Y           ; add to current digit                            
 BMI BorrowOne                 ; if result is a negative number, branch to subtract                  ; 
 CMP #10                                                                                             ;  B
 BCS CarryOne                  ; if digit greater than $09, branch to add                            ; 
-StoreNewD:  STA DisplayDigits,Y; store as new score or game timer digit                             ;  B
+StoreNewD:  STA DisplayDigits,Y; store as new score or game timer digit                             ; fun(AYX):  B
 DEY                           ; move onto next digits in score or game timer                        ; 
 DEX                           ; and digit amounts to increment                                      ; 
 BPL AddModLoop                ; loop back if we're not done yet                                     ; 
@@ -2645,7 +2645,9 @@ Sprite0Data:                                                                    
 DATA: ByteValue(value=24), ByteValue(value=255), ByteValue(value=35), ByteValue(value=88)           ; 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
-                                                                                                    ; 
+                              ; @FRAMES_CONSUMED: 3                                                 ; 
+                              ; This routine takes ~68,250 cycles (about 3 frames worth). When called during NMI,; 
+                              ; the next 2 frames will not receive NMI (frames are consumed without input).; 
 InitializeGame:                                                                                     ; fun(A):  B
 LDY #$6f                      ; clear all memory as in initialization procedure,                    ; 
 JSR InitializeMemory          ; but this time, clear only as far as $076f                           ; 
@@ -2657,6 +2659,9 @@ LDA #$18                      ; set demo timer                                  
 STA DemoTimer                                                                                       ; 
 JSR LoadAreaPointer                                                                                 ; 
                                                                                                     ; 
+                              ; @FRAMES_CONSUMED: 2                                                 ; 
+                              ; This routine takes ~34,700 cycles (about 2 frames worth). When called during NMI,; 
+                              ; the next frame will not receive NMI (frame is consumed without input).; 
 InitializeArea:                                                                                     ; fun():  B
 LDY #$4b                      ; clear all memory again, only as far as $074b                        ; 
 JSR InitializeMemory          ; this is only necessary if branching from                            ; 
@@ -2947,9 +2952,9 @@ GameOverMode:                                                                   
 LDA OperMode_Task                                                                                   ; 
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
-DATA: Expr(expr=SetupGameOver)                                                                      ; 
-DATA: Expr(expr=ScreenRoutines)                                                                     ; 
-DATA: Expr(expr=RunGameOver)                                                                        ; 
+DATA: Expr(expr=SetupGameOver), Expr(expr=)                                                         ; 
+DATA: Expr(expr=ScreenRoutines), Expr(expr=)                                                        ; 
+DATA: Expr(expr=RunGameOver), Expr(expr=)                                                           ; 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
@@ -2987,7 +2992,7 @@ STA ScreenTimer               ; leave                                           
 STA OperMode                                                                                        ; 
 RTS                                                                                                 ; 
                                                                                                     ;  B
-ContinueGame:                                                                                       ;  B
+ContinueGame:                                                                                       ; fun():  B
 JSR LoadAreaPointer           ; update level pointer with                                           ; 
 LDA #$01                      ; actual world and area numbers, then                                 ; 
 STA PlayerSize                ; reset player's size, status, and                                    ; 
@@ -3048,14 +3053,14 @@ SkipATRender:  RTS                                                              
 AreaParserTasks:                                                                                    ; fun():  B
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
-DATA: Expr(expr=IncrementColumnPos)                                                                 ; 
-DATA: Expr(expr=RenderAreaGraphics)                                                                 ; 
-DATA: Expr(expr=RenderAreaGraphics)                                                                 ; 
-DATA: Expr(expr=AreaParserCore)                                                                     ; 
-DATA: Expr(expr=IncrementColumnPos)                                                                 ; 
-DATA: Expr(expr=RenderAreaGraphics)                                                                 ; 
-DATA: Expr(expr=RenderAreaGraphics)                                                                 ; 
-DATA: Expr(expr=AreaParserCore)                                                                     ; 
+DATA: Expr(expr=IncrementColumnPos), Expr(expr=)                                                    ; 
+DATA: Expr(expr=RenderAreaGraphics), Expr(expr=)                                                    ; 
+DATA: Expr(expr=RenderAreaGraphics), Expr(expr=)                                                    ; 
+DATA: Expr(expr=AreaParserCore), Expr(expr=)                                                        ; 
+DATA: Expr(expr=IncrementColumnPos), Expr(expr=)                                                    ; 
+DATA: Expr(expr=RenderAreaGraphics), Expr(expr=)                                                    ; 
+DATA: Expr(expr=RenderAreaGraphics), Expr(expr=)                                                    ; 
+DATA: Expr(expr=AreaParserCore), Expr(expr=)                                                        ; 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
@@ -3225,7 +3230,7 @@ TerMTile:  LDA TerrainMetatiles,Y; otherwise get appropriate metatile for area t
 LDY CloudTypeOverride         ; check for cloud type override                                       ; 
 BEQ StoreMT                   ; if not set, keep value otherwise                                    ; 
 LDA #$88                      ; use cloud block terrain                                             ;  B
-StoreMT:  STA $07             ; store value here                                                    ;  B
+StoreMT:  STA $07             ; store value here                                                    ; fun(A):  B
 LDX #$00                      ; initialize X, use as metatile buffer offset                         ; 
 LDA TerrainControl            ; use yet another value from the header                               ; 
 ASL                           ; multiply by 2 and use as yet another offset                         ; 
@@ -3345,8 +3350,8 @@ BCC SetBehind                 ; if so branch                                    
 RdyDecode:  JSR DecodeAreaData; do sub and do not turn on flag                                      ;  B
 JMP ChkLength                                                                                       ; 
 SetBehind:  INC BehindAreaParserFlag; turn on flag if object is behind renderer                     ;  B
-NextAObj:  JSR IncAreaObjOffset; increment buffer offset and move on                                ;  B
-ChkLength:  LDX ObjectOffset  ; get buffer offset                                                   ;  B
+NextAObj:  JSR IncAreaObjOffset; increment buffer offset and move on                                ; fun():  B
+ChkLength:  LDX ObjectOffset  ; get buffer offset                                                   ; fun():  B
 LDA AreaObjectLength,X        ; check object length for anything stored here                        ; 
 BMI ProcLoopb                 ; if not, branch to handle loopback                                   ; 
 DEC AreaObjectLength,X        ; otherwise decrement length or get rid of it                         ;  B
@@ -3427,11 +3432,11 @@ JMP MoveAOId                                                                    
 SpecObj:  INY                 ; branch here for rows 12-15                                          ;  B
 LDA (AreaData),Y                                                                                    ; 
 AND #%01110000                ; get next byte and mask out all but d6-d4                            ; 
-MoveAOId:  LSR                ; move d6-d4 to lower nybble                                          ;  B
+MoveAOId:  LSR                ; move d6-d4 to lower nybble                                          ; fun(A):  B
 LSR                                                                                                 ; 
 LSR                                                                                                 ; 
 LSR                                                                                                 ; 
-NormObj:  STA $00             ; store value here (branch for small objects and rows 13 and 14)      ;  B
+NormObj:  STA $00             ; store value here (branch for small objects and rows 13 and 14)      ; fun(AX$07):  B
 LDA AreaObjectLength,X        ; is there something stored here already?                             ; 
 BPL RunAObj                   ; if so, branch to do its particular sub                              ; 
 LDA AreaObjectPageLoc         ; otherwise check to see if the object we've loaded is on the         ;  B
@@ -3470,63 +3475,63 @@ ADC $07                                                                         
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
                               ; large objects (rows $00-$0b or 00-11, d6-d4 set)                    ; 
-DATA: Expr(expr=VerticalPipe) ; used by warp pipes                                                  ; 
-DATA: Expr(expr=AreaStyleObject)                                                                    ; 
-DATA: Expr(expr=RowOfBricks)                                                                        ; 
-DATA: Expr(expr=RowOfSolidBlocks)                                                                   ; 
-DATA: Expr(expr=RowOfCoins)                                                                         ; 
-DATA: Expr(expr=ColumnOfBricks)                                                                     ; 
-DATA: Expr(expr=ColumnOfSolidBlocks)                                                                ; 
-DATA: Expr(expr=VerticalPipe) ; used by decoration pipes                                            ; 
+DATA: Expr(expr=VerticalPipe), Expr(expr=); used by warp pipes                                      ; 
+DATA: Expr(expr=AreaStyleObject), Expr(expr=)                                                       ; 
+DATA: Expr(expr=RowOfBricks), Expr(expr=)                                                           ; 
+DATA: Expr(expr=RowOfSolidBlocks), Expr(expr=)                                                      ; 
+DATA: Expr(expr=RowOfCoins), Expr(expr=)                                                            ; 
+DATA: Expr(expr=ColumnOfBricks), Expr(expr=)                                                        ; 
+DATA: Expr(expr=ColumnOfSolidBlocks), Expr(expr=)                                                   ; 
+DATA: Expr(expr=VerticalPipe), Expr(expr=); used by decoration pipes                                ; 
                                                                                                     ; 
                               ; objects for special row $0c or 12                                   ; 
-DATA: Expr(expr=Hole_Empty)                                                                         ; 
-DATA: Expr(expr=PulleyRopeObject)                                                                   ; 
-DATA: Expr(expr=Bridge_High)                                                                        ; 
-DATA: Expr(expr=Bridge_Middle)                                                                      ; 
-DATA: Expr(expr=Bridge_Low)                                                                         ; 
-DATA: Expr(expr=Hole_Water)                                                                         ; 
-DATA: Expr(expr=QuestionBlockRow_High)                                                              ; 
-DATA: Expr(expr=QuestionBlockRow_Low)                                                               ; 
+DATA: Expr(expr=Hole_Empty), Expr(expr=)                                                            ; 
+DATA: Expr(expr=PulleyRopeObject), Expr(expr=)                                                      ; 
+DATA: Expr(expr=Bridge_High), Expr(expr=)                                                           ; 
+DATA: Expr(expr=Bridge_Middle), Expr(expr=)                                                         ; 
+DATA: Expr(expr=Bridge_Low), Expr(expr=)                                                            ; 
+DATA: Expr(expr=Hole_Water), Expr(expr=)                                                            ; 
+DATA: Expr(expr=QuestionBlockRow_High), Expr(expr=)                                                 ; 
+DATA: Expr(expr=QuestionBlockRow_Low), Expr(expr=)                                                  ; 
                                                                                                     ; 
                               ; objects for special row $0f or 15                                   ; 
-DATA: Expr(expr=EndlessRope)                                                                        ; 
-DATA: Expr(expr=BalancePlatRope)                                                                    ; 
-DATA: Expr(expr=CastleObject)                                                                       ; 
-DATA: Expr(expr=StaircaseObject)                                                                    ; 
-DATA: Expr(expr=ExitPipe)                                                                           ; 
-DATA: Expr(expr=FlagBalls_Residual)                                                                 ; 
+DATA: Expr(expr=EndlessRope), Expr(expr=)                                                           ; 
+DATA: Expr(expr=BalancePlatRope), Expr(expr=)                                                       ; 
+DATA: Expr(expr=CastleObject), Expr(expr=)                                                          ; 
+DATA: Expr(expr=StaircaseObject), Expr(expr=)                                                       ; 
+DATA: Expr(expr=ExitPipe), Expr(expr=)                                                              ; 
+DATA: Expr(expr=FlagBalls_Residual), Expr(expr=)                                                    ; 
                                                                                                     ; 
                               ; small objects (rows $00-$0b or 00-11, d6-d4 all clear)              ; 
-DATA: Expr(expr=QuestionBlock); power-up                                                            ; 
-DATA: Expr(expr=QuestionBlock); coin                                                                ; 
-DATA: Expr(expr=QuestionBlock); hidden, coin                                                        ; 
-DATA: Expr(expr=Hidden1UpBlock); hidden, 1-up                                                       ; 
-DATA: Expr(expr=BrickWithItem); brick, power-up                                                     ; 
-DATA: Expr(expr=BrickWithItem); brick, vine                                                         ; 
-DATA: Expr(expr=BrickWithItem); brick, star                                                         ; 
-DATA: Expr(expr=BrickWithCoins); brick, coins                                                       ; 
-DATA: Expr(expr=BrickWithItem); brick, 1-up                                                         ; 
-DATA: Expr(expr=WaterPipe)                                                                          ; 
-DATA: Expr(expr=EmptyBlock)                                                                         ; 
-DATA: Expr(expr=Jumpspring)                                                                         ; 
+DATA: Expr(expr=QuestionBlock), Expr(expr=); power-up                                               ; 
+DATA: Expr(expr=QuestionBlock), Expr(expr=); coin                                                   ; 
+DATA: Expr(expr=QuestionBlock), Expr(expr=); hidden, coin                                           ; 
+DATA: Expr(expr=Hidden1UpBlock), Expr(expr=); hidden, 1-up                                          ; 
+DATA: Expr(expr=BrickWithItem), Expr(expr=); brick, power-up                                        ; 
+DATA: Expr(expr=BrickWithItem), Expr(expr=); brick, vine                                            ; 
+DATA: Expr(expr=BrickWithItem), Expr(expr=); brick, star                                            ; 
+DATA: Expr(expr=BrickWithCoins), Expr(expr=); brick, coins                                          ; 
+DATA: Expr(expr=BrickWithItem), Expr(expr=); brick, 1-up                                            ; 
+DATA: Expr(expr=WaterPipe), Expr(expr=)                                                             ; 
+DATA: Expr(expr=EmptyBlock), Expr(expr=)                                                            ; 
+DATA: Expr(expr=Jumpspring), Expr(expr=)                                                            ; 
                                                                                                     ; 
                               ; objects for special row $0d or 13 (d6 set)                          ; 
-DATA: Expr(expr=IntroPipe)                                                                          ; 
-DATA: Expr(expr=FlagpoleObject)                                                                     ; 
-DATA: Expr(expr=AxeObj)                                                                             ; 
-DATA: Expr(expr=ChainObj)                                                                           ; 
-DATA: Expr(expr=CastleBridgeObj)                                                                    ; 
-DATA: Expr(expr=ScrollLockObject_Warp)                                                              ; 
-DATA: Expr(expr=ScrollLockObject)                                                                   ; 
-DATA: Expr(expr=ScrollLockObject)                                                                   ; 
-DATA: Expr(expr=AreaFrenzy)   ; flying cheep-cheeps                                                 ; 
-DATA: Expr(expr=AreaFrenzy)   ; bullet bills or swimming cheep-cheeps                               ; 
-DATA: Expr(expr=AreaFrenzy)   ; stop frenzy                                                         ; 
-DATA: Expr(expr=LoopCmdE)                                                                           ; 
+DATA: Expr(expr=IntroPipe), Expr(expr=)                                                             ; 
+DATA: Expr(expr=FlagpoleObject), Expr(expr=)                                                        ; 
+DATA: Expr(expr=AxeObj), Expr(expr=)                                                                ; 
+DATA: Expr(expr=ChainObj), Expr(expr=)                                                              ; 
+DATA: Expr(expr=CastleBridgeObj), Expr(expr=)                                                       ; 
+DATA: Expr(expr=ScrollLockObject_Warp), Expr(expr=)                                                 ; 
+DATA: Expr(expr=ScrollLockObject), Expr(expr=)                                                      ; 
+DATA: Expr(expr=ScrollLockObject), Expr(expr=)                                                      ; 
+DATA: Expr(expr=AreaFrenzy), Expr(expr=); flying cheep-cheeps                                       ; 
+DATA: Expr(expr=AreaFrenzy), Expr(expr=); bullet bills or swimming cheep-cheeps                     ; 
+DATA: Expr(expr=AreaFrenzy), Expr(expr=); stop frenzy                                               ; 
+DATA: Expr(expr=LoopCmdE), Expr(expr=)                                                              ; 
                                                                                                     ; 
                               ; object for special row $0e or 14                                    ; 
-DATA: Expr(expr=AlterAreaAttributes)                                                                ; 
+DATA: Expr(expr=AlterAreaAttributes), Expr(expr=)                                                   ; 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                               ; (these apply to all area object subroutines in this section unless otherwise stated); 
@@ -3621,9 +3626,9 @@ RTS                                                                             
 AreaStyleObject:                                                                                    ; fun():  B
 LDA AreaStyle                 ; load level object style and jump to the right sub                   ; 
 JSR JumpEngine                                                                                      ; 
-DATA: Expr(expr=TreeLedge)    ; also used for cloud type levels                                     ;  B
-DATA: Expr(expr=MushroomLedge)                                                                      ; 
-DATA: Expr(expr=BulletBillCannon)                                                                   ; 
+DATA: Expr(expr=TreeLedge), Expr(expr=); also used for cloud type levels                            ;  B
+DATA: Expr(expr=MushroomLedge), Expr(expr=)                                                         ; 
+DATA: Expr(expr=BulletBillCannon), Expr(expr=)                                                      ; 
                                                                                                     ; 
 TreeLedge:                                                                                          ; fun(XY$07):  B
 JSR GetLrgObjAttrib           ; get row and length of green ledge                                   ; 
@@ -3668,10 +3673,10 @@ INX                                                                             
 LDA #$4f                                                                                            ; 
 STA MetatileBuffer,X          ; render stem top of mushroom underneath the middle                   ; 
 LDA #$50                                                                                            ; 
-AllUnder:  INX                                                                                      ;  B
+AllUnder:  INX                                                                                      ; fun(X):  B
 LDY #$0f                      ; set $0f to render all way down                                      ; 
 JMP RenderUnderPart           ; now render the stem of mushroom                                     ; 
-NoUnder:  LDX $07             ; load row of ledge                                                   ;  B
+NoUnder:  LDX $07             ; load row of ledge                                                   ; fun($07):  B
 LDY #$00                      ; set 0 for no bottom on this part                                    ; 
 JMP RenderUnderPart                                                                                 ; 
                                                                                                     ;  B
@@ -3920,7 +3925,7 @@ QuestionBlockRow_High:                                                          
 LDA #$03                      ; start on the fourth row                                             ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-QuestionBlockRow_Low:                                                                               ; fun():  B
+QuestionBlockRow_Low:                                                                               ;  B
 LDA #$07                      ; start on the eighth row                                             ; 
 PHA                           ; save whatever row to the stack for now                              ; 
 JSR ChkLrgObjLength           ; get low nybble and save as length                                   ; 
@@ -3936,11 +3941,11 @@ Bridge_High:                                                                    
 LDA #$06                      ; start on the seventh row from top of screen                         ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-Bridge_Middle:                                                                                      ; fun():  B
+Bridge_Middle:                                                                                      ;  B
 LDA #$07                      ; start on the eighth row                                             ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-Bridge_Low:                                                                                         ; fun():  B
+Bridge_Low:                                                                                         ;  B
 LDA #$09                      ; start on the tenth row                                              ; 
 PHA                           ; save whatever row to the stack for now                              ; 
 JSR ChkLrgObjLength           ; get low nybble and save as length                                   ; 
@@ -4006,7 +4011,7 @@ PLA                           ; get back object buffer offset                   
 TAX                                                                                                 ; 
 JSR GetLrgObjAttrib           ; get vertical length from lower nybble                               ; 
 LDX #$01                                                                                            ; 
-DrawRope:  LDA #$40           ; render the actual rope                                              ;  B
+DrawRope:  LDA #$40           ; render the actual rope                                              ; fun():  B
 JMP RenderUnderPart                                                                                 ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
@@ -4014,7 +4019,7 @@ JMP RenderUnderPart                                                             
 CoinMetatileData:                                                                                   ;  B
 DATA: ByteValue(value=195), ByteValue(value=194), ByteValue(value=194), ByteValue(value=194)        ; 
                                                                                                     ; 
-RowOfCoins:                                                                                         ; fun($07):  B
+RowOfCoins:                                                                                         ; fun():  B
 LDY AreaType                  ; get area type                                                       ; 
 LDA CoinMetatileData,Y        ; load appropriate coin metatile                                      ; 
 JMP GetRow                                                                                          ; 
@@ -4046,7 +4051,7 @@ EmptyBlock:                                                                     
 JSR GetLrgObjAttrib           ; get row location                                                    ; 
 LDX $07                                                                                             ; 
 LDA #$c4                                                                                            ; 
-ColObj:  LDY #$00             ; column length of 1                                                  ;  B
+ColObj:  LDY #$00             ; column length of 1                                                  ; fun():  B
 JMP RenderUnderPart                                                                                 ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
@@ -4058,7 +4063,7 @@ BrickMetatiles:                                                                 
 DATA: ByteValue(value=34), ByteValue(value=81), ByteValue(value=82), ByteValue(value=82)            ; 
 DATA: ByteValue(value=136)    ; used only by row of bricks object                                   ; 
                                                                                                     ; 
-RowOfBricks:                                                                                        ; fun($07):  B
+RowOfBricks:                                                                                        ; fun():  B
 LDY AreaType                  ; load area type obtained from area offset pointer                    ; 
 LDA CloudTypeOverride         ; check for cloud type override                                       ; 
 BEQ DrawBricks                                                                                      ; 
@@ -4066,25 +4071,25 @@ LDY #$04                      ; if cloud type, override area type               
 DrawBricks:  LDA BrickMetatiles,Y; get appropriate metatile                                         ;  B
 JMP GetRow                    ; and go render it                                                    ; 
                                                                                                     ;  B
-RowOfSolidBlocks:                                                                                   ; fun($07):  B
+RowOfSolidBlocks:                                                                                   ; fun():  B
 LDY AreaType                  ; load area type obtained from area offset pointer                    ; 
 LDA SolidBlockMetatiles,Y     ; get metatile                                                        ; 
-GetRow:  PHA                  ; store metatile here                                                 ;  B
+GetRow:  PHA                  ; store metatile here                                                 ; fun(A):  B
 JSR ChkLrgObjLength           ; get row number, load length                                         ; 
-DrawRow:  LDX $07                                                                                   ;  B
+DrawRow:  LDX $07                                                                                   ; fun($07):  B
 LDY #$00                      ; set vertical height of 1                                            ; 
 PLA                                                                                                 ; 
 JMP RenderUnderPart           ; render object                                                       ; 
                                                                                                     ;  B
-ColumnOfBricks:                                                                                     ; fun($07):  B
+ColumnOfBricks:                                                                                     ; fun():  B
 LDY AreaType                  ; load area type obtained from area offset                            ; 
 LDA BrickMetatiles,Y          ; get metatile (no cloud override as for row)                         ; 
 JMP GetRow2                                                                                         ; 
                                                                                                     ;  B
-ColumnOfSolidBlocks:                                                                                ; fun($07):  B
+ColumnOfSolidBlocks:                                                                                ; fun():  B
 LDY AreaType                  ; load area type obtained from area offset                            ; 
 LDA SolidBlockMetatiles,Y     ; get metatile                                                        ; 
-GetRow2:  PHA                 ; save metatile to stack for now                                      ;  B
+GetRow2:  PHA                 ; save metatile to stack for now                                      ; fun(A$07):  B
 JSR GetLrgObjAttrib           ; get length and row                                                  ; 
 PLA                           ; restore metatile                                                    ; 
 LDX $07                       ; get starting row                                                    ; 
@@ -4176,7 +4181,7 @@ LDA #$00                      ; if set, init for the next one                   
 STA Hidden1UpFlag                                                                                   ; 
 JMP BrickWithItem             ; jump to code shared with unbreakable bricks                         ; 
                                                                                                     ;  B
-QuestionBlock:                                                                                      ; fun(Y$07):  B
+QuestionBlock:                                                                                      ; fun():  B
 JSR GetAreaObjectID           ; get value from level decoder routine                                ; 
 JMP DrawQBlk                  ; go to render it                                                     ; 
                                                                                                     ;  B
@@ -4195,7 +4200,7 @@ LDA #$05                      ; otherwise use adder for bricks without lines    
 BWithL:  CLC                  ; add object ID to adder                                              ;  B
 ADC $07                                                                                             ; 
 TAY                           ; use as offset for metatile                                          ; 
-DrawQBlk:  LDA BrickQBlockMetatiles,Y; get appropriate metatile for brick (question block           ;  B
+DrawQBlk:  LDA BrickQBlockMetatiles,Y; get appropriate metatile for brick (question block           ; fun(Y):  B
 PHA                           ; if branched to here from question block routine)                    ; 
 JSR GetLrgObjAttrib           ; get row from location byte                                          ; 
 JMP DrawRow                   ; now render the object                                               ; 
@@ -5291,10 +5296,10 @@ GameMode:                                                                       
 LDA OperMode_Task                                                                                   ; 
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
-DATA: Expr(expr=InitializeArea)                                                                     ; 
-DATA: Expr(expr=ScreenRoutines)                                                                     ; 
-DATA: Expr(expr=SecondaryGameSetup)                                                                 ; 
-DATA: Expr(expr=GameCoreRoutine)                                                                    ; 
+DATA: Expr(expr=InitializeArea), Expr(expr=)                                                        ; 
+DATA: Expr(expr=ScreenRoutines), Expr(expr=)                                                        ; 
+DATA: Expr(expr=SecondaryGameSetup), Expr(expr=)                                                    ; 
+DATA: Expr(expr=GameCoreRoutine), Expr(expr=)                                                       ; 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
@@ -5353,7 +5358,7 @@ CycleTwo:  LSR                ; if branched here, divide by 2 to cycle every oth
 JSR CyclePlayerPalette        ; do sub to cycle the palette (note: shares fire flower code)         ; 
 JMP SaveAB                    ; then skip this sub to finish up the game engine                     ; 
 ClrPlrPal:  JSR ResetPalStar  ; do sub to clear player's palette bits in attributes                 ;  B
-SaveAB:  LDA A_B_Buttons      ; save current A and B button                                         ;  B
+SaveAB:  LDA A_B_Buttons      ; save current A and B button                                         ; fun():  B
 STA PreviousA_B_Buttons       ; into temp variable to be used on next frame                         ; 
 LDA #$00                                                                                            ; 
 STA Left_Right_Buttons        ; nullify left and right buttons temp variable                        ; 
@@ -5425,7 +5430,7 @@ STA ScrollIntervalTimer       ; set scroll timer (residual, not used elsewhere) 
 JMP ChkPOffscr                ; skip this part                                                      ; 
 InitScrlAmt:  LDA #$00                                                                              ;  B
 STA ScrollAmount              ; initialize value here                                               ; 
-ChkPOffscr:  LDX #$00         ; set X for player offset                                             ;  B
+ChkPOffscr:  LDX #$00         ; set X for player offset                                             ; fun(A):  B
 JSR GetXOffscreenBits         ; get horizontal offscreen bits for player                            ; 
 STA $00                       ; save them here                                                      ; 
 LDY #$00                      ; load default offset (left side)                                     ; 
@@ -5475,19 +5480,19 @@ GameRoutines:                                                                   
 LDA GameEngineSubroutine      ; run routine based on number (a few of these routines are            ; 
 JSR JumpEngine                ; merely placeholders as conditions for other routines)               ; 
                                                                                                     ;  B
-DATA: Expr(expr=Entrance_GameTimerSetup)                                                            ; 
-DATA: Expr(expr=Vine_AutoClimb)                                                                     ; 
-DATA: Expr(expr=SideExitPipeEntry)                                                                  ; 
-DATA: Expr(expr=VerticalPipeEntry)                                                                  ; 
-DATA: Expr(expr=FlagpoleSlide)                                                                      ; 
-DATA: Expr(expr=PlayerEndLevel)                                                                     ; 
-DATA: Expr(expr=PlayerLoseLife)                                                                     ; 
-DATA: Expr(expr=PlayerEntrance)                                                                     ; 
-DATA: Expr(expr=PlayerCtrlRoutine)                                                                  ; 
-DATA: Expr(expr=PlayerChangeSize)                                                                   ; 
-DATA: Expr(expr=PlayerInjuryBlink)                                                                  ; 
-DATA: Expr(expr=PlayerDeath)                                                                        ; 
-DATA: Expr(expr=PlayerFireFlower)                                                                   ; 
+DATA: Expr(expr=Entrance_GameTimerSetup), Expr(expr=)                                               ; 
+DATA: Expr(expr=Vine_AutoClimb), Expr(expr=)                                                        ; 
+DATA: Expr(expr=SideExitPipeEntry), Expr(expr=)                                                     ; 
+DATA: Expr(expr=VerticalPipeEntry), Expr(expr=)                                                     ; 
+DATA: Expr(expr=FlagpoleSlide), Expr(expr=)                                                         ; 
+DATA: Expr(expr=PlayerEndLevel), Expr(expr=)                                                        ; 
+DATA: Expr(expr=PlayerLoseLife), Expr(expr=)                                                        ; 
+DATA: Expr(expr=PlayerEntrance), Expr(expr=)                                                        ; 
+DATA: Expr(expr=PlayerCtrlRoutine), Expr(expr=)                                                     ; 
+DATA: Expr(expr=PlayerChangeSize), Expr(expr=)                                                      ; 
+DATA: Expr(expr=PlayerInjuryBlink), Expr(expr=)                                                     ; 
+DATA: Expr(expr=PlayerDeath), Expr(expr=)                                                           ; 
+DATA: Expr(expr=PlayerFireFlower), Expr(expr=)                                                      ; 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
@@ -5705,7 +5710,7 @@ RTS                                                                             
 SideExitPipeEntry:                                                                                  ; fun():  B
 JSR EnterSidePipe             ; execute sub to move player to the right                             ; 
 LDY #$02                                                                                            ; 
-ChgAreaPipe:  DEC ChangeAreaTimer; decrement timer for change of area                               ;  B
+ChgAreaPipe:  DEC ChangeAreaTimer; decrement timer for change of area                               ; fun(Y):  B
 BNE ExitCAPipe                                                                                      ; 
 STY AltEntranceControl        ; when timer expires set mode of alternate entry                      ;  B
 ChgAreaMode:  INC DisableScreenFlag; set flag to disable screen output                              ; fun(): A B
@@ -5750,7 +5755,7 @@ BEQ DonePlayerTask            ; branch if at that point, and not before or after
 JMP PlayerCtrlRoutine         ; otherwise run player control routine                                ;  B
 ExitBlink:  BNE ExitBoth      ; do unconditional branch to leave                                    ;  B
                                                                                                     ;  B
-InitChangeSize:                                                                                     ;  B
+InitChangeSize:                                                                                     ; fun():  B
 LDY PlayerChangeSizeFlag      ; if growing/shrinking flag already set                               ; 
 BNE ExitBoth                  ; then branch to leave                                                ; 
 STY PlayerAnimCtrl            ; otherwise initialize player's animation frame control               ;  B
@@ -5860,7 +5865,7 @@ LDA CoinTallyFor1Ups          ; check third area coin tally for bonus 1-ups     
 CMP Hidden1UpCoinAmts,Y       ; against minimum value, if player has not collected                  ; 
 BCC NextArea                  ; at least this number of coins, leave flag clear                     ; 
 INC Hidden1UpFlag             ; otherwise set hidden 1-up box control flag                          ;  B
-NextArea:  INC AreaNumber     ; increment area number used for address loader                       ;  B
+NextArea:  INC AreaNumber     ; increment area number used for address loader                       ; fun(A):  B
 JSR LoadAreaPointer           ; get new level pointer                                               ; 
 INC FetchNewGameTimerFlag     ; set flag to load new game timer                                     ; 
 JSR ChgAreaMode               ; do sub to set secondary mode, disable screen and sprite 0           ; 
@@ -5890,10 +5895,10 @@ LDY #$18                                                                        
 STY ClimbSideTimer            ; otherwise reset timer now                                           ; 
 MoveSubs:  JSR JumpEngine                                                                           ;  B
                                                                                                     ;  B
-DATA: Expr(expr=OnGroundStateSub)                                                                   ; 
-DATA: Expr(expr=JumpSwimSub)                                                                        ; 
-DATA: Expr(expr=FallingSub)                                                                         ; 
-DATA: Expr(expr=ClimbingSub)                                                                        ; 
+DATA: Expr(expr=OnGroundStateSub), Expr(expr=)                                                      ; 
+DATA: Expr(expr=JumpSwimSub), Expr(expr=)                                                           ; 
+DATA: Expr(expr=FallingSub), Expr(expr=)                                                            ; 
+DATA: Expr(expr=ClimbingSub), Expr(expr=)                                                           ; 
                                                                                                     ; 
 NoMoveSub:  RTS                                                                                     ;  B
                                                                                                     ;  B
@@ -5944,7 +5949,7 @@ STA VerticalForce             ; otherwise set fractional                        
 LRWater:  LDA Left_Right_Buttons; check left/right controller bits (check for swimming)             ;  B
 BEQ LRAir                     ; if not pressing any, skip                                           ; 
 STA PlayerFacingDir           ; otherwise set facing direction accordingly                          ;  B
-LRAir:  LDA Left_Right_Buttons; check left/right controller bits (check for jumping/falling)        ;  B
+LRAir:  LDA Left_Right_Buttons; check left/right controller bits (check for jumping/falling)        ; fun():  B
 BEQ JSMove                    ; if not pressing any, skip                                           ; 
 JSR ImposeFriction            ; otherwise process horizontal movement                               ;  B
 JSMove:  JSR MovePlayerHorizontally; do a sub to move player horizontally                           ;  B
@@ -6136,7 +6141,7 @@ LDY PlayerSize                ; is mario big?                                   
 BEQ SJumpSnd                                                                                        ; 
 LDA #Sfx_SmallJump            ; if not, load small mario's jump sound                               ;  B
 SJumpSnd:  STA Square1SoundQueue; store appropriate jump sound in square 1 sfx queue                ;  B
-X_Physics:  LDY #$00                                                                                ;  B
+X_Physics:  LDY #$00                                                                                ; fun():  B
 STY $00                       ; init value here                                                     ; 
 LDA Player_State              ; if mario is on the ground, branch                                   ; 
 BEQ ProcPRun                                                                                        ; 
@@ -6167,7 +6172,7 @@ FastXSp:  INC $00             ; if running speed set or speed => $21 increment $
 JMP GetXPhy                   ; and jump ahead                                                      ; 
 SetRTmr:  LDA #$0a            ; if b button pressed, set running timer                              ;  B
 STA RunningTimer                                                                                    ; 
-GetXPhy:  LDA MaxLeftXSpdData,Y; get maximum speed to the left                                      ;  B
+GetXPhy:  LDA MaxLeftXSpdData,Y; get maximum speed to the left                                      ; fun(Y$00):  B
 STA MaximumLeftSpeed                                                                                ; 
 LDA GameEngineSubroutine      ; check for specific routine running                                  ; 
 CMP #$07                      ; (player entrance)                                                   ; 
@@ -6218,7 +6223,7 @@ STA Player_MovingDir          ; otherwise use facing direction to set moving dir
 LDA #$00                                                                                            ; 
 STA Player_X_Speed            ; nullify player's horizontal speed                                   ; 
 STA Player_X_MoveForce        ; and dummy variable for player                                       ; 
-SetAnimSpd:  LDA PlayerAnimTmrData,Y; get animation timer setting using Y as offset                 ;  B
+SetAnimSpd:  LDA PlayerAnimTmrData,Y; get animation timer setting using Y as offset                 ; fun(Y):  B
 STA PlayerAnimTimerSet                                                                              ; 
 RTS                                                                                                 ; 
                                                                                                     ;  B
@@ -6262,7 +6267,7 @@ BPL SetAbsSpd                 ; branch and leave horizontal speed value unmodifi
 EOR #$ff                                                                                            ;  B
 CLC                           ; otherwise get two's compliment to get absolute                      ; 
 ADC #$01                      ; unsigned walking/running speed                                      ; 
-SetAbsSpd:  STA Player_XSpeedAbsolute; store walking/running speed here and leave                   ;  B
+SetAbsSpd:  STA Player_XSpeedAbsolute; store walking/running speed here and leave                   ; fun(A):  B
 RTS                                                                                                 ; 
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
@@ -6558,7 +6563,7 @@ ADC #$01                      ; add one pixel                                   
 STA Player_X_Position         ; set player's new horizontal coordinate                              ; 
 LDA Player_PageLoc                                                                                  ; 
 ADC #$00                      ; add carry                                                           ; 
-SetPWh:  STA Player_PageLoc   ; set player's new page location                                      ;  B
+SetPWh:  STA Player_PageLoc   ; set player's new page location                                      ; fun(A):  B
 WhPull:  LDA #$10                                                                                   ;  B
 STA $00                       ; set vertical movement force                                         ; 
 LDA #$01                                                                                            ; 
@@ -6615,7 +6620,7 @@ STA DigitModifier,X           ; store in digit modifier                         
 JSR AddToScore                ; do sub to award player points depending on height of collision      ; 
 LDA #$05                                                                                            ; 
 STA GameEngineSubroutine      ; set to run end-of-level subroutine on next frame                    ; 
-FPGfx:  JSR GetEnemyOffscreenBits; get offscreen information                                        ;  B
+FPGfx:  JSR GetEnemyOffscreenBits; get offscreen information                                        ; fun():  B
 JSR RelativeEnemyPosition     ; get relative coordinates                                            ; 
 JSR FlagpoleGfxHandler        ; draw flagpole flag and floatey number                               ; 
 ExitFlagP:  RTS                                                                                     ;  B
@@ -6625,7 +6630,7 @@ ExitFlagP:  RTS                                                                 
 Jumpspring_Y_PosData:                                                                               ;  B
 DATA: ByteValue(value=8), ByteValue(value=16), ByteValue(value=8), ByteValue(value=0)               ; 
                                                                                                     ; 
-JumpspringHandler:                                                                                  ; fun(X):  B
+JumpspringHandler:                                                                                  ; fun():  B
 JSR GetEnemyOffscreenBits     ; get offscreen information                                           ; 
 LDA TimerControl              ; check master timer control                                          ; 
 BNE DrawJSpr                  ; branch to last section if set                                       ; 
@@ -6641,7 +6646,7 @@ INC Player_Y_Position         ; move player's vertical position down two pixels 
 JMP PosJSpr                   ; skip to next part                                                   ; 
 DownJSpr:  DEC Player_Y_Position; move player's vertical position up two pixels                     ;  B
 DEC Player_Y_Position                                                                               ; 
-PosJSpr:  LDA Jumpspring_FixedYPos,X; get permanent vertical position                               ;  B
+PosJSpr:  LDA Jumpspring_FixedYPos,X; get permanent vertical position                               ; fun(XY):  B
 CLC                                                                                                 ; 
 ADC Jumpspring_Y_PosData,Y    ; add value using frame control as offset                             ; 
 STA Enemy_Y_Position,X        ; store as new vertical position                                      ; 
@@ -6804,7 +6809,7 @@ STA Enemy_BoundBoxCtrl,X      ; set bounding box size control for bullet bill   
 LDA #BulletBill_CannonVar                                                                           ; 
 STA Enemy_ID,X                ; load identifier for bullet bill (cannon variant)                    ; 
 JMP Next3Slt                  ; move onto next slot                                                 ; 
-Chk_BB:  LDA Enemy_ID,X       ; check enemy identifier for bullet bill (cannon variant)             ;  B
+Chk_BB:  LDA Enemy_ID,X       ; check enemy identifier for bullet bill (cannon variant)             ; fun(X):  B
 CMP #BulletBill_CannonVar                                                                           ; 
 BNE Next3Slt                  ; if not found, branch to get next slot                               ; 
 JSR OffscreenBoundsCheck      ; otherwise, check to see if it went offscreen                        ;  B
@@ -6812,7 +6817,7 @@ LDA Enemy_Flag,X              ; check enemy buffer flag                         
 BEQ Next3Slt                  ; if not set, branch to get next slot                                 ; 
 JSR GetEnemyOffscreenBits     ; otherwise, get offscreen information                                ;  B
 JSR BulletBillHandler         ; then do sub to handle bullet bill                                   ; 
-Next3Slt:  DEX                ; move onto next slot                                                 ;  B
+Next3Slt:  DEX                ; move onto next slot                                                 ; fun(X):  B
 BPL ThreeSChk                 ; do this until first three slots are checked                         ; 
 ExCannon:  RTS                ; then leave                                                          ;  B
                                                                                                     ;  B
@@ -6949,7 +6954,7 @@ STA Misc_Y_Position,X         ; store as hammer's vertical position             
 LDA #$01                                                                                            ; 
 STA Misc_Y_HighPos,X          ; set hammer's vertical high byte                                     ; 
 BNE RunHSubs                  ; unconditional branch to skip first routine                          ; 
-RunAllH:  JSR PlayerHammerCollision; handle collisions                                              ;  B
+RunAllH:  JSR PlayerHammerCollision; handle collisions                                              ; fun():  B
 RunHSubs:  JSR GetMiscOffscreenBits; get offscreen information                                      ;  B
 JSR RelativeMiscPosition      ; get relative coordinates                                            ; 
 JSR GetMiscBoundBox           ; get bounding box coordinates                                        ; 
@@ -6986,7 +6991,7 @@ STA Misc_X_Position,Y         ; save as horizontal coordinate for misc object   
 LDA $02                       ; get vertical high nybble offset from earlier                        ; 
 ADC #$20                      ; add 32 pixels for the status bar                                    ; 
 STA Misc_Y_Position,Y         ; store as vertical coordinate                                        ; 
-JCoinC:  LDA #$fb                                                                                   ;  B
+JCoinC:  LDA #$fb                                                                                   ; fun(YX):  B
 STA Misc_Y_Speed,Y            ; set vertical speed                                                  ; 
 LDA #$01                                                                                            ; 
 STA Misc_Y_HighPos,Y          ; set vertical high byte                                              ; 
@@ -7065,7 +7070,7 @@ JSR GetMiscOffscreenBits      ; get offscreen information                       
 JSR GetMiscBoundBox           ; get bounding box coordinates (why?)                                 ; 
 JSR JCoinGfxHandler           ; draw the coin or floatey number                                     ; 
                                                                                                     ; 
-MiscLoopBack:                                                                                       ;  B
+MiscLoopBack:                                                                                       ; fun(X):  B
 DEX                           ; decrement misc object offset                                        ; 
 BPL MiscLoop                  ; loop back until all misc objects handled                            ; 
 RTS                           ; then leave                                                          ;  B
@@ -7122,7 +7127,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-SetupPowerUp:                                                                                       ;  B
+SetupPowerUp:                                                                                       ; fun(X):  B
 LDA #PowerUpObject            ; load power-up identifier into                                       ; 
 STA Enemy_ID+5                ; special use slot of enemy object buffer                             ; 
 LDA Block_PageLoc,X           ; store page location of block object                                 ; 
@@ -7198,7 +7203,7 @@ STA Enemy_MovingDir,X         ; set moving direction                            
 ChkPUSte:  LDA Enemy_State+5  ; check power-up object's state                                       ;  B
 CMP #$06                      ; for if power-up has risen enough                                    ; 
 BCC ExitPUp                   ; if not, don't even bother running these routines                    ; 
-RunPUSubs:  JSR RelativeEnemyPosition; get coordinates relative to screen                           ;  B
+RunPUSubs:  JSR RelativeEnemyPosition; get coordinates relative to screen                           ; fun():  B
 JSR GetEnemyOffscreenBits     ; get offscreen bits                                                  ; 
 JSR GetEnemyBoundBox          ; get bounding box coordinates                                        ; 
 JSR DrawPowerUp               ; draw the power-up object                                            ; 
@@ -7281,7 +7286,7 @@ BEQ Unbreak                   ; if set to value loaded for unbreakable, branch  
 JSR BrickShatter              ; execute code for breakable brick                                    ;  B
 JMP InvOBit                   ; skip subroutine to do last part of code here                        ; 
 Unbreak:  JSR BumpBlock       ; execute code for unbreakable brick or question block                ;  B
-InvOBit:  LDA SprDataOffset_Ctrl; invert control bit used by block objects                          ;  B
+InvOBit:  LDA SprDataOffset_Ctrl; invert control bit used by block objects                          ; fun():  B
 EOR #$01                      ; and floatey numbers                                                 ; 
 STA SprDataOffset_Ctrl                                                                              ; 
 RTS                           ; leave!                                                              ; 
@@ -7323,15 +7328,15 @@ BCC BlockCode                 ; branch to use current number                    
 SBC #$05                      ; otherwise subtract 5 for second set to get proper number            ;  B
 BlockCode:  JSR JumpEngine    ; run appropriate subroutine depending on block number                ;  B
                                                                                                     ;  B
-DATA: Expr(expr=MushFlowerBlock)                                                                    ; 
-DATA: Expr(expr=CoinBlock)                                                                          ; 
-DATA: Expr(expr=CoinBlock)                                                                          ; 
-DATA: Expr(expr=ExtraLifeMushBlock)                                                                 ; 
-DATA: Expr(expr=MushFlowerBlock)                                                                    ; 
-DATA: Expr(expr=VineBlock)                                                                          ; 
-DATA: Expr(expr=StarBlock)                                                                          ; 
-DATA: Expr(expr=CoinBlock)                                                                          ; 
-DATA: Expr(expr=ExtraLifeMushBlock)                                                                 ; 
+DATA: Expr(expr=MushFlowerBlock), Expr(expr=)                                                       ; 
+DATA: Expr(expr=CoinBlock), Expr(expr=)                                                             ; 
+DATA: Expr(expr=CoinBlock), Expr(expr=)                                                             ; 
+DATA: Expr(expr=ExtraLifeMushBlock), Expr(expr=)                                                    ; 
+DATA: Expr(expr=MushFlowerBlock), Expr(expr=)                                                       ; 
+DATA: Expr(expr=VineBlock), Expr(expr=)                                                             ; 
+DATA: Expr(expr=StarBlock), Expr(expr=)                                                             ; 
+DATA: Expr(expr=CoinBlock), Expr(expr=)                                                             ; 
+DATA: Expr(expr=ExtraLifeMushBlock), Expr(expr=)                                                    ; 
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                                                                                                     ; 
@@ -7339,11 +7344,11 @@ MushFlowerBlock:                                                                
 LDA #$00                      ; load mushroom/fire flower into power-up type                        ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-StarBlock:                                                                                          ; fun():  B
+StarBlock:                                                                                          ;  B
 LDA #$02                      ; load star into power-up type                                        ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-ExtraLifeMushBlock:                                                                                 ; fun(X):  B
+ExtraLifeMushBlock:                                                                                 ;  B
 LDA #$03                      ; load 1-up mushroom into power-up type                               ; 
 STA $39                       ; store correct power-up type                                         ; 
 JMP SetupPowerUp                                                                                    ; 
@@ -7583,7 +7588,7 @@ ExXMove:  RTS                 ; and leave                                       
                               ; $01 - used for upward force                                         ; 
                               ; $02 - used for maximum vertical speed                               ; 
                                                                                                     ; 
-MovePlayerVertically:                                                                               ;  B
+MovePlayerVertically:                                                                               ; fun():  B
 LDX #$00                      ; set X for player offset                                             ; 
 LDA TimerControl                                                                                    ; 
 BNE NoJSChk                   ; if master timer control set, branch ahead                           ; 
@@ -7608,14 +7613,14 @@ ContVMove:  JMP SetHiMax      ; jump to skip the rest of this                   
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-MoveRedPTroopaDown:                                                                                 ;  B
+MoveRedPTroopaDown:                                                                                 ; fun():  B
 LDY #$00                      ; set Y to move downwards                                             ; 
 JMP MoveRedPTroopa            ; skip to movement routine                                            ; 
                                                                                                     ;  B
-MoveRedPTroopaUp:                                                                                   ;  B
+MoveRedPTroopaUp:                                                                                   ; fun():  B
 LDY #$01                      ; set Y to move upwards                                               ; 
                                                                                                     ; 
-MoveRedPTroopa:                                                                                     ;  B
+MoveRedPTroopa:                                                                                     ; fun(XY):  B
 INX                           ; increment X for enemy offset                                        ; 
 LDA #$03                                                                                            ; 
 STA $00                       ; set downward movement amount here                                   ; 
@@ -7641,7 +7646,7 @@ BNE SetXMoveAmt               ; unconditional branch                            
                                                                                                     ; 
 MoveJ_EnemyVertically:                                                                              ; fun():  B
 LDY #$1c                      ; set movement amount for podoboo/other objects                       ; 
-SetHiMax:  LDA #$03           ; set maximum speed in A                                              ;  B
+SetHiMax:  LDA #$03           ; set maximum speed in A                                              ; fun():  B
 SetXMoveAmt:  STY $00         ; set movement amount here                                            ; fun(YX):  B
 INX                           ; increment X for enemy offset                                        ; 
 JSR ImposeGravitySprObj       ; do a sub to move enemy object downwards                             ; 
@@ -7670,7 +7675,7 @@ JMP ImposeGravity             ; jump to the code that actually moves it         
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-MovePlatformDown:                                                                                   ; fun():  B
+MovePlatformDown:                                                                                   ; fun(X):  B
 LDA #$00                      ; save value to stack (if branching here, execute next                ; 
 DATA: ByteValue(value=44)     ; part as BIT instruction)                                            ; 
                                                                                                     ; 
@@ -7691,7 +7696,7 @@ STA $02                                                                         
 PLA                           ; get value from stack                                                ; 
 TAY                           ; use as Y, then move onto code shared by red koopa                   ; 
                                                                                                     ; 
-RedPTroopaGrav:                                                                                     ;  B
+RedPTroopaGrav:                                                                                     ; fun():  B
 JSR ImposeGravity             ; do a sub to move object gradually                                   ; 
 LDX ObjectOffset              ; get enemy object offset and leave                                   ; 
 RTS                                                                                                 ; 
@@ -7760,7 +7765,7 @@ ExVMove:  RTS                 ; leave!                                          
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-EnemiesAndLoopsCore:                                                                                ; fun(X): X B
+EnemiesAndLoopsCore:                                                                                ; fun(X):  B
 LDA Enemy_Flag,X              ; check data here for MSB set                                         ; 
 PHA                           ; save in stack                                                       ; 
 ASL                                                                                                 ; 
@@ -7823,7 +7828,7 @@ LDA AreaDataOfsLoopback,Y     ; adjust area object offset based on              
 STA AreaDataOffset            ; which loop command we encountered                                   ; 
 RTS                                                                                                 ; 
                                                                                                     ;  B
-ProcLoopCommand:                                                                                    ;  B
+ProcLoopCommand:                                                                                    ; fun(X):  B
 LDA LoopCommand               ; check if loop command was found                                     ; 
 BEQ ChkEnemyFrenzy                                                                                  ; 
 LDA CurrentColumnPos          ; check to see if we're still on the first page                       ;  B
@@ -8000,7 +8005,7 @@ LDA Enemy_Flag,X              ; check to see if flag is set                     
 BNE Inc2B                     ; if not, leave, otherwise branch                                     ; 
 RTS                                                                                                 ;  B
                                                                                                     ;  B
-CheckFrenzyBuffer:                                                                                  ;  B
+CheckFrenzyBuffer:                                                                                  ; fun(X):  B
 LDA EnemyFrenzyBuffer         ; if enemy object stored in frenzy buffer                             ; 
 BNE StrFre                    ; then branch ahead to store in enemy object buffer                   ; 
 LDA VineFlagOffset            ; otherwise check vine flag offset                                    ;  B
@@ -8038,14 +8043,14 @@ AND #%00011111                ; the 3 MSB from before, save as page number to be
 STA EntrancePage              ; used upon entry to area, if area is entered                         ; 
 NotUse:  JMP Inc3B                                                                                  ;  B
                                                                                                     ;  B
-CheckThreeBytes:                                                                                    ;  B
+CheckThreeBytes:                                                                                    ; fun():  B
 LDY EnemyDataOffset           ; load current offset for enemy object data                           ; 
 LDA (EnemyData),Y             ; get first byte                                                      ; 
 AND #%00001111                ; check for special row $0e                                           ; 
 CMP #$0e                                                                                            ; 
 BNE Inc2B                                                                                           ; 
-Inc3B:  INC EnemyDataOffset   ; if row = $0e, increment three bytes                                 ;  B
-Inc2B:  INC EnemyDataOffset   ; otherwise increment two bytes                                       ;  B
+Inc3B:  INC EnemyDataOffset   ; if row = $0e, increment three bytes                                 ; fun():  B
+Inc2B:  INC EnemyDataOffset   ; otherwise increment two bytes                                       ; fun():  B
 INC EnemyDataOffset                                                                                 ; 
 LDA #$00                      ; init page select for enemy objects                                  ; 
 STA EnemyObjectPageSel                                                                              ; 
@@ -8069,64 +8074,64 @@ JSR JumpEngine                                                                  
                                                                                                     ;  B
                               ; jump engine table for newly loaded enemy objects                    ; 
                                                                                                     ; 
-DATA: Expr(expr=InitNormalEnemy); for objects $00-$0f                                               ; 
-DATA: Expr(expr=InitNormalEnemy)                                                                    ; 
-DATA: Expr(expr=InitNormalEnemy)                                                                    ; 
-DATA: Expr(expr=InitRedKoopa)                                                                       ; 
-DATA: Expr(expr=NoInitCode)                                                                         ; 
-DATA: Expr(expr=InitHammerBro)                                                                      ; 
-DATA: Expr(expr=InitGoomba)                                                                         ; 
-DATA: Expr(expr=InitBloober)                                                                        ; 
-DATA: Expr(expr=InitBulletBill)                                                                     ; 
-DATA: Expr(expr=NoInitCode)                                                                         ; 
-DATA: Expr(expr=InitCheepCheep)                                                                     ; 
-DATA: Expr(expr=InitCheepCheep)                                                                     ; 
-DATA: Expr(expr=InitPodoboo)                                                                        ; 
-DATA: Expr(expr=InitPiranhaPlant)                                                                   ; 
-DATA: Expr(expr=InitJumpGPTroopa)                                                                   ; 
-DATA: Expr(expr=InitRedPTroopa)                                                                     ; 
+DATA: Expr(expr=InitNormalEnemy), Expr(expr=); for objects $00-$0f                                  ; 
+DATA: Expr(expr=InitNormalEnemy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=InitNormalEnemy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=InitRedKoopa), Expr(expr=)                                                          ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=InitHammerBro), Expr(expr=)                                                         ; 
+DATA: Expr(expr=InitGoomba), Expr(expr=)                                                            ; 
+DATA: Expr(expr=InitBloober), Expr(expr=)                                                           ; 
+DATA: Expr(expr=InitBulletBill), Expr(expr=)                                                        ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=InitCheepCheep), Expr(expr=)                                                        ; 
+DATA: Expr(expr=InitCheepCheep), Expr(expr=)                                                        ; 
+DATA: Expr(expr=InitPodoboo), Expr(expr=)                                                           ; 
+DATA: Expr(expr=InitPiranhaPlant), Expr(expr=)                                                      ; 
+DATA: Expr(expr=InitJumpGPTroopa), Expr(expr=)                                                      ; 
+DATA: Expr(expr=InitRedPTroopa), Expr(expr=)                                                        ; 
                                                                                                     ; 
-DATA: Expr(expr=InitHorizFlySwimEnemy); for objects $10-$1f                                         ; 
-DATA: Expr(expr=InitLakitu)                                                                         ; 
-DATA: Expr(expr=InitEnemyFrenzy)                                                                    ; 
-DATA: Expr(expr=NoInitCode)                                                                         ; 
-DATA: Expr(expr=InitEnemyFrenzy)                                                                    ; 
-DATA: Expr(expr=InitEnemyFrenzy)                                                                    ; 
-DATA: Expr(expr=InitEnemyFrenzy)                                                                    ; 
-DATA: Expr(expr=InitEnemyFrenzy)                                                                    ; 
-DATA: Expr(expr=EndFrenzy)                                                                          ; 
-DATA: Expr(expr=NoInitCode)                                                                         ; 
-DATA: Expr(expr=NoInitCode)                                                                         ; 
-DATA: Expr(expr=InitShortFirebar)                                                                   ; 
-DATA: Expr(expr=InitShortFirebar)                                                                   ; 
-DATA: Expr(expr=InitShortFirebar)                                                                   ; 
-DATA: Expr(expr=InitShortFirebar)                                                                   ; 
-DATA: Expr(expr=InitLongFirebar)                                                                    ; 
+DATA: Expr(expr=InitHorizFlySwimEnemy), Expr(expr=); for objects $10-$1f                            ; 
+DATA: Expr(expr=InitLakitu), Expr(expr=)                                                            ; 
+DATA: Expr(expr=InitEnemyFrenzy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=InitEnemyFrenzy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=InitEnemyFrenzy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=InitEnemyFrenzy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=InitEnemyFrenzy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=EndFrenzy), Expr(expr=)                                                             ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=InitShortFirebar), Expr(expr=)                                                      ; 
+DATA: Expr(expr=InitShortFirebar), Expr(expr=)                                                      ; 
+DATA: Expr(expr=InitShortFirebar), Expr(expr=)                                                      ; 
+DATA: Expr(expr=InitShortFirebar), Expr(expr=)                                                      ; 
+DATA: Expr(expr=InitLongFirebar), Expr(expr=)                                                       ; 
                                                                                                     ; 
-DATA: Expr(expr=NoInitCode)   ; for objects $20-$2f                                                 ; 
-DATA: Expr(expr=NoInitCode)                                                                         ; 
-DATA: Expr(expr=NoInitCode)                                                                         ; 
-DATA: Expr(expr=NoInitCode)                                                                         ; 
-DATA: Expr(expr=InitBalPlatform)                                                                    ; 
-DATA: Expr(expr=InitVertPlatform)                                                                   ; 
-DATA: Expr(expr=LargeLiftUp)                                                                        ; 
-DATA: Expr(expr=LargeLiftDown)                                                                      ; 
-DATA: Expr(expr=InitHoriPlatform)                                                                   ; 
-DATA: Expr(expr=InitDropPlatform)                                                                   ; 
-DATA: Expr(expr=InitHoriPlatform)                                                                   ; 
-DATA: Expr(expr=PlatLiftUp)                                                                         ; 
-DATA: Expr(expr=PlatLiftDown)                                                                       ; 
-DATA: Expr(expr=InitBowser)                                                                         ; 
-DATA: Expr(expr=PwrUpJmp)     ; possibly dummy value                                                ; 
-DATA: Expr(expr=Setup_Vine)                                                                         ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=); for objects $20-$2f                                       ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=InitBalPlatform), Expr(expr=)                                                       ; 
+DATA: Expr(expr=InitVertPlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=LargeLiftUp), Expr(expr=)                                                           ; 
+DATA: Expr(expr=LargeLiftDown), Expr(expr=)                                                         ; 
+DATA: Expr(expr=InitHoriPlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=InitDropPlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=InitHoriPlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=PlatLiftUp), Expr(expr=)                                                            ; 
+DATA: Expr(expr=PlatLiftDown), Expr(expr=)                                                          ; 
+DATA: Expr(expr=InitBowser), Expr(expr=)                                                            ; 
+DATA: Expr(expr=PwrUpJmp), Expr(expr=); possibly dummy value                                        ; 
+DATA: Expr(expr=Setup_Vine), Expr(expr=)                                                            ; 
                                                                                                     ; 
-DATA: Expr(expr=NoInitCode)   ; for objects $30-$36                                                 ; 
-DATA: Expr(expr=NoInitCode)                                                                         ; 
-DATA: Expr(expr=NoInitCode)                                                                         ; 
-DATA: Expr(expr=NoInitCode)                                                                         ; 
-DATA: Expr(expr=NoInitCode)                                                                         ; 
-DATA: Expr(expr=InitRetainerObj)                                                                    ; 
-DATA: Expr(expr=EndOfEnemyInitCode)                                                                 ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=); for objects $30-$36                                       ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=NoInitCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=InitRetainerObj), Expr(expr=)                                                       ; 
+DATA: Expr(expr=EndOfEnemyInitCode), Expr(expr=)                                                    ; 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
@@ -8163,13 +8168,13 @@ RTS                                                                             
 NormalXSpdData:                                                                                     ;  B
 DATA: ByteValue(value=248), ByteValue(value=244)                                                    ; 
                                                                                                     ; 
-InitNormalEnemy:                                                                                    ; fun(X):  B
+InitNormalEnemy:                                                                                    ; fun():  B
 LDY #$01                      ; load offset of 1 by default                                         ; 
 LDA PrimaryHardMode           ; check for primary hard mode flag set                                ; 
 BNE GetESpd                                                                                         ; 
 DEY                           ; if not set, decrement offset                                        ;  B
 GetESpd:  LDA NormalXSpdData,Y; get appropriate horizontal speed                                    ;  B
-SetESpd:  STA Enemy_X_Speed,X ; store as speed for enemy object                                     ;  B
+SetESpd:  STA Enemy_X_Speed,X ; store as speed for enemy object                                     ; fun(AX):  B
 JMP TallBBox                  ; branch to set bounding box control and other data                   ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
@@ -8197,7 +8202,7 @@ JMP SetBBox                                                                     
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-InitHorizFlySwimEnemy:                                                                              ; fun(X):  B
+InitHorizFlySwimEnemy:                                                                              ; fun():  B
 LDA #$00                      ; initialize horizontal speed                                         ; 
 JMP SetESpd                                                                                         ; 
                                                                                                     ;  B
@@ -8206,7 +8211,7 @@ JMP SetESpd                                                                     
 InitBloober:                                                                                        ; fun(X):  B
 LDA #$00                      ; initialize horizontal speed                                         ; 
 STA BlooperMoveSpeed,X                                                                              ; 
-SmallBBox:  LDA #$09          ; set specific bounding box size control                              ; fun(X): A B
+SmallBBox:  LDA #$09          ; set specific bounding box size control                              ; fun(): A B
 BNE SetBBox                   ; unconditional branch                                                ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
@@ -8220,8 +8225,8 @@ LDY #$e0                      ; if => $80, load position adder for 32 pixels up 
 GetCent:  TYA                 ; send central position adder to A                                    ;  B
 ADC Enemy_Y_Position,X        ; add to current vertical coordinate                                  ; 
 STA RedPTroopaCenterYPos,X    ; store as central vertical coordinate                                ; 
-TallBBox:  LDA #$03           ; set specific bounding box size control                              ;  B
-SetBBox:  STA Enemy_BoundBoxCtrl,X; set bounding box control here                                   ;  B
+TallBBox:  LDA #$03           ; set specific bounding box size control                              ; fun():  B
+SetBBox:  STA Enemy_BoundBoxCtrl,X; set bounding box control here                                   ; fun(AX):  B
 LDA #$02                      ; set moving direction for left                                       ; 
 STA Enemy_MovingDir,X                                                                               ; 
 InitVStf:  LDA #$00           ; initialize vertical speed                                           ; fun(X): A B
@@ -8255,7 +8260,7 @@ InitLakitu:                                                                     
 LDA EnemyFrenzyBuffer         ; check to see if an enemy is already in                              ; 
 BNE KillLakitu                ; the frenzy buffer, and branch to kill lakitu if so                  ; 
                                                                                                     ;  B
-SetupLakitu:                                                                                        ; fun(X):  B
+SetupLakitu:                                                                                        ; fun():  B
 LDA #$00                      ; erase counter for lakitu's reappearance                             ; 
 STA LakituReappearTimer                                                                             ; 
 JSR InitHorizFlySwimEnemy     ; set $03 as bounding box, set other attributes                       ; 
@@ -8491,7 +8496,7 @@ SBC FlyCCXPositionData,Y      ; if d1 not set, subtract value obtained from pseu
 STA Enemy_X_Position,X        ; offset and save as enemy's horizontal position                      ; 
 LDA Player_PageLoc            ; get player's page location                                          ; 
 SBC #$00                      ; subtract borrow                                                     ; 
-FinCCSt:  STA Enemy_PageLoc,X ; save as enemy's page location                                       ;  B
+FinCCSt:  STA Enemy_PageLoc,X ; save as enemy's page location                                       ; fun(AX):  B
 LDA #$01                                                                                            ; 
 STA Enemy_Flag,X              ; set enemy's buffer flag                                             ; 
 STA Enemy_Y_HighPos,X         ; set enemy's high vertical byte                                      ; 
@@ -8612,7 +8617,7 @@ STA Enemy_Y_MoveForce,X       ; to vertical movement force                      
 LDA #$00                                                                                            ; 
 STA EnemyFrenzyBuffer         ; clear enemy frenzy buffer                                           ; 
                                                                                                     ; 
-FinishFlame:                                                                                        ;  B
+FinishFlame:                                                                                        ; fun(X):  B
 LDA #$08                      ; set $08 for bounding box control                                    ; 
 STA Enemy_BoundBoxCtrl,X                                                                            ; 
 LDA #$01                      ; set high byte of vertical and                                       ; 
@@ -8710,7 +8715,7 @@ LDA #$00                      ; initialize vertical position filter             
 STA BitMFilter                                                                                      ; 
 GetRBit:  LDA PseudoRandomBitReg,X; get first part of LSFR                                          ;  B
 AND #%00000111                ; mask out all but 3 LSB                                              ; 
-ChkRBit:  TAY                 ; use as offset                                                       ;  B
+ChkRBit:  TAY                 ; use as offset                                                       ; fun(AX):  B
 LDA Bitmasks,Y                ; load bitmask                                                        ; 
 BIT BitMFilter                ; perform AND on filter without changing it                           ; 
 BEQ AddFBit                                                                                         ; 
@@ -8752,7 +8757,7 @@ BNE Set17ID                   ; unconditional branch                            
                               ; $02 - used to store page location of right side of screen           ; 
                               ; $03 - used to store X position of right side of screen              ; 
                                                                                                     ; 
-HandleGroupEnemies:                                                                                 ;  B
+HandleGroupEnemies:                                                                                 ; fun(A):  B
 LDY #$00                      ; load value for green koopa troopa                                   ; 
 SEC                                                                                                 ; 
 SBC #$37                      ; subtract $37 from second byte read                                  ; 
@@ -8835,12 +8840,12 @@ SBC #$12                      ; subtract 12 and use as offset for jump engine   
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
                               ; frenzy object jump table                                            ; 
-DATA: Expr(expr=LakituAndSpinyHandler)                                                              ; 
-DATA: Expr(expr=NoFrenzyCode)                                                                       ; 
-DATA: Expr(expr=InitFlyingCheepCheep)                                                               ; 
-DATA: Expr(expr=InitBowserFlame)                                                                    ; 
-DATA: Expr(expr=InitFireworks)                                                                      ; 
-DATA: Expr(expr=BulletBillCheepCheep)                                                               ; 
+DATA: Expr(expr=LakituAndSpinyHandler), Expr(expr=)                                                 ; 
+DATA: Expr(expr=NoFrenzyCode), Expr(expr=)                                                          ; 
+DATA: Expr(expr=InitFlyingCheepCheep), Expr(expr=)                                                  ; 
+DATA: Expr(expr=InitBowserFlame), Expr(expr=)                                                       ; 
+DATA: Expr(expr=InitFireworks), Expr(expr=)                                                         ; 
+DATA: Expr(expr=BulletBillCheepCheep), Expr(expr=)                                                  ; 
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                                                                                                     ; 
@@ -8870,8 +8875,8 @@ LDA #$02                      ; set for movement to the left                    
 STA Enemy_MovingDir,X                                                                               ; 
 LDA #$f8                      ; set horizontal speed                                                ; 
 STA Enemy_X_Speed,X                                                                                 ; 
-TallBBox2:  LDA #$03          ; set specific value for bounding box control                         ;  B
-SetBBox2:  STA Enemy_BoundBoxCtrl,X; set bounding box control then leave                            ;  B
+TallBBox2:  LDA #$03          ; set specific value for bounding box control                         ; fun():  B
+SetBBox2:  STA Enemy_BoundBoxCtrl,X; set bounding box control then leave                            ; fun(AX):  B
 RTS                                                                                                 ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
@@ -8927,9 +8932,9 @@ STA YPlatformCenterYPos,X     ; save result as central vertical position        
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-CommonPlatCode:                                                                                     ;  B
+CommonPlatCode:                                                                                     ; fun():  B
 JSR InitVStf                  ; do a sub to init certain other values                               ; 
-SPBBox:  LDA #$05             ; set default bounding box size control                               ;  B
+SPBBox:  LDA #$05             ; set default bounding box size control                               ; fun(X):  B
 LDY AreaType                                                                                        ; 
 CPY #$03                      ; check for castle-type level                                         ; 
 BEQ CasPBB                    ; use default value if found                                          ; 
@@ -8941,14 +8946,14 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-LargeLiftUp:                                                                                        ; fun(X):  B
+LargeLiftUp:                                                                                        ; fun():  B
 JSR PlatLiftUp                ; execute code for platforms going up                                 ; 
 JMP LargeLiftBBox             ; overwrite bounding box for large platforms                          ; 
                                                                                                     ;  B
-LargeLiftDown:                                                                                      ; fun(X):  B
+LargeLiftDown:                                                                                      ; fun():  B
 JSR PlatLiftDown              ; execute code for platforms going down                               ; 
                                                                                                     ; 
-LargeLiftBBox:                                                                                      ;  B
+LargeLiftBBox:                                                                                      ; fun():  B
 JMP SPBBox                    ; jump to overwrite bounding box size control                         ; 
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
@@ -8970,7 +8975,7 @@ STA Enemy_Y_Speed,X                                                             
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-CommonSmallLift:                                                                                    ;  B
+CommonSmallLift:                                                                                    ; fun(X):  B
 LDY #$01                                                                                            ; 
 JSR PosPlatform               ; do a sub to add 12 pixels due to preset value                       ; 
 LDA #$04                                                                                            ; 
@@ -9002,7 +9007,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-RunEnemyObjectsCore:                                                                                ;  B
+RunEnemyObjectsCore:                                                                                ; fun():  B
 LDX ObjectOffset              ; get offset for enemy object buffer                                  ; 
 LDA #$00                      ; load value 0 for jump engine by default                             ; 
 LDY Enemy_ID,X                                                                                      ; 
@@ -9012,43 +9017,43 @@ TYA                           ; otherwise subtract $14 from the value and use   
 SBC #$14                      ; as value for jump engine                                            ; 
 JmpEO:  JSR JumpEngine                                                                              ;  B
                                                                                                     ;  B
-DATA: Expr(expr=RunNormalEnemies); for objects $00-$14                                              ; 
+DATA: Expr(expr=RunNormalEnemies), Expr(expr=); for objects $00-$14                                 ; 
                                                                                                     ; 
-DATA: Expr(expr=RunBowserFlame); for objects $15-$1f                                                ; 
-DATA: Expr(expr=RunFireworks)                                                                       ; 
-DATA: Expr(expr=NoRunCode)                                                                          ; 
-DATA: Expr(expr=NoRunCode)                                                                          ; 
-DATA: Expr(expr=NoRunCode)                                                                          ; 
-DATA: Expr(expr=NoRunCode)                                                                          ; 
-DATA: Expr(expr=RunFirebarObj)                                                                      ; 
-DATA: Expr(expr=RunFirebarObj)                                                                      ; 
-DATA: Expr(expr=RunFirebarObj)                                                                      ; 
-DATA: Expr(expr=RunFirebarObj)                                                                      ; 
-DATA: Expr(expr=RunFirebarObj)                                                                      ; 
+DATA: Expr(expr=RunBowserFlame), Expr(expr=); for objects $15-$1f                                   ; 
+DATA: Expr(expr=RunFireworks), Expr(expr=)                                                          ; 
+DATA: Expr(expr=NoRunCode), Expr(expr=)                                                             ; 
+DATA: Expr(expr=NoRunCode), Expr(expr=)                                                             ; 
+DATA: Expr(expr=NoRunCode), Expr(expr=)                                                             ; 
+DATA: Expr(expr=NoRunCode), Expr(expr=)                                                             ; 
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)                                                         ; 
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)                                                         ; 
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)                                                         ; 
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)                                                         ; 
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)                                                         ; 
                                                                                                     ; 
-DATA: Expr(expr=RunFirebarObj); for objects $20-$2f                                                 ; 
-DATA: Expr(expr=RunFirebarObj)                                                                      ; 
-DATA: Expr(expr=RunFirebarObj)                                                                      ; 
-DATA: Expr(expr=NoRunCode)                                                                          ; 
-DATA: Expr(expr=RunLargePlatform)                                                                   ; 
-DATA: Expr(expr=RunLargePlatform)                                                                   ; 
-DATA: Expr(expr=RunLargePlatform)                                                                   ; 
-DATA: Expr(expr=RunLargePlatform)                                                                   ; 
-DATA: Expr(expr=RunLargePlatform)                                                                   ; 
-DATA: Expr(expr=RunLargePlatform)                                                                   ; 
-DATA: Expr(expr=RunLargePlatform)                                                                   ; 
-DATA: Expr(expr=RunSmallPlatform)                                                                   ; 
-DATA: Expr(expr=RunSmallPlatform)                                                                   ; 
-DATA: Expr(expr=RunBowser)                                                                          ; 
-DATA: Expr(expr=PowerUpObjHandler)                                                                  ; 
-DATA: Expr(expr=VineObjectHandler)                                                                  ; 
+DATA: Expr(expr=RunFirebarObj), Expr(expr=); for objects $20-$2f                                    ; 
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)                                                         ; 
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)                                                         ; 
+DATA: Expr(expr=NoRunCode), Expr(expr=)                                                             ; 
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=RunSmallPlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=RunSmallPlatform), Expr(expr=)                                                      ; 
+DATA: Expr(expr=RunBowser), Expr(expr=)                                                             ; 
+DATA: Expr(expr=PowerUpObjHandler), Expr(expr=)                                                     ; 
+DATA: Expr(expr=VineObjectHandler), Expr(expr=)                                                     ; 
                                                                                                     ; 
-DATA: Expr(expr=NoRunCode)    ; for objects $30-$35                                                 ; 
-DATA: Expr(expr=RunStarFlagObj)                                                                     ; 
-DATA: Expr(expr=JumpspringHandler)                                                                  ; 
-DATA: Expr(expr=NoRunCode)                                                                          ; 
-DATA: Expr(expr=WarpZoneObject)                                                                     ; 
-DATA: Expr(expr=RunRetainerObj)                                                                     ; 
+DATA: Expr(expr=NoRunCode), Expr(expr=); for objects $30-$35                                        ; 
+DATA: Expr(expr=RunStarFlagObj), Expr(expr=)                                                        ; 
+DATA: Expr(expr=JumpspringHandler), Expr(expr=)                                                     ; 
+DATA: Expr(expr=NoRunCode), Expr(expr=)                                                             ; 
+DATA: Expr(expr=WarpZoneObject), Expr(expr=)                                                        ; 
+DATA: Expr(expr=RunRetainerObj), Expr(expr=)                                                        ; 
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                                                                                                     ; 
@@ -9083,27 +9088,27 @@ EnemyMovementSubs:                                                              
 LDA Enemy_ID,X                                                                                      ; 
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
-DATA: Expr(expr=MoveNormalEnemy); only objects $00-$14 use this table                               ; 
-DATA: Expr(expr=MoveNormalEnemy)                                                                    ; 
-DATA: Expr(expr=MoveNormalEnemy)                                                                    ; 
-DATA: Expr(expr=MoveNormalEnemy)                                                                    ; 
-DATA: Expr(expr=MoveNormalEnemy)                                                                    ; 
-DATA: Expr(expr=ProcHammerBro)                                                                      ; 
-DATA: Expr(expr=MoveNormalEnemy)                                                                    ; 
-DATA: Expr(expr=MoveBloober)                                                                        ; 
-DATA: Expr(expr=MoveBulletBill)                                                                     ; 
-DATA: Expr(expr=NoMoveCode)                                                                         ; 
-DATA: Expr(expr=MoveSwimmingCheepCheep)                                                             ; 
-DATA: Expr(expr=MoveSwimmingCheepCheep)                                                             ; 
-DATA: Expr(expr=MovePodoboo)                                                                        ; 
-DATA: Expr(expr=MovePiranhaPlant)                                                                   ; 
-DATA: Expr(expr=MoveJumpingEnemy)                                                                   ; 
-DATA: Expr(expr=ProcMoveRedPTroopa)                                                                 ; 
-DATA: Expr(expr=MoveFlyGreenPTroopa)                                                                ; 
-DATA: Expr(expr=MoveLakitu)                                                                         ; 
-DATA: Expr(expr=MoveNormalEnemy)                                                                    ; 
-DATA: Expr(expr=NoMoveCode)   ; dummy                                                               ; 
-DATA: Expr(expr=MoveFlyingCheepCheep)                                                               ; 
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=); only objects $00-$14 use this table                  ; 
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=ProcHammerBro), Expr(expr=)                                                         ; 
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=MoveBloober), Expr(expr=)                                                           ; 
+DATA: Expr(expr=MoveBulletBill), Expr(expr=)                                                        ; 
+DATA: Expr(expr=NoMoveCode), Expr(expr=)                                                            ; 
+DATA: Expr(expr=MoveSwimmingCheepCheep), Expr(expr=)                                                ; 
+DATA: Expr(expr=MoveSwimmingCheepCheep), Expr(expr=)                                                ; 
+DATA: Expr(expr=MovePodoboo), Expr(expr=)                                                           ; 
+DATA: Expr(expr=MovePiranhaPlant), Expr(expr=)                                                      ; 
+DATA: Expr(expr=MoveJumpingEnemy), Expr(expr=)                                                      ; 
+DATA: Expr(expr=ProcMoveRedPTroopa), Expr(expr=)                                                    ; 
+DATA: Expr(expr=MoveFlyGreenPTroopa), Expr(expr=)                                                   ; 
+DATA: Expr(expr=MoveLakitu), Expr(expr=)                                                            ; 
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)                                                       ; 
+DATA: Expr(expr=NoMoveCode), Expr(expr=); dummy                                                     ; 
+DATA: Expr(expr=MoveFlyingCheepCheep), Expr(expr=)                                                  ; 
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                                                                                                     ; 
@@ -9160,13 +9165,13 @@ SEC                                                                             
 SBC #$24                                                                                            ; 
 JSR JumpEngine                                                                                      ; 
                                                                                                     ;  B
-DATA: Expr(expr=BalancePlatform); table used by objects $24-$2a                                     ; 
-DATA: Expr(expr=YMovingPlatform)                                                                    ; 
-DATA: Expr(expr=MoveLargeLiftPlat)                                                                  ; 
-DATA: Expr(expr=MoveLargeLiftPlat)                                                                  ; 
-DATA: Expr(expr=XMovingPlatform)                                                                    ; 
-DATA: Expr(expr=DropPlatform)                                                                       ; 
-DATA: Expr(expr=RightPlatform)                                                                      ; 
+DATA: Expr(expr=BalancePlatform), Expr(expr=); table used by objects $24-$2a                        ; 
+DATA: Expr(expr=YMovingPlatform), Expr(expr=)                                                       ; 
+DATA: Expr(expr=MoveLargeLiftPlat), Expr(expr=)                                                     ; 
+DATA: Expr(expr=MoveLargeLiftPlat), Expr(expr=)                                                     ; 
+DATA: Expr(expr=XMovingPlatform), Expr(expr=)                                                       ; 
+DATA: Expr(expr=DropPlatform), Expr(expr=)                                                          ; 
+DATA: Expr(expr=RightPlatform), Expr(expr=)                                                         ; 
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
@@ -9257,7 +9262,7 @@ LDA PseudoRandomBitReg+1,X    ; get part of LSFR, mask out all but LSB          
 AND #$01                                                                                            ; 
 BNE SetHJ                     ; if d0 of LSFR set, branch and use current speed and $00             ; 
 LDY #$fa                      ; otherwise reset to default vertical speed                           ;  B
-SetHJ:  STY Enemy_Y_Speed,X   ; set vertical speed for jumping                                      ;  B
+SetHJ:  STY Enemy_Y_Speed,X   ; set vertical speed for jumping                                      ; fun(YX$00):  B
 LDA Enemy_State,X             ; set d0 in enemy state for jumping                                   ; 
 ORA #$01                                                                                            ; 
 STA Enemy_State,X                                                                                   ; 
@@ -9273,7 +9278,7 @@ LDA PseudoRandomBitReg+1,X                                                      
 ORA #%11000000                ; get contents of part of LSFR, set d7 and d6, then                   ; 
 STA HammerBroJumpTimer,X      ; store in jump timer                                                 ; 
                                                                                                     ; 
-MoveHammerBroXDir:                                                                                  ;  B
+MoveHammerBroXDir:                                                                                  ; fun(X):  B
 LDY #$fc                      ; move hammer bro a little to the left                                ; 
 LDA FrameCounter                                                                                    ; 
 AND #%01000000                ; change hammer bro's direction every 64 frames                       ; 
@@ -9353,7 +9358,7 @@ SetRSpd:  LDA RevivedXSpeed,Y ; load and store new horizontal speed             
 STA Enemy_X_Speed,X           ; and leave                                                           ; 
 RTS                                                                                                 ; 
                                                                                                     ;  B
-MoveDefeatedEnemy:                                                                                  ;  B
+MoveDefeatedEnemy:                                                                                  ; fun():  B
 JSR MoveD_EnemyVertically     ; execute sub to move defeated enemy downwards                        ; 
 JMP MoveEnemyHorizontally     ; now move defeated enemy horizontally                                ; 
                                                                                                     ;  B
@@ -9643,7 +9648,7 @@ STA Enemy_Y_Position,X        ; save as new vertical coordinate                 
 LDA Enemy_Y_HighPos,X                                                                               ; 
 SBC #$00                      ; subtract borrow from page location                                  ; 
                                                                                                     ; 
-ChkSwimYPos:                                                                                        ;  B
+ChkSwimYPos:                                                                                        ; fun(AX):  B
 STA Enemy_Y_HighPos,X         ; save new page location here                                         ; 
 LDY #$00                      ; load movement speed to upwards by default                           ; 
 LDA Enemy_Y_Position,X        ; get vertical coordinate                                             ; 
@@ -9756,7 +9761,7 @@ CMP $ed                       ; if we end up at the maximum part, go on and leav
 BCC DrawFbar                  ; otherwise go back and do another                                    ; 
 SkipFBar:  RTS                                                                                      ;  B
                                                                                                     ;  B
-DrawFirebar_Collision:                                                                              ; fun($03$06$01$02):  B
+DrawFirebar_Collision:                                                                              ; fun($03$06$01):  B
 LDA $03                       ; store mirror data elsewhere                                         ; 
 STA $05                                                                                             ; 
 LDY $06                       ; load OAM data offset for firebar                                    ; 
@@ -9777,7 +9782,7 @@ SBC $06                       ; original one and skip this part                 
 JMP ChkFOfs                                                                                         ; 
 SubtR1:  SEC                  ; subtract original X from the                                        ;  B
 SBC Enemy_Rel_XPos            ; current sprite X                                                    ; 
-ChkFOfs:  CMP #$59            ; if difference of coordinates within a certain range,                ;  B
+ChkFOfs:  CMP #$59            ; if difference of coordinates within a certain range,                ; fun(AY$02$05):  B
 BCC VAHandl                   ; continue by handling vertical adder                                 ; 
 LDA #$f8                      ; otherwise, load offscreen Y coordinate                              ;  B
 BNE SetVFbr                   ; and unconditionally branch to move sprite offscreen                 ; 
@@ -9794,7 +9799,7 @@ ADC Enemy_Rel_YPos            ; the second data, modified or otherwise          
 SetVFbr:  STA Sprite_Y_Position,Y; store as Y coordinate here                                       ;  B
 STA $07                       ; also store here for now                                             ; 
                                                                                                     ; 
-FirebarCollision:                                                                                   ; fun(Y$07$00):  B
+FirebarCollision:                                                                                   ; fun(Y):  B
 JSR DrawFirebar               ; run sub here to draw current tile of firebar                        ; 
 TYA                           ; return OAM data offset and save                                     ; 
 PHA                           ; to the stack for now                                                ; 
@@ -9817,7 +9822,7 @@ CLC                           ; then add 24 pixels to the player's              
 ADC #$18                      ; vertical coordinate                                                 ; 
 TAY                                                                                                 ; 
 BigJp:  TYA                   ; get vertical coordinate, altered or otherwise, from Y               ;  B
-FBCLoop:  SEC                 ; subtract vertical position of firebar                               ;  B
+FBCLoop:  SEC                 ; subtract vertical position of firebar                               ; fun(A$07$06$05$00):  B
 SBC $07                       ; from the vertical coordinate of the player                          ; 
 BPL ChkVFBD                   ; if player lower on the screen than firebar,                         ; 
 EOR #$ff                      ; skip two's compliment part                                          ;  B
@@ -10212,7 +10217,7 @@ LDY #$01                      ; set alternate movement speed here (move right)  
 CompDToO:  CMP MaxRangeFromOrigin; compare difference with pseudorandom value                       ;  B
 BCC HammerChk                 ; if difference < pseudorandom value, leave speed alone               ; 
 STY BowserMovementSpeed       ; otherwise change bowser's movement speed                            ;  B
-HammerChk:  LDA EnemyFrameTimer,X; if timer set here not expired yet, skip ahead to                 ;  B
+HammerChk:  LDA EnemyFrameTimer,X; if timer set here not expired yet, skip ahead to                 ; fun(X):  B
 BNE MakeBJump                 ; some other section of code                                          ; 
 JSR MoveEnemySlowVert         ; otherwise start by moving bowser downwards                          ;  B
 LDA WorldNumber               ; check world number                                                  ; 
@@ -10230,14 +10235,14 @@ AND #%00000011                ; get pseudorandom offset                         
 TAY                                                                                                 ; 
 LDA PRandomRange,Y            ; get value using pseudorandom offset                                 ; 
 STA EnemyFrameTimer,X         ; set for timer here                                                  ; 
-SkipToFB:  JMP ChkFireB       ; jump to execute flames code                                         ;  B
+SkipToFB:  JMP ChkFireB       ; jump to execute flames code                                         ; fun():  B
 MakeBJump:  CMP #$01          ; if timer not yet about to expire,                                   ;  B
 BNE ChkFireB                  ; skip ahead to next part                                             ; 
 DEC Enemy_Y_Position,X        ; otherwise decrement vertical coordinate                             ;  B
 JSR InitVStf                  ; initialize movement amount                                          ; 
 LDA #$fe                                                                                            ; 
 STA Enemy_Y_Speed,X           ; set vertical speed to move bowser upwards                           ; 
-ChkFireB:  LDA WorldNumber    ; check world number here                                             ;  B
+ChkFireB:  LDA WorldNumber    ; check world number here                                             ; fun():  B
 CMP #World8                   ; world 8?                                                            ; 
 BEQ SpawnFBr                  ; if so, execute this part here                                       ; 
 CMP #World6                   ; world 6-7?                                                          ;  B
@@ -10261,7 +10266,7 @@ STA EnemyFrenzyBuffer         ; in enemy frenzy buffer                          
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-BowserGfxHandler:                                                                                   ;  B
+BowserGfxHandler:                                                                                   ; fun(X):  B
 JSR ProcessBowserHalf         ; do a sub here to process bowser's front                             ; 
 LDY #$10                      ; load default value here to position bowser's rear                   ; 
 LDA Enemy_MovingDir,X         ; check moving direction                                              ; 
@@ -10457,11 +10462,11 @@ CMP #$05                      ; if greater than 5, branch to exit               
 BCS StarFlagExit                                                                                    ; 
 JSR JumpEngine                ; otherwise jump to appropriate sub                                   ;  B
                                                                                                     ;  B
-DATA: Expr(expr=StarFlagExit)                                                                       ; 
-DATA: Expr(expr=GameTimerFireworks)                                                                 ; 
-DATA: Expr(expr=AwardGameTimerPoints)                                                               ; 
-DATA: Expr(expr=RaiseFlagSetoffFWorks)                                                              ; 
-DATA: Expr(expr=DelayToAreaEnd)                                                                     ; 
+DATA: Expr(expr=StarFlagExit), Expr(expr=)                                                          ; 
+DATA: Expr(expr=GameTimerFireworks), Expr(expr=)                                                    ; 
+DATA: Expr(expr=AwardGameTimerPoints), Expr(expr=)                                                  ; 
+DATA: Expr(expr=RaiseFlagSetoffFWorks), Expr(expr=)                                                 ; 
+DATA: Expr(expr=DelayToAreaEnd), Expr(expr=)                                                        ; 
                                                                                                     ; 
 GameTimerFireworks:                                                                                 ; fun(X):  B
 LDY #$05                      ; set default state for star flag object                              ; 
@@ -10501,7 +10506,7 @@ JSR DigitsMathRoutine         ; subtract digit                                  
 LDA #$05                      ; set now to add 50 points                                            ; 
 STA DigitModifier+5           ; per game timer interval subtracted                                  ; 
                                                                                                     ; 
-EndAreaPoints:                                                                                      ;  B
+EndAreaPoints:                                                                                      ; fun():  B
 LDY #$0b                      ; load offset for mario's score by default                            ; 
 LDA CurrentPlayer             ; check player on the screen                                          ; 
 BEQ ELPGive                   ; if mario, do not change                                             ; 
@@ -10664,7 +10669,7 @@ RTS                                                                             
                               ; $01 - used to hold high byte of name table for rope                 ; 
                               ; $02 - used to hold page location of rope                            ; 
                                                                                                     ; 
-BalancePlatform:                                                                                    ; fun(X$01):  B
+BalancePlatform:                                                                                    ; fun(X):  B
 LDA Enemy_Y_HighPos,X         ; check high byte of vertical position                                ; 
 CMP #$03                                                                                            ; 
 BNE DoBPl                                                                                           ; 
@@ -10730,7 +10735,7 @@ PlatSt:  JSR StopPlatforms    ; do a sub to stop movement                       
 JMP DoOtherPlatform           ; jump ahead to remaining code                                        ; 
 PlatDn:  JSR MovePlatformDown ; do a sub to move downwards                                          ;  B
                                                                                                     ; 
-DoOtherPlatform:                                                                                    ;  B
+DoOtherPlatform:                                                                                    ; fun(X$01$00):  B
 LDY Enemy_State,X             ; get offset of other platform                                        ; 
 PLA                           ; get old vertical coordinate from stack                              ; 
 SEC                                                                                                 ; 
@@ -10772,7 +10777,7 @@ EraseR1:  LDA #$24            ; put blank tiles in vram buffer                  
 STA VRAM_Buffer1+3,X          ; to erase rope                                                       ; 
 STA VRAM_Buffer1+4,X                                                                                ; 
                                                                                                     ; 
-OtherRope:                                                                                          ;  B
+OtherRope:                                                                                          ; fun(Y$01X$00):  B
 LDA Enemy_State,Y             ; get offset of other platform from state                             ; 
 TAY                           ; use as Y here                                                       ; 
 PLA                           ; pull second copy of vertical speed from stack                       ; 
@@ -10794,7 +10799,7 @@ JMP EndRp                     ; jump to skip this part                          
 EraseR2:  LDA #$24            ; put blank tiles in vram buffer                                      ;  B
 STA VRAM_Buffer1+8,X          ; to erase rope                                                       ; 
 STA VRAM_Buffer1+9,X                                                                                ; 
-EndRp:  LDA #$00              ; put null terminator at the end                                      ;  B
+EndRp:  LDA #$00              ; put null terminator at the end                                      ; fun(X):  B
 STA VRAM_Buffer1+10,X                                                                               ; 
 LDA VRAM_Buffer1_Offset       ; add ten bytes to the vram buffer offset                             ; 
 CLC                           ; and store                                                           ; 
@@ -10857,7 +10862,7 @@ AND #%10111111                ; mask out d6 of low byte of name table address   
 STA $00                                                                                             ; 
 ExPRp:  RTS                   ; leave!                                                              ;  B
                                                                                                     ;  B
-InitPlatformFall:                                                                                   ;  B
+InitPlatformFall:                                                                                   ; fun(Y):  B
 TYA                           ; move offset of other platform from Y to X                           ; 
 TAX                                                                                                 ; 
 JSR GetEnemyOffscreenBits     ; get offscreen bits                                                  ; 
@@ -10876,7 +10881,7 @@ STA Enemy_Y_Speed,Y           ; for both platforms and leave                    
 STA Enemy_Y_MoveForce,Y                                                                             ; 
 RTS                                                                                                 ; 
                                                                                                     ;  B
-PlatformFall:                                                                                       ;  B
+PlatformFall:                                                                                       ; fun(Y):  B
 TYA                           ; save offset for other platform to stack                             ; 
 PHA                                                                                                 ; 
 JSR MoveFallingPlatform       ; make current platform fall                                          ; 
@@ -10915,7 +10920,7 @@ JSR MovePlatformUp            ; otherwise start slowing descent/moving upwards  
 JMP ChkYPCollision                                                                                  ; 
 YMDown:  JSR MovePlatformDown ; start slowing ascent/moving downwards                               ;  B
                                                                                                     ; 
-ChkYPCollision:                                                                                     ;  B
+ChkYPCollision:                                                                                     ; fun(X):  B
 LDA PlatformCollisionFlag,X   ; if collision flag not set here, branch                              ; 
 BMI ExYPl                     ; to leave                                                            ; 
 JSR PositionPlayerOnVPlat     ; otherwise position player appropriately                             ;  B
@@ -10942,7 +10947,7 @@ BMI PPHSubt                   ; if negative, branch to subtract                 
 ADC #$00                      ; otherwise add carry to page location                                ;  B
 JMP SetPVar                   ; jump to skip subtraction                                            ; 
 PPHSubt:  SBC #$00            ; subtract borrow from page location                                  ;  B
-SetPVar:  STA Player_PageLoc  ; save result to player's page location                               ;  B
+SetPVar:  STA Player_PageLoc  ; save result to player's page location                               ; fun(AY):  B
 STY Platform_X_Scroll         ; put saved value from second sub here to be used later               ; 
 JSR PositionPlayerOnVPlat     ; position player vertically and appropriately                        ; 
 ExXMP:  RTS                   ; and we are done here                                                ;  B
@@ -10971,11 +10976,11 @@ ExRPl:  RTS                   ; then leave                                      
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-MoveLargeLiftPlat:                                                                                  ; fun(X):  B
+MoveLargeLiftPlat:                                                                                  ; fun():  B
 JSR MoveLiftPlatforms         ; execute common to all large and small lift platforms                ; 
 JMP ChkYPCollision            ; branch to position player correctly                                 ; 
                                                                                                     ;  B
-MoveSmallPlatform:                                                                                  ; fun(X):  B
+MoveSmallPlatform:                                                                                  ; fun():  B
 JSR MoveLiftPlatforms         ; execute common to all large and small lift platforms                ; 
 JMP ChkSmallPlatCollision     ; branch to position player correctly                                 ; 
                                                                                                     ;  B
@@ -10991,7 +10996,7 @@ ADC Enemy_Y_Speed,X           ; vertical position plus carry to move up or down 
 STA Enemy_Y_Position,X        ; and then leave                                                      ; 
 RTS                                                                                                 ; 
                                                                                                     ;  B
-ChkSmallPlatCollision:                                                                              ;  B
+ChkSmallPlatCollision:                                                                              ; fun(X):  B
 LDA PlatformCollisionFlag,X   ; get bounding box counter saved in collision flag                    ; 
 BEQ ExLiftP                   ; if none found, leave player position alone                          ; 
 JSR PositionPlayerOnS_Plat    ; use to position player correctly                                    ;  B
@@ -11234,7 +11239,7 @@ ExPHC:  RTS                                                                     
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-HandlePowerUpCollision:                                                                             ;  B
+HandlePowerUpCollision:                                                                             ; fun(X):  B
 JSR EraseEnemyObject          ; erase the power-up object                                           ; 
 LDA #$06                                                                                            ; 
 JSR SetupFloateyNumber        ; award 1000 points to player by default                              ; 
@@ -11274,7 +11279,7 @@ LDA #$01                      ; set player status to super                      
 STA PlayerStatus                                                                                    ; 
 LDA #$09                      ; set value to be used by subroutine tree (super)                     ; 
                                                                                                     ; 
-UpToFiery:                                                                                          ;  B
+UpToFiery:                                                                                          ; fun():  B
 LDY #$00                      ; set value to be used as new player state                            ; 
 JSR SetPRout                  ; set values to stop certain things in motion                         ; 
 NoPUp:  RTS                                                                                         ;  B
@@ -11508,16 +11513,16 @@ INC StompTimer                ; increment stomp timer of some sort              
 LDY PrimaryHardMode           ; check primary hard mode flag                                        ; 
 LDA RevivalRateData,Y         ; load timer setting according to flag                                ; 
 STA EnemyIntervalTimer,X      ; set as enemy timer to revive stomped enemy                          ; 
-SBnce:  LDA #$fc              ; set player's vertical speed for bounce                              ;  B
+SBnce:  LDA #$fc              ; set player's vertical speed for bounce                              ; fun():  B
 STA Player_Y_Speed            ; and then leave!!!                                                   ; 
 RTS                                                                                                 ; 
                                                                                                     ;  B
-ChkEnemyFaceRight:                                                                                  ;  B
+ChkEnemyFaceRight:                                                                                  ; fun(X):  B
 LDA Enemy_MovingDir,X         ; check to see if enemy is moving to the right                        ; 
 CMP #$01                                                                                            ; 
 BNE LInj                      ; if not, branch                                                      ; 
 JMP InjurePlayer              ; otherwise go back to hurt player                                    ;  B
-LInj:  JSR EnemyTurnAround    ; turn the enemy around, if necessary                                 ;  B
+LInj:  JSR EnemyTurnAround    ; turn the enemy around, if necessary                                 ; fun():  B
 JMP InjurePlayer              ; go back to hurt player                                              ; 
                                                                                                     ;  B
                                                                                                     ; 
@@ -11609,7 +11614,7 @@ LDA Enemy_CollisionBits,Y     ; load first enemy's collision-related bits       
 AND ClearBitsMask,X           ; clear bit connected to second enemy                                 ; 
 STA Enemy_CollisionBits,Y     ; then move onto next enemy slot                                      ; 
                                                                                                     ; 
-ReadyNextEnemy:                                                                                     ;  B
+ReadyNextEnemy:                                                                                     ; fun($01):  B
 PLA                           ; get first enemy's bounding box offset from the stack                ; 
 TAY                           ; use as Y again                                                      ; 
 LDX $01                       ; get and decrement second enemy's object buffer offset               ; 
@@ -11693,7 +11698,7 @@ CMP #GreenParatroopaJump                                                        
 BEQ RXSpd                     ; if green paratroopa, turn it around                                 ; 
 CMP #$07                                                                                            ;  B
 BCS ExTA                      ; if any OTHER enemy object => $07, leave                             ; 
-RXSpd:  LDA Enemy_X_Speed,X   ; load horizontal speed                                               ;  B
+RXSpd:  LDA Enemy_X_Speed,X   ; load horizontal speed                                               ; fun(X):  B
 EOR #$ff                      ; get two's compliment for horizontal speed                           ; 
 TAY                                                                                                 ; 
 INY                                                                                                 ; 
@@ -11899,7 +11904,7 @@ RTS                                                                             
 PlayerBGUpperExtent:                                                                                ;  B
 DATA: ByteValue(value=32), ByteValue(value=16)                                                      ; 
                                                                                                     ; 
-PlayerBGCollision:                                                                                  ; fun($04$06):  B
+PlayerBGCollision:                                                                                  ; fun($04):  B
 LDA DisableCollisionDet       ; if collision detection disabled flag set,                           ; 
 BNE ExPBGCol                  ; branch to leave                                                     ; 
 LDA GameEngineSubroutine                                                                            ;  B
@@ -11972,7 +11977,7 @@ STA Square1SoundQueue         ; otherwise load bump sound                       
 NYSpd:  LDA #$01              ; set player's vertical speed to nullify                              ;  B
 STA Player_Y_Speed            ; jump or swim                                                        ; 
                                                                                                     ; 
-DoFootCheck:                                                                                        ;  B
+DoFootCheck:                                                                                        ; fun($04):  B
 LDY $eb                       ; get block buffer adder offset                                       ; 
 LDA Player_Y_Position                                                                               ; 
 CMP #$cf                      ; check to see how low player is                                      ; 
@@ -12112,19 +12117,19 @@ RTS                           ; and leave                                       
                               ; $04 - low nybble of horizontal coordinate from block buffer         ; 
                               ; $06-$07 - block buffer address                                      ; 
                                                                                                     ; 
-StopPlayerMove:                                                                                     ;  B
+StopPlayerMove:                                                                                     ; fun():  B
 JSR ImpedePlayerMove          ; stop player's movement                                              ; 
 ExCSM:  RTS                   ; leave                                                               ;  B
                                                                                                     ;  B
 AreaChangeTimerData:                                                                                ;  B
 DATA: ByteValue(value=160), ByteValue(value=52)                                                     ; 
                                                                                                     ; 
-HandleCoinMetatile:                                                                                 ;  B
+HandleCoinMetatile:                                                                                 ; fun():  B
 JSR ErACM                     ; do sub to erase coin metatile from block buffer                     ; 
 INC CoinTallyFor1Ups          ; increment coin tally used for 1-up blocks                           ; 
 JMP GiveOneCoin               ; update coin amount and tally on the screen                          ; 
                                                                                                     ;  B
-HandleAxeMetatile:                                                                                  ;  B
+HandleAxeMetatile:                                                                                  ; fun():  B
 LDA #$00                                                                                            ; 
 STA OperMode_Task             ; reset secondary mode                                                ; 
 LDA #$02                                                                                            ; 
@@ -12150,7 +12155,7 @@ DATA: ByteValue(value=255), ByteValue(value=0)                                  
 FlagpoleYPosData:                                                                                   ;  B
 DATA: ByteValue(value=24), ByteValue(value=34), ByteValue(value=80), ByteValue(value=104), ByteValue(value=144); 
                                                                                                     ; 
-HandleClimbing:                                                                                     ;  B
+HandleClimbing:                                                                                     ; fun($04A):  B
 LDY $04                       ; check low nybble of horizontal coordinate returned from             ; 
 CPY #$06                      ; collision detection routine against certain values, this            ; 
 BCC ExHC                      ; makes actual physical part of vine or flagpole thinner              ; 
@@ -12203,7 +12208,7 @@ BCS PutPlayerOnVine           ; branch if not that far up                       
 LDA #$01                                                                                            ;  B
 STA GameEngineSubroutine      ; otherwise set to run autoclimb routine next frame                   ; 
                                                                                                     ; 
-PutPlayerOnVine:                                                                                    ;  B
+PutPlayerOnVine:                                                                                    ; fun($06):  B
 LDA #$03                      ; set player state to climbing                                        ; 
 STA Player_State                                                                                    ; 
 LDA #$00                      ; nullify player's horizontal speed                                   ; 
@@ -12330,7 +12335,7 @@ RImpd:  LDX #$02              ; return $02 to X                                 
 CPY #$01                      ; if player moving to the right,                                      ; 
 BPL ExIPM                     ; branch to invert bit and leave                                      ; 
 LDA #$01                      ; otherwise load A with value to be used here                         ;  B
-NXSpd:  LDY #$10                                                                                    ;  B
+NXSpd:  LDY #$10                                                                                    ; fun(AX):  B
 STY SideCollisionTimer        ; set timer of some sort                                              ; 
 LDY #$00                                                                                            ; 
 STY Player_X_Speed            ; nullify player's horizontal speed                                   ; 
@@ -12569,7 +12574,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-ChkForRedKoopa:                                                                                     ;  B
+ChkForRedKoopa:                                                                                     ; fun(X):  B
 LDA Enemy_ID,X                ; check for red koopa troopa $03                                      ; 
 CMP #RedKoopa                                                                                       ; 
 BNE Chk2MSBSt                 ; branch if not found                                                 ; 
@@ -12583,13 +12588,13 @@ LDA Enemy_State,X                                                               
 ORA #%01000000                ; set d6                                                              ; 
 JMP SetD6Ste                  ; jump ahead of this part                                             ; 
 GetSteFromD:  LDA EnemyBGCStateData,Y; load new enemy state with old as offset                      ;  B
-SetD6Ste:  STA Enemy_State,X  ; set as new state                                                    ;  B
+SetD6Ste:  STA Enemy_State,X  ; set as new state                                                    ; fun(AX):  B
                                                                                                     ; 
                               ; --------------------------------                                    ; 
                               ; $00 - used to store bitmask (not used but initialized here)         ; 
                               ; $eb - used in DoEnemySideCheck as counter and to compare moving directions; 
                                                                                                     ; 
-DoEnemySideCheck:                                                                                   ;  B
+DoEnemySideCheck:                                                                                   ; fun(X):  B
 LDA Enemy_Y_Position,X        ; if enemy within status bar, branch to leave                         ; 
 CMP #$20                      ; because there's nothing there that impedes movement                 ; 
 BCC ExESdeC                                                                                         ; 
@@ -12677,7 +12682,7 @@ DoSide:  JMP DoEnemySideCheck ; check for horizontal blockage, then leave       
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-HammerBroBGColl:                                                                                    ;  B
+HammerBroBGColl:                                                                                    ; fun(ZeroFlagAX):  B
 JSR ChkUnderEnemy             ; check to see if hammer bro is standing on anything                  ; 
 BEQ NoUnderHammerBro                                                                                ; 
 CMP #$23                      ; check for blank metatile $23 and branch if not found                ;  B
@@ -12794,18 +12799,18 @@ LDY #$06                      ; set offset for relative coordinates             
 FBallB:  JSR BoundingBoxCore  ; get bounding box coordinates                                        ;  B
 JMP CheckRightScreenBBox      ; jump to handle any offscreen coordinates                            ; 
                                                                                                     ;  B
-GetEnemyBoundBox:                                                                                   ; fun(X):  B
+GetEnemyBoundBox:                                                                                   ; fun():  B
 LDY #$48                      ; store bitmask here for now                                          ; 
 STY $00                                                                                             ; 
 LDY #$44                      ; store another bitmask here for now and jump                         ; 
 JMP GetMaskedOffScrBits                                                                             ; 
                                                                                                     ;  B
-SmallPlatformBoundBox:                                                                              ; fun(X):  B
+SmallPlatformBoundBox:                                                                              ; fun():  B
 LDY #$08                      ; store bitmask here for now                                          ; 
 STY $00                                                                                             ; 
 LDY #$04                      ; store another bitmask here for now                                  ; 
                                                                                                     ; 
-GetMaskedOffScrBits:                                                                                ;  B
+GetMaskedOffScrBits:                                                                                ; fun(XY$00):  B
 LDA Enemy_X_Position,X        ; get enemy object position relative                                  ; 
 SEC                           ; to the left side of the screen                                      ; 
 SBC ScreenLeft_X_Pos                                                                                ; 
@@ -12829,7 +12834,7 @@ DEX                           ; decrement to return to original offset          
 CMP #$fe                      ; if completely offscreen, branch to put entire bounding              ; 
 BCS MoveBoundBoxOffscreen     ; box offscreen, otherwise start getting coordinates                  ; 
                                                                                                     ;  B
-SetupEOffsetFBBox:                                                                                  ;  B
+SetupEOffsetFBBox:                                                                                  ; fun(X):  B
 TXA                           ; add 1 to offset to properly address                                 ; 
 CLC                           ; the enemy object memory locations                                   ; 
 ADC #$01                                                                                            ; 
@@ -12888,7 +12893,7 @@ TAY                           ; use as Y                                        
 LDX $00                       ; get original offset and use as X again                              ; 
 RTS                                                                                                 ; 
                                                                                                     ;  B
-CheckRightScreenBBox:                                                                               ;  B
+CheckRightScreenBBox:                                                                               ; fun(XY):  B
 LDA ScreenLeft_X_Pos          ; add 128 pixels to left side of screen                               ; 
 CLC                           ; and store as horizontal coordinate of middle                        ; 
 ADC #$80                                                                                            ; 
@@ -13018,8 +13023,8 @@ TXA                                                                             
 CLC                                                                                                 ; 
 ADC #$07                      ; add seven bytes to use                                              ; 
 TAX                                                                                                 ; 
-ResJmpM:  LDA #$00            ; set A to return vertical coordinate                                 ;  B
-BBChk_E:  JSR BlockBufferCollision; do collision detection subroutine for sprite object             ;  B
+ResJmpM:  LDA #$00            ; set A to return vertical coordinate                                 ; fun():  B
+BBChk_E:  JSR BlockBufferCollision; do collision detection subroutine for sprite object             ; fun(A):  B
 LDX ObjectOffset              ; get object offset                                                   ; 
 CMP #$00                      ; check to see if object bumped into anything                         ; 
 RTS                                                                                                 ; 
@@ -13046,7 +13051,7 @@ BlockBufferColli_Head:                                                          
 LDA #$00                      ; set flag to return vertical coordinate                              ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-BlockBufferColli_Side:                                                                              ; fun(): ZeroFlag B
+BlockBufferColli_Side:                                                                              ;  B
 LDA #$01                      ; set flag to return horizontal coordinate                            ; 
 LDX #$00                      ; set offset for player object                                        ; 
                                                                                                     ; 
@@ -13084,7 +13089,7 @@ BNE RetXC                     ; if A = 1, branch                                
 LDA SprObject_Y_Position,X    ; if A = 0, load vertical coordinate                                  ;  B
 JMP RetYC                     ; and jump                                                            ; 
 RetXC:  LDA SprObject_X_Position,X; otherwise load horizontal coordinate                            ;  B
-RetYC:  AND #%00001111        ; and mask out high nybble                                            ;  B
+RetYC:  AND #%00001111        ; and mask out high nybble                                            ; fun(A$03):  B
 STA $04                       ; store masked out result here                                        ; 
 LDA $03                       ; get saved content of block buffer                                   ; 
 RTS                           ; and leave                                                           ; 
@@ -13461,7 +13466,7 @@ STA Sprite_Attributes,Y       ; set attribute byte in first sprite              
 LDA #$82                                                                                            ; 
 STA Sprite_Attributes+4,Y     ; set attribute byte with vertical flip in second sprite              ; 
 LDX ObjectOffset              ; get misc object offset                                              ; 
-ExJCGfx:  RTS                 ; leave                                                               ;  B
+ExJCGfx:  RTS                 ; leave                                                               ; fun():  B
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                               ; $00-$01 - used to hold tiles for drawing the power-up, $00 also used to hold power-up type; 
@@ -13722,7 +13727,7 @@ ChkFrontSte:  LDA $ed         ; check saved enemy state                         
 AND #%00100000                ; if bowser not defeated, do not set flag                             ; 
 BEQ DrawBowser                                                                                      ; 
                                                                                                     ;  B
-FlipBowserOver:                                                                                     ;  B
+FlipBowserOver:                                                                                     ; fun(X):  B
 STX VerticalFlipFlag          ; set vertical flip flag to nonzero                                   ; 
                                                                                                     ; 
 DrawBowser:                                                                                         ;  B
@@ -13801,7 +13806,7 @@ BNE CheckForHammerBro         ; branch if set                                   
 LDX #$8a                      ; load offset for defeated goomba                                     ;  B
 DEC $02                       ; set different value and decrement saved vertical position           ; 
                                                                                                     ; 
-CheckForHammerBro:                                                                                  ;  B
+CheckForHammerBro:                                                                                  ; fun(X$02):  B
 LDY ObjectOffset                                                                                    ; 
 LDA $ef                       ; check for hammer bro object                                         ; 
 CMP #HammerBro                                                                                      ; 
@@ -13855,7 +13860,7 @@ LDA FrameCounter              ; load frame counter                              
 AND EnemyAnimTimingBMask,Y    ; mask it (partly residual, one byte not ever used)                   ; 
 BNE CheckDefeatedState        ; branch if timing is off                                             ; 
                                                                                                     ;  B
-CheckAnimationStop:                                                                                 ;  B
+CheckAnimationStop:                                                                                 ; fun(X):  B
 LDA $ed                       ; check saved enemy state                                             ; 
 AND #%10100000                ; for d7 or d5, or check for timers stopped                           ; 
 ORA TimerControl                                                                                    ; 
@@ -13865,7 +13870,7 @@ CLC                                                                             
 ADC #$06                      ; add $06 to current enemy offset                                     ; 
 TAX                           ; to animate various enemy objects                                    ; 
                                                                                                     ; 
-CheckDefeatedState:                                                                                 ;  B
+CheckDefeatedState:                                                                                 ; fun():  B
 LDA $ed                       ; check saved enemy state                                             ; 
 AND #%00100000                ; for d5 set                                                          ; 
 BEQ DrawEnemyObject           ; branch if not set                                                   ; 
@@ -13877,7 +13882,7 @@ STY VerticalFlipFlag          ; set vertical flip flag                          
 DEY                                                                                                 ; 
 STY $ec                       ; init saved value here                                               ; 
                                                                                                     ; 
-DrawEnemyObject:                                                                                    ;  B
+DrawEnemyObject:                                                                                    ; fun():  B
 LDY $eb                       ; load sprite data offset                                             ; 
 JSR DrawEnemyObjRow           ; draw six tiles of data                                              ; 
 JSR DrawEnemyObjRow           ; into sprite data                                                    ; 
@@ -14016,7 +14021,7 @@ ORA #%01000000                                                                  
 STA Sprite_Attributes+12,Y    ; set, in addition to those, horizontal flip                          ; 
 STA Sprite_Attributes+20,Y    ; for second and third row right sprites                              ; 
                                                                                                     ; 
-SprObjectOffscrChk:                                                                                 ;  B
+SprObjectOffscrChk:                                                                                 ; fun():  B
 LDX ObjectOffset              ; get enemy buffer offset                                             ; 
 LDA Enemy_OffscreenBits       ; check offscreen information                                         ; 
 LSR                                                                                                 ; 
@@ -14065,7 +14070,7 @@ LDA EnemyGraphicsTable,X      ; load two tiles of enemy graphics                
 STA $00                                                                                             ; 
 LDA EnemyGraphicsTable+1,X                                                                          ; 
                                                                                                     ; 
-DrawOneSpriteRow:                                                                                   ; fun(A$03$00Y$04$02$05X): X B
+DrawOneSpriteRow:                                                                                   ; fun(A):  B
 STA $01                                                                                             ; 
 JMP DrawSpriteObject          ; draw them                                                           ; 
                                                                                                     ;  B
@@ -14226,7 +14231,7 @@ ExBCDr:  RTS                  ; leave                                           
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-DrawFireball:                                                                                       ;  B
+DrawFireball:                                                                                       ; fun(X):  B
 LDY FBall_SprDataOffset,X     ; get fireball's sprite data offset                                   ; 
 LDA Fireball_Rel_YPos         ; get relative vertical coordinate                                    ; 
 STA Sprite_Y_Position,Y       ; store as sprite Y coordinate                                        ; 
@@ -14255,7 +14260,7 @@ RTS                                                                             
 ExplosionTiles:                                                                                     ;  B
 DATA: ByteValue(value=104), ByteValue(value=103), ByteValue(value=102)                              ; 
                                                                                                     ; 
-DrawExplosion_Fireball:                                                                             ;  B
+DrawExplosion_Fireball:                                                                             ; fun(X):  B
 LDY Alt_SprDataOffset,X       ; get OAM data offset of alternate sort for fireball's explosion      ; 
 LDA Fireball_State,X          ; load fireball state                                                 ; 
 INC Fireball_State,X          ; increment state for next frame                                      ; 
@@ -14471,7 +14476,7 @@ BigKTS:  LDA SwimKickTileNum,X; overwrite tile number in sprite 7/8             
 STA Sprite_Tilenumber+24,Y    ; to animate player's feet when swimming                              ; 
 ExPGH:  RTS                   ; then leave                                                          ;  B
                                                                                                     ;  B
-FindPlayerAction:                                                                                   ; fun(A):  B
+FindPlayerAction:                                                                                   ; fun():  B
 JSR ProcessPlayerAction       ; find proper offset to graphics table by player's actions            ; 
 JMP PlayerGfxProcessing       ; draw player, then process for fireball throwing                     ; 
                                                                                                     ;  B
@@ -14483,7 +14488,7 @@ PlayerKilled:                                                                   
 LDY #$0e                      ; load offset for player killed                                       ; 
 LDA PlayerGfxTblOffsets,Y     ; get offset to graphics table                                        ; 
                                                                                                     ; 
-PlayerGfxProcessing:                                                                                ;  B
+PlayerGfxProcessing:                                                                                ; fun(A):  B
 STA PlayerGfxOffset           ; store offset to graphics table here                                 ; 
 LDA #$04                                                                                            ; 
 JSR RenderPlayerSub           ; draw player based on offset loaded                                  ; 
@@ -14614,7 +14619,7 @@ AND PlayerFacingDir           ; and facing direction are the same               
 BNE ActionWalkRun             ; if moving direction = facing direction, branch, don't skid          ; 
 INY                           ; otherwise increment to skid offset ($03)                            ;  B
                                                                                                     ; 
-NonAnimatedActs:                                                                                    ;  B
+NonAnimatedActs:                                                                                    ; fun(Y):  B
 JSR GetGfxOffsetAdder         ; do a sub here to get offset adder for graphics table                ; 
 LDA #$00                                                                                            ; 
 STA PlayerAnimCtrl            ; initialize animation frame control                                  ; 
@@ -14648,18 +14653,18 @@ LDA A_B_Buttons                                                                 
 ASL                           ; check for A button pressed                                          ; 
 BCS FourFrameExtent           ; branch to same place if A button pressed                            ; 
                                                                                                     ;  B
-GetCurrentAnimOffset:                                                                               ; fun(Y): A B
+GetCurrentAnimOffset:                                                                               ; fun(): A B
 LDA PlayerAnimCtrl            ; get animation frame control                                         ; 
 JMP GetOffsetFromAnimCtrl     ; jump to get proper offset to graphics table                         ; 
                                                                                                     ;  B
-FourFrameExtent:                                                                                    ;  B
+FourFrameExtent:                                                                                    ; fun():  B
 LDA #$03                      ; load upper extent for frame control                                 ; 
 JMP AnimationControl          ; jump to get offset and animate player object                        ; 
                                                                                                     ;  B
-ThreeFrameExtent:                                                                                   ;  B
+ThreeFrameExtent:                                                                                   ; fun():  B
 LDA #$02                      ; load upper extent for frame control for climbing                    ; 
                                                                                                     ; 
-AnimationControl:                                                                                   ;  B
+AnimationControl:                                                                                   ; fun(A):  B
 STA $00                       ; store upper extent here                                             ; 
 JSR GetCurrentAnimOffset      ; get proper offset to graphics table                                 ; 
 PHA                           ; save offset to stack                                                ; 
@@ -14706,7 +14711,7 @@ BNE ShrinkPlayer              ; if player small, skip ahead to next part        
 LDA ChangeSizeOffsetAdder,Y   ; get offset adder based on frame control as offset                   ;  B
 LDY #$0f                      ; load offset for player growing                                      ; 
                                                                                                     ; 
-GetOffsetFromAnimCtrl:                                                                              ;  B
+GetOffsetFromAnimCtrl:                                                                              ; fun(AY):  B
 ASL                           ; multiply animation frame control                                    ; 
 ASL                           ; by eight to get proper amount                                       ; 
 ASL                           ; to add to our offset                                                ; 
@@ -14763,7 +14768,7 @@ LDX #$00                      ; set offsets for relative cooordinates           
 LDY #$00                      ; routine to correspond to player object                              ; 
 JMP RelWOfs                   ; get the coordinates                                                 ; 
                                                                                                     ;  B
-RelativeBubblePosition:                                                                             ; fun(): X B
+RelativeBubblePosition:                                                                             ; fun():  B
 LDY #$01                      ; set for air bubble offsets                                          ; 
 JSR GetProperObjOffset        ; modify X to get proper air bubble offset                            ; 
 LDY #$03                                                                                            ; 
@@ -14773,7 +14778,7 @@ RelativeFireballPosition:                                                       
 LDY #$00                      ; set for fireball offsets                                            ; 
 JSR GetProperObjOffset        ; modify X to get proper fireball offset                              ; 
 LDY #$02                                                                                            ; 
-RelWOfs:  JSR GetObjRelativePosition; get the coordinates                                           ;  B
+RelWOfs:  JSR GetObjRelativePosition; get the coordinates                                           ; fun():  B
 LDX ObjectOffset              ; return original offset                                              ; 
 RTS                           ; leave                                                               ; 
                                                                                                     ;  B
@@ -14818,24 +14823,24 @@ RTS                                                                             
                               ; -------------------------------------------------------------------------------------; 
                               ; $00 - used as temp variable to hold offscreen bits                  ; 
                                                                                                     ; 
-GetPlayerOffscreenBits:                                                                             ; fun($00):  B
+GetPlayerOffscreenBits:                                                                             ; fun():  B
 LDX #$00                      ; set offsets for player-specific variables                           ; 
 LDY #$00                      ; and get offscreen information about player                          ; 
 JMP GetOffScreenBitsSet                                                                             ; 
                                                                                                     ;  B
-GetFireballOffscreenBits:                                                                           ; fun($00):  B
+GetFireballOffscreenBits:                                                                           ; fun():  B
 LDY #$00                      ; set for fireball offsets                                            ; 
 JSR GetProperObjOffset        ; modify X to get proper fireball offset                              ; 
 LDY #$02                      ; set other offset for fireball's offscreen bits                      ; 
 JMP GetOffScreenBitsSet       ; and get offscreen information about fireball                        ; 
                                                                                                     ;  B
-GetBubbleOffscreenBits:                                                                             ; fun($00): X B
+GetBubbleOffscreenBits:                                                                             ; fun():  B
 LDY #$01                      ; set for air bubble offsets                                          ; 
 JSR GetProperObjOffset        ; modify X to get proper air bubble offset                            ; 
 LDY #$03                      ; set other offset for airbubble's offscreen bits                     ; 
 JMP GetOffScreenBitsSet       ; and get offscreen information about air bubble                      ; 
                                                                                                     ;  B
-GetMiscOffscreenBits:                                                                               ; fun($00):  B
+GetMiscOffscreenBits:                                                                               ; fun():  B
 LDY #$02                      ; set for misc object offsets                                         ; 
 JSR GetProperObjOffset        ; modify X to get proper misc object offset                           ; 
 LDY #$06                      ; set other offset for misc object's offscreen bits                   ; 
@@ -14851,22 +14856,22 @@ ADC ObjOffsetData,Y           ; add amount of bytes to offset depending on setti
 TAX                           ; put back in X and leave                                             ; 
 RTS                                                                                                 ; 
                                                                                                     ;  B
-GetEnemyOffscreenBits:                                                                              ; fun(X):  B
+GetEnemyOffscreenBits:                                                                              ; fun():  B
 LDA #$01                      ; set A to add 1 byte in order to get enemy offset                    ; 
 LDY #$01                      ; set Y to put offscreen bits in Enemy_OffscreenBits                  ; 
 JMP SetOffscrBitsOffset                                                                             ; 
                                                                                                     ;  B
-GetBlockOffscreenBits:                                                                              ; fun(X):  B
+GetBlockOffscreenBits:                                                                              ; fun():  B
 LDA #$09                      ; set A to add 9 bytes in order to get block obj offset               ; 
 LDY #$04                      ; set Y to put offscreen bits in Block_OffscreenBits                  ; 
                                                                                                     ; 
-SetOffscrBitsOffset:                                                                                ;  B
+SetOffscrBitsOffset:                                                                                ; fun(XA):  B
 STX $00                                                                                             ; 
 CLC                           ; add contents of X to A to get                                       ; 
 ADC $00                       ; appropriate offset, then give back to X                             ; 
 TAX                                                                                                 ; 
                                                                                                     ; 
-GetOffScreenBitsSet:                                                                                ;  B
+GetOffScreenBitsSet:                                                                                ; fun(Y$00):  B
 TYA                           ; save offscreen bits offset to stack for now                         ; 
 PHA                                                                                                 ; 
 JSR RunOffscrBitsSubs                                                                               ; 
@@ -14883,7 +14888,7 @@ STA SprObject_OffscrBits,Y                                                      
 LDX ObjectOffset                                                                                    ; 
 RTS                                                                                                 ; 
                                                                                                     ;  B
-RunOffscrBitsSubs:                                                                                  ; fun(AX): A$00 B
+RunOffscrBitsSubs:                                                                                  ; fun(A): A$00 B
 JSR GetXOffscreenBits         ; do subroutine here                                                  ; 
 LSR                           ; move high nybble to low                                             ; 
 LSR                                                                                                 ; 
@@ -14946,7 +14951,7 @@ DATA: ByteValue(value=4), ByteValue(value=0), ByteValue(value=4)                
 HighPosUnitData:                                                                                    ;  B
 DATA: ByteValue(value=255), ByteValue(value=0)                                                      ; 
                                                                                                     ; 
-GetYOffscreenBits:                                                                                  ;  B
+GetYOffscreenBits:                                                                                  ; fun(X):  B
 STX $04                       ; save position in buffer to here                                     ; 
 LDY #$01                      ; start with top of screen                                            ; 
 YOfsLoop:  LDA HighPosUnitData,Y; load coordinate for edge of vertical unit                         ;  B
@@ -14997,7 +15002,7 @@ ExDivPD:  RTS                 ; leave                                           
                               ; $04 - sprite attributes                                             ; 
                               ; $05 - X coordinate                                                  ; 
                                                                                                     ; 
-DrawSpriteObject:                                                                                   ;  B
+DrawSpriteObject:                                                                                   ; fun($03$00Y$01$04$02$05X):  B
 LDA $03                       ; get saved flip control bits                                         ; 
 LSR                                                                                                 ; 
 LSR                           ; move d1 into carry                                                  ; 
@@ -15308,7 +15313,7 @@ BNE SmTick                                                                      
 SmSpc:  LDA #$90              ; this creates spaces in the sound, giving it its distinct noise      ;  B
 SmTick:  STA SND_SQUARE1_REG                                                                        ;  B
                                                                                                     ; 
-DecrementSfx1Length:                                                                                ;  B
+DecrementSfx1Length:                                                                                ; fun():  B
 DEC Squ1_SfxLenCounter        ; decrement length of sfx                                             ; 
 BNE ExSfx1                                                                                          ; 
                                                                                                     ;  B
@@ -15373,7 +15378,7 @@ LDY #$7f                      ; load the rest of reg contents                   
 LDA #$42                      ; of coin grab and timer tick sound                                   ; 
 JSR PlaySqu2Sfx                                                                                     ; 
                                                                                                     ; 
-ContinueCGrabTTick:                                                                                 ;  B
+ContinueCGrabTTick:                                                                                 ; fun():  B
 LDA Squ2_SfxLenCounter        ; check for time to play second tone yet                              ; 
 CMP #$30                      ; timer tick sound also executes this, not sure why                   ; 
 BNE N2Tone                                                                                          ; 
@@ -15412,11 +15417,11 @@ LDY #$7f                                                                        
 LoadSqu2Regs:                                                                                       ;  B
 JSR PlaySqu2Sfx                                                                                     ; 
                                                                                                     ; 
-DecrementSfx2Length:                                                                                ;  B
+DecrementSfx2Length:                                                                                ; fun():  B
 DEC Squ2_SfxLenCounter        ; decrement length of sfx                                             ; 
 BNE ExSfx2                                                                                          ; 
                                                                                                     ;  B
-EmptySfx2Buffer:                                                                                    ;  B
+EmptySfx2Buffer:                                                                                    ; fun():  B
 LDX #$00                      ; initialize square 2's sound effects buffer                          ; 
 STX Square2SoundBuffer                                                                              ; 
                                                                                                     ; 
@@ -15617,7 +15622,7 @@ ORA AreaMusicBuffer                                                             
 BNE ContinueMusic                                                                                   ; 
 RTS                           ; no music, then leave                                                ;  B
                                                                                                     ;  B
-LoadEventMusic:                                                                                     ;  B
+LoadEventMusic:                                                                                     ; fun(A):  B
 STA EventMusicBuffer          ; copy event music queue contents to buffer                           ; 
 CMP #DeathMusic               ; is it death music?                                                  ; 
 BNE NoStopSfx                 ; if not, jump elsewhere                                              ; 
@@ -15641,7 +15646,7 @@ JSR StopSquare1Sfx                                                              
 NoStop1:  LDY #$10            ; start counter used only by ground level music                       ;  B
 GMLoopB:  STY GroundMusicHeaderOfs                                                                  ;  B
                                                                                                     ; 
-HandleAreaMusicLoopB:                                                                               ;  B
+HandleAreaMusicLoopB:                                                                               ; fun(A):  B
 LDY #$00                      ; clear event music buffer                                            ; 
 STY EventMusicBuffer                                                                                ; 
 STA AreaMusicBuffer           ; copy area music queue contents to buffer                            ; 
@@ -15692,7 +15697,7 @@ STA SND_MASTERCTRL_REG                                                          
 LDA #$0f                                                                                            ; 
 STA SND_MASTERCTRL_REG                                                                              ; 
                                                                                                     ; 
-HandleSquare2Music:                                                                                 ;  B
+HandleSquare2Music:                                                                                 ; fun():  B
 DEC Squ2_NoteLenCounter       ; decrement square 2 note length                                      ; 
 BNE MiscSqu2MusicTasks        ; is it time for more data?  if not, branch to end tasks              ; 
 LDY MusicOffset_Square2       ; increment square 2 music offset and fetch data                      ;  B
@@ -16347,6 +16352,6 @@ DATA: ByteValue(value=26), ByteValue(value=26), ByteValue(value=28), ByteValue(v
                               ; -------------------------------------------------------------------------------------; 
                               ; INTERRUPT VECTORS                                                   ; 
                                                                                                     ; 
-DATA: Expr(expr=NonMaskableInterrupt)                                                               ; 
-DATA: Expr(expr=Start)                                                                              ; 
+DATA: Expr(expr=NonMaskableInterrupt), Expr(expr=)                                                  ; 
+DATA: Expr(expr=Start), Expr(expr=)                                                                 ; 
 DATA: ByteValue(value=240), ByteValue(value=255); unused                                            ; 

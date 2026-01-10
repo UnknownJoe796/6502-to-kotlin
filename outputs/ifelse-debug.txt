@@ -2,8 +2,8 @@ Control flow nodes:
 - If:
     Then (1 nodes):
     - Block: NotZero
-    Else (0 nodes):
-- Block: IsZero
+    Else (1 nodes):
+    - Block: IsZero
 
 Generated Kotlin:
 // Decompiled from CheckValue

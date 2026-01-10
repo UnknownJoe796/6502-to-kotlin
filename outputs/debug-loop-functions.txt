@@ -18,11 +18,11 @@ Clobbers: X, NegativeFlag, ZeroFlag, A, $06, $07, CarryFlag, Y
 
 [1] LoopNode
   Type: LoopNode
-  Body nodes: 6
+  Body nodes: 2
   Entry: InitPageLoop
 
 [2] BlockNode
-  Block: @2784
+  Block: @2789
   Lines: 1
     RTS 
 
@@ -32,24 +32,24 @@ InitializeMemory
   Lines: 4
   Fall through: InitPageLoop
   Branch: null
-  Entered from: [@2763]
-  Dominator: 2763
+  Entered from: [@2768]
+  Dominator: 2768
 
 InitPageLoop
   Lines: 1
   Fall through: InitByteLoop
   Branch: null
-  Entered from: [InitializeMemory, @2782]
+  Entered from: [InitializeMemory, @2787]
   Dominator: InitializeMemory
 
 InitByteLoop
   Lines: 2
-  Fall through: 2776
+  Fall through: 2781
   Branch: InitByte
   Entered from: [InitPageLoop, SkipByte]
   Dominator: InitPageLoop
 
-@2776
+@2781
   Lines: 2
   Fall through: InitByte
   Branch: SkipByte
@@ -60,29 +60,29 @@ InitByte
   Lines: 1
   Fall through: SkipByte
   Branch: null
-  Entered from: [@2776, InitByteLoop]
+  Entered from: [@2781, InitByteLoop]
   Dominator: InitByteLoop
 
 SkipByte
   Lines: 3
-  Fall through: 2782
+  Fall through: 2787
   Branch: InitByteLoop
-  Entered from: [InitByte, @2776]
+  Entered from: [InitByte, @2781]
   Dominator: InitByteLoop
 
-@2782
+@2787
   Lines: 2
-  Fall through: 2784
+  Fall through: 2789
   Branch: InitPageLoop
   Entered from: [SkipByte]
   Dominator: SkipByte
 
-@2784
+@2789
   Lines: 1
   Fall through: null
   Branch: null
-  Entered from: [@2782]
-  Dominator: 2782
+  Entered from: [@2787]
+  Dominator: 2787
 
 
 

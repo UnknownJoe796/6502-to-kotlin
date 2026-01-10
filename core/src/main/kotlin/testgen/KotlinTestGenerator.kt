@@ -12,8 +12,15 @@ class KotlinTestGenerator(
     /** Function name lookup (address -> name) */
     private val functionNames: Map<Int, String> = emptyMap(),
 
-    /** Set of function names that are available and parameterless (can be tested) */
+    /** Set of function names that exist in the decompiled code (any signature) */
     private val validFunctions: Set<String> = emptySet(),
+
+    /**
+     * Function signatures: function name -> list of parameter names (A, X, Y).
+     * Empty list means no parameters.
+     * Example: "putBlockMetatile" -> listOf("A", "X", "Y")
+     */
+    private val functionSignatures: Map<String, List<String>> = emptyMap(),
 
     /**
      * Maximum offset from function entry point for fuzzy matching.
@@ -28,13 +35,40 @@ class KotlinTestGenerator(
      */
     private val decompiledFunctionAddresses: Map<Int, String> = emptyMap(),
 
+    /**
+     * Functions to skip due to unreliable capture data.
+     * These are typically functions that are fall-through targets (no RTS before label),
+     * so the captured data includes operations from the preceding function.
+     */
+    // by Claude - Added more fall-through targets with unreliable capture data
+    private val skipFunctions: Set<String> = setOf(
+        // DrawFireball falls through into DrawFirebar, so captured data for
+        // "drawFirebar" includes operations from DrawFireball that don't match
+        // the decompiled drawFirebar function.
+        "drawFirebar",
+        // doNothing2 is just RTS but preceding code falls through to it
+        // (lda #$ff; sta $06c9 then DoNothing2: rts)
+        "doNothing2"
+    ),
+
+    /** Timeout in milliseconds for each test (0 = no timeout) */
+    private val testTimeoutMs: Long = 1000,
+
     /** Import statements to include */
     private val imports: List<String> = listOf(
         "com.ivieleague.decompiler6502tokotlin.hand.*",
-        "com.ivieleague.decompiler6502tokotlin.smb.*",  // Import decompiled SMB functions
+        "com.ivieleague.decompiler6502tokotlin.smb.*",
         "kotlin.test.Test",
-        "kotlin.test.assertEquals"
-    )
+        "kotlin.test.assertEquals",
+        "org.junit.jupiter.api.Assertions.assertTimeoutPreemptively",
+        "org.junit.jupiter.api.BeforeAll",
+        "org.junit.jupiter.api.TestInstance",
+        "java.time.Duration",
+        "java.io.File"
+    ),
+
+    /** ROM file path for loading test data */
+    private val romFilePath: String? = null
 ) {
     // Sorted list of decompiled function addresses for efficient fuzzy lookup
     private val sortedDecompiledAddresses = decompiledFunctionAddresses.keys.sorted()
@@ -63,6 +97,7 @@ class KotlinTestGenerator(
         val funcName = decompiledFunctionAddresses[nearestPreceding] ?: return null
         return funcName to offset
     }
+
     /**
      * Generate test file for all captured functions.
      */
@@ -94,8 +129,29 @@ class KotlinTestGenerator(
         sb.appendLine(" * These tests verify that decompiled functions produce the same")
         sb.appendLine(" * outputs as the original 6502 binary interpreter.")
         sb.appendLine(" */")
+        // by Claude - Add @TestInstance annotation for @BeforeAll support
+        sb.appendLine("@TestInstance(TestInstance.Lifecycle.PER_CLASS)")
         sb.appendLine("class GeneratedFunctionTests {")
         sb.appendLine()
+
+        // by Claude - Add @BeforeAll method to load ROM data before any tests run
+        if (romFilePath != null) {
+            sb.appendLine("    @BeforeAll")
+            sb.appendLine("    fun loadRomData() {")
+            sb.appendLine("        // Load ROM into memory for functions that read from ROM tables")
+            sb.appendLine("        val romFile = File(\"$romFilePath\")")
+            sb.appendLine("        if (romFile.exists()) {")
+            sb.appendLine("            val romData = romFile.readBytes().toUByteArray()")
+            sb.appendLine("            // SMB ROM: 16-byte header + 32KB PRG ROM")
+            sb.appendLine("            val prgStart = 16")
+            sb.appendLine("            val prgSize = 0x8000")
+            sb.appendLine("            for (i in 0 until prgSize) {")
+            sb.appendLine("                memory[0x8000 + i] = romData[prgStart + i]")
+            sb.appendLine("            }")
+            sb.appendLine("        }")
+            sb.appendLine("    }")
+            sb.appendLine()
+        }
 
         // Group captured functions by their matched decompiled function
         data class MatchedFunction(
@@ -106,9 +162,13 @@ class KotlinTestGenerator(
         )
 
         val matchedFunctions = mutableListOf<MatchedFunction>()
-        var skippedFunctions = 0
+        var skippedNotValid = 0
+        var skippedNoSignature = 0
+        var skippedUnreliable = 0
         var exactMatches = 0
         var fuzzyMatches = 0
+        var parameterizedFunctions = 0
+        var parameterlessFunctions = 0
 
         for ((_, funcData) in data.functions.entries.sortedBy { it.value.address }) {
             // Try to find a matching decompiled function
@@ -116,12 +176,29 @@ class KotlinTestGenerator(
 
             if (match != null) {
                 val (funcName, offset) = match
-                // Check if this function is in validFunctions
+
+                // Check if this function is in the skip list
+                if (funcName in skipFunctions) {
+                    skippedUnreliable++
+                    continue
+                }
+
+                // Check if this function exists in validFunctions
                 if (validFunctions.isEmpty() || funcName in validFunctions) {
-                    matchedFunctions.add(MatchedFunction(funcName, funcData.address, offset, funcData))
-                    if (offset == 0) exactMatches++ else fuzzyMatches++
+                    // Check if we have a signature for this function
+                    if (functionSignatures.containsKey(funcName)) {
+                        matchedFunctions.add(MatchedFunction(funcName, funcData.address, offset, funcData))
+                        if (offset == 0) exactMatches++ else fuzzyMatches++
+                        if (functionSignatures[funcName]?.isNotEmpty() == true) {
+                            parameterizedFunctions++
+                        } else {
+                            parameterlessFunctions++
+                        }
+                    } else {
+                        skippedNoSignature++
+                    }
                 } else {
-                    skippedFunctions++
+                    skippedNotValid++
                 }
             } else {
                 // Fall back to old behavior for backwards compatibility
@@ -129,11 +206,26 @@ class KotlinTestGenerator(
                     ?: functionNames[funcData.address]
                     ?: "func_${funcData.addressHex.removePrefix("0x")}"
 
+                // Check if this function is in the skip list
+                if (funcName in skipFunctions) {
+                    skippedUnreliable++
+                    continue
+                }
+
                 if (validFunctions.isEmpty() || funcName in validFunctions) {
-                    matchedFunctions.add(MatchedFunction(funcName, funcData.address, 0, funcData))
-                    exactMatches++
+                    if (functionSignatures.containsKey(funcName)) {
+                        matchedFunctions.add(MatchedFunction(funcName, funcData.address, 0, funcData))
+                        exactMatches++
+                        if (functionSignatures[funcName]?.isNotEmpty() == true) {
+                            parameterizedFunctions++
+                        } else {
+                            parameterlessFunctions++
+                        }
+                    } else {
+                        skippedNoSignature++
+                    }
                 } else {
-                    skippedFunctions++
+                    skippedNotValid++
                 }
             }
         }
@@ -141,6 +233,7 @@ class KotlinTestGenerator(
         // Group by function name and generate tests
         val groupedByFunction = matchedFunctions.groupBy { it.funcName }
         var generatedFunctions = 0
+        var generatedTests = 0
 
         for ((funcName, matches) in groupedByFunction.entries.sortedBy { it.value.first().capturedAddress }) {
             generatedFunctions++
@@ -149,9 +242,13 @@ class KotlinTestGenerator(
             val bestMatch = matches.minByOrNull { it.offset }!!
             val funcData = bestMatch.funcData
             val offset = bestMatch.offset
+            val params = functionSignatures[funcName] ?: emptyList()
 
             sb.appendLine("    // =========================================")
             sb.appendLine("    // ${funcData.addressHex}: $funcName")
+            if (params.isNotEmpty()) {
+                sb.appendLine("    // Parameters: ${params.joinToString(", ")}")
+            }
             if (offset > 0) {
                 sb.appendLine("    // FUZZY MATCH: captured at +$offset bytes from entry")
             }
@@ -160,17 +257,25 @@ class KotlinTestGenerator(
             sb.appendLine()
 
             funcData.testCases.forEachIndexed { testIdx, testCase ->
-                generateTestMethod(sb, funcName, funcData.addressHex, testIdx, testCase, offset)
+                generateTestMethod(sb, funcName, funcData.addressHex, testIdx, testCase, offset, params)
+                generatedTests++
             }
         }
 
         // Insert summary comment
         val summaryComment = buildString {
-            if (skippedFunctions > 0) {
-                appendLine("// Note: $skippedFunctions functions skipped (not in validFunctions)")
+            if (skippedNotValid > 0) {
+                appendLine("// Note: $skippedNotValid functions skipped (not in validFunctions)")
             }
-            appendLine("// Generated tests for $generatedFunctions functions")
+            if (skippedNoSignature > 0) {
+                appendLine("// Note: $skippedNoSignature functions skipped (no signature found)")
+            }
+            if (skippedUnreliable > 0) {
+                appendLine("// Note: $skippedUnreliable functions skipped (unreliable capture data)")
+            }
+            appendLine("// Generated $generatedTests tests for $generatedFunctions functions")
             appendLine("// Exact matches: $exactMatches, Fuzzy matches: $fuzzyMatches")
+            appendLine("// Parameterless: $parameterlessFunctions, With parameters: $parameterizedFunctions")
             appendLine()
         }
         sb.insert(sb.indexOf("class GeneratedFunctionTests"), summaryComment)
@@ -190,7 +295,8 @@ class KotlinTestGenerator(
         addressHex: String,
         testIdx: Int,
         testCase: FunctionCallCapture,
-        offset: Int = 0
+        offset: Int = 0,
+        params: List<String> = emptyList()
     ) {
         val safeFuncName = funcName.replace("-", "_").replace(".", "_")
         val methodName = "${safeFuncName}_frame${testCase.frame}_test$testIdx"
@@ -198,6 +304,9 @@ class KotlinTestGenerator(
         sb.appendLine("    /**")
         sb.appendLine("     * Test case $testIdx from frame ${testCase.frame}")
         sb.appendLine("     * Function: $funcName ($addressHex)")
+        if (params.isNotEmpty()) {
+            sb.appendLine("     * Parameters: ${params.joinToString(", ")}")
+        }
         if (offset > 0) {
             sb.appendLine("     * FUZZY MATCH: entry +$offset bytes")
         }
@@ -206,41 +315,66 @@ class KotlinTestGenerator(
         sb.appendLine("     */")
         sb.appendLine("    @Test")
         sb.appendLine("    fun `$methodName`() {")
-        sb.appendLine("        // Setup: Reset state")
-        sb.appendLine("        resetCPU()")
-        sb.appendLine("        clearMemory()")
+
+        // Indent for assertTimeoutPreemptively wrapper
+        val indent = if (testTimeoutMs > 0) "            " else "        "
+
+        if (testTimeoutMs > 0) {
+            sb.appendLine("        assertTimeoutPreemptively(Duration.ofMillis($testTimeoutMs)) {")
+        }
+
+        sb.appendLine("${indent}// Setup: Reset state")
+        sb.appendLine("${indent}resetCPU()")
+        sb.appendLine("${indent}clearMemory()")
         sb.appendLine()
-        // Note: We don't set CPU registers/flags as input since the decompiled code
-        // is high-level Kotlin that doesn't use global register state.
-        // The function reads its inputs from memory.
-        sb.appendLine("        // Setup: Set input memory (${testCase.memoryReads.size} addresses)")
+
+        // Set input memory
+        sb.appendLine("${indent}// Setup: Set input memory (${testCase.memoryReads.size} addresses)")
         if (testCase.memoryReads.isEmpty()) {
-            sb.appendLine("        // No memory inputs")
+            sb.appendLine("${indent}// No memory inputs")
         } else {
             for ((addr, value) in testCase.memoryReads.toSortedMap()) {
                 val addrHex = addr.toString(16).uppercase().padStart(4, '0')
                 val valHex = value.toString(16).uppercase().padStart(2, '0')
-                sb.appendLine("        memory[0x$addrHex] = 0x${valHex}u")
+                sb.appendLine("${indent}memory[0x$addrHex] = 0x${valHex}u")
             }
         }
         sb.appendLine()
-        sb.appendLine("        // Execute decompiled function")
-        sb.appendLine("        $funcName()")
+
+        // Build function call with parameters
+        val args = params.map { param ->
+            when (param) {
+                "A" -> "0x${testCase.inputState.A.toString(16).uppercase().padStart(2, '0')}"
+                "X" -> "0x${testCase.inputState.X.toString(16).uppercase().padStart(2, '0')}"
+                "Y" -> "0x${testCase.inputState.Y.toString(16).uppercase().padStart(2, '0')}"
+                else -> "0"
+            }
+        }
+        val callExpr = if (args.isEmpty()) {
+            "$funcName()"
+        } else {
+            "$funcName(${args.joinToString(", ")})"
+        }
+
+        sb.appendLine("${indent}// Execute decompiled function")
+        sb.appendLine("${indent}$callExpr")
         sb.appendLine()
-        // Note: We don't check CPU registers/flags since the decompiled code is high-level
-        // Kotlin that uses local variables, not global register state.
-        // We only verify memory writes (the actual side effects).
+
         // Filter out stack writes (0x0100-0x01FF) since decompiled code uses native Kotlin calls
         val nonStackWrites = testCase.memoryWrites.filter { (addr, _) -> addr !in 0x0100..0x01FF }
-        sb.appendLine("        // Verify: Check output memory (${nonStackWrites.size} addresses)")
+        sb.appendLine("${indent}// Verify: Check output memory (${nonStackWrites.size} addresses)")
         if (nonStackWrites.isEmpty()) {
-            sb.appendLine("        // No memory outputs to verify (or only stack writes)")
+            sb.appendLine("${indent}// No memory outputs to verify (or only stack writes)")
         } else {
             for ((addr, value) in nonStackWrites.toSortedMap()) {
                 val addrHex = addr.toString(16).uppercase().padStart(4, '0')
                 val valHex = value.toString(16).uppercase().padStart(2, '0')
-                sb.appendLine("        assertEquals(0x${valHex}u, memory[0x$addrHex], \"Memory 0x$addrHex mismatch\")")
+                sb.appendLine("${indent}assertEquals(0x${valHex}u, memory[0x$addrHex], \"Memory 0x$addrHex mismatch\")")
             }
+        }
+
+        if (testTimeoutMs > 0) {
+            sb.appendLine("        }")
         }
         sb.appendLine("    }")
         sb.appendLine()
@@ -263,5 +397,45 @@ class KotlinTestGenerator(
             sb.appendLine("  ${funcData.addressHex} ($name): ${funcData.totalCalls} calls -> ${funcData.testCases.size} tests")
         }
         return sb.toString()
+    }
+
+    companion object {
+        /**
+         * Parse function signatures from a Kotlin source file.
+         * Returns a map of function name -> list of parameter names.
+         */
+        fun parseSignaturesFromFile(file: File): Map<String, List<String>> {
+            if (!file.exists()) return emptyMap()
+            return parseSignaturesFromText(file.readText())
+        }
+
+        /**
+         * Parse function signatures from Kotlin source text.
+         * Returns a map of function name -> list of parameter names.
+         */
+        fun parseSignaturesFromText(text: String): Map<String, List<String>> {
+            val result = mutableMapOf<String, List<String>>()
+
+            // Match: fun functionName() or fun functionName(params)
+            val funPattern = Regex("""^fun ([a-zA-Z_][a-zA-Z0-9_]*)\(([^)]*)\)""", RegexOption.MULTILINE)
+
+            for (match in funPattern.findAll(text)) {
+                val funcName = match.groupValues[1]
+                val paramsStr = match.groupValues[2].trim()
+
+                val params = if (paramsStr.isEmpty()) {
+                    emptyList()
+                } else {
+                    // Parse "A: Int, X: Int, Y: Int" -> ["A", "X", "Y"]
+                    paramsStr.split(",")
+                        .map { it.trim().substringBefore(":").trim() }
+                        .filter { it.isNotEmpty() }
+                }
+
+                result[funcName] = params
+            }
+
+            return result
+        }
     }
 }

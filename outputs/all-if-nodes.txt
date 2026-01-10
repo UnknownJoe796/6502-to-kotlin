@@ -1,3 +1,17 @@
 Printing ALL if nodes in MusicHandler control flow:
+[1] IfNode:
+  Branch block: @15617
+  Sense: false
+  Flag setter: lda AreaMusicQueue      ;check area music queue
+  Kotlin condition: A == 0
+  Then branch has 2 nodes, else has 0 nodes
+  Then:
+[2] IfNode:
+  Branch block: LoadAreaMusic
+  Sense: false
+  Flag setter: cmp #$04                  ;is it underground music?
+  Kotlin condition: A == 0
+  Then branch has 1 nodes, else has 0 nodes
+  Then:
 
-Total if nodes: 0
+Total if nodes: 2

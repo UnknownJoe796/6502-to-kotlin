@@ -159,12 +159,16 @@ private fun parseWordItems(payload: String): List<AssemblyData.DbItem> {
                     items += AssemblyData.DbItem.ByteValue(hi)
                 }
                 else -> {
-                    // Unknown expression/label: keep as expression and assume 2 bytes for sizing (handled by Db as 1 each)
+                    // Unknown expression/label: add TWO Expr items to account for 2-byte word size
+                    // Each Expr is counted as 1 byte by byteCount(), so we need 2 for proper sizing
                     items += AssemblyData.DbItem.Expr(tok)
+                    items += AssemblyData.DbItem.Expr("") // Placeholder for second byte
                 }
             }
         } catch (_: Throwable) {
+            // Error parsing: add TWO Expr items for 2-byte word size
             items += AssemblyData.DbItem.Expr(tok)
+            items += AssemblyData.DbItem.Expr("") // Placeholder for second byte
         }
     }
     return items

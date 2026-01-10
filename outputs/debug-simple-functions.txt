@@ -22,8 +22,8 @@ GetAreaObjXPosition
   Lines: 7
   Fall through: null
   Branch: null
-  Entered from: [@4297]
-  Dominator: 4297
+  Entered from: [@4302]
+  Dominator: 4302
 
 
 
@@ -50,8 +50,8 @@ GetAreaObjYPosition
   Lines: 9
   Fall through: null
   Branch: null
-  Entered from: [@4307]
-  Dominator: 4307
+  Entered from: [@4312]
+  Dominator: 4312
 
 
 
@@ -78,8 +78,8 @@ PlayerEnemyDiff
   Lines: 8
   Fall through: null
   Branch: null
-  Entered from: [@12630]
-  Dominator: 12630
+  Entered from: [@12635]
+  Dominator: 12635
 
 
 

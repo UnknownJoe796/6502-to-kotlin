@@ -7,7 +7,7 @@ Inputs: X
 Outputs: X
 Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, X, OverflowFlag
 
---- Control Flow Nodes (7 nodes) ---
+--- Control Flow Nodes (6 nodes) ---
 
 [0] BlockNode
   Block: FloateyNumbersRoutine
@@ -43,15 +43,7 @@ Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, X, OverflowFlag
   Condition block: FloateyPart
   Sense: false
   Then branch: 1 nodes
-  Else branch: 0 nodes
-
-[6] BlockNode
-  Block: SetupNumSpr
-  Lines: 20
-    LDA FloateyNum_Y_Pos,X
-    SBC #$08
-    JSR DumpTwoSpr
-    ... (17 more)
+  Else branch: 1 nodes
 
 --- Blocks Graph ---
 
@@ -210,9 +202,9 @@ EndExitOne
 Entry: MusicHandler
 Inputs: 
 Outputs: 
-Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, X, Y
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y
 
---- Control Flow Nodes (4 nodes) ---
+--- Control Flow Nodes (5 nodes) ---
 
 [0] BlockNode
   Block: MusicHandler
@@ -220,104 +212,108 @@ Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, X, Y
     LDA EventMusicQueue
     BNE LoadEventMusic
 
-[1] BlockNode
-  Block: @15612
-  Lines: 2
-    LDA AreaMusicQueue
-    BNE LoadAreaMusic
+[1] IfNode
+  Condition block: @15617
+  Sense: false
+  Then branch: 2 nodes
+  Else branch: 0 nodes
 
-[2] BlockNode
-  Block: @15614
-  Lines: 3
-    LDA EventMusicBuffer
-    ORA AreaMusicBuffer
-    BNE ContinueMusic
+[2] IfNode
+  Condition block: LoadAreaMusic
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
 
 [3] BlockNode
-  Block: @15617
+  Block: NoStop1
   Lines: 1
-    RTS 
+    LDY #$10
+
+[4] BlockNode
+  Block: GMLoopB
+  Lines: 2
+    STY GroundMusicHeaderOfs
 
 --- Blocks Graph ---
 
 MusicHandler
   Lines: 3
-  Fall through: 15612
+  Fall through: 15617
   Branch: LoadEventMusic
-  Entered from: [@15608]
-  Dominator: 15608
+  Entered from: [@15613]
+  Dominator: 15613
 
-@15612
+@15617
   Lines: 2
-  Fall through: 15614
+  Fall through: 15619
   Branch: LoadAreaMusic
   Entered from: [MusicHandler]
   Dominator: MusicHandler
 
-@15614
+@15619
   Lines: 3
-  Fall through: 15617
+  Fall through: 15622
   Branch: ContinueMusic
-  Entered from: [@15612]
-  Dominator: 15612
+  Entered from: [@15617]
+  Dominator: 15617
 
-@15617
+@15622
   Lines: 1
   Fall through: null
   Branch: null
-  Entered from: [@15614]
-  Dominator: 15614
+  Entered from: [@15619]
+  Dominator: 15619
 
 ContinueMusic
   Lines: 2
   Fall through: null
   Branch: HandleSquare2Music
-  Entered from: [@15603, @15614]
+  Entered from: [@15608, @15619]
   Dominator: null
 
 HandleSquare2Music
   Lines: 3
-  Fall through: 15697
+  Fall through: 15702
   Branch: MiscSqu2MusicTasks
   Entered from: [LoadHeader, ContinueMusic]
   Dominator: null
 
-@15697
+@15702
   Lines: 4
-  Fall through: 15701
+  Fall through: 15706
   Branch: EndOfMusicData
   Entered from: [HandleSquare2Music]
   Dominator: HandleSquare2Music
 
-@15701
+@15706
   Lines: 1
-  Fall through: 15702
+  Fall through: 15707
   Branch: Squ2NoteHandler
-  Entered from: [@15697]
-  Dominator: 15697
-
-@15702
-  Lines: 1
-  Fall through: 15703
-  Branch: Squ2LengthHandler
-  Entered from: [@15701]
-  Dominator: 15701
-
-@15703
-  Lines: 1
-  Fall through: EndOfMusicData
-  Branch: null
   Entered from: [@15702]
   Dominator: 15702
 
-EndOfMusicData
-  Lines: 4
+@15707
+  Lines: 1
   Fall through: 15708
-  Branch: NotTRO
-  Entered from: [@15703, @15697]
-  Dominator: 15697
+  Branch: Squ2LengthHandler
+  Entered from: [@15706]
+  Dominator: 15706
 
 @15708
+  Lines: 1
+  Fall through: EndOfMusicData
+  Branch: null
+  Entered from: [@15707]
+  Dominator: 15707
+
+EndOfMusicData
+  Lines: 4
+  Fall through: 15713
+  Branch: NotTRO
+  Entered from: [@15708, @15702]
+  Dominator: 15702
+
+@15713
   Lines: 2
   Fall through: NotTRO
   Branch: MusicLoopBack
@@ -326,75 +322,75 @@ EndOfMusicData
 
 NotTRO
   Lines: 2
-  Fall through: 15712
+  Fall through: 15717
   Branch: VictoryMLoopBack
-  Entered from: [@15708, EndOfMusicData]
+  Entered from: [@15713, EndOfMusicData]
   Dominator: EndOfMusicData
 
-@15712
+@15717
   Lines: 3
-  Fall through: 15715
+  Fall through: 15720
   Branch: MusicLoopBack
   Entered from: [NotTRO]
   Dominator: NotTRO
 
-@15715
+@15720
   Lines: 8
   Fall through: null
   Branch: null
-  Entered from: [@15712]
-  Dominator: 15712
+  Entered from: [@15717]
+  Dominator: 15717
 
 MusicLoopBack
   Lines: 2
   Fall through: null
   Branch: HandleAreaMusicLoopB
-  Entered from: [@15723, @15708, @15712]
+  Entered from: [@15728, @15713, @15717]
   Dominator: null
 
 HandleAreaMusicLoopB
   Lines: 6
-  Fall through: 15649
+  Fall through: 15654
   Branch: FindAreaMusicHeader
   Entered from: [GMLoopB, MusicLoopBack]
   Dominator: null
 
-@15649
+@15654
   Lines: 4
-  Fall through: 15653
+  Fall through: 15658
   Branch: LoadHeader
   Entered from: [HandleAreaMusicLoopB]
   Dominator: HandleAreaMusicLoopB
 
-@15653
+@15658
   Lines: 2
-  Fall through: 15655
+  Fall through: 15660
   Branch: GMLoopB
-  Entered from: [@15649]
-  Dominator: 15649
+  Entered from: [@15654]
+  Dominator: 15654
 
-@15655
+@15660
   Lines: 1
   Fall through: FindAreaMusicHeader
   Branch: null
-  Entered from: [@15653]
-  Dominator: 15653
+  Entered from: [@15658]
+  Dominator: 15658
 
 FindAreaMusicHeader
   Lines: 4
   Fall through: FindEventMusicHeader
   Branch: null
-  Entered from: [@15655, HandleAreaMusicLoopB]
+  Entered from: [@15660, HandleAreaMusicLoopB]
   Dominator: HandleAreaMusicLoopB
 
 FindEventMusicHeader
   Lines: 4
-  Fall through: 15664
+  Fall through: 15669
   Branch: FindEventMusicHeader
-  Entered from: [FindAreaMusicHeader, NoStopSfx, @15632, FindEventMusicHeader]
+  Entered from: [FindAreaMusicHeader, NoStopSfx, @15637, FindEventMusicHeader]
   Dominator: null
 
-@15664
+@15669
   Lines: 1
   Fall through: LoadHeader
   Branch: null
@@ -405,31 +401,31 @@ LoadHeader
   Lines: 29
   Fall through: HandleSquare2Music
   Branch: null
-  Entered from: [@15664, @15649]
+  Entered from: [@15669, @15654]
   Dominator: null
 
 GMLoopB
   Lines: 2
   Fall through: HandleAreaMusicLoopB
   Branch: null
-  Entered from: [NoStop1, @15653]
+  Entered from: [NoStop1, @15658]
   Dominator: null
 
 VictoryMLoopBack
   Lines: 2
   Fall through: null
   Branch: LoadEventMusic
-  Entered from: [@15726, NotTRO]
+  Entered from: [@15731, NotTRO]
   Dominator: null
 
 LoadEventMusic
   Lines: 4
-  Fall through: 15623
+  Fall through: 15628
   Branch: NoStopSfx
-  Entered from: [@15618, MusicHandler, VictoryMLoopBack]
+  Entered from: [@15623, MusicHandler, VictoryMLoopBack]
   Dominator: null
 
-@15623
+@15628
   Lines: 2
   Fall through: NoStopSfx
   Branch: null
@@ -438,33 +434,33 @@ LoadEventMusic
 
 NoStopSfx
   Lines: 7
-  Fall through: 15632
+  Fall through: 15637
   Branch: FindEventMusicHeader
-  Entered from: [@15623, LoadEventMusic]
+  Entered from: [@15628, LoadEventMusic]
   Dominator: LoadEventMusic
 
-@15632
+@15637
   Lines: 3
-  Fall through: 15635
+  Fall through: 15640
   Branch: FindEventMusicHeader
   Entered from: [NoStopSfx]
   Dominator: NoStopSfx
 
-@15635
+@15640
   Lines: 1
   Fall through: LoadAreaMusic
   Branch: null
-  Entered from: [@15632]
-  Dominator: 15632
+  Entered from: [@15637]
+  Dominator: 15637
 
 LoadAreaMusic
   Lines: 3
-  Fall through: 15639
+  Fall through: 15644
   Branch: NoStop1
-  Entered from: [@15635, @15612]
+  Entered from: [@15640, @15617]
   Dominator: null
 
-@15639
+@15644
   Lines: 1
   Fall through: NoStop1
   Branch: null
@@ -475,43 +471,43 @@ NoStop1
   Lines: 1
   Fall through: GMLoopB
   Branch: null
-  Entered from: [@15639, LoadAreaMusic]
+  Entered from: [@15644, LoadAreaMusic]
   Dominator: LoadAreaMusic
 
 Squ2LengthHandler
   Lines: 7
   Fall through: Squ2NoteHandler
   Branch: null
-  Entered from: [@15729, @15702]
+  Entered from: [@15734, @15707]
   Dominator: null
 
 Squ2NoteHandler
   Lines: 3
-  Fall through: 15740
+  Fall through: 15745
   Branch: SkipFqL1
-  Entered from: [Squ2LengthHandler, @15701]
+  Entered from: [Squ2LengthHandler, @15706]
   Dominator: null
 
-@15740
+@15745
   Lines: 2
-  Fall through: 15742
+  Fall through: 15747
   Branch: Rest
   Entered from: [Squ2NoteHandler]
   Dominator: Squ2NoteHandler
 
-@15742
+@15747
   Lines: 1
   Fall through: Rest
   Branch: null
-  Entered from: [@15740]
-  Dominator: 15740
+  Entered from: [@15745]
+  Dominator: 15745
 
 Rest
   Lines: 2
   Fall through: SkipFqL1
   Branch: null
-  Entered from: [@15742, @15740]
-  Dominator: 15740
+  Entered from: [@15747, @15745]
+  Dominator: 15745
 
 SkipFqL1
   Lines: 3
@@ -522,152 +518,152 @@ SkipFqL1
 
 MiscSqu2MusicTasks
   Lines: 3
-  Fall through: 15751
+  Fall through: 15756
   Branch: HandleSquare1Music
   Entered from: [SkipFqL1, HandleSquare2Music]
   Dominator: null
 
-@15751
+@15756
   Lines: 3
-  Fall through: 15754
+  Fall through: 15759
   Branch: HandleSquare1Music
   Entered from: [MiscSqu2MusicTasks]
   Dominator: MiscSqu2MusicTasks
 
-@15754
+@15759
   Lines: 2
-  Fall through: 15756
+  Fall through: 15761
   Branch: NoDecEnv1
-  Entered from: [@15751]
-  Dominator: 15751
+  Entered from: [@15756]
+  Dominator: 15756
 
-@15756
+@15761
   Lines: 1
   Fall through: NoDecEnv1
   Branch: null
-  Entered from: [@15754]
-  Dominator: 15754
+  Entered from: [@15759]
+  Dominator: 15759
 
 NoDecEnv1
   Lines: 5
   Fall through: HandleSquare1Music
   Branch: null
-  Entered from: [@15756, @15754]
-  Dominator: 15754
+  Entered from: [@15761, @15759]
+  Dominator: 15759
 
 HandleSquare1Music
   Lines: 3
-  Fall through: 15765
+  Fall through: 15770
   Branch: HandleTriangleMusic
-  Entered from: [NoDecEnv1, MiscSqu2MusicTasks, @15751]
+  Entered from: [NoDecEnv1, MiscSqu2MusicTasks, @15756]
   Dominator: MiscSqu2MusicTasks
 
-@15765
+@15770
   Lines: 2
-  Fall through: 15767
+  Fall through: 15772
   Branch: MiscSqu1MusicTasks
   Entered from: [HandleSquare1Music]
   Dominator: HandleSquare1Music
 
-@15767
+@15772
   Lines: 1
   Fall through: FetchSqu1MusicData
   Branch: null
-  Entered from: [@15765]
-  Dominator: 15765
+  Entered from: [@15770]
+  Dominator: 15770
 
 FetchSqu1MusicData
   Lines: 5
-  Fall through: 15773
+  Fall through: 15778
   Branch: Squ1NoteHandler
-  Entered from: [@15767, @15773]
-  Dominator: 15767
+  Entered from: [@15772, @15778]
+  Dominator: 15772
 
-@15773
+@15778
   Lines: 6
-  Fall through: 15779
+  Fall through: 15784
   Branch: FetchSqu1MusicData
   Entered from: [FetchSqu1MusicData]
   Dominator: FetchSqu1MusicData
 
-@15779
+@15784
   Lines: 1
   Fall through: Squ1NoteHandler
   Branch: null
-  Entered from: [@15773]
-  Dominator: 15773
+  Entered from: [@15778]
+  Dominator: 15778
 
 Squ1NoteHandler
   Lines: 5
-  Fall through: 15785
+  Fall through: 15790
   Branch: HandleTriangleMusic
-  Entered from: [@15779, FetchSqu1MusicData]
+  Entered from: [@15784, FetchSqu1MusicData]
   Dominator: FetchSqu1MusicData
 
-@15785
+@15790
   Lines: 4
-  Fall through: 15789
+  Fall through: 15794
   Branch: SkipCtrlL
   Entered from: [Squ1NoteHandler]
   Dominator: Squ1NoteHandler
 
-@15789
+@15794
   Lines: 1
   Fall through: SkipCtrlL
   Branch: null
-  Entered from: [@15785]
-  Dominator: 15785
+  Entered from: [@15790]
+  Dominator: 15790
 
 SkipCtrlL
   Lines: 3
   Fall through: MiscSqu1MusicTasks
   Branch: null
-  Entered from: [@15789, @15785]
-  Dominator: 15785
+  Entered from: [@15794, @15790]
+  Dominator: 15790
 
 MiscSqu1MusicTasks
   Lines: 3
-  Fall through: 15796
+  Fall through: 15801
   Branch: HandleTriangleMusic
-  Entered from: [SkipCtrlL, @15765]
-  Dominator: 15765
+  Entered from: [SkipCtrlL, @15770]
+  Dominator: 15770
 
-@15796
+@15801
   Lines: 3
-  Fall through: 15799
+  Fall through: 15804
   Branch: DeathMAltReg
   Entered from: [MiscSqu1MusicTasks]
   Dominator: MiscSqu1MusicTasks
 
-@15799
+@15804
   Lines: 2
-  Fall through: 15801
+  Fall through: 15806
   Branch: NoDecEnv2
-  Entered from: [@15796]
-  Dominator: 15796
+  Entered from: [@15801]
+  Dominator: 15801
 
-@15801
+@15806
   Lines: 1
   Fall through: NoDecEnv2
   Branch: null
-  Entered from: [@15799]
-  Dominator: 15799
+  Entered from: [@15804]
+  Dominator: 15804
 
 NoDecEnv2
   Lines: 2
   Fall through: DeathMAltReg
   Branch: null
-  Entered from: [@15801, @15799]
-  Dominator: 15799
+  Entered from: [@15806, @15804]
+  Dominator: 15804
 
 DeathMAltReg
   Lines: 2
-  Fall through: 15806
+  Fall through: 15811
   Branch: DoAltLoad
-  Entered from: [NoDecEnv2, @15796]
-  Dominator: 15796
+  Entered from: [NoDecEnv2, @15801]
+  Dominator: 15801
 
-@15806
+@15811
   Lines: 1
   Fall through: DoAltLoad
   Branch: null
@@ -678,52 +674,52 @@ DoAltLoad
   Lines: 2
   Fall through: HandleTriangleMusic
   Branch: null
-  Entered from: [@15806, DeathMAltReg]
+  Entered from: [@15811, DeathMAltReg]
   Dominator: DeathMAltReg
 
 HandleTriangleMusic
   Lines: 4
-  Fall through: 15813
+  Fall through: 15818
   Branch: HandleNoiseMusic
   Entered from: [DoAltLoad, HandleSquare1Music, Squ1NoteHandler, MiscSqu1MusicTasks]
   Dominator: HandleSquare1Music
 
-@15813
+@15818
   Lines: 4
-  Fall through: 15817
+  Fall through: 15822
   Branch: LoadTriCtrlReg
   Entered from: [HandleTriangleMusic]
   Dominator: HandleTriangleMusic
 
-@15817
+@15822
   Lines: 1
-  Fall through: 15818
+  Fall through: 15823
   Branch: TriNoteHandler
-  Entered from: [@15813]
-  Dominator: 15813
-
-@15818
-  Lines: 8
-  Fall through: 15826
-  Branch: LoadTriCtrlReg
-  Entered from: [@15817]
-  Dominator: 15817
-
-@15826
-  Lines: 1
-  Fall through: TriNoteHandler
-  Branch: null
   Entered from: [@15818]
   Dominator: 15818
 
+@15823
+  Lines: 8
+  Fall through: 15831
+  Branch: LoadTriCtrlReg
+  Entered from: [@15822]
+  Dominator: 15822
+
+@15831
+  Lines: 1
+  Fall through: TriNoteHandler
+  Branch: null
+  Entered from: [@15823]
+  Dominator: 15823
+
 TriNoteHandler
   Lines: 7
-  Fall through: 15834
+  Fall through: 15839
   Branch: NotDOrD4
-  Entered from: [@15826, @15817]
-  Dominator: 15817
+  Entered from: [@15831, @15822]
+  Dominator: 15822
 
-@15834
+@15839
   Lines: 3
   Fall through: NotDOrD4
   Branch: HandleNoiseMusic
@@ -732,31 +728,31 @@ TriNoteHandler
 
 NotDOrD4
   Lines: 3
-  Fall through: 15840
+  Fall through: 15845
   Branch: LongN
-  Entered from: [@15834, TriNoteHandler]
+  Entered from: [@15839, TriNoteHandler]
   Dominator: TriNoteHandler
 
-@15840
+@15845
   Lines: 3
-  Fall through: 15843
+  Fall through: 15848
   Branch: MediN
   Entered from: [NotDOrD4]
   Dominator: NotDOrD4
 
-@15843
+@15848
   Lines: 2
   Fall through: MediN
   Branch: LoadTriCtrlReg
-  Entered from: [@15840]
-  Dominator: 15840
+  Entered from: [@15845]
+  Dominator: 15845
 
 MediN
   Lines: 2
   Fall through: LongN
   Branch: LoadTriCtrlReg
-  Entered from: [@15843, @15840]
-  Dominator: 15840
+  Entered from: [@15848, @15845]
+  Dominator: 15845
 
 LongN
   Lines: 2
@@ -769,101 +765,101 @@ LoadTriCtrlReg
   Lines: 3
   Fall through: HandleNoiseMusic
   Branch: null
-  Entered from: [LongN, @15813, @15818, @15843, MediN]
-  Dominator: 15813
+  Entered from: [LongN, @15818, @15823, @15848, MediN]
+  Dominator: 15818
 
 HandleNoiseMusic
   Lines: 4
-  Fall through: 15856
+  Fall through: 15861
   Branch: ExitMusicHandler
-  Entered from: [LoadTriCtrlReg, HandleTriangleMusic, @15834]
+  Entered from: [LoadTriCtrlReg, HandleTriangleMusic, @15839]
   Dominator: HandleTriangleMusic
 
-@15856
+@15861
   Lines: 2
-  Fall through: 15858
+  Fall through: 15863
   Branch: ExitMusicHandler
   Entered from: [HandleNoiseMusic]
   Dominator: HandleNoiseMusic
 
-@15858
+@15863
   Lines: 1
   Fall through: FetchNoiseBeatData
   Branch: null
-  Entered from: [@15856]
-  Dominator: 15856
+  Entered from: [@15861]
+  Dominator: 15861
 
 FetchNoiseBeatData
   Lines: 5
-  Fall through: 15864
+  Fall through: 15869
   Branch: NoiseBeatHandler
-  Entered from: [@15858, @15864]
-  Dominator: 15858
+  Entered from: [@15863, @15869]
+  Dominator: 15863
 
-@15864
+@15869
   Lines: 3
-  Fall through: 15867
+  Fall through: 15872
   Branch: FetchNoiseBeatData
   Entered from: [FetchNoiseBeatData]
   Dominator: FetchNoiseBeatData
 
-@15867
+@15872
   Lines: 1
   Fall through: NoiseBeatHandler
   Branch: null
-  Entered from: [@15864]
-  Dominator: 15864
+  Entered from: [@15869]
+  Dominator: 15869
 
 NoiseBeatHandler
   Lines: 6
-  Fall through: 15874
+  Fall through: 15879
   Branch: SilentBeat
-  Entered from: [@15867, FetchNoiseBeatData]
+  Entered from: [@15872, FetchNoiseBeatData]
   Dominator: FetchNoiseBeatData
 
-@15874
+@15879
   Lines: 2
-  Fall through: 15876
+  Fall through: 15881
   Branch: LongBeat
   Entered from: [NoiseBeatHandler]
   Dominator: NoiseBeatHandler
 
-@15876
+@15881
   Lines: 2
-  Fall through: 15878
+  Fall through: 15883
   Branch: StrongBeat
-  Entered from: [@15874]
-  Dominator: 15874
+  Entered from: [@15879]
+  Dominator: 15879
 
-@15878
+@15883
   Lines: 2
-  Fall through: 15880
+  Fall through: 15885
   Branch: SilentBeat
-  Entered from: [@15876]
-  Dominator: 15876
+  Entered from: [@15881]
+  Dominator: 15881
 
-@15880
+@15885
   Lines: 4
-  Fall through: 15884
+  Fall through: 15889
   Branch: PlayBeat
-  Entered from: [@15878]
-  Dominator: 15878
+  Entered from: [@15883]
+  Dominator: 15883
 
-@15884
+@15889
   Lines: 1
   Fall through: StrongBeat
   Branch: null
-  Entered from: [@15880]
-  Dominator: 15880
+  Entered from: [@15885]
+  Dominator: 15885
 
 StrongBeat
   Lines: 5
-  Fall through: 15890
+  Fall through: 15895
   Branch: PlayBeat
-  Entered from: [@15884, @15876]
-  Dominator: 15876
+  Entered from: [@15889, @15881]
+  Dominator: 15881
 
-@15890
+@15895
   Lines: 1
   Fall through: LongBeat
   Branch: null
@@ -872,12 +868,12 @@ StrongBeat
 
 LongBeat
   Lines: 5
-  Fall through: 15896
+  Fall through: 15901
   Branch: PlayBeat
-  Entered from: [@15890, @15874]
-  Dominator: 15874
+  Entered from: [@15895, @15879]
+  Dominator: 15879
 
-@15896
+@15901
   Lines: 1
   Fall through: SilentBeat
   Branch: null
@@ -888,21 +884,21 @@ SilentBeat
   Lines: 3
   Fall through: PlayBeat
   Branch: null
-  Entered from: [@15896, NoiseBeatHandler, @15878]
+  Entered from: [@15901, NoiseBeatHandler, @15883]
   Dominator: NoiseBeatHandler
 
 PlayBeat
   Lines: 5
   Fall through: ExitMusicHandler
   Branch: null
-  Entered from: [SilentBeat, @15880, StrongBeat, LongBeat]
+  Entered from: [SilentBeat, @15885, StrongBeat, LongBeat]
   Dominator: NoiseBeatHandler
 
 ExitMusicHandler
   Lines: 2
   Fall through: null
   Branch: null
-  Entered from: [PlayBeat, HandleNoiseMusic, @15856]
+  Entered from: [PlayBeat, HandleNoiseMusic, @15861]
   Dominator: HandleNoiseMusic
 
 
@@ -913,61 +909,53 @@ ExitMusicHandler
 Entry: ImpedePlayerMove
 Inputs: $00
 Outputs: 
-Clobbers: A, NegativeFlag, ZeroFlag, Y, X, CarryFlag, $00, OverflowFlag
+Clobbers: A, NegativeFlag, ZeroFlag, Y, X, CarryFlag
 
---- Control Flow Nodes (3 nodes) ---
+--- Control Flow Nodes (2 nodes) ---
 
 [0] IfNode
   Condition block: ImpedePlayerMove
   Sense: false
   Then branch: 1 nodes
-  Else branch: 1 nodes
+  Else branch: 0 nodes
 
 [1] IfNode
-  Condition block: NXSpd
+  Condition block: RImpd
   Sense: false
   Then branch: 1 nodes
   Else branch: 0 nodes
-
-[2] BlockNode
-  Block: PlatF
-  Lines: 7
-    STY $00
-    CLC 
-    ADC Player_X_Position
-    ... (4 more)
 
 --- Blocks Graph ---
 
 ImpedePlayerMove
   Lines: 6
-  Fall through: 12323
+  Fall through: 12328
   Branch: RImpd
-  Entered from: [@12316, @12011]
+  Entered from: [@12321, @12016]
   Dominator: null
 
-@12323
+@12328
   Lines: 3
-  Fall through: 12326
+  Fall through: 12331
   Branch: ExIPM
   Entered from: [ImpedePlayerMove]
   Dominator: ImpedePlayerMove
 
-@12326
+@12331
   Lines: 2
   Fall through: null
   Branch: NXSpd
-  Entered from: [@12323]
-  Dominator: 12323
+  Entered from: [@12328]
+  Dominator: 12328
 
 NXSpd
   Lines: 6
-  Fall through: 12338
+  Fall through: 12343
   Branch: PlatF
-  Entered from: [@12331, @12326]
+  Entered from: [@12336, @12331]
   Dominator: ImpedePlayerMove
 
-@12338
+@12343
   Lines: 1
   Fall through: PlatF
   Branch: null
@@ -978,24 +966,24 @@ PlatF
   Lines: 7
   Fall through: ExIPM
   Branch: null
-  Entered from: [@12338, NXSpd]
+  Entered from: [@12343, NXSpd]
   Dominator: NXSpd
 
 ExIPM
   Lines: 5
   Fall through: null
   Branch: null
-  Entered from: [PlatF, @12323, RImpd]
+  Entered from: [PlatF, @12328, RImpd]
   Dominator: ImpedePlayerMove
 
 RImpd
   Lines: 3
-  Fall through: 12331
+  Fall through: 12336
   Branch: ExIPM
   Entered from: [ImpedePlayerMove]
   Dominator: ImpedePlayerMove
 
-@12331
+@12336
   Lines: 1
   Fall through: NXSpd
   Branch: null

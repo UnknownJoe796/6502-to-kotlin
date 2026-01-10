@@ -42,7 +42,10 @@ data class FunctionCallCapture(
     val nestedCalls: List<Int>,
 
     /** Unique hash of input state for deduplication */
-    val inputStateHash: Long
+    val inputStateHash: Long,
+
+    /** Function name (if known from decompiled metadata) */
+    val functionName: String? = null
 )
 
 /**

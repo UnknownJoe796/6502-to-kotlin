@@ -9,7 +9,7 @@ NoiseSfxHandler function:
         lda Noise_SfxLenCounter
         lsr                         ;divide by 2 and check for bit set to use offset
         bcc DecrementSfx3Length
-    - @15555
+    - @15560
         ldx BrickShatterFreqData,y  ;load reg contents of brick shatter sound
         lda BrickShatterEnvData,y
         
@@ -21,7 +21,7 @@ NoiseSfxHandler function:
         DecrementSfx3Length:
         dec Noise_SfxLenCounter  ;decrement length of sfx
         bne ExSfx3
-    - @15568
+    - @15573
         sta SND_NOISE_REG
         lda #$00
         sta NoiseSoundBuffer
@@ -31,23 +31,23 @@ NoiseSfxHandler function:
         NoiseSfxHandler:
         ldy NoiseSoundQueue   ;check for sfx in queue
         beq CheckNoiseBuffer
-    - @15577
+    - @15582
         sty NoiseSoundBuffer  ;if found, put in buffer
         lsr NoiseSoundQueue
         bcs PlayBrickShatter  ;brick shatter
-    - @15580
+    - @15585
         lsr NoiseSoundQueue
         bcs PlayBowserFlame   ;bowser flame
-    - @15582
+    - @15587
         
     - CheckNoiseBuffer
         CheckNoiseBuffer:
         lda NoiseSoundBuffer      ;check for sfx in buffer
         beq ExNH                  ;if not found, exit sub
-    - @15586
+    - @15591
         lsr
         bcs ContinueBrickShatter  ;brick shatter
-    - @15588
+    - @15593
         lsr
         bcs ContinueBowserFlame   ;bowser flame
     - ExNH [HAS RTS]
@@ -60,59 +60,81 @@ NoiseSfxHandler function:
         ldx #$0f                    ;load reg contents of bowser flame sound
         lda BowserFlameEnvData-1,y
         bne PlayNoiseSfx            ;unconditional branch here
-    - @15603
+    - @15608
         
         ;--------------------------------
         
 
   Starting block for control flow: NoiseSfxHandler
-  Starting block line index: 15574
+  Starting block line index: 15579
   Reachable blocks from starting block (within function): 18
   Assigned blocks: 18
   Unreachable assigned blocks: 0
 
   Control flow (analyzeControls):
-  Nodes: 10
+  Nodes: 8
     - Block: PlayBrickShatter
     - If:
         Then:
-        - Block: @15555
+        - Block: @15560
         - Block: PlayNoiseSfx
     - If:
         Then:
-        - Block: @15568
-    - Block: ExSfx3 [RETURN]
+        - Block: @15573
+        Else:
+        - Block: ExSfx3 [RETURN]
     - If:
         Then:
         - Loop (PostTest):
           - Block: PlayBrickShatter
           - Block: ContinueBrickShatter
-          - Block: @15555
+          - Block: @15560
           - Block: PlayNoiseSfx
           - Block: DecrementSfx3Length
-          - Block: @15568
+          - Block: @15573
           - Block: ExSfx3 [RETURN]
           - Block: NoiseSfxHandler
-          - Block: @15577
+          - Block: @15582
         - If:
             Then:
-            - Block: @15582
+            - Block: @15587
     - If:
         Then:
-        - Block: @15586
+        - Block: @15591
         - If:
-    - Block: ExNH [RETURN]
+        Else:
+        - Block: ExNH [RETURN]
     - Block: PlayBowserFlame
     - Block: ContinueBowserFlame
-    - Block: @15603
+    - Block: @15608
 
   Control flow (improveControlFlow):
-  Nodes: 3
+  Nodes: 7
     - If:
         Then:
-        - Block: @15555
+        - Block: @15560
         - Block: PlayNoiseSfx
     - If:
         Then:
-        - Block: @15568
-    - Block: ExSfx3 [RETURN]
+        - Block: @15573
+        Else:
+        - Block: ExSfx3 [RETURN]
+    - If:
+        Then:
+        - Loop (PostTest):
+          - Block: PlayBrickShatter
+          - Block: ContinueBrickShatter
+          - Block: DecrementSfx3Length
+          - Block: NoiseSfxHandler
+          - Block: @15582
+        - If:
+            Then:
+            - Block: @15587
+    - If:
+        Then:
+        - Block: @15591
+        Else:
+        - Block: ExNH [RETURN]
+    - Block: PlayBowserFlame
+    - Block: ContinueBowserFlame
+    - Block: @15608

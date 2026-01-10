@@ -90,6 +90,8 @@ class CaptureFromTASTest {
     private fun findTasFile(): File? {
         return listOf(
             "local/tas/happylee-warps.fm2",
+            "local/tas/smb-tas.fm2",
+            "smb/happylee-warps.fm2",
             "happylee-warps.fm2"
         ).map { File(it) }.firstOrNull { it.exists() }
     }
@@ -256,52 +258,88 @@ class CaptureFromTASTest {
             null
         }
 
+        // Log JSR target statistics
+        if (mapper != null) {
+            val jsrTargets = mapper.getJsrTargetAddresses()
+            println("JSR target labels: ${mapper.getJsrTargetLabels().size}")
+            println("JSR target addresses: ${jsrTargets.size}")
+
+            // Check how many captured addresses are JSR targets
+            val capturedAddresses = allCaptures.map { it.functionAddress }.toSet()
+            val capturedJsrTargets = capturedAddresses.filter { mapper.isJsrTarget(it) }
+            println("Captured addresses that are JSR targets: ${capturedJsrTargets.size} / ${capturedAddresses.size}")
+        }
+
         val functionNames = mapper?.getAllAddresses()?.associate { addr ->
             addr to mapper.getFunctionName(addr)!!
         } ?: emptyMap()
 
-        // Extract parameterless functions from decompiled file
-        val decompiledFile = File("smb/src/main/kotlin/com/ivieleague/decompiler6502tokotlin/smb/SMBDecompiled.kt")
-        val validFunctions = if (decompiledFile.exists()) {
-            val funPattern = Regex("""^fun ([a-zA-Z_][a-zA-Z0-9_]*)\(\)""", RegexOption.MULTILINE)
-            funPattern.findAll(decompiledFile.readText())
-                .map { it.groupValues[1] }
-                .toSet()
-                .also { println("\nFound ${it.size} parameterless functions in decompiled code") }
+        // Parse function signatures from decompiled file (includes both parameterless and parameterized)
+        val decompiledFile = File("smb/src/main/kotlin/com/ivieleague/decompiler6502tokotlin/smb/generated/SMBDecompiled.kt")
+        val functionSignatures = if (decompiledFile.exists()) {
+            KotlinTestGenerator.parseSignaturesFromFile(decompiledFile).also {
+                val parameterless = it.count { (_, params) -> params.isEmpty() }
+                val withParams = it.count { (_, params) -> params.isNotEmpty() }
+                println("\nParsed ${it.size} functions from decompiled code:")
+                println("  - $parameterless parameterless functions")
+                println("  - $withParams functions with parameters")
+            }
         } else {
             println("\n⚠️ SMBDecompiled.kt not found - will generate all tests (may have compile errors)")
-            emptySet()
+            emptyMap()
         }
 
-        // Build map of decompiled function addresses for fuzzy matching
+        // All function names are valid (we have their signatures)
+        val validFunctions = functionSignatures.keys
+
+        // Build map of decompiled function addresses for matching
+        // Only include JSR targets to filter out internal labels
         val decompiledFunctionAddresses = if (mapper != null) {
             val result = mutableMapOf<Int, String>()
+            val jsrTargetLabels = mapper.getJsrTargetLabels()
+            var totalLabels = 0
+            var jsrTargetCount = 0
+            var validFunctionCount = 0
+
             for (label in mapper.getFunctionLabels()) {
+                totalLabels++
                 val funcName = AddressLabelMapper.labelToKotlinFunctionName(label)
+
+                // Skip internal labels (not JSR targets)
+                if (label !in jsrTargetLabels) continue
+                jsrTargetCount++
+
                 if (funcName in validFunctions) {
+                    validFunctionCount++
                     mapper.getAddress(label)?.let { addr ->
                         result[addr] = funcName
                     }
                 }
             }
-            println("Found ${result.size} decompiled function addresses for fuzzy matching")
+            println("\nFiltering by JSR targets:")
+            println("  Total labels: $totalLabels")
+            println("  JSR targets: $jsrTargetCount")
+            println("  Valid decompiled functions that are JSR targets: $validFunctionCount")
+            println("Found ${result.size} decompiled function addresses for matching")
             result
         } else {
             emptyMap()
         }
 
-        // Generate Kotlin tests with proper function names and fuzzy matching
+        // Generate Kotlin tests with exact matches only (no fuzzy matching)
         // Output to smb module test directory so tests can be compiled and run
         val smbTestDir = File("smb/src/test/kotlin/com/ivieleague/decompiler6502tokotlin/smb/generated")
-        val fuzzyThreshold = 50  // Match captures within 50 bytes of function entry
+        // by Claude - Added romFilePath to load ROM data for functions that read from ROM tables
         val generator = KotlinTestGenerator(
             packageName = "com.ivieleague.decompiler6502tokotlin.smb.generated",
             functionNames = functionNames,
             validFunctions = validFunctions,
-            fuzzyMatchThreshold = fuzzyThreshold,
-            decompiledFunctionAddresses = decompiledFunctionAddresses
+            functionSignatures = functionSignatures,
+            fuzzyMatchThreshold = 0,  // Exact matches only - no fuzzy matching
+            decompiledFunctionAddresses = decompiledFunctionAddresses,
+            romFilePath = romFile.absolutePath
         )
-        println("Using fuzzy matching with threshold: $fuzzyThreshold bytes")
+        println("Using exact matches only (no fuzzy matching)")
         val testFile = File(smbTestDir, "GeneratedFunctionTests.kt")
         generator.generateTestFile(testData, testFile)
         println("✅ Generated test file: ${testFile.absolutePath}")

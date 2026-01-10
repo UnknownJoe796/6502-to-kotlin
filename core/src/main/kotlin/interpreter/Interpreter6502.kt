@@ -250,6 +250,15 @@ class Interpreter6502(
                 val value = resolveLabel(addressing.name)
                 (value and 0xFF).toUByte()
             }
+            // by Claude - Added handlers for constant reference hi/lo selection
+            is AssemblyAddressing.ConstantReferenceLower -> {
+                val value = resolveLabel(addressing.name)
+                (value and 0xFF).toUByte()
+            }
+            is AssemblyAddressing.ConstantReferenceUpper -> {
+                val value = resolveLabel(addressing.name)
+                ((value shr 8) and 0xFF).toUByte()
+            }
             else -> {
                 val addr = getOperandAddress(addressing!!)
                 memory.readByte(addr)

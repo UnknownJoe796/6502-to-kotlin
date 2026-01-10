@@ -112,6 +112,11 @@ class KotlinCodeGenTest {
         val outDir = File("outputs")
         if (!outDir.exists()) outDir.mkdirs()
         val outFile = outDir.resolve("smb-decompiled.kt")
+
+        // by Claude - also write to production location for testing
+        val prodDir = File("smb/src/main/kotlin/com/ivieleague/decompiler6502tokotlin/smb/generated")
+        if (!prodDir.exists()) prodDir.mkdirs()
+        val prodFile = prodDir.resolve("SMBDecompiled.kt")
         val constantsFile = outDir.resolve("smb-constants.kt")
 
         // Extract all constants from the assembly
@@ -409,6 +414,10 @@ class KotlinCodeGenTest {
 
         println("\nGenerated Kotlin code written to: ${outFile.absolutePath}")
         println("First 10 functions converted successfully!")
+
+        // by Claude - copy to production location
+        outFile.copyTo(prodFile, overwrite = true)
+        println("Also copied to: ${prodFile.absolutePath}")
 
         assertTrue(outFile.exists())
         assertTrue(outFile.length() > 0)

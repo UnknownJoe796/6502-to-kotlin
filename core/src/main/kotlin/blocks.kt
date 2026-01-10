@@ -57,6 +57,16 @@ class AssemblyBlock(
      */
     var function: AssemblyFunction? = null
 
+    /**
+     * by Claude - Set of functions for which the first instruction of this block should be skipped.
+     * This is set when the block is reached via a .db $2c BIT skip pattern from another block.
+     * The BIT instruction "eats" the next 2 bytes (the first instruction of this block).
+     * Using a set allows the same block to have different skip behavior in different functions
+     * (e.g., MoveSpritesOffscreen block skips when part of MoveAllSpritesOffscreen, but not when
+     * decompiled as its own function).
+     */
+    val skipFirstInstructionForFunctions: MutableSet<AssemblyFunction> = mutableSetOf()
+
     val dominationDepth: Int get() = generateSequence(this.immediateDominator) { it.immediateDominator }.count()
 }
 
@@ -424,8 +434,27 @@ fun List<AssemblyBlock>.functionify(
     // Build a map from label to block for fast lookup
     val labelToBlock = this.filter { it.label != null }.associateBy { it.label }
 
+    // by Claude - Collect JMP targets as candidates, but don't immediately mark them as functions
+    // We'll filter them after determining which are already reachable from JSR-based functions
+    val jmpTargetCandidates = mutableSetOf<AssemblyBlock>()
+
     for (block in this) {
         for ((index, line) in block.lines.withIndex()) {
+            // by Claude - Collect JMP targets as candidates for later filtering
+            // We include backward jumps here - they might be tail calls to earlier functions
+            // The filtering step will determine if they're internal control flow or real functions
+            if (line.instruction?.op == AssemblyOp.JMP) {
+                val addr = line.instruction.address
+                if (addr is AssemblyAddressing.Direct) {
+                    val targetLabel = addr.label
+                    val targetBlock = labelToBlock[targetLabel]
+                    // Only consider as candidate if not already in the current block's fall-through path
+                    if (targetBlock != null && targetBlock != block.fallThroughExit) {
+                        jmpTargetCandidates.add(targetBlock)
+                    }
+                }
+            }
+
             if (line.instruction?.op == AssemblyOp.JSR) {
                 val targetLabel = (line.instruction.address as AssemblyAddressing.Direct).label
                 val targetBlock = labelToBlock[targetLabel] ?: throw IllegalArgumentException("Could not find block with label $targetLabel")
@@ -480,6 +509,15 @@ fun List<AssemblyBlock>.functionify(
         }
     }
 
+    // by Claude - Promote ALL JMP targets to functions
+    // This handles shared utility routines like IncSubtask that are reached via JMP from multiple functions.
+    // The code generator will handle fallthrough-to-function-entry by inserting a tail call.
+    for (candidate in jmpTargetCandidates) {
+        // Skip if already a function entry (via JSR)
+        if (candidate in functionEntryBlocks) continue
+        functionEntryBlocks.getOrPut(candidate) { ArrayList() }
+    }
+
     // Step 2: For each function, compute its blocks using dominator tree
     for ((entryBlock, callers) in functionEntryBlocks.entries) {
         val function = AssemblyFunction(entryBlock, callers)
@@ -492,14 +530,48 @@ fun List<AssemblyBlock>.functionify(
         val toVisit = mutableListOf(entryBlock)
         val visited = mutableSetOf<AssemblyBlock>()
 
+        // by Claude - Track blocks that end with .db $2c (BIT skip pattern)
+        // When a block ends with .db $2c, the fall-through target's first instruction is "skipped"
+        // by the BIT instruction. We should continue traversal in this case to include the target's
+        // code in this function, since the behavior is different when called directly vs via BIT skip.
+        fun blockEndsWith2c(block: AssemblyBlock): Boolean {
+            return block.lines.any { line ->
+                val data = line.data
+                data is AssemblyData.Db && data.items.size == 1 &&
+                data.items[0] is AssemblyData.DbItem.ByteValue &&
+                (data.items[0] as AssemblyData.DbItem.ByteValue).value == 0x2C
+            }
+        }
+
         while (toVisit.isNotEmpty()) {
             val current = toVisit.removeAt(0)
             if (current in visited) continue
             visited.add(current)
 
             // Stop if we hit another function entry (unless it's the current function)
+            // Exception: If we arrived via a .db $2c BIT skip pattern, continue traversal
+            // because the BIT instruction "eats" the first instruction of the target function.
             if (current in functionEntryBlocks && current != entryBlock) {
-                continue
+                // Check if we got here via a BIT skip from a block already in this function
+                val arrivedViaBitSkip = functionBlocks.any { block ->
+                    blockEndsWith2c(block) && block.fallThroughExit == current
+                }
+                if (!arrivedViaBitSkip) {
+                    continue
+                }
+            }
+
+            // by Claude - Check if we arrived via a BIT skip pattern from any block in this function
+            // This applies to ALL blocks, not just function entries
+            // The skip is recorded per-function so that a block can have different behavior
+            // when decompiled as part of different functions
+            val arrivedViaBitSkip = functionBlocks.any { block ->
+                blockEndsWith2c(block) && block.fallThroughExit == current
+            }
+            if (arrivedViaBitSkip) {
+                // Mark this block to skip its first instruction for THIS function only
+                // because the BIT instruction "eats" the next 2 bytes (first instruction)
+                current.skipFirstInstructionForFunctions.add(function)
             }
 
             functionBlocks.add(current)

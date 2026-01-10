@@ -930,10 +930,10 @@ OperModeExecutionTree:
 LDA OperMode         ; this is the heart of the entire program,
 JSR JumpEngine         ; most of what goes on starts here
 
-DATA: Expr(expr=TitleScreenMode)
-DATA: Expr(expr=GameMode)
-DATA: Expr(expr=VictoryMode)
-DATA: Expr(expr=GameOverMode)
+DATA: Expr(expr=TitleScreenMode), Expr(expr=)
+DATA: Expr(expr=GameMode), Expr(expr=)
+DATA: Expr(expr=VictoryMode), Expr(expr=)
+DATA: Expr(expr=GameOverMode), Expr(expr=)
 
          ; -------------------------------------------------------------------------------------
 
@@ -958,10 +958,10 @@ TitleScreenMode:
 LDA OperMode_Task
 JSR JumpEngine
 
-DATA: Expr(expr=InitializeGame)
-DATA: Expr(expr=ScreenRoutines)
-DATA: Expr(expr=PrimaryGameSetup)
-DATA: Expr(expr=GameMenuRoutine)
+DATA: Expr(expr=InitializeGame), Expr(expr=)
+DATA: Expr(expr=ScreenRoutines), Expr(expr=)
+DATA: Expr(expr=PrimaryGameSetup), Expr(expr=)
+DATA: Expr(expr=GameMenuRoutine), Expr(expr=)
 
          ; -------------------------------------------------------------------------------------
 
@@ -1123,11 +1123,11 @@ VictoryModeSubroutines:
 LDA OperMode_Task
 JSR JumpEngine
 
-DATA: Expr(expr=BridgeCollapse)
-DATA: Expr(expr=SetupVictoryMode)
-DATA: Expr(expr=PlayerVictoryWalk)
-DATA: Expr(expr=PrintVictoryMessages)
-DATA: Expr(expr=PlayerEndWorld)
+DATA: Expr(expr=BridgeCollapse), Expr(expr=)
+DATA: Expr(expr=SetupVictoryMode), Expr(expr=)
+DATA: Expr(expr=PlayerVictoryWalk), Expr(expr=)
+DATA: Expr(expr=PrintVictoryMessages), Expr(expr=)
+DATA: Expr(expr=PlayerEndWorld), Expr(expr=)
 
          ; -------------------------------------------------------------------------------------
 
@@ -1362,21 +1362,21 @@ ScreenRoutines:
 LDA ScreenRoutineTask         ; run one of the following subroutines
 JSR JumpEngine
 
-DATA: Expr(expr=InitScreen)
-DATA: Expr(expr=SetupIntermediate)
-DATA: Expr(expr=WriteTopStatusLine)
-DATA: Expr(expr=WriteBottomStatusLine)
-DATA: Expr(expr=DisplayTimeUp)
-DATA: Expr(expr=ResetSpritesAndScreenTimer)
-DATA: Expr(expr=DisplayIntermediate)
-DATA: Expr(expr=ResetSpritesAndScreenTimer)
-DATA: Expr(expr=AreaParserTaskControl)
-DATA: Expr(expr=GetAreaPalette)
-DATA: Expr(expr=GetBackgroundColor)
-DATA: Expr(expr=GetAlternatePalette1)
-DATA: Expr(expr=DrawTitleScreen)
-DATA: Expr(expr=ClearBuffersDrawIcon)
-DATA: Expr(expr=WriteTopScore)
+DATA: Expr(expr=InitScreen), Expr(expr=)
+DATA: Expr(expr=SetupIntermediate), Expr(expr=)
+DATA: Expr(expr=WriteTopStatusLine), Expr(expr=)
+DATA: Expr(expr=WriteBottomStatusLine), Expr(expr=)
+DATA: Expr(expr=DisplayTimeUp), Expr(expr=)
+DATA: Expr(expr=ResetSpritesAndScreenTimer), Expr(expr=)
+DATA: Expr(expr=DisplayIntermediate), Expr(expr=)
+DATA: Expr(expr=ResetSpritesAndScreenTimer), Expr(expr=)
+DATA: Expr(expr=AreaParserTaskControl), Expr(expr=)
+DATA: Expr(expr=GetAreaPalette), Expr(expr=)
+DATA: Expr(expr=GetBackgroundColor), Expr(expr=)
+DATA: Expr(expr=GetAlternatePalette1), Expr(expr=)
+DATA: Expr(expr=DrawTitleScreen), Expr(expr=)
+DATA: Expr(expr=ClearBuffersDrawIcon), Expr(expr=)
+DATA: Expr(expr=WriteTopScore), Expr(expr=)
 
          ; -------------------------------------------------------------------------------------
 
@@ -1587,9 +1587,9 @@ RTS
 DrawTitleScreen:  
 LDA OperMode         ; are we in title screen mode?
 BNE IncModeTask_B         ; if not, exit
-LDA          ; load address $1ec0 into
+LDA #>TitleScreenDataOffset         ; load address $1ec0 into
 STA PPU_ADDRESS         ; the vram address register
-LDA 
+LDA #<TitleScreenDataOffset
 STA PPU_ADDRESS
 LDA #$03         ; put address $0300 into
 STA $01         ; the indirect at $00
@@ -2645,7 +2645,9 @@ Sprite0Data:
 DATA: ByteValue(value=24), ByteValue(value=255), ByteValue(value=35), ByteValue(value=88)
 
          ; -------------------------------------------------------------------------------------
-
+         ; @FRAMES_CONSUMED: 3
+         ; This routine takes ~68,250 cycles (about 3 frames worth). When called during NMI,
+         ; the next 2 frames will not receive NMI (frames are consumed without input).
 InitializeGame:  
 LDY #$6f         ; clear all memory as in initialization procedure,
 JSR InitializeMemory         ; but this time, clear only as far as $076f
@@ -2657,6 +2659,9 @@ LDA #$18         ; set demo timer
 STA DemoTimer
 JSR LoadAreaPointer
 
+         ; @FRAMES_CONSUMED: 2
+         ; This routine takes ~34,700 cycles (about 2 frames worth). When called during NMI,
+         ; the next frame will not receive NMI (frame is consumed without input).
 InitializeArea:  
 LDY #$4b         ; clear all memory again, only as far as $074b
 JSR InitializeMemory         ; this is only necessary if branching from
@@ -2947,9 +2952,9 @@ GameOverMode:
 LDA OperMode_Task
 JSR JumpEngine
 
-DATA: Expr(expr=SetupGameOver)
-DATA: Expr(expr=ScreenRoutines)
-DATA: Expr(expr=RunGameOver)
+DATA: Expr(expr=SetupGameOver), Expr(expr=)
+DATA: Expr(expr=ScreenRoutines), Expr(expr=)
+DATA: Expr(expr=RunGameOver), Expr(expr=)
 
          ; -------------------------------------------------------------------------------------
 
@@ -3048,14 +3053,14 @@ SkipATRender:  RTS
 AreaParserTasks:  
 JSR JumpEngine
 
-DATA: Expr(expr=IncrementColumnPos)
-DATA: Expr(expr=RenderAreaGraphics)
-DATA: Expr(expr=RenderAreaGraphics)
-DATA: Expr(expr=AreaParserCore)
-DATA: Expr(expr=IncrementColumnPos)
-DATA: Expr(expr=RenderAreaGraphics)
-DATA: Expr(expr=RenderAreaGraphics)
-DATA: Expr(expr=AreaParserCore)
+DATA: Expr(expr=IncrementColumnPos), Expr(expr=)
+DATA: Expr(expr=RenderAreaGraphics), Expr(expr=)
+DATA: Expr(expr=RenderAreaGraphics), Expr(expr=)
+DATA: Expr(expr=AreaParserCore), Expr(expr=)
+DATA: Expr(expr=IncrementColumnPos), Expr(expr=)
+DATA: Expr(expr=RenderAreaGraphics), Expr(expr=)
+DATA: Expr(expr=RenderAreaGraphics), Expr(expr=)
+DATA: Expr(expr=AreaParserCore), Expr(expr=)
 
          ; -------------------------------------------------------------------------------------
 
@@ -3470,63 +3475,63 @@ ADC $07
 JSR JumpEngine
 
          ; large objects (rows $00-$0b or 00-11, d6-d4 set)
-DATA: Expr(expr=VerticalPipe)         ; used by warp pipes
-DATA: Expr(expr=AreaStyleObject)
-DATA: Expr(expr=RowOfBricks)
-DATA: Expr(expr=RowOfSolidBlocks)
-DATA: Expr(expr=RowOfCoins)
-DATA: Expr(expr=ColumnOfBricks)
-DATA: Expr(expr=ColumnOfSolidBlocks)
-DATA: Expr(expr=VerticalPipe)         ; used by decoration pipes
+DATA: Expr(expr=VerticalPipe), Expr(expr=)         ; used by warp pipes
+DATA: Expr(expr=AreaStyleObject), Expr(expr=)
+DATA: Expr(expr=RowOfBricks), Expr(expr=)
+DATA: Expr(expr=RowOfSolidBlocks), Expr(expr=)
+DATA: Expr(expr=RowOfCoins), Expr(expr=)
+DATA: Expr(expr=ColumnOfBricks), Expr(expr=)
+DATA: Expr(expr=ColumnOfSolidBlocks), Expr(expr=)
+DATA: Expr(expr=VerticalPipe), Expr(expr=)         ; used by decoration pipes
 
          ; objects for special row $0c or 12
-DATA: Expr(expr=Hole_Empty)
-DATA: Expr(expr=PulleyRopeObject)
-DATA: Expr(expr=Bridge_High)
-DATA: Expr(expr=Bridge_Middle)
-DATA: Expr(expr=Bridge_Low)
-DATA: Expr(expr=Hole_Water)
-DATA: Expr(expr=QuestionBlockRow_High)
-DATA: Expr(expr=QuestionBlockRow_Low)
+DATA: Expr(expr=Hole_Empty), Expr(expr=)
+DATA: Expr(expr=PulleyRopeObject), Expr(expr=)
+DATA: Expr(expr=Bridge_High), Expr(expr=)
+DATA: Expr(expr=Bridge_Middle), Expr(expr=)
+DATA: Expr(expr=Bridge_Low), Expr(expr=)
+DATA: Expr(expr=Hole_Water), Expr(expr=)
+DATA: Expr(expr=QuestionBlockRow_High), Expr(expr=)
+DATA: Expr(expr=QuestionBlockRow_Low), Expr(expr=)
 
          ; objects for special row $0f or 15
-DATA: Expr(expr=EndlessRope)
-DATA: Expr(expr=BalancePlatRope)
-DATA: Expr(expr=CastleObject)
-DATA: Expr(expr=StaircaseObject)
-DATA: Expr(expr=ExitPipe)
-DATA: Expr(expr=FlagBalls_Residual)
+DATA: Expr(expr=EndlessRope), Expr(expr=)
+DATA: Expr(expr=BalancePlatRope), Expr(expr=)
+DATA: Expr(expr=CastleObject), Expr(expr=)
+DATA: Expr(expr=StaircaseObject), Expr(expr=)
+DATA: Expr(expr=ExitPipe), Expr(expr=)
+DATA: Expr(expr=FlagBalls_Residual), Expr(expr=)
 
          ; small objects (rows $00-$0b or 00-11, d6-d4 all clear)
-DATA: Expr(expr=QuestionBlock)         ; power-up
-DATA: Expr(expr=QuestionBlock)         ; coin
-DATA: Expr(expr=QuestionBlock)         ; hidden, coin
-DATA: Expr(expr=Hidden1UpBlock)         ; hidden, 1-up
-DATA: Expr(expr=BrickWithItem)         ; brick, power-up
-DATA: Expr(expr=BrickWithItem)         ; brick, vine
-DATA: Expr(expr=BrickWithItem)         ; brick, star
-DATA: Expr(expr=BrickWithCoins)         ; brick, coins
-DATA: Expr(expr=BrickWithItem)         ; brick, 1-up
-DATA: Expr(expr=WaterPipe)
-DATA: Expr(expr=EmptyBlock)
-DATA: Expr(expr=Jumpspring)
+DATA: Expr(expr=QuestionBlock), Expr(expr=)         ; power-up
+DATA: Expr(expr=QuestionBlock), Expr(expr=)         ; coin
+DATA: Expr(expr=QuestionBlock), Expr(expr=)         ; hidden, coin
+DATA: Expr(expr=Hidden1UpBlock), Expr(expr=)         ; hidden, 1-up
+DATA: Expr(expr=BrickWithItem), Expr(expr=)         ; brick, power-up
+DATA: Expr(expr=BrickWithItem), Expr(expr=)         ; brick, vine
+DATA: Expr(expr=BrickWithItem), Expr(expr=)         ; brick, star
+DATA: Expr(expr=BrickWithCoins), Expr(expr=)         ; brick, coins
+DATA: Expr(expr=BrickWithItem), Expr(expr=)         ; brick, 1-up
+DATA: Expr(expr=WaterPipe), Expr(expr=)
+DATA: Expr(expr=EmptyBlock), Expr(expr=)
+DATA: Expr(expr=Jumpspring), Expr(expr=)
 
          ; objects for special row $0d or 13 (d6 set)
-DATA: Expr(expr=IntroPipe)
-DATA: Expr(expr=FlagpoleObject)
-DATA: Expr(expr=AxeObj)
-DATA: Expr(expr=ChainObj)
-DATA: Expr(expr=CastleBridgeObj)
-DATA: Expr(expr=ScrollLockObject_Warp)
-DATA: Expr(expr=ScrollLockObject)
-DATA: Expr(expr=ScrollLockObject)
-DATA: Expr(expr=AreaFrenzy)         ; flying cheep-cheeps
-DATA: Expr(expr=AreaFrenzy)         ; bullet bills or swimming cheep-cheeps
-DATA: Expr(expr=AreaFrenzy)         ; stop frenzy
-DATA: Expr(expr=LoopCmdE)
+DATA: Expr(expr=IntroPipe), Expr(expr=)
+DATA: Expr(expr=FlagpoleObject), Expr(expr=)
+DATA: Expr(expr=AxeObj), Expr(expr=)
+DATA: Expr(expr=ChainObj), Expr(expr=)
+DATA: Expr(expr=CastleBridgeObj), Expr(expr=)
+DATA: Expr(expr=ScrollLockObject_Warp), Expr(expr=)
+DATA: Expr(expr=ScrollLockObject), Expr(expr=)
+DATA: Expr(expr=ScrollLockObject), Expr(expr=)
+DATA: Expr(expr=AreaFrenzy), Expr(expr=)         ; flying cheep-cheeps
+DATA: Expr(expr=AreaFrenzy), Expr(expr=)         ; bullet bills or swimming cheep-cheeps
+DATA: Expr(expr=AreaFrenzy), Expr(expr=)         ; stop frenzy
+DATA: Expr(expr=LoopCmdE), Expr(expr=)
 
          ; object for special row $0e or 14
-DATA: Expr(expr=AlterAreaAttributes)
+DATA: Expr(expr=AlterAreaAttributes), Expr(expr=)
 
          ; -------------------------------------------------------------------------------------
          ; (these apply to all area object subroutines in this section unless otherwise stated)
@@ -3621,9 +3626,9 @@ RTS
 AreaStyleObject:  
 LDA AreaStyle         ; load level object style and jump to the right sub
 JSR JumpEngine
-DATA: Expr(expr=TreeLedge)         ; also used for cloud type levels
-DATA: Expr(expr=MushroomLedge)
-DATA: Expr(expr=BulletBillCannon)
+DATA: Expr(expr=TreeLedge), Expr(expr=)         ; also used for cloud type levels
+DATA: Expr(expr=MushroomLedge), Expr(expr=)
+DATA: Expr(expr=BulletBillCannon), Expr(expr=)
 
 TreeLedge:  
 JSR GetLrgObjAttrib         ; get row and length of green ledge
@@ -5291,10 +5296,10 @@ GameMode:
 LDA OperMode_Task
 JSR JumpEngine
 
-DATA: Expr(expr=InitializeArea)
-DATA: Expr(expr=ScreenRoutines)
-DATA: Expr(expr=SecondaryGameSetup)
-DATA: Expr(expr=GameCoreRoutine)
+DATA: Expr(expr=InitializeArea), Expr(expr=)
+DATA: Expr(expr=ScreenRoutines), Expr(expr=)
+DATA: Expr(expr=SecondaryGameSetup), Expr(expr=)
+DATA: Expr(expr=GameCoreRoutine), Expr(expr=)
 
          ; -------------------------------------------------------------------------------------
 
@@ -5475,19 +5480,19 @@ GameRoutines:
 LDA GameEngineSubroutine         ; run routine based on number (a few of these routines are
 JSR JumpEngine         ; merely placeholders as conditions for other routines)
 
-DATA: Expr(expr=Entrance_GameTimerSetup)
-DATA: Expr(expr=Vine_AutoClimb)
-DATA: Expr(expr=SideExitPipeEntry)
-DATA: Expr(expr=VerticalPipeEntry)
-DATA: Expr(expr=FlagpoleSlide)
-DATA: Expr(expr=PlayerEndLevel)
-DATA: Expr(expr=PlayerLoseLife)
-DATA: Expr(expr=PlayerEntrance)
-DATA: Expr(expr=PlayerCtrlRoutine)
-DATA: Expr(expr=PlayerChangeSize)
-DATA: Expr(expr=PlayerInjuryBlink)
-DATA: Expr(expr=PlayerDeath)
-DATA: Expr(expr=PlayerFireFlower)
+DATA: Expr(expr=Entrance_GameTimerSetup), Expr(expr=)
+DATA: Expr(expr=Vine_AutoClimb), Expr(expr=)
+DATA: Expr(expr=SideExitPipeEntry), Expr(expr=)
+DATA: Expr(expr=VerticalPipeEntry), Expr(expr=)
+DATA: Expr(expr=FlagpoleSlide), Expr(expr=)
+DATA: Expr(expr=PlayerEndLevel), Expr(expr=)
+DATA: Expr(expr=PlayerLoseLife), Expr(expr=)
+DATA: Expr(expr=PlayerEntrance), Expr(expr=)
+DATA: Expr(expr=PlayerCtrlRoutine), Expr(expr=)
+DATA: Expr(expr=PlayerChangeSize), Expr(expr=)
+DATA: Expr(expr=PlayerInjuryBlink), Expr(expr=)
+DATA: Expr(expr=PlayerDeath), Expr(expr=)
+DATA: Expr(expr=PlayerFireFlower), Expr(expr=)
 
          ; -------------------------------------------------------------------------------------
 
@@ -5890,10 +5895,10 @@ LDY #$18
 STY ClimbSideTimer         ; otherwise reset timer now
 MoveSubs:  JSR JumpEngine
 
-DATA: Expr(expr=OnGroundStateSub)
-DATA: Expr(expr=JumpSwimSub)
-DATA: Expr(expr=FallingSub)
-DATA: Expr(expr=ClimbingSub)
+DATA: Expr(expr=OnGroundStateSub), Expr(expr=)
+DATA: Expr(expr=JumpSwimSub), Expr(expr=)
+DATA: Expr(expr=FallingSub), Expr(expr=)
+DATA: Expr(expr=ClimbingSub), Expr(expr=)
 
 NoMoveSub:  RTS 
 
@@ -7323,15 +7328,15 @@ BCC BlockCode         ; branch to use current number
 SBC #$05         ; otherwise subtract 5 for second set to get proper number
 BlockCode:  JSR JumpEngine         ; run appropriate subroutine depending on block number
 
-DATA: Expr(expr=MushFlowerBlock)
-DATA: Expr(expr=CoinBlock)
-DATA: Expr(expr=CoinBlock)
-DATA: Expr(expr=ExtraLifeMushBlock)
-DATA: Expr(expr=MushFlowerBlock)
-DATA: Expr(expr=VineBlock)
-DATA: Expr(expr=StarBlock)
-DATA: Expr(expr=CoinBlock)
-DATA: Expr(expr=ExtraLifeMushBlock)
+DATA: Expr(expr=MushFlowerBlock), Expr(expr=)
+DATA: Expr(expr=CoinBlock), Expr(expr=)
+DATA: Expr(expr=CoinBlock), Expr(expr=)
+DATA: Expr(expr=ExtraLifeMushBlock), Expr(expr=)
+DATA: Expr(expr=MushFlowerBlock), Expr(expr=)
+DATA: Expr(expr=VineBlock), Expr(expr=)
+DATA: Expr(expr=StarBlock), Expr(expr=)
+DATA: Expr(expr=CoinBlock), Expr(expr=)
+DATA: Expr(expr=ExtraLifeMushBlock), Expr(expr=)
 
          ; --------------------------------
 
@@ -8069,64 +8074,64 @@ JSR JumpEngine
 
          ; jump engine table for newly loaded enemy objects
 
-DATA: Expr(expr=InitNormalEnemy)         ; for objects $00-$0f
-DATA: Expr(expr=InitNormalEnemy)
-DATA: Expr(expr=InitNormalEnemy)
-DATA: Expr(expr=InitRedKoopa)
-DATA: Expr(expr=NoInitCode)
-DATA: Expr(expr=InitHammerBro)
-DATA: Expr(expr=InitGoomba)
-DATA: Expr(expr=InitBloober)
-DATA: Expr(expr=InitBulletBill)
-DATA: Expr(expr=NoInitCode)
-DATA: Expr(expr=InitCheepCheep)
-DATA: Expr(expr=InitCheepCheep)
-DATA: Expr(expr=InitPodoboo)
-DATA: Expr(expr=InitPiranhaPlant)
-DATA: Expr(expr=InitJumpGPTroopa)
-DATA: Expr(expr=InitRedPTroopa)
+DATA: Expr(expr=InitNormalEnemy), Expr(expr=)         ; for objects $00-$0f
+DATA: Expr(expr=InitNormalEnemy), Expr(expr=)
+DATA: Expr(expr=InitNormalEnemy), Expr(expr=)
+DATA: Expr(expr=InitRedKoopa), Expr(expr=)
+DATA: Expr(expr=NoInitCode), Expr(expr=)
+DATA: Expr(expr=InitHammerBro), Expr(expr=)
+DATA: Expr(expr=InitGoomba), Expr(expr=)
+DATA: Expr(expr=InitBloober), Expr(expr=)
+DATA: Expr(expr=InitBulletBill), Expr(expr=)
+DATA: Expr(expr=NoInitCode), Expr(expr=)
+DATA: Expr(expr=InitCheepCheep), Expr(expr=)
+DATA: Expr(expr=InitCheepCheep), Expr(expr=)
+DATA: Expr(expr=InitPodoboo), Expr(expr=)
+DATA: Expr(expr=InitPiranhaPlant), Expr(expr=)
+DATA: Expr(expr=InitJumpGPTroopa), Expr(expr=)
+DATA: Expr(expr=InitRedPTroopa), Expr(expr=)
 
-DATA: Expr(expr=InitHorizFlySwimEnemy)         ; for objects $10-$1f
-DATA: Expr(expr=InitLakitu)
-DATA: Expr(expr=InitEnemyFrenzy)
-DATA: Expr(expr=NoInitCode)
-DATA: Expr(expr=InitEnemyFrenzy)
-DATA: Expr(expr=InitEnemyFrenzy)
-DATA: Expr(expr=InitEnemyFrenzy)
-DATA: Expr(expr=InitEnemyFrenzy)
-DATA: Expr(expr=EndFrenzy)
-DATA: Expr(expr=NoInitCode)
-DATA: Expr(expr=NoInitCode)
-DATA: Expr(expr=InitShortFirebar)
-DATA: Expr(expr=InitShortFirebar)
-DATA: Expr(expr=InitShortFirebar)
-DATA: Expr(expr=InitShortFirebar)
-DATA: Expr(expr=InitLongFirebar)
+DATA: Expr(expr=InitHorizFlySwimEnemy), Expr(expr=)         ; for objects $10-$1f
+DATA: Expr(expr=InitLakitu), Expr(expr=)
+DATA: Expr(expr=InitEnemyFrenzy), Expr(expr=)
+DATA: Expr(expr=NoInitCode), Expr(expr=)
+DATA: Expr(expr=InitEnemyFrenzy), Expr(expr=)
+DATA: Expr(expr=InitEnemyFrenzy), Expr(expr=)
+DATA: Expr(expr=InitEnemyFrenzy), Expr(expr=)
+DATA: Expr(expr=InitEnemyFrenzy), Expr(expr=)
+DATA: Expr(expr=EndFrenzy), Expr(expr=)
+DATA: Expr(expr=NoInitCode), Expr(expr=)
+DATA: Expr(expr=NoInitCode), Expr(expr=)
+DATA: Expr(expr=InitShortFirebar), Expr(expr=)
+DATA: Expr(expr=InitShortFirebar), Expr(expr=)
+DATA: Expr(expr=InitShortFirebar), Expr(expr=)
+DATA: Expr(expr=InitShortFirebar), Expr(expr=)
+DATA: Expr(expr=InitLongFirebar), Expr(expr=)
 
-DATA: Expr(expr=NoInitCode)         ; for objects $20-$2f
-DATA: Expr(expr=NoInitCode)
-DATA: Expr(expr=NoInitCode)
-DATA: Expr(expr=NoInitCode)
-DATA: Expr(expr=InitBalPlatform)
-DATA: Expr(expr=InitVertPlatform)
-DATA: Expr(expr=LargeLiftUp)
-DATA: Expr(expr=LargeLiftDown)
-DATA: Expr(expr=InitHoriPlatform)
-DATA: Expr(expr=InitDropPlatform)
-DATA: Expr(expr=InitHoriPlatform)
-DATA: Expr(expr=PlatLiftUp)
-DATA: Expr(expr=PlatLiftDown)
-DATA: Expr(expr=InitBowser)
-DATA: Expr(expr=PwrUpJmp)         ; possibly dummy value
-DATA: Expr(expr=Setup_Vine)
+DATA: Expr(expr=NoInitCode), Expr(expr=)         ; for objects $20-$2f
+DATA: Expr(expr=NoInitCode), Expr(expr=)
+DATA: Expr(expr=NoInitCode), Expr(expr=)
+DATA: Expr(expr=NoInitCode), Expr(expr=)
+DATA: Expr(expr=InitBalPlatform), Expr(expr=)
+DATA: Expr(expr=InitVertPlatform), Expr(expr=)
+DATA: Expr(expr=LargeLiftUp), Expr(expr=)
+DATA: Expr(expr=LargeLiftDown), Expr(expr=)
+DATA: Expr(expr=InitHoriPlatform), Expr(expr=)
+DATA: Expr(expr=InitDropPlatform), Expr(expr=)
+DATA: Expr(expr=InitHoriPlatform), Expr(expr=)
+DATA: Expr(expr=PlatLiftUp), Expr(expr=)
+DATA: Expr(expr=PlatLiftDown), Expr(expr=)
+DATA: Expr(expr=InitBowser), Expr(expr=)
+DATA: Expr(expr=PwrUpJmp), Expr(expr=)         ; possibly dummy value
+DATA: Expr(expr=Setup_Vine), Expr(expr=)
 
-DATA: Expr(expr=NoInitCode)         ; for objects $30-$36
-DATA: Expr(expr=NoInitCode)
-DATA: Expr(expr=NoInitCode)
-DATA: Expr(expr=NoInitCode)
-DATA: Expr(expr=NoInitCode)
-DATA: Expr(expr=InitRetainerObj)
-DATA: Expr(expr=EndOfEnemyInitCode)
+DATA: Expr(expr=NoInitCode), Expr(expr=)         ; for objects $30-$36
+DATA: Expr(expr=NoInitCode), Expr(expr=)
+DATA: Expr(expr=NoInitCode), Expr(expr=)
+DATA: Expr(expr=NoInitCode), Expr(expr=)
+DATA: Expr(expr=NoInitCode), Expr(expr=)
+DATA: Expr(expr=InitRetainerObj), Expr(expr=)
+DATA: Expr(expr=EndOfEnemyInitCode), Expr(expr=)
 
          ; -------------------------------------------------------------------------------------
 
@@ -8835,12 +8840,12 @@ SBC #$12         ; subtract 12 and use as offset for jump engine
 JSR JumpEngine
 
          ; frenzy object jump table
-DATA: Expr(expr=LakituAndSpinyHandler)
-DATA: Expr(expr=NoFrenzyCode)
-DATA: Expr(expr=InitFlyingCheepCheep)
-DATA: Expr(expr=InitBowserFlame)
-DATA: Expr(expr=InitFireworks)
-DATA: Expr(expr=BulletBillCheepCheep)
+DATA: Expr(expr=LakituAndSpinyHandler), Expr(expr=)
+DATA: Expr(expr=NoFrenzyCode), Expr(expr=)
+DATA: Expr(expr=InitFlyingCheepCheep), Expr(expr=)
+DATA: Expr(expr=InitBowserFlame), Expr(expr=)
+DATA: Expr(expr=InitFireworks), Expr(expr=)
+DATA: Expr(expr=BulletBillCheepCheep), Expr(expr=)
 
          ; --------------------------------
 
@@ -9012,43 +9017,43 @@ TYA          ; otherwise subtract $14 from the value and use
 SBC #$14         ; as value for jump engine
 JmpEO:  JSR JumpEngine
 
-DATA: Expr(expr=RunNormalEnemies)         ; for objects $00-$14
+DATA: Expr(expr=RunNormalEnemies), Expr(expr=)         ; for objects $00-$14
 
-DATA: Expr(expr=RunBowserFlame)         ; for objects $15-$1f
-DATA: Expr(expr=RunFireworks)
-DATA: Expr(expr=NoRunCode)
-DATA: Expr(expr=NoRunCode)
-DATA: Expr(expr=NoRunCode)
-DATA: Expr(expr=NoRunCode)
-DATA: Expr(expr=RunFirebarObj)
-DATA: Expr(expr=RunFirebarObj)
-DATA: Expr(expr=RunFirebarObj)
-DATA: Expr(expr=RunFirebarObj)
-DATA: Expr(expr=RunFirebarObj)
+DATA: Expr(expr=RunBowserFlame), Expr(expr=)         ; for objects $15-$1f
+DATA: Expr(expr=RunFireworks), Expr(expr=)
+DATA: Expr(expr=NoRunCode), Expr(expr=)
+DATA: Expr(expr=NoRunCode), Expr(expr=)
+DATA: Expr(expr=NoRunCode), Expr(expr=)
+DATA: Expr(expr=NoRunCode), Expr(expr=)
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)
 
-DATA: Expr(expr=RunFirebarObj)         ; for objects $20-$2f
-DATA: Expr(expr=RunFirebarObj)
-DATA: Expr(expr=RunFirebarObj)
-DATA: Expr(expr=NoRunCode)
-DATA: Expr(expr=RunLargePlatform)
-DATA: Expr(expr=RunLargePlatform)
-DATA: Expr(expr=RunLargePlatform)
-DATA: Expr(expr=RunLargePlatform)
-DATA: Expr(expr=RunLargePlatform)
-DATA: Expr(expr=RunLargePlatform)
-DATA: Expr(expr=RunLargePlatform)
-DATA: Expr(expr=RunSmallPlatform)
-DATA: Expr(expr=RunSmallPlatform)
-DATA: Expr(expr=RunBowser)
-DATA: Expr(expr=PowerUpObjHandler)
-DATA: Expr(expr=VineObjectHandler)
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)         ; for objects $20-$2f
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)
+DATA: Expr(expr=RunFirebarObj), Expr(expr=)
+DATA: Expr(expr=NoRunCode), Expr(expr=)
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)
+DATA: Expr(expr=RunLargePlatform), Expr(expr=)
+DATA: Expr(expr=RunSmallPlatform), Expr(expr=)
+DATA: Expr(expr=RunSmallPlatform), Expr(expr=)
+DATA: Expr(expr=RunBowser), Expr(expr=)
+DATA: Expr(expr=PowerUpObjHandler), Expr(expr=)
+DATA: Expr(expr=VineObjectHandler), Expr(expr=)
 
-DATA: Expr(expr=NoRunCode)         ; for objects $30-$35
-DATA: Expr(expr=RunStarFlagObj)
-DATA: Expr(expr=JumpspringHandler)
-DATA: Expr(expr=NoRunCode)
-DATA: Expr(expr=WarpZoneObject)
-DATA: Expr(expr=RunRetainerObj)
+DATA: Expr(expr=NoRunCode), Expr(expr=)         ; for objects $30-$35
+DATA: Expr(expr=RunStarFlagObj), Expr(expr=)
+DATA: Expr(expr=JumpspringHandler), Expr(expr=)
+DATA: Expr(expr=NoRunCode), Expr(expr=)
+DATA: Expr(expr=WarpZoneObject), Expr(expr=)
+DATA: Expr(expr=RunRetainerObj), Expr(expr=)
 
          ; --------------------------------
 
@@ -9083,27 +9088,27 @@ EnemyMovementSubs:
 LDA Enemy_ID,X
 JSR JumpEngine
 
-DATA: Expr(expr=MoveNormalEnemy)         ; only objects $00-$14 use this table
-DATA: Expr(expr=MoveNormalEnemy)
-DATA: Expr(expr=MoveNormalEnemy)
-DATA: Expr(expr=MoveNormalEnemy)
-DATA: Expr(expr=MoveNormalEnemy)
-DATA: Expr(expr=ProcHammerBro)
-DATA: Expr(expr=MoveNormalEnemy)
-DATA: Expr(expr=MoveBloober)
-DATA: Expr(expr=MoveBulletBill)
-DATA: Expr(expr=NoMoveCode)
-DATA: Expr(expr=MoveSwimmingCheepCheep)
-DATA: Expr(expr=MoveSwimmingCheepCheep)
-DATA: Expr(expr=MovePodoboo)
-DATA: Expr(expr=MovePiranhaPlant)
-DATA: Expr(expr=MoveJumpingEnemy)
-DATA: Expr(expr=ProcMoveRedPTroopa)
-DATA: Expr(expr=MoveFlyGreenPTroopa)
-DATA: Expr(expr=MoveLakitu)
-DATA: Expr(expr=MoveNormalEnemy)
-DATA: Expr(expr=NoMoveCode)         ; dummy
-DATA: Expr(expr=MoveFlyingCheepCheep)
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)         ; only objects $00-$14 use this table
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)
+DATA: Expr(expr=ProcHammerBro), Expr(expr=)
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)
+DATA: Expr(expr=MoveBloober), Expr(expr=)
+DATA: Expr(expr=MoveBulletBill), Expr(expr=)
+DATA: Expr(expr=NoMoveCode), Expr(expr=)
+DATA: Expr(expr=MoveSwimmingCheepCheep), Expr(expr=)
+DATA: Expr(expr=MoveSwimmingCheepCheep), Expr(expr=)
+DATA: Expr(expr=MovePodoboo), Expr(expr=)
+DATA: Expr(expr=MovePiranhaPlant), Expr(expr=)
+DATA: Expr(expr=MoveJumpingEnemy), Expr(expr=)
+DATA: Expr(expr=ProcMoveRedPTroopa), Expr(expr=)
+DATA: Expr(expr=MoveFlyGreenPTroopa), Expr(expr=)
+DATA: Expr(expr=MoveLakitu), Expr(expr=)
+DATA: Expr(expr=MoveNormalEnemy), Expr(expr=)
+DATA: Expr(expr=NoMoveCode), Expr(expr=)         ; dummy
+DATA: Expr(expr=MoveFlyingCheepCheep), Expr(expr=)
 
          ; --------------------------------
 
@@ -9160,13 +9165,13 @@ SEC
 SBC #$24
 JSR JumpEngine
 
-DATA: Expr(expr=BalancePlatform)         ; table used by objects $24-$2a
-DATA: Expr(expr=YMovingPlatform)
-DATA: Expr(expr=MoveLargeLiftPlat)
-DATA: Expr(expr=MoveLargeLiftPlat)
-DATA: Expr(expr=XMovingPlatform)
-DATA: Expr(expr=DropPlatform)
-DATA: Expr(expr=RightPlatform)
+DATA: Expr(expr=BalancePlatform), Expr(expr=)         ; table used by objects $24-$2a
+DATA: Expr(expr=YMovingPlatform), Expr(expr=)
+DATA: Expr(expr=MoveLargeLiftPlat), Expr(expr=)
+DATA: Expr(expr=MoveLargeLiftPlat), Expr(expr=)
+DATA: Expr(expr=XMovingPlatform), Expr(expr=)
+DATA: Expr(expr=DropPlatform), Expr(expr=)
+DATA: Expr(expr=RightPlatform), Expr(expr=)
 
          ; -------------------------------------------------------------------------------------
 
@@ -10457,11 +10462,11 @@ CMP #$05         ; if greater than 5, branch to exit
 BCS StarFlagExit
 JSR JumpEngine         ; otherwise jump to appropriate sub
 
-DATA: Expr(expr=StarFlagExit)
-DATA: Expr(expr=GameTimerFireworks)
-DATA: Expr(expr=AwardGameTimerPoints)
-DATA: Expr(expr=RaiseFlagSetoffFWorks)
-DATA: Expr(expr=DelayToAreaEnd)
+DATA: Expr(expr=StarFlagExit), Expr(expr=)
+DATA: Expr(expr=GameTimerFireworks), Expr(expr=)
+DATA: Expr(expr=AwardGameTimerPoints), Expr(expr=)
+DATA: Expr(expr=RaiseFlagSetoffFWorks), Expr(expr=)
+DATA: Expr(expr=DelayToAreaEnd), Expr(expr=)
 
 GameTimerFireworks:  
 LDY #$05         ; set default state for star flag object
@@ -16347,6 +16352,6 @@ DATA: ByteValue(value=26), ByteValue(value=26), ByteValue(value=28), ByteValue(v
          ; -------------------------------------------------------------------------------------
          ; INTERRUPT VECTORS
 
-DATA: Expr(expr=NonMaskableInterrupt)
-DATA: Expr(expr=Start)
+DATA: Expr(expr=NonMaskableInterrupt), Expr(expr=)
+DATA: Expr(expr=Start), Expr(expr=)
 DATA: ByteValue(value=240), ByteValue(value=255)         ; unused

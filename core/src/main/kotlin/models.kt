@@ -447,6 +447,13 @@ sealed interface AssemblyAddressing {
     data class ConstantReference(val name: String) : Value {
         override fun toString(): String = "#$name"
     }
+    // by Claude - Added to handle #<ConstantName and #>ConstantName patterns
+    data class ConstantReferenceLower(val name: String) : Value {
+        override fun toString(): String = "#<$name"
+    }
+    data class ConstantReferenceUpper(val name: String) : Value {
+        override fun toString(): String = "#>$name"
+    }
 
     data class Direct(val label: String, val offset: Int = 0) : AssemblyAddressing {
         override fun toString(): String = "$label${offset.renderOffset()}"
@@ -494,8 +501,23 @@ sealed interface AssemblyAddressing {
                     nextLetter.isLetter() -> {
                         return ConstantReference(trimmed.substring(1))
                     }
-                    nextLetter == '<' -> parse("#" + trimmed.substring(2))?.let { return ValueLowerSelection(it as? ShortValue ?: return null) }
-                    nextLetter == '>' -> parse("#" + trimmed.substring(2))?.let { return ValueUpperSelection(it as? ShortValue ?: return null) }
+                    // by Claude - Fixed to handle both ShortValue and ConstantReference for hi/lo byte selection
+                    nextLetter == '<' -> {
+                        val inner = parse("#" + trimmed.substring(2)) ?: return null
+                        return when (inner) {
+                            is ShortValue -> ValueLowerSelection(inner)
+                            is ConstantReference -> ConstantReferenceLower(inner.name)
+                            else -> null
+                        }
+                    }
+                    nextLetter == '>' -> {
+                        val inner = parse("#" + trimmed.substring(2)) ?: return null
+                        return when (inner) {
+                            is ShortValue -> ValueUpperSelection(inner)
+                            is ConstantReference -> ConstantReferenceUpper(inner.name)
+                            else -> null
+                        }
+                    }
                     else -> {
                         val radix = Radix.entries.find { it.prefix == nextLetter.toString() } ?: throw IllegalStateException("What am I supposed to do with '$trimmed'?")
                         val digits = trimmed.substring(2)
@@ -505,10 +527,55 @@ sealed interface AssemblyAddressing {
                     }
                 }
             }
+            // by Claude - Helper to parse hex or decimal offset values
+            fun parseOffsetValue(value: String): Int {
+                val trimmed = value.trim()
+                return when {
+                    trimmed.startsWith("$") -> trimmed.substring(1).toInt(16)
+                    trimmed.startsWith("0x", ignoreCase = true) -> trimmed.substring(2).toInt(16)
+                    else -> trimmed.toInt()
+                }
+            }
+
+            // by Claude - Fixed to handle complex offsets like "VRAM_Buffer1-1+$100"
             fun String.parseLabelWithOffset(): Pair<String, Int> {
-                val opIndex = indexOfAny(charArrayOf('+', '-'))
-                if (opIndex < 0) return this to 0
-                return substring(0, opIndex) to substring(opIndex).substringAfter('+').toInt()
+                val firstOpIndex = indexOfAny(charArrayOf('+', '-'))
+                if (firstOpIndex < 0) return this to 0
+
+                val label = substring(0, firstOpIndex)
+                val offsetPart = substring(firstOpIndex)
+
+                // Parse offset expression with multiple components (e.g., "-1+$100")
+                var offset = 0
+                var currentSign = 1
+                var currentNumber = StringBuilder()
+
+                for (char in offsetPart) {
+                    when {
+                        char == '+' -> {
+                            if (currentNumber.isNotEmpty()) {
+                                offset += currentSign * parseOffsetValue(currentNumber.toString())
+                                currentNumber.clear()
+                            }
+                            currentSign = 1
+                        }
+                        char == '-' -> {
+                            if (currentNumber.isNotEmpty()) {
+                                offset += currentSign * parseOffsetValue(currentNumber.toString())
+                                currentNumber.clear()
+                            }
+                            currentSign = -1
+                        }
+                        else -> currentNumber.append(char)
+                    }
+                }
+
+                // Don't forget the last number
+                if (currentNumber.isNotEmpty()) {
+                    offset += currentSign * parseOffsetValue(currentNumber.toString())
+                }
+
+                return label to offset
             }
             if (trimmed.endsWith(",X)", ignoreCase = true)) {
                 val parsed = trimmed.substringAfter('(').substringBefore(',').parseLabelWithOffset()
