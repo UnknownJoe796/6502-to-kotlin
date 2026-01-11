@@ -9,6 +9,7 @@ Generated Kotlin:
 // Decompiled from CheckValue
 fun checkValue() {
     var temp0: Int = 0
+    var temp1: Int = 0
     //> CheckValue:
     //> LDA #$00
     //> BEQ IsZero
@@ -16,11 +17,13 @@ fun checkValue() {
     if (0x00 != 0) {
         //> NotZero:
         //> LDX #$01
+        temp1 = 0x01
         //> RTS
         return
     } else {
         //> IsZero:
         //> LDX #$02
+        temp1 = 0x02
         //> RTS
         return
     }

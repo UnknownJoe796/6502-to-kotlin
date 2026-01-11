@@ -7,39 +7,43 @@ Inputs: X
 Outputs: X
 Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, X, OverflowFlag
 
---- Control Flow Nodes (6 nodes) ---
+--- Control Flow Nodes (7 nodes) ---
 
 [0] BlockNode
-  Block: FloateyNumbersRoutine
-  Lines: 3
-    LDA FloateyNum_Control,X
-    BEQ EndExitOne
+  Block: EndExitOne
+  Lines: 1
+    RTS 
 
-[1] IfNode
+[1] LoopNode
+  Type: LoopNode
+  Body nodes: 2
+  Entry: EndExitOne
+
+[2] IfNode
   Condition block: @1285
   Sense: false
   Then branch: 1 nodes
   Else branch: 0 nodes
 
-[2] IfNode
+[3] IfNode
   Condition block: ChkNumTimer
   Sense: false
   Then branch: 1 nodes
   Else branch: 0 nodes
 
-[3] IfNode
+[4] IfNode
   Condition block: DecNumTimer
   Sense: false
   Then branch: 2 nodes
   Else branch: 0 nodes
 
-[4] IfNode
+[5] IfNode
   Condition block: ChkTallEnemy
   Sense: false
   Then branch: 1 nodes
   Else branch: 0 nodes
 
-[5] IfNode
+[6] IfNode
   Condition block: FloateyPart
   Sense: false
   Then branch: 1 nodes
@@ -204,7 +208,7 @@ Inputs:
 Outputs: 
 Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y
 
---- Control Flow Nodes (5 nodes) ---
+--- Control Flow Nodes (4 nodes) ---
 
 [0] BlockNode
   Block: MusicHandler
@@ -212,27 +216,23 @@ Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y
     LDA EventMusicQueue
     BNE LoadEventMusic
 
-[1] IfNode
-  Condition block: @15617
-  Sense: false
-  Then branch: 2 nodes
-  Else branch: 0 nodes
+[1] BlockNode
+  Block: @15617
+  Lines: 2
+    LDA AreaMusicQueue
+    BNE LoadAreaMusic
 
-[2] IfNode
-  Condition block: LoadAreaMusic
-  Sense: false
-  Then branch: 1 nodes
-  Else branch: 0 nodes
+[2] BlockNode
+  Block: @15619
+  Lines: 3
+    LDA EventMusicBuffer
+    ORA AreaMusicBuffer
+    BNE ContinueMusic
 
 [3] BlockNode
-  Block: NoStop1
+  Block: @15622
   Lines: 1
-    LDY #$10
-
-[4] BlockNode
-  Block: GMLoopB
-  Lines: 2
-    STY GroundMusicHeaderOfs
+    RTS 
 
 --- Blocks Graph ---
 
@@ -911,19 +911,25 @@ Inputs: $00
 Outputs: 
 Clobbers: A, NegativeFlag, ZeroFlag, Y, X, CarryFlag
 
---- Control Flow Nodes (2 nodes) ---
+--- Control Flow Nodes (3 nodes) ---
 
 [0] IfNode
   Condition block: ImpedePlayerMove
   Sense: false
-  Then branch: 1 nodes
+  Then branch: 2 nodes
   Else branch: 0 nodes
 
-[1] IfNode
-  Condition block: RImpd
-  Sense: false
-  Then branch: 1 nodes
-  Else branch: 0 nodes
+[1] BlockNode
+  Block: RImpd
+  Lines: 3
+    LDX #$02
+    CPY #$01
+    BPL ExIPM
+
+[2] BlockNode
+  Block: @12336
+  Lines: 1
+    LDA #$01
 
 --- Blocks Graph ---
 

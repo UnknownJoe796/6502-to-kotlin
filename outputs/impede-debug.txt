@@ -2,7 +2,7 @@ ImpedePlayerMove function:
   Starting block: ImpedePlayerMove
   Starting block line: 12322
 
-Blocks in function (6):
+Blocks in function (5):
   Block: ImpedePlayerMove
     Lines (6):
       ImpedePlayerMove:
@@ -28,34 +28,27 @@ Blocks in function (6):
   Block: @12336
     Lines (1):
       lda #$01                  ;otherwise load A with value to be used here
-  Block: ExIPM
-    Lines (5):
-      ExIPM: txa                       ;invert contents of X
-      eor #$ff
-      and Player_CollisionBits  ;mask out bit that was set here
-      sta Player_CollisionBits  ;store to clear bit
-      rts
 
 Control flow (improveControlFlow):
     - If (block ImpedePlayerMove)
-        Then (1 nodes):
-        - If (block @12328)
-            Then (1 nodes):
-            - Block: @12331
-              Lines: 2
-                lda #$ff                  ;otherwise load A with value to be used later
-                jmp NXSpd                 ;and jump to affect movement
-            Else (1 nodes):
-            - Block: ExIPM
-              Lines: 5
-                ExIPM: txa                       ;invert contents of X
-                eor #$ff
-                and Player_CollisionBits  ;mask out bit that was set here
-    - If (block RImpd)
-        Then (1 nodes):
-        - Block: @12336
-          Lines: 1
-            lda #$01                  ;otherwise load A with value to be used here
+        Then (2 nodes):
+        - Block: @12328
+          Lines: 3
+            inx                       ;return value to X
+            cpy #$00                  ;if player moving to the left,
+            bmi ExIPM                 ;branch to invert bit and leave
+        - Block: @12331
+          Lines: 2
+            lda #$ff                  ;otherwise load A with value to be used later
+            jmp NXSpd                 ;and jump to affect movement
+    - Block: RImpd
+      Lines: 3
+        RImpd: ldx #$02                  ;return $02 to X
+        cpy #$01                  ;if player moving to the right,
+        bpl ExIPM                 ;branch to invert bit and leave
+    - Block: @12336
+      Lines: 1
+        lda #$01                  ;otherwise load A with value to be used here
 
 Generated Kotlin:
 // Decompiled from ImpedePlayerMove
@@ -63,49 +56,41 @@ fun impedePlayerMove() {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
-    var temp3: Int = 0
-    var temp4: Int = 0
-    var playerCollisionbits by MemoryByte(Player_CollisionBits)
     var playerXSpeed by MemoryByte(Player_X_Speed)
     //> ImpedePlayerMove:
     //> lda #$00                  ;initialize value here
     //> ldy Player_X_Speed        ;get player's horizontal speed
+    temp0 = playerXSpeed
     //> ldx $00                   ;check value set earlier for
+    temp1 = memory[0x0].toInt()
     //> dex                       ;left side collision
-    temp0 = memory[0x0].toInt()
-    temp0 = (temp0 - 1) and 0xFF
+    temp1 = (temp1 - 1) and 0xFF
     //> bne RImpd                 ;if right side collision, skip this part
-    temp1 = 0x00
-    temp2 = playerXSpeed
-    if (temp0 == 0) {
+    temp2 = 0x00
+    if (temp1 == 0) {
         //> inx                       ;return value to X
-        temp0 = (temp0 + 1) and 0xFF
+        temp1 = (temp1 + 1) and 0xFF
         //> cpy #$00                  ;if player moving to the left,
         //> bmi ExIPM                 ;branch to invert bit and leave
-        if ((temp0 and 0x80) == 0) {
-            //> lda #$ff                  ;otherwise load A with value to be used later
-            temp1 = 0xFF
-            //> jmp NXSpd                 ;and jump to affect movement
-        } else {
-            //> ExIPM: txa                       ;invert contents of X
-            //> eor #$ff
-            temp3 = temp0 xor 0xFF
-            //> and Player_CollisionBits  ;mask out bit that was set here
-            temp4 = temp3 and playerCollisionbits
-            //> sta Player_CollisionBits  ;store to clear bit
-            playerCollisionbits = temp4
-            //> rts
+        if ((temp1 and 0x80) != 0) {
+            //  goto ExIPM
             return
         }
+        //> lda #$ff                  ;otherwise load A with value to be used later
+        temp2 = 0xFF
+        //> jmp NXSpd                 ;and jump to affect movement
     }
     //> RImpd: ldx #$02                  ;return $02 to X
-    temp0 = 0x02
+    temp1 = 0x02
     //> cpy #$01                  ;if player moving to the right,
     //> bpl ExIPM                 ;branch to invert bit and leave
-    if ((temp0 and 0x80) != 0) {
+    if (!((temp1 and 0x80) != 0)) {
+        //  goto ExIPM
+        return
+    } else {
         //> lda #$01                  ;otherwise load A with value to be used here
-        temp1 = 0x01
+        temp2 = 0x01
     }
     // Fall-through tail call to nXSpd
-    nXSpd(temp1, temp0)
+    nXSpd(temp2, temp1)
 }

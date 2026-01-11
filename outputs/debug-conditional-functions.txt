@@ -13,7 +13,7 @@ Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y
   Condition block: CheckPlayerVertical
   Sense: false
   Then branch: 1 nodes
-  Else branch: 0 nodes
+  Else branch: 1 nodes
 
 --- Blocks Graph ---
 
@@ -61,7 +61,7 @@ Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, X, Y
   Condition block: HandlePipeEntry
   Sense: false
   Then branch: 1 nodes
-  Else branch: 0 nodes
+  Else branch: 1 nodes
 
 --- Blocks Graph ---
 
@@ -143,8 +143,8 @@ Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, OverflowFlag, $01, $00, $03, 
 [0] IfNode
   Condition block: OffscreenBoundsCheck
   Sense: false
-  Then branch: 3 nodes
-  Else branch: 0 nodes
+  Then branch: 4 nodes
+  Else branch: 1 nodes
 
 --- Blocks Graph ---
 
@@ -350,7 +350,7 @@ Inputs: $00, X
 Outputs: 
 Clobbers: Y, NegativeFlag, ZeroFlag, A, CarryFlag, OverflowFlag, $00
 
---- Control Flow Nodes (5 nodes) ---
+--- Control Flow Nodes (6 nodes) ---
 
 [0] IfNode
   Condition block: PlayerLakituDiff
@@ -380,6 +380,11 @@ Clobbers: Y, NegativeFlag, ZeroFlag, A, CarryFlag, OverflowFlag, $00
   Type: LoopNode
   Body nodes: 1
   Entry: SPixelLak
+
+[5] BlockNode
+  Block: ExMoveLak
+  Lines: 1
+    RTS 
 
 --- Blocks Graph ---
 

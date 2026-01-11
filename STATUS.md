@@ -310,7 +310,50 @@ do {
 
 **Test**: `core/src/test/kotlin/decompiler/FlagNullificationTest.kt` (6 tests)
 
-### Known Decompilation Bugs to Fix
+### ✅ Fix #9: Transfer Instruction Register Aliasing (2026-01-10)
+**Problem**: When TAY copies a temp variable and the source is later reassigned by LDA, the Y register tracking becomes stale. This caused CPY conditions to check the wrong value.
+
+**Example** - OutputNumbers function:
+```asm
+asl           ; temp2 = shifted value
+tay           ; ctx.registerY = temp2 (KVar reference)
+lda #$20      ; temp2 = 0x20 (overwrites!)
+cpy #$00      ; should check Y (shifted), but used temp2 (0x20)
+```
+
+**Root Cause**: Transfer instructions (TAY, TAX, TXA, TYA) copied KVar references instead of values. When the source variable was later reassigned, the destination register's tracking became stale.
+
+**Fix**: Transfer instructions now materialize the source value into a new immutable variable when the source is a mutable KVar (temp variable). This preserves the snapshot value.
+
+**Files Modified**:
+- `core/src/main/kotlin/instruction-handlers.kt` - Transfer instruction handlers
+
+**Impact**: 6 more tests pass (347/663 vs 353/663 previously). OutputNumbers tests now pass.
+
+### Known Decompilation Bugs to Fix (Updated 2026-01-10)
+
+**Current Status**: 347 out of 663 generated function tests fail.
+
+#### Bug: Function Call Register Output Capture
+Functions called via JSR may set output registers (X, Y, A) that the caller uses later, but the decompiler doesn't capture these outputs.
+
+**Example** - chkLrgObjLength:
+```kotlin
+// WRONG:
+getLrgObjAttrib(X)  // Return value IGNORED!
+chkLrgObjFixedLength(X, Y)  // Y is undefined!
+
+// CORRECT should be:
+val (resultA, resultY) = getLrgObjAttrib(X)
+chkLrgObjFixedLength(X, resultY)
+```
+
+**Affected functions** (at least 10 failures each):
+- chkLrgObjLength, alternateLengthHandler, imposeFriction
+- boundingBoxCore, getMTileAttrib, getEnemyOffscreenBits
+- getYOffscreenBits, miscLoopBack, moveRedPTroopa
+- drawVine, soundEngine, and many others
+
 These functions have test failures - actual mismatches between decompiled Kotlin and 6502:
 - **floateyNumbersRoutine**: 6 failures
 - **soundEngine**: 10 failures

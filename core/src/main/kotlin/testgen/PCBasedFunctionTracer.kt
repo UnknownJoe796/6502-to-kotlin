@@ -250,10 +250,11 @@ class PCBasedFunctionTracer(
         if (addr in 0x2000..0x2007) return  // PPU
         if (addr in 0x4000..0x401F) return  // APU/IO
 
-        // Only record reads at the same call depth as the function entry
-        // This filters out reads from nested function calls
-        val pending = callStack.last()
-        if (callDepth == pending.callDepth && addr !in pending.memoryReads) {
+        // by Claude - Find pending at current call depth, not just last on stack
+        // This fixes issues with JumpEngine-style indirect jumps where orphaned
+        // pendings may remain on the stack at different depths
+        val pending = callStack.lastOrNull { it.callDepth == callDepth } ?: return
+        if (addr !in pending.memoryReads) {
             val value = hookedValue?.toInt() ?: interpreter.memory.readByte(addr).toInt()
             pending.memoryReads[addr] = value
         }
@@ -271,12 +272,11 @@ class PCBasedFunctionTracer(
         if (addr in 0x2000..0x2007) return
         if (addr in 0x4000..0x401F) return
 
-        // Only record writes at the same call depth as the function entry
-        // This filters out writes from nested function calls
-        val pending = callStack.last()
-        if (callDepth == pending.callDepth) {
-            pending.memoryWrites[addr] = value.toInt()
-        }
+        // by Claude - Find pending at current call depth, not just last on stack
+        // This fixes issues with JumpEngine-style indirect jumps where orphaned
+        // pendings may remain on the stack at different depths
+        val pending = callStack.lastOrNull { it.callDepth == callDepth } ?: return
+        pending.memoryWrites[addr] = value.toInt()
     }
 
     // NMI handling

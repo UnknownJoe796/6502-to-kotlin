@@ -149,6 +149,9 @@ class AssemblyFunction(
     var stackSizeChange: Int? = null
 
     var asControls: List<ControlNode>? = null
+
+    // by Claude - All blocks belonging to this function (populated during functionify)
+    var blocks: Set<AssemblyBlock>? = null
 }
 
 /**
@@ -624,7 +627,8 @@ fun List<AssemblyBlock>.functionify(
         }
         function.inputs = inputs
         function.clobbers = defined.toSet()
-        
+        function.blocks = functionBlocks  // by Claude - Store blocks for transitive input analysis
+
         // Analyze function outputs by looping through callers. A state is an output if:
         // - This function can define it, AND
         // - At least one caller reads that state immediately after the call before redefining it.
@@ -671,6 +675,61 @@ fun List<AssemblyBlock>.functionify(
         functions.add(function)
     }
 
+    // by Claude - Step 4: Propagate transitive inputs from JSR calls
+    // When function A calls function B, A inherits B's inputs (unless A already defines them before the call)
+    // Use fixpoint iteration since call chains can be arbitrarily deep
+    val labelToFunction = functions
+        .filter { func -> func.startingBlock.label != null }
+        .associateBy { func -> func.startingBlock.label!! }
+
+    var changed = true
+    var iterations = 0
+    val maxIterations = 100 // Prevent infinite loops in case of cycles
+
+    while (changed && iterations < maxIterations) {
+        changed = false
+        iterations++
+
+        for (func in functions) {
+            val funcBlocks = func.blocks ?: continue
+            val currentInputs = func.inputs?.toMutableSet() ?: mutableSetOf()
+            val definedBeforeCall = mutableSetOf<TrackedAsIo>()
+
+            for (block in funcBlocks) {
+                for (line in block.lines) {
+                    val instr = line.instruction ?: continue
+
+                    // Track what's been defined before each JSR
+                    if (instr.op == AssemblyOp.JSR) {
+                        // Get the called function
+                        val targetLabel = (instr.address as? AssemblyAddressing.Direct)?.label
+                        val calledFunction = if (targetLabel != null) labelToFunction[targetLabel] else null
+
+                        if (calledFunction != null) {
+                            val calleeInputs = calledFunction.inputs ?: emptySet()
+                            // Add callee's inputs to caller's inputs if not already defined
+                            for (input in calleeInputs) {
+                                if (input !in definedBeforeCall && input !in currentInputs) {
+                                    currentInputs.add(input)
+                                    changed = true
+                                }
+                            }
+                        }
+                    }
+
+                    // Update what's defined after this instruction
+                    val addrClass = instr.address?.let { addr -> addr::class }
+                    instr.op.modifies(addrClass)
+                        .mapNotNull { aff -> aff.toTrackedAsIo(instr.address, labelIsVirtualRegister) }
+                        .forEach { state -> definedBeforeCall.add(state) }
+                }
+            }
+
+            if (currentInputs != func.inputs) {
+                func.inputs = currentInputs
+            }
+        }
+    }
 
     return functions
 }

@@ -105,6 +105,25 @@ class CodeGenContext(
 
     fun nextTempVar(): String = "temp${tempVarCounter++}"
 
+    // by Claude - Counter for Pair result variables (uses "pair" prefix to avoid Int hoisting)
+    private var pairVarCounter = 0
+
+    /** Get a unique variable name for storing a Pair result. Uses "pair" prefix to avoid hoisting as Int. */
+    fun nextPairVar(): String = "pair${pairVarCounter++}"
+
+    // by Claude - Counter for register-tracking variables (uses "reg" prefix to avoid hoisting as Int = 0)
+    // These are used when a register needs to be captured into a variable that preserves its current value
+    private var regVarCounter = 0
+
+    /** Get a unique variable name for register tracking. Uses "reg" prefix to avoid hoisting. */
+    fun nextRegVar(): String = "reg${regVarCounter++}"
+
+    // by Claude - Counter for temporary flag variables (used to capture carry before shift operations)
+    private var flagVarCounter = 0
+
+    /** Get a unique variable name for flag tracking. */
+    fun nextFlagVar(): String = "${flagVarCounter++}"
+
     /** Track which blocks have been converted to avoid duplicates */
     val convertedBlocks = mutableSetOf<AssemblyBlock>()
 
@@ -177,28 +196,31 @@ class CodeGenContext(
      * Get or create a function-level variable for a register.
      * Returns the variable name and whether it was newly created.
      */
+    // by Claude - Return the register name directly since A, X, Y are already declared at function start
+    // (either as parameters or as local vars initialized to 0)
+    // This avoids scope issues where regN vars created inside if-bodies aren't visible outside
     fun getOrCreateFunctionLevelVar(register: String): Pair<String, Boolean> {
         return when (register) {
             "A" -> {
                 if (functionLevelA == null) {
-                    functionLevelA = nextTempVar()
-                    Pair(functionLevelA!!, true)
+                    functionLevelA = register  // Use "A" directly
+                    Pair(register, false)  // false = don't declare inline, it's already declared
                 } else {
                     Pair(functionLevelA!!, false)
                 }
             }
             "X" -> {
                 if (functionLevelX == null) {
-                    functionLevelX = nextTempVar()
-                    Pair(functionLevelX!!, true)
+                    functionLevelX = register  // Use "X" directly
+                    Pair(register, false)
                 } else {
                     Pair(functionLevelX!!, false)
                 }
             }
             "Y" -> {
                 if (functionLevelY == null) {
-                    functionLevelY = nextTempVar()
-                    Pair(functionLevelY!!, true)
+                    functionLevelY = register  // Use "Y" directly
+                    Pair(register, false)
                 } else {
                     Pair(functionLevelY!!, false)
                 }
@@ -724,6 +746,7 @@ fun List<KotlinStmt>.isRegisterAssigned(register: String): Boolean {
         return when (stmt) {
             is KAssignment -> stmt.target is KVar && (stmt.target as KVar).name == register
             is KVarDecl -> stmt.name == register
+            is KDestructuringDecl -> register in stmt.names  // by Claude
             is KIf -> stmt.thenBranch.any { checkStmt(it) } || stmt.elseBranch.any { checkStmt(it) }
             is KWhile -> stmt.body.any { checkStmt(it) }
             is KDoWhile -> stmt.body.any { checkStmt(it) }
@@ -802,6 +825,8 @@ fun collectTempVars(stmts: List<KotlinStmt>): Set<String> {
                 }
                 stmt.elseBranch.forEach { collectFromStmt(it) }
             }
+            // by Claude - Destructuring decls use pairA/pairY names, not temp, so just collect from value
+            is KDestructuringDecl -> collectFromExpr(stmt.value)
             else -> {}
         }
     }
@@ -909,13 +934,27 @@ fun AssemblyFunction.toKotlinFunction(
 ): KFunction {
     val ctx = CodeGenContext(functionRegistry, jumpEngineTables, this)
 
+    // by Claude - Pre-initialize register references for registers that are likely parameters
+    // This enables materializeAllRegisters() to work correctly before branches that modify them
+    // If a register is an input to this function, we set it to the parameter reference so that
+    // materializeRegister() will create a temp var initialized with the parameter value
+    if (this.inputs?.contains(TrackedAsIo.A) == true) {
+        ctx.registerA = KVar("A")
+    }
+    if (this.inputs?.contains(TrackedAsIo.X) == true) {
+        ctx.registerX = KVar("X")
+    }
+    if (this.inputs?.contains(TrackedAsIo.Y) == true) {
+        ctx.registerY = KVar("Y")
+    }
+
     // Pre-scan all instructions to identify indexed memory accesses.
     // This ensures that labels like AreaObjectLength that are accessed both
     // directly and with an offset use the indexed delegate consistently.
     preScanMemoryAccesses(ctx)
 
-    // Get improved control flow
-    val controlNodes = this.asControls ?: this.improveControlFlow()
+    // Get control flow structure
+    val controlNodes = this.asControls ?: this.analyzeControls()
 
     // Convert all control nodes to Kotlin statements, but stop after a return
     val body = mutableListOf<KotlinStmt>()
@@ -1115,52 +1154,50 @@ fun AssemblyFunction.toKotlinFunction(
         assemblyLabelToKotlinName(label)
     } ?: "func_${this.startingBlock.originalLineIndex}"
 
-    // Detect return type from outputs
+    // by Claude - Detect return type from outputs: A only, Y only, both A+Y, or void
+    val hasAOutput = this.outputs?.contains(TrackedAsIo.A) == true
+    val hasYOutput = this.outputs?.contains(TrackedAsIo.Y) == true
+
     val returnType = when {
-        this.outputs == null || this.outputs!!.isEmpty() -> null
-        TrackedAsIo.A in this.outputs!! -> "Int"  // A register returns a value
-        else -> null  // Other outputs (flags, etc.) don't translate to return values
+        hasAOutput && hasYOutput -> "Pair<Int, Int>"  // Both A and Y
+        hasAOutput -> "Int"  // A only
+        hasYOutput -> "Int"  // Y only (returns Y value)
+        else -> null  // Void
     }
 
-    // by Claude - Handle return values correctly:
-    // - For A-returning functions: keep return values from RTS handler, add fallback if missing
-    // - For void functions: strip any return values
-    val bodyWithReturns = if (returnType != null) {
-        val updated = finalBody.map { stmt ->
-            when (stmt) {
-                // RTS handler now captures ctx.registerA, so only fallback if value is null
-                is KReturn -> if (stmt.value == null) KReturn(KVar("A")) else stmt
-                is KIf -> KIf(
-                    condition = stmt.condition,
-                    thenBranch = stmt.thenBranch.addReturnValues(),
-                    elseBranch = stmt.elseBranch.addReturnValues()
-                )
-                is KWhile -> KWhile(stmt.condition, stmt.body.addReturnValues())
-                is KDoWhile -> KDoWhile(stmt.body.addReturnValues(), stmt.condition)
-                is KLoop -> KLoop(stmt.body.addReturnValues())
-                else -> stmt
-            }
+    // by Claude - Handle return values based on output type
+    // RTS handler now generates correct return values, so we just need to ensure paths have returns
+    val bodyWithReturns = when {
+        hasAOutput && hasYOutput -> {
+            // Pair return: RTS generates Pair(A, Y) - just ensure all paths have returns
+            val fallbackReturn = KReturn(KCall("Pair", listOf(KVar("A"), KVar("Y"))))
+            finalBody.ensureReturnsPresent(fallbackReturn)
         }
-        // If function doesn't end with a return, add one
-        if (updated.lastOrNull() !is KReturn) {
-            updated + KReturn(KVar("A"))
-        } else {
-            updated
+        hasAOutput -> {
+            // A-only return: RTS generates A value - ensure all paths have returns
+            val fallbackReturn = KReturn(KVar("A"))
+            finalBody.ensureReturnsPresent(fallbackReturn)
         }
-    } else {
-        // Void function: strip any return values from RTS handler
-        finalBody.map { stmt ->
-            when (stmt) {
-                is KReturn -> KReturn(null)  // Strip return value
-                is KIf -> KIf(
-                    condition = stmt.condition,
-                    thenBranch = stmt.thenBranch.stripReturnValues(),
-                    elseBranch = stmt.elseBranch.stripReturnValues()
-                )
-                is KWhile -> KWhile(stmt.condition, stmt.body.stripReturnValues())
-                is KDoWhile -> KDoWhile(stmt.body.stripReturnValues(), stmt.condition)
-                is KLoop -> KLoop(stmt.body.stripReturnValues())
-                else -> stmt
+        hasYOutput -> {
+            // Y-only return: RTS generates Y value - ensure all paths have returns
+            val fallbackReturn = KReturn(KVar("Y"))
+            finalBody.ensureReturnsPresent(fallbackReturn)
+        }
+        else -> {
+            // Void function: strip any return values from RTS handler
+            finalBody.map { stmt ->
+                when (stmt) {
+                    is KReturn -> KReturn(null)
+                    is KIf -> KIf(
+                        condition = stmt.condition,
+                        thenBranch = stmt.thenBranch.stripReturnValues(),
+                        elseBranch = stmt.elseBranch.stripReturnValues()
+                    )
+                    is KWhile -> KWhile(stmt.condition, stmt.body.stripReturnValues())
+                    is KDoWhile -> KDoWhile(stmt.body.stripReturnValues(), stmt.condition)
+                    is KLoop -> KLoop(stmt.body.stripReturnValues())
+                    else -> stmt
+                }
             }
         }
     }
@@ -1178,6 +1215,55 @@ fun AssemblyFunction.toKotlinFunction(
  * Add return values to return statements recursively.
  * Used when a function has a return type to ensure all returns include the value.
  */
+// by Claude - Transform return statements using a custom transformation function
+/**
+ * Transform return statements recursively using the provided transformation function.
+ * The transformer receives the return value expression (may be null) and returns a new KReturn.
+ */
+fun List<KotlinStmt>.transformReturns(transformer: (KotlinExpr?) -> KReturn): List<KotlinStmt> {
+    return this.map { stmt ->
+        when (stmt) {
+            is KReturn -> transformer(stmt.value)
+            is KIf -> KIf(
+                condition = stmt.condition,
+                thenBranch = stmt.thenBranch.transformReturns(transformer),
+                elseBranch = stmt.elseBranch.transformReturns(transformer)
+            )
+            is KWhile -> KWhile(stmt.condition, stmt.body.transformReturns(transformer))
+            is KDoWhile -> KDoWhile(stmt.body.transformReturns(transformer), stmt.condition)
+            is KLoop -> KLoop(stmt.body.transformReturns(transformer))
+            else -> stmt
+        }
+    }
+}
+
+// by Claude - Ensure all return statements have values, keeping existing values
+/**
+ * Ensures all paths have proper returns. Keeps existing return values,
+ * and adds fallback return if function doesn't end with one.
+ */
+fun List<KotlinStmt>.ensureReturnsPresent(fallbackReturn: KReturn): List<KotlinStmt> {
+    val updated = this.map { stmt ->
+        when (stmt) {
+            is KReturn -> if (stmt.value == null) fallbackReturn else stmt
+            is KIf -> KIf(
+                condition = stmt.condition,
+                thenBranch = stmt.thenBranch.ensureReturnsPresent(fallbackReturn),
+                elseBranch = stmt.elseBranch.ensureReturnsPresent(fallbackReturn)
+            )
+            is KWhile -> KWhile(stmt.condition, stmt.body.ensureReturnsPresent(fallbackReturn))
+            is KDoWhile -> KDoWhile(stmt.body.ensureReturnsPresent(fallbackReturn), stmt.condition)
+            is KLoop -> KLoop(stmt.body.ensureReturnsPresent(fallbackReturn))
+            else -> stmt
+        }
+    }
+    return if (updated.lastOrNull() !is KReturn) {
+        updated + fallbackReturn
+    } else {
+        updated
+    }
+}
+
 fun List<KotlinStmt>.addReturnValues(): List<KotlinStmt> {
     return this.map { stmt ->
         when (stmt) {
@@ -1271,6 +1357,15 @@ fun List<KotlinStmt>.isRegisterReadBeforeWrite(registerName: String, ctx: CodeGe
             }
             is KLoop -> stmt.body.any { checkStmt(it) }
             is KReturn -> stmt.value?.usesRegister(registerName) ?: false
+            // by Claude - Destructuring decl is a write to all named vars
+            is KDestructuringDecl -> {
+                if (registerName in stmt.names) {
+                    seenWrite = true
+                    false
+                } else {
+                    stmt.value.usesRegister(registerName)
+                }
+            }
             else -> false
         }
     }
@@ -1303,6 +1398,7 @@ fun KotlinStmt.usesRegister(registerName: String): Boolean {
         is KLoop -> body.any { it.usesRegister(registerName) }
         is KReturn -> value?.usesRegister(registerName) ?: false
         is KVarDecl -> value?.usesRegister(registerName) ?: false
+        is KDestructuringDecl -> value.usesRegister(registerName)  // by Claude
         else -> false
     }
 }

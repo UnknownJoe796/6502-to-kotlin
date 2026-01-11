@@ -953,4 +953,100 @@ class AddressCalculationDebugTest {
         // This is a limitation of this test - we'll get some false mismatches
         return false
     }
+
+    // by Claude - Generate SMBConstants.kt with correct addresses using AddressLabelMapper
+    @Test
+    fun generateSMBConstantsWithCorrectAddresses() {
+        val asmFile = File("smbdism.asm")
+        val text = asmFile.readText()
+        val codeFile = text.parseToAssemblyCodeFile()
+
+        // Use the fixed AddressLabelMapper for accurate code addresses
+        val mapper = AddressLabelMapper.fromAssemblyFile(asmFile)
+
+        println("=== Generating SMBConstants with Correct Addresses ===\n")
+
+        // Collect memory constants from assembly
+        val memoryConstants = mutableMapOf<String, Int>()
+        for (line in codeFile.lines) {
+            val constant = line.constant
+            if (constant != null) {
+                val value = when (val v = constant.value) {
+                    is AssemblyAddressing.ByteValue -> v.value.toInt()
+                    is AssemblyAddressing.ShortValue -> v.value.toInt()
+                    else -> null
+                }
+                if (value != null) {
+                    memoryConstants[constant.name] = value
+                }
+            }
+        }
+
+        // Get code labels from mapper - use getFunctionLabels() to get ALL labels including aliases
+        val codeLabels = mapper.getFunctionLabels()
+            .mapNotNull { label -> mapper.getAddress(label)?.let { label to it } }
+            .toMap()
+
+        println("Memory constants: ${memoryConstants.size}")
+        println("Code labels: ${codeLabels.size}")
+
+        // Verify some known addresses
+        val initGameAddr = mapper.getAddress("InitializeGame")
+        val initAreaAddr = mapper.getAddress("InitializeArea")
+        val startAddr = mapper.getAddress("Start")
+
+        println("\nKey addresses:")
+        println("  Start = 0x${startAddr?.toString(16)?.uppercase() ?: "NOT FOUND"}")
+        println("  InitializeGame = 0x${initGameAddr?.toString(16)?.uppercase() ?: "NOT FOUND"}")
+        println("  InitializeArea = 0x${initAreaAddr?.toString(16)?.uppercase() ?: "NOT FOUND"}")
+
+        // Generate the constants file
+        val outFile = File("smb/src/main/kotlin/com/ivieleague/decompiler6502tokotlin/smb/generated/SMBConstants.kt")
+        outFile.parentFile.mkdirs()
+
+        outFile.bufferedWriter().use { out ->
+            out.appendLine("@file:OptIn(ExperimentalUnsignedTypes::class)")
+            out.appendLine()
+            out.appendLine("package com.ivieleague.decompiler6502tokotlin.smb")
+            out.appendLine()
+            out.appendLine("import com.ivieleague.decompiler6502tokotlin.hand.MemoryByte")
+            out.appendLine()
+            out.appendLine("// Memory address variables from smbdism.asm")
+            out.appendLine("// Generated with corrected addresses from AddressLabelMapper")
+            out.appendLine("// by Claude - regenerated with fixes #6-8 for accurate address calculation")
+            out.appendLine()
+
+            // Sort all entries by name for consistent output
+            val allEntries = (memoryConstants + codeLabels).entries.sortedBy { it.key }
+
+            for ((name, addr) in allEntries) {
+                val hexAddr = "0x${addr.toString(16).uppercase()}"
+                val camelName = labelToCamelCase(name)
+
+                out.appendLine("const val $name = $hexAddr")
+                // Only create property delegates for memory addresses (< 0x8000)
+                // Code labels don't need delegates
+                if (addr < 0x8000) {
+                    out.appendLine("var $camelName by MemoryByte($name)")
+                }
+            }
+        }
+
+        println("\nGenerated ${outFile.absolutePath}")
+        println("Total entries: ${memoryConstants.size + codeLabels.size}")
+    }
+
+    // by Claude - Convert label to camelCase
+    private fun labelToCamelCase(label: String): String {
+        if (label.isEmpty()) return "unknown"
+        // Handle underscores
+        val parts = label.split('_')
+        return parts.mapIndexed { index, part ->
+            if (index == 0) {
+                part.replaceFirstChar { it.lowercase() }
+            } else {
+                part.replaceFirstChar { it.uppercase() }
+            }
+        }.joinToString("")
+    }
 }

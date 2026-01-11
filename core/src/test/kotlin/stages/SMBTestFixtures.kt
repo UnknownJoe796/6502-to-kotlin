@@ -25,8 +25,8 @@ object SMBTestFixtures {
     internal val allFunctions by lazy {
         allBlocks.dominators()
         val functions = allBlocks.functionify()
-        // Apply control flow improvements to all functions
-        functions.improveControlFlow()
+        // Analyze control flow for all functions
+        functions.analyzeControls()
         functions
     }
 

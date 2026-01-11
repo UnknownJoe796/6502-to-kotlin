@@ -147,6 +147,17 @@ data class KVarDecl(
     }
 }
 
+/** Destructuring declaration: val (a, b) = pair() - by Claude */
+data class KDestructuringDecl(
+    val names: List<String>,
+    val value: KotlinExpr
+) : KotlinStmt {
+    override fun toKotlin(indent: String): String {
+        val namesStr = names.joinToString(", ")
+        return "${indent}val ($namesStr) = ${value.toKotlin()}"
+    }
+}
+
 /** Assignment: x = 5, memory[addr] = value */
 data class KAssignment(val target: KotlinExpr, val value: KotlinExpr) : KotlinStmt {
     override fun toKotlin(indent: String) = "$indent${target.toKotlin()} = ${value.toKotlin()}"

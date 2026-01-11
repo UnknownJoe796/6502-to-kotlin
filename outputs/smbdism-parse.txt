@@ -1616,7 +1616,7 @@ LDA OperMode         ; check game mode
 BNE IncModeTask_B         ; if not title screen mode, leave
 LDX #$00         ; otherwise, clear buffer space
 TScrClear:  STA VRAM_Buffer1-1,X
-
+STA VRAM_Buffer1+255,X
 DEX 
 BNE TScrClear
 JSR DrawMushroomIcon         ; draw player select icon
@@ -5538,7 +5538,7 @@ LDA #$03
 STA Player_State         ; otherwise set player state to climbing
 INY          ; increment value in Y
 LDA #$08         ; set block in block buffer to cover hole, then
-         ; use same value to force player to climb
+STA Block_Buffer_1+180         ; use same value to force player to climb
 OffVine:  STY DisableCollisionDet         ; set collision detection disable flag
 JSR AutoControlPlayer         ; use contents of A to move player up or right, execute sub
 LDA Player_X_Position

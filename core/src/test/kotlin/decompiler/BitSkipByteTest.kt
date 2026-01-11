@@ -84,13 +84,19 @@ class BitSkipByteTest {
         )
 
         // The key test: Y should start at 0, not 4
-        // The ldy #$04 should be skipped, so temp0 should be initialized to 0
-        val hasYZeroInit = kotlinCode.contains("temp0 = 0x00") ||
-                           kotlinCode.contains("temp0 = 0") ||
-                           kotlinCode.contains("var temp0: Int = 0")
+        // The ldy #$04 should be skipped, so Y should be initialized to 0
+        // by Claude - Updated to check for Y instead of temp0 (code gen now uses function-level vars)
+        val hasYZeroInit = kotlinCode.contains("Y = 0x00") ||
+                           kotlinCode.contains("Y = 0") ||
+                           kotlinCode.contains("var Y: Int = 0") ||
+                           kotlinCode.contains("temp0 = 0x00") ||
+                           kotlinCode.contains("temp0 = 0")
 
-        // Also check that it doesn't initialize to 4
-        val hasYFourInit = kotlinCode.contains("temp0 = 0x04") ||
+        // Also check that it doesn't initialize to 4 after the 0x00 init
+        // (the skipped instruction is ldy #$04)
+        val hasYFourInit = kotlinCode.contains("Y = 0x04") ||
+                           kotlinCode.contains("Y = 4") ||
+                           kotlinCode.contains("temp0 = 0x04") ||
                            kotlinCode.contains("temp0 = 4")
 
         assertTrue(

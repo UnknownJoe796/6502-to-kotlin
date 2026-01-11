@@ -25,55 +25,64 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
         // Load instructions
         // All load instructions set Z (zero) and N (negative) flags
         // ===========================
+        // by Claude - LDA: always generate a statement to ensure the value is captured
+        // Previous bug: when no function-level var existed, only ctx.registerA was updated
+        // without generating a statement, losing the modification in if-bodies
         AssemblyOp.LDA -> {
             val rawValue = this.address.toKotlinExpr(ctx)
             val value = wrapPropertyRead(rawValue)
-            // If a function-level A var exists, assign to it; otherwise track expression
-            val existingVar = ctx.getFunctionLevelVar("A")
-            if (existingVar != null) {
-                stmts.add(KAssignment(existingVar, value))
-                ctx.registerA = existingVar
+            // Always get or create a function-level variable to ensure statement is generated
+            val (varName, isNew) = ctx.getOrCreateFunctionLevelVar("A")
+            val varRef = KVar(varName)
+            if (isNew) {
+                stmts.add(KVarDecl(varName, "Int", value, mutable = true))
             } else {
-                ctx.registerA = value
+                stmts.add(KAssignment(varRef, value))
             }
+            ctx.registerA = varRef
             // LDA sets Z flag if value == 0, N flag if bit 7 is set
-            val flagRef = ctx.registerA!!
-            ctx.zeroFlag = KBinaryOp(flagRef, "==", KLiteral("0"))
-            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(flagRef, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            ctx.zeroFlag = KBinaryOp(varRef, "==", KLiteral("0"))
+            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(varRef, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
 
+        // by Claude - LDX: always generate a statement to ensure the value is captured
+        // Previous bug: when no function-level var existed, only ctx.registerX was updated
+        // without generating a statement, losing the modification in if-bodies
         AssemblyOp.LDX -> {
             val rawValue = this.address.toKotlinExpr(ctx)
             val value = wrapPropertyRead(rawValue)
-            // If a function-level X var exists, assign to it; otherwise track expression
-            val existingVar = ctx.getFunctionLevelVar("X")
-            if (existingVar != null) {
-                stmts.add(KAssignment(existingVar, value))
-                ctx.registerX = existingVar
+            // Always get or create a function-level variable to ensure statement is generated
+            val (varName, isNew) = ctx.getOrCreateFunctionLevelVar("X")
+            val varRef = KVar(varName)
+            if (isNew) {
+                stmts.add(KVarDecl(varName, "Int", value, mutable = true))
             } else {
-                ctx.registerX = value
+                stmts.add(KAssignment(varRef, value))
             }
+            ctx.registerX = varRef
             // LDX sets Z flag if value == 0, N flag if bit 7 is set
-            val flagRef = ctx.registerX!!
-            ctx.zeroFlag = KBinaryOp(flagRef, "==", KLiteral("0"))
-            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(flagRef, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            ctx.zeroFlag = KBinaryOp(varRef, "==", KLiteral("0"))
+            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(varRef, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
 
+        // by Claude - LDY: always generate a statement to ensure the value is captured
+        // Previous bug: when no function-level var existed, only ctx.registerY was updated
+        // without generating a statement, losing the modification in if-bodies
         AssemblyOp.LDY -> {
             val rawValue = this.address.toKotlinExpr(ctx)
             val value = wrapPropertyRead(rawValue)
-            // If a function-level Y var exists, assign to it; otherwise track expression
-            val existingVar = ctx.getFunctionLevelVar("Y")
-            if (existingVar != null) {
-                stmts.add(KAssignment(existingVar, value))
-                ctx.registerY = existingVar
+            // Always get or create a function-level variable to ensure statement is generated
+            val (varName, isNew) = ctx.getOrCreateFunctionLevelVar("Y")
+            val varRef = KVar(varName)
+            if (isNew) {
+                stmts.add(KVarDecl(varName, "Int", value, mutable = true))
             } else {
-                ctx.registerY = value
+                stmts.add(KAssignment(varRef, value))
             }
+            ctx.registerY = varRef
             // LDY sets Z flag if value == 0, N flag if bit 7 is set
-            val flagRef = ctx.registerY!!
-            ctx.zeroFlag = KBinaryOp(flagRef, "==", KLiteral("0"))
-            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(flagRef, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            ctx.zeroFlag = KBinaryOp(varRef, "==", KLiteral("0"))
+            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(varRef, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
 
         // ===========================
@@ -351,17 +360,37 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
             if (this.address == null) {
                 // Accumulator mode
                 val a = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
-                // Carry flag = bit 7 of original value (shifted out)
-                ctx.carryFlag = KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
-                val result = KBinaryOp(KParen(KBinaryOp(a, "shl", KLiteral("1"))), "and", KLiteral("0xFF"))
+
+                // by Claude - CRITICAL FIX: Capture original value BEFORE the shift
+                // The carry flag must test bit 7 of the ORIGINAL value, not the shifted result.
+                // If `a` is a KVar (mutable), we must capture it to avoid the stale reference bug.
+                val originalValue: KotlinExpr
+                if (a is KVar) {
+                    // Capture the original value into a temp variable
+                    val origVarName = "orig${ctx.nextFlagVar()}"
+                    stmts.add(KVarDecl(origVarName, "Int", a, mutable = false))
+                    originalValue = KVar(origVarName)
+                } else {
+                    // Expression is immutable, safe to reference directly
+                    originalValue = a
+                }
+
+                // Carry flag = bit 7 of ORIGINAL value (shifted out)
+                ctx.carryFlag = KBinaryOp(KParen(KBinaryOp(originalValue, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+
+                // Compute the shift result using the original value
+                val result = KBinaryOp(KParen(KBinaryOp(originalValue, "shl", KLiteral("1"))), "and", KLiteral("0xFF"))
+
                 // If A is a KVar (mutable variable), emit assignment; otherwise track expression
                 if (a is KVar) {
                     stmts.add(KAssignment(a, result))
                 } else {
                     ctx.registerA = result
                 }
-                ctx.zeroFlag = KBinaryOp(a, "==", KLiteral("0"))
-                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+
+                // Flags are based on the result, not the original
+                ctx.zeroFlag = KBinaryOp(result, "==", KLiteral("0"))
+                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(result, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
             } else {
                 val target = this.address.toKotlinExpr(ctx)
                 val readValue = wrapPropertyRead(target)
@@ -380,16 +409,28 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
             if (this.address == null) {
                 // Accumulator mode
                 val a = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
-                // Carry flag = bit 0 of original value (shifted out)
-                ctx.carryFlag = KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x01"))), "!=", KLiteral("0"))
-                val result = KBinaryOp(a, "shr", KLiteral("1"))
+
+                // by Claude - CRITICAL FIX: Capture original value BEFORE the shift
+                val originalValue: KotlinExpr
+                if (a is KVar) {
+                    val origVarName = "orig${ctx.nextFlagVar()}"
+                    stmts.add(KVarDecl(origVarName, "Int", a, mutable = false))
+                    originalValue = KVar(origVarName)
+                } else {
+                    originalValue = a
+                }
+
+                // Carry flag = bit 0 of ORIGINAL value (shifted out)
+                ctx.carryFlag = KBinaryOp(KParen(KBinaryOp(originalValue, "and", KLiteral("0x01"))), "!=", KLiteral("0"))
+                val result = KBinaryOp(originalValue, "shr", KLiteral("1"))
+
                 // If A is a KVar (mutable variable), emit assignment; otherwise track expression
                 if (a is KVar) {
                     stmts.add(KAssignment(a, result))
                 } else {
                     ctx.registerA = result
                 }
-                ctx.zeroFlag = KBinaryOp(a, "==", KLiteral("0"))
+                ctx.zeroFlag = KBinaryOp(result, "==", KLiteral("0"))
                 ctx.negativeFlag = KLiteral("false")  // LSR always clears N (bit 7 becomes 0)
             } else {
                 val target = this.address.toKotlinExpr(ctx)
@@ -410,20 +451,32 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                 // Accumulator mode
                 val a = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
                 val oldCarry = ctx.carryFlag ?: KVar("flagC")
-                // New carry = old bit 7
-                ctx.carryFlag = KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+
+                // by Claude - CRITICAL FIX: Capture original value BEFORE the rotate
+                val originalValue: KotlinExpr
+                if (a is KVar) {
+                    val origVarName = "orig${ctx.nextFlagVar()}"
+                    stmts.add(KVarDecl(origVarName, "Int", a, mutable = false))
+                    originalValue = KVar(origVarName)
+                } else {
+                    originalValue = a
+                }
+
+                // New carry = old bit 7 of ORIGINAL value
+                ctx.carryFlag = KBinaryOp(KParen(KBinaryOp(originalValue, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
                 // Result = (a << 1) | old_carry, masked to 8 bits
-                val shiftedPart = KBinaryOp(KParen(KBinaryOp(a, "shl", KLiteral("1"))), "and", KLiteral("0xFE"))
+                val shiftedPart = KBinaryOp(KParen(KBinaryOp(originalValue, "shl", KLiteral("1"))), "and", KLiteral("0xFE"))
                 val carryBit = KIfExpr(oldCarry, KLiteral("1"), KLiteral("0"))
                 val result = KBinaryOp(shiftedPart, "or", carryBit)
+
                 // If A is a KVar (mutable variable), emit assignment; otherwise track expression
                 if (a is KVar) {
                     stmts.add(KAssignment(a, result))
                 } else {
                     ctx.registerA = result
                 }
-                ctx.zeroFlag = KBinaryOp(a, "==", KLiteral("0"))
-                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+                ctx.zeroFlag = KBinaryOp(result, "==", KLiteral("0"))
+                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(result, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
             } else {
                 val target = this.address.toKotlinExpr(ctx)
                 val readValue = wrapPropertyRead(target)
@@ -445,20 +498,32 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                 // Accumulator mode
                 val a = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
                 val oldCarry = ctx.carryFlag ?: KVar("flagC")
-                // New carry = old bit 0
-                ctx.carryFlag = KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x01"))), "!=", KLiteral("0"))
+
+                // by Claude - CRITICAL FIX: Capture original value BEFORE the rotate
+                val originalValue: KotlinExpr
+                if (a is KVar) {
+                    val origVarName = "orig${ctx.nextFlagVar()}"
+                    stmts.add(KVarDecl(origVarName, "Int", a, mutable = false))
+                    originalValue = KVar(origVarName)
+                } else {
+                    originalValue = a
+                }
+
+                // New carry = old bit 0 of ORIGINAL value
+                ctx.carryFlag = KBinaryOp(KParen(KBinaryOp(originalValue, "and", KLiteral("0x01"))), "!=", KLiteral("0"))
                 // Result = (a >> 1) | (old_carry << 7)
-                val shiftedPart = KBinaryOp(a, "shr", KLiteral("1"))
+                val shiftedPart = KBinaryOp(originalValue, "shr", KLiteral("1"))
                 val carryBit = KIfExpr(oldCarry, KLiteral("0x80"), KLiteral("0"))
                 val result = KBinaryOp(shiftedPart, "or", carryBit)
+
                 // If A is a KVar (mutable variable), emit assignment; otherwise track expression
                 if (a is KVar) {
                     stmts.add(KAssignment(a, result))
                 } else {
                     ctx.registerA = result
                 }
-                ctx.zeroFlag = KBinaryOp(a, "==", KLiteral("0"))
-                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+                ctx.zeroFlag = KBinaryOp(result, "==", KLiteral("0"))
+                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(result, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
             } else {
                 val target = this.address.toKotlinExpr(ctx)
                 val readValue = wrapPropertyRead(target)
@@ -583,7 +648,40 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                     }
                 }
 
-                stmts.add(KExprStmt(KCall(functionName, args)))
+                // by Claude - Capture register outputs from functions that return values
+                val hasAOutput = targetFunction?.outputs?.contains(TrackedAsIo.A) == true
+                val hasYOutput = targetFunction?.outputs?.contains(TrackedAsIo.Y) == true
+
+                when {
+                    hasAOutput && hasYOutput -> {
+                        // by Claude - Function returns Pair<Int, Int> (A, Y) - capture both
+                        // Use nextPairVar for Pair (won't be hoisted as Int), nextTempVar for extracted values
+                        val pairVar = ctx.nextPairVar()  // "pair0" - not hoisted
+                        val aVar = ctx.nextTempVar()     // "tempN" - hoisted as Int
+                        val yVar = ctx.nextTempVar()     // "tempM" - hoisted as Int
+                        stmts.add(KVarDecl(pairVar, mutable = false, value = KCall(functionName, args)))
+                        stmts.add(KVarDecl(aVar, mutable = true, value = KMemberAccess(KVar(pairVar), KVar("first"))))
+                        stmts.add(KVarDecl(yVar, mutable = true, value = KMemberAccess(KVar(pairVar), KVar("second"))))
+                        ctx.registerA = KVar(aVar)
+                        ctx.registerY = KVar(yVar)
+                    }
+                    hasAOutput -> {
+                        // by Claude - Function returns Int (A value) - capture it
+                        val resultVar = ctx.nextTempVar()
+                        stmts.add(KVarDecl(resultVar, mutable = true, value = KCall(functionName, args)))
+                        ctx.registerA = KVar(resultVar)
+                    }
+                    hasYOutput -> {
+                        // by Claude - Function returns Int (Y value) - capture it
+                        val resultVar = ctx.nextTempVar()
+                        stmts.add(KVarDecl(resultVar, mutable = true, value = KCall(functionName, args)))
+                        ctx.registerY = KVar(resultVar)
+                    }
+                    else -> {
+                        // Void function - just call it
+                        stmts.add(KExprStmt(KCall(functionName, args)))
+                    }
+                }
 
                 // Terminal subroutines like JumpEngine don't return - add a return statement
                 if (isTerminalSubroutine(this)) {
@@ -592,12 +690,32 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
             }
         }
 
-        // by Claude - Fixed RTS to capture current A register value for return
+        // by Claude - RTS returns based on function output type
         AssemblyOp.RTS, AssemblyOp.RTI -> {
-            // Capture the current A register value as potential return value.
-            // The function generator will use this value for A-returning functions,
-            // or strip it for void functions.
-            val returnValue = ctx.registerA ?: ctx.getFunctionLevelVar("A")
+            val funcOutputs = ctx.currentFunction?.outputs
+            val hasAOutput = funcOutputs?.contains(TrackedAsIo.A) == true
+            val hasYOutput = funcOutputs?.contains(TrackedAsIo.Y) == true
+
+            val returnValue = when {
+                hasAOutput && hasYOutput -> {
+                    // Return Pair(A, Y) for functions that output both
+                    val aValue = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
+                    val yValue = ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y")
+                    KCall("Pair", listOf(aValue, yValue))
+                }
+                hasAOutput -> {
+                    // Return A value
+                    ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
+                }
+                hasYOutput -> {
+                    // Return Y value
+                    ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y")
+                }
+                else -> {
+                    // Void function - return with no value (will be stripped by function generator)
+                    null
+                }
+            }
             stmts.add(KReturn(returnValue))
         }
 

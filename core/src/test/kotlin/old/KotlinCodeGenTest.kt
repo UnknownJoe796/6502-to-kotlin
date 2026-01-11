@@ -1,5 +1,6 @@
 package com.ivieleague.decompiler6502tokotlin.hand
 
+import com.ivieleague.decompiler6502tokotlin.testgen.AddressLabelMapper
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -123,48 +124,30 @@ class KotlinCodeGenTest {
         val constants = code.lines.mapNotNull { it.constant }
             .sortedBy { it.name }
 
-        // Calculate ROM addresses for code labels and collect data bytes
+        // by Claude - Use AddressLabelMapper for correct address calculation
+        // The previous manual byte counting had bugs that caused 758+ byte drift
+        val addressMapper = AddressLabelMapper.fromAssemblyFile(asmFile)
+
+        // Get all label addresses from the mapper (correct addresses)
         val codeLabels = mutableMapOf<String, Int>()
-        val romData = mutableListOf<Pair<Int, List<Int>>>() // address -> bytes
-        var currentAddress = 0x8000  // Default start address
         for (line in code.lines) {
-            // Check for .org directive
-            line.originalLine?.let { originalText ->
-                val orgMatch = Regex("""\\.org\\s+\$([0-9a-fA-F]+)""").find(originalText)
-                if (orgMatch != null) {
-                    currentAddress = orgMatch.groupValues[1].toInt(16)
-                    return@let
+            val label = line.label
+            if (label != null && !label.startsWith("$")) {
+                val addr = addressMapper.getAddress(label)
+                if (addr != null) {
+                    codeLabels[label] = addr
                 }
             }
+        }
 
-            // Track code labels
-            if (line.label != null && !line.label.startsWith("$")) {
-                codeLabels[line.label] = currentAddress
-            }
-
-            // Count bytes for this line and collect data
-            val byteCount = when {
-                line.instruction != null -> {
-                    // Instruction size = 1 (opcode) + addressing mode size
-                    val addrSize = when (line.instruction.address) {
-                        null -> 0  // Implied/accumulator
-                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.ByteValue,
-                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.ConstantReference -> 1
-                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.Direct,
-                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.DirectX,
-                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.DirectY,
-                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.IndirectX,
-                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.IndirectY,
-                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.IndirectAbsolute,
-                        is com.ivieleague.decompiler6502tokotlin.hand.AssemblyAddressing.ShortValue -> 2
-                        else -> 0
-                    }
-                    1 + addrSize
-                }
-                line.data != null -> {
+        // Collect ROM data bytes using correct addresses from mapper
+        val romData = mutableListOf<Pair<Int, List<Int>>>()
+        for (line in code.lines) {
+            if (line.data != null && line.label != null) {
+                val addr = addressMapper.getAddress(line.label)
+                if (addr != null && addr in 0x8000..0xFFFF) {
                     when (val d = line.data) {
                         is com.ivieleague.decompiler6502tokotlin.hand.AssemblyData.Db -> {
-                            // Collect actual byte values
                             val bytes = d.items.flatMap { item ->
                                 when (item) {
                                     is com.ivieleague.decompiler6502tokotlin.hand.AssemblyData.DbItem.ByteValue ->
@@ -172,7 +155,6 @@ class KotlinCodeGenTest {
                                     is com.ivieleague.decompiler6502tokotlin.hand.AssemblyData.DbItem.StringLiteral ->
                                         item.text.map { it.code }
                                     is com.ivieleague.decompiler6502tokotlin.hand.AssemblyData.DbItem.Expr -> {
-                                        // Expression references - resolve from codeLabels if possible
                                         val expr = item.expr.removePrefix("<").removePrefix(">")
                                         val labelAddr = codeLabels[expr]
                                         if (labelAddr != null) {
@@ -181,11 +163,9 @@ class KotlinCodeGenTest {
                                             } else if (item.expr.startsWith(">")) {
                                                 listOf((labelAddr shr 8) and 0xFF)
                                             } else {
-                                                // Full word - lo, hi
                                                 listOf(labelAddr and 0xFF, (labelAddr shr 8) and 0xFF)
                                             }
                                         } else {
-                                            // Placeholder for unresolved expression
                                             if (item.expr.startsWith("<") || item.expr.startsWith(">")) {
                                                 listOf(0)
                                             } else {
@@ -196,33 +176,34 @@ class KotlinCodeGenTest {
                                 }
                             }
                             if (bytes.isNotEmpty()) {
-                                romData.add(currentAddress to bytes)
+                                romData.add(addr to bytes)
                             }
-                            d.byteCount()
                         }
-                        else -> 0
+                        else -> {}
                     }
                 }
-                else -> 0
             }
-            currentAddress += byteCount
         }
 
         // Generate ROM data initialization file using lazy loading to avoid JVM method size limits
         val romDataFile = outDir.resolve("smb-rom-data.kt")
         var totalRomBytes = 0
 
-        // Merge consecutive ROM regions for efficiency
+        // by Claude - Merge consecutive ROM regions for efficiency
+        // Added bounds check to prevent addresses > 0xFFFF
         val mergedRomData = mutableListOf<Pair<Int, MutableList<Int>>>()
         for ((addr, bytes) in romData.sortedBy { it.first }) {
             val last = mergedRomData.lastOrNull()
-            if (last != null && last.first + last.second.size == addr) {
-                // Consecutive - merge
+            // Only merge if consecutive AND the merged region won't exceed 0xFFFF
+            if (last != null && last.first + last.second.size == addr &&
+                last.first + last.second.size + bytes.size <= 0x10000) {
+                // Consecutive and within bounds - merge
                 last.second.addAll(bytes)
-            } else {
-                // New region
+            } else if (addr + bytes.size <= 0x10000) {
+                // New region (only add if within bounds)
                 mergedRomData.add(addr to bytes.toMutableList())
             }
+            // Skip regions that would exceed 0xFFFF
         }
 
         // Split into chunks for JVM method size limit

@@ -132,7 +132,13 @@ class FunctionCallTracer(
         if (addr in 0x2000..0x2007) return  // PPU registers
         if (addr in 0x4000..0x401F) return  // APU/IO registers
 
-        val pending = callStack.last()
+        // by Claude - Find pending with depth matching current context
+        // Inside a function after JSR: callDepth = pending.callDepth + 1
+        // After nested RTS returns: callDepth = pending.callDepth
+        // First try callDepth - 1 (normal case), then callDepth (post-RTS case)
+        val pending = callStack.lastOrNull { it.callDepth == callDepth - 1 }
+            ?: callStack.lastOrNull { it.callDepth == callDepth }
+            ?: return
         if (addr !in pending.memoryReads) {
             // Get the actual value (from hook or memory)
             val value = hookedValue?.toInt() ?: interpreter.memory.readByte(addr).toInt()
@@ -151,7 +157,13 @@ class FunctionCallTracer(
         if (addr in 0x2000..0x2007) return
         if (addr in 0x4000..0x401F) return
 
-        val pending = callStack.last()
+        // by Claude - Find pending with depth matching current context
+        // Inside a function after JSR: callDepth = pending.callDepth + 1
+        // After nested RTS returns: callDepth = pending.callDepth
+        // First try callDepth - 1 (normal case), then callDepth (post-RTS case)
+        val pending = callStack.lastOrNull { it.callDepth == callDepth - 1 }
+            ?: callStack.lastOrNull { it.callDepth == callDepth }
+            ?: return
         pending.memoryWrites[addr] = value.toInt()
     }
 
