@@ -1001,18 +1001,20 @@ fun gameMenuRoutine() {
     temp0 = A or savedJoypad2Bits
     //> cmp #Start_Button
     //> beq StartGame
-    if (temp0 - Start_Button == 0) {
-        //  goto StartGame
+    // by Claude - Bug #1 fix: beq StartGame where StartGame is jmp ChkContinue
+    // The decompiler generated 'return' instead of calling chkContinue()
+    if (temp0 == Start_Button) {
+        //> StartGame:    jmp ChkContinue             ;if either start or A + start, execute here
+        chkContinue(temp0)
         return
     }
     A = temp0
-    if (temp0 != Start_Button) {
-        //> cmp #A_Button+Start_Button  ;check to see if A + start was pressed
-        //> bne ChkSelect               ;if not, branch to check select button
-        if (A == A_Button+Start_Button) {
-        }
-    } else {
-        //> StartGame:    jmp ChkContinue             ;if either start or A + start, execute here
+    //> cmp #A_Button+Start_Button  ;check to see if A + start was pressed
+    //> bne ChkSelect               ;if not, branch to check select button
+    if (A == A_Button + Start_Button) {
+        // by Claude - Also call chkContinue for A+Start
+        chkContinue(A)
+        return
     }
     //> ChkSelect:    cmp #Select_Button          ;check to see if the select button was pressed
     //> beq SelectBLogic            ;if so, branch reset demo timer
@@ -1177,24 +1179,86 @@ fun runDemo() {
 }
 
 // Decompiled from ChkContinue
+// by Claude - REWRITTEN: Original decompiled version was completely wrong (contained ResetTitle code)
+// Bug #4 in local/decompiler-bugs.md: Function contained wrong code due to label aliasing confusion
 fun chkContinue(A: Int) {
     var A: Int = A
+    var X: Int = 0
+    var Y: Int = 0
+    var continueWorld by MemoryByte(ContinueWorld)
+    var demoTimer by MemoryByte(DemoTimer)
     var disableScreenFlag by MemoryByte(DisableScreenFlag)
+    var fetchNewGameTimerFlag by MemoryByte(FetchNewGameTimerFlag)
+    var hidden1UpFlag by MemoryByte(Hidden1UpFlag)
+    var offscrHidden1Upflag by MemoryByte(OffScr_Hidden1UpFlag)
     var operMode by MemoryByte(OperMode)
     var opermodeTask by MemoryByte(OperMode_Task)
+    var primaryHardMode by MemoryByte(PrimaryHardMode)
     var sprite0HitDetectFlag by MemoryByte(Sprite0HitDetectFlag)
+    var worldSelectEnableFlag by MemoryByte(WorldSelectEnableFlag)
     val scoreAndCoinDisplay by MemoryByteIndexed(ScoreAndCoinDisplay)
-    //> ResetTitle:   lda #$00                    ;reset game modes, disable
+
+    //> ChkContinue:  ldy DemoTimer               ;if timer for demo has expired, reset modes
+    Y = demoTimer
+    //> beq ResetTitle
+    if (Y == 0) {
+        //> ResetTitle:   lda #$00                    ;reset game modes, disable
+        A = 0x00
+        //> sta OperMode                ;sprite 0 check and disable
+        operMode = A
+        //> sta OperMode_Task           ;screen output
+        opermodeTask = A
+        //> sta Sprite0HitDetectFlag
+        sprite0HitDetectFlag = A
+        //> inc DisableScreenFlag
+        disableScreenFlag = (disableScreenFlag + 1) and 0xFF
+        return
+    }
+
+    //> asl                         ;check to see if A button was also pushed
+    val carry = (A and 0x80) != 0
+    A = (A shl 1) and 0xFF
+    //> bcc StartWorld1             ;if not, don't load continue function's world number
+    if (carry) {
+        //> lda ContinueWorld           ;load previously saved world number for secret
+        A = continueWorld
+        //> jsr GoContinue              ;continue function when pressing A + start
+        goContinue(A)
+    }
+
+    //> StartWorld1:  jsr LoadAreaPointer
+    loadAreaPointer(A)
+    //> inc Hidden1UpFlag           ;set 1-up box flag for both players
+    hidden1UpFlag = (hidden1UpFlag + 1) and 0xFF
+    //> inc OffScr_Hidden1UpFlag
+    offscrHidden1Upflag = (offscrHidden1Upflag + 1) and 0xFF
+    //> inc FetchNewGameTimerFlag   ;set fetch new game timer flag
+    fetchNewGameTimerFlag = (fetchNewGameTimerFlag + 1) and 0xFF
+    //> inc OperMode                ;set next game mode (CRITICAL: transitions to gameplay!)
+    operMode = (operMode + 1) and 0xFF
+    //> lda WorldSelectEnableFlag   ;if world select flag is on, then primary
+    A = worldSelectEnableFlag
+    //> sta PrimaryHardMode         ;hard mode must be on as well
+    primaryHardMode = A
+    //> lda #$00
     A = 0x00
-    //> sta OperMode                ;sprite 0 check and disable
-    operMode = A
-    //> sta OperMode_Task           ;screen output
+    //> sta OperMode_Task           ;set game mode here, and clear demo timer
     opermodeTask = A
-    //> sta Sprite0HitDetectFlag
-    sprite0HitDetectFlag = A
-    //> inc DisableScreenFlag
-    disableScreenFlag = (disableScreenFlag + 1) and 0xFF
-    //> rts
+    //> sta DemoTimer
+    demoTimer = A
+    //> ldx #$17
+    X = 0x17
+    //> lda #$00
+    A = 0x00
+    //> InitScores:   sta ScoreAndCoinDisplay,x   ;clear player scores and coin displays
+    //> dex
+    //> bpl InitScores
+    while (X >= 0) {
+        scoreAndCoinDisplay[X] = A
+        X = (X - 1) and 0xFF
+        if (X >= 0x80) break  // X went negative (wrapped)
+    }
+    //> ExitMenu:     rts
     return
 }
 
@@ -1798,6 +1862,7 @@ fun screenRoutines() {
 }
 
 // Decompiled from InitScreen
+// by Claude - Fixed control flow bug: was returning instead of calling incSubtask() when OperMode==0
 fun initScreen() {
     var A: Int = 0
     var X: Int = 0
@@ -1811,16 +1876,14 @@ fun initScreen() {
     A = operMode
     //> beq NextSubtask             ;if mode still 0, do not load
     if (A == 0) {
-        //  goto NextSubtask
+        //> NextSubtask:   jmp IncSubtask           ;move onto next task
+        incSubtask()
         return
     }
-    if (A != 0) {
-        //> ldx #$03                    ;into buffer pointer
-        X = 0x03
-        //> jmp SetVRAMAddr_A
-    } else {
-        //> NextSubtask:   jmp IncSubtask           ;move onto next task
-    }
+    //> ldx #$03                    ;into buffer pointer
+    X = 0x03
+    //> jmp SetVRAMAddr_A
+    setvramaddrA(X)
 }
 
 // Decompiled from SetupIntermediate
@@ -1856,6 +1919,8 @@ fun setupIntermediate() {
     //> sta BackgroundColorCtrl  ;color ctrl and player status from stack
     backgroundColorCtrl = A
     //> jmp IncSubtask           ;then move onto the next task
+    // by Claude - Fixed: was missing incSubtask() call
+    incSubtask()
 }
 
 // Decompiled from GetAreaPalette
@@ -1874,13 +1939,13 @@ fun getAreaPalette() {
 }
 
 // Decompiled from SetVRAMAddr_A
+// by Claude - Fixed: was calling initScreen() instead of incSubtask()
 fun setvramaddrA(X: Int) {
     var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
     //> SetVRAMAddr_A: stx VRAM_Buffer_AddrCtrl ;store offset into buffer control
     vramBufferAddrctrl = X
     //> NextSubtask:   jmp IncSubtask           ;move onto next task
-    // Fall-through tail call to initScreen
-    initScreen()
+    incSubtask()
 }
 
 // Decompiled from GetBackgroundColor
@@ -2006,6 +2071,7 @@ fun setVRAMOffset(A: Int) {
 }
 
 // Decompiled from GetAlternatePalette1
+// by Claude - Fixed: NoAltPal branch was returning instead of calling incSubtask
 fun getAlternatePalette1() {
     var A: Int = 0
     var areaStyle by MemoryByte(AreaStyle)
@@ -2014,29 +2080,29 @@ fun getAlternatePalette1() {
     A = areaStyle
     //> cmp #$01
     //> bne NoAltPal
-    if (!(A - 0x01 == 0)) {
-        //  goto NoAltPal
+    if (A != 0x01) {
+        //> NoAltPal: jmp IncSubtask           ;now onto the next task
+        incSubtask()
         return
     }
-    if (A == 0x01) {
-        //> lda #$0b                 ;if found, load appropriate palette
-        A = 0x0B
-    } else {
-        //> NoAltPal:      jmp IncSubtask           ;now onto the next task
-    }
+    //> lda #$0b                 ;if found, load appropriate palette
+    A = 0x0B
     // Fall-through tail call to setvramaddrB
     setvramaddrB(A)
 }
 
 // Decompiled from SetVRAMAddr_B
+// by Claude - Fixed: was missing incSubtask() call
 fun setvramaddrB(A: Int) {
     var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
     //> SetVRAMAddr_B: sta VRAM_Buffer_AddrCtrl
     vramBufferAddrctrl = A
     //> NoAltPal:      jmp IncSubtask           ;now onto the next task
+    incSubtask()
 }
 
 // Decompiled from WriteTopStatusLine
+// by Claude - Fixed: was missing incSubtask() call
 fun writeTopStatusLine() {
     var A: Int = 0
     //> WriteTopStatusLine:
@@ -2045,6 +2111,7 @@ fun writeTopStatusLine() {
     //> jsr WriteGameText ;output it
     writeGameText(A)
     //> jmp IncSubtask    ;onto the next task
+    incSubtask()
 }
 
 // Decompiled from WriteBottomStatusLine
@@ -2104,9 +2171,11 @@ fun writeBottomStatusLine() {
     //> sta VRAM_Buffer1_Offset
     vramBuffer1Offset = A
     //> jmp IncSubtask
+    incSubtask()  // by Claude - was missing
 }
 
 // Decompiled from DisplayTimeUp
+// by Claude - Fixed control flow: NoTimeUp increments ScrTask by 2 (inc + incSubtask)
 fun displayTimeUp() {
     var A: Int = 0
     var gameTimerExpiredFlag by MemoryByte(GameTimerExpiredFlag)
@@ -2116,25 +2185,24 @@ fun displayTimeUp() {
     A = gameTimerExpiredFlag
     //> beq NoTimeUp              ;control 2 tasks forward, otherwise, stay here
     if (A == 0) {
-        //  goto NoTimeUp
-        return
-    }
-    if (A != 0) {
-        //> lda #$00
-        A = 0x00
-        //> sta GameTimerExpiredFlag  ;reset timer expiration flag
-        gameTimerExpiredFlag = A
-        //> lda #$02                  ;output time-up screen to buffer
-        A = 0x02
-        //> jmp OutputInter
-    } else {
         //> NoTimeUp: inc ScreenRoutineTask     ;increment control task 2 tasks forward
         screenRoutineTask = (screenRoutineTask + 1) and 0xFF
         //> jmp IncSubtask
+        incSubtask()
+        return
     }
+    //> lda #$00
+    A = 0x00
+    //> sta GameTimerExpiredFlag  ;reset timer expiration flag
+    gameTimerExpiredFlag = A
+    //> lda #$02                  ;output time-up screen to buffer
+    A = 0x02
+    //> jmp OutputInter
+    outputInter(A)
 }
 
 // Decompiled from DisplayIntermediate
+// by Claude - Fixed: when OperMode==0, must branch to NoInter (set ScrTask=8)
 fun displayIntermediate() {
     var A: Int = 0
     var Y: Int = 0
@@ -2148,7 +2216,13 @@ fun displayIntermediate() {
     //> lda OperMode                 ;check primary mode of operation
     A = operMode
     //> beq NoInter                  ;if in title screen mode, skip this
-    if (A != 0) {
+    if (A == 0) {
+        //> NoInter:       lda #$08                     ;set for specific task and leave
+        screenRoutineTask = 0x08
+        return
+    }
+    // OperMode != 0
+    if (true) {
         //> cmp #GameOverModeValue       ;are we in game over mode?
         //> beq GameOverInter            ;if so, proceed to display game over screen
         if (A - GameOverModeValue == 0) {
@@ -2250,20 +2324,25 @@ fun areaParserTaskControl() {
 }
 
 // Decompiled from DrawTitleScreen
+// by Claude - Fixed: when OperMode != 0, must call incModeTask_B (inc OperMode_Task)
 fun drawTitleScreen() {
     var A: Int = 0
     var Y: Int = 0
     var operMode by MemoryByte(OperMode)
+    var opermodeTask by MemoryByte(OperMode_Task)
     var ppuAddress by MemoryByte(PPU_ADDRESS)
     var ppuData by MemoryByte(PPU_DATA)
     //> DrawTitleScreen:
     //> lda OperMode                 ;are we in title screen mode?
     A = operMode
     //> bne IncModeTask_B            ;if not, exit
-    if (!(A == 0)) {
-        //  goto IncModeTask_B
+    if (A != 0) {
+        //> IncModeTask_B: inc OperMode_Task
+        opermodeTask = (opermodeTask + 1) and 0xFF
         return
-    } else {
+    }
+    // else OperMode == 0
+    run {
         //> lda #>TitleScreenDataOffset  ;load address $1ec0 into
         A = TitleScreenDataOffset shr 8
         //> sta PPU_ADDRESS              ;the vram address register
@@ -2305,6 +2384,7 @@ fun drawTitleScreen() {
     //> lda #$05                     ;set buffer transfer control to $0300,
     A = 0x05
     //> jmp SetVRAMAddr_B            ;increment task and exit
+    setvramaddrB(A)  // by Claude - was missing: jmp not translated to tail call
 }
 
 // Decompiled from ClearBuffersDrawIcon
@@ -11481,9 +11561,10 @@ fun setPWh(A: Int) {
     val orig0: Int = A
     A = orig0 shr 1
     //> tax                         ;set X for player offset
+    val X = A
     //> jmp ImposeGravity           ;jump to put whirlpool effect on player vertically, do not return
-    // Fall-through tail call to processWhirlpools
-    processWhirlpools()
+    // by Claude - Bug #1 fix: jmp was incorrectly translated to processWhirlpools() causing infinite recursion
+    imposeGravity(A, X)
 }
 
 // Decompiled from FlagpoleRoutine

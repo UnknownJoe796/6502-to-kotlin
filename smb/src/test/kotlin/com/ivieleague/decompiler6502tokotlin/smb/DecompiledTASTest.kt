@@ -26,6 +26,36 @@ import kotlin.test.assertTrue
  */
 class DecompiledTASTest {
 
+    // by Claude - Controller simulation for decompiled code
+    // Emulates NES controller shift register behavior
+    private class ControllerState {
+        var player1Buttons = 0
+        private var shiftReg = 0
+        private var strobe = false
+
+        fun setButtons(buttons: Int) {
+            player1Buttons = buttons
+        }
+
+        fun writeStrobe(value: Int) {
+            val newStrobe = (value and 0x01) != 0
+            if (newStrobe) {
+                shiftReg = player1Buttons
+            }
+            strobe = newStrobe
+        }
+
+        fun readPort(): Int {
+            val bit = shiftReg and 0x01
+            if (!strobe) {
+                shiftReg = shiftReg shr 1
+            }
+            return bit
+        }
+    }
+
+    private val controller = ControllerState()
+
     companion object {
         // Key addresses
         const val OperMode = 0x0770
@@ -69,6 +99,44 @@ class DecompiledTASTest {
     }
 
     /**
+     * by Claude - Set up memory intercepts for controller and PPU emulation
+     */
+    private fun setupControllerIntercepts() {
+        // JOYPAD_PORT addresses
+        val JOYPAD_PORT = 0x4016
+        val JOYPAD_PORT2 = 0x4017
+
+        // Set up read intercept for controller reads
+        memoryReadIntercept = { addr ->
+            when (addr) {
+                JOYPAD_PORT -> controller.readPort().toUByte()
+                JOYPAD_PORT2 -> 0u  // Player 2 not used
+                in 0x2000..0x2007 -> {
+                    // PPU registers - return appropriate values
+                    when (addr) {
+                        0x2002 -> 0x80u  // VBlank always set
+                        else -> 0u
+                    }
+                }
+                else -> null  // Use normal memory read
+            }
+        }
+
+        // Set up write intercept for controller strobe
+        memoryWriteIntercept = { addr, value ->
+            when (addr) {
+                JOYPAD_PORT -> {
+                    controller.writeStrobe(value.toInt())
+                    true  // Handled
+                }
+                in 0x2000..0x2007 -> true  // PPU writes - ignore
+                in 0x4000..0x4017 -> true  // APU/IO writes - ignore
+                else -> false  // Use normal memory write
+            }
+        }
+    }
+
+    /**
      * Run the full TAS through decompiled code and verify W8-4 completion.
      */
     @Test
@@ -105,10 +173,15 @@ class DecompiledTASTest {
 
         println("\n=== Running TAS through decompiled code ===")
 
+        // by Claude - Set up memory intercepts for controller emulation
+        setupControllerIntercepts()
+
         // Run through all TAS frames
         for (frame in 0 until tasInputs.size) {
-            // Set controller input
+            // Set controller input for the shift register
             val buttons = tasInputs[frame].buttons
+            controller.setButtons(buttons)
+            // Also set SavedJoypad1Bits for any code that reads from there directly
             memory[SavedJoypad1Bits] = buttons.toUByte()
 
             // Run decompiled NMI
@@ -148,6 +221,17 @@ class DecompiledTASTest {
             // Progress reporting every 1000 frames
             if (frame % 1000 == 0) {
                 println("Frame $frame/$${tasInputs.size}: W$world-$level, OperMode=$operMode, FC=${memory[FrameCounter]}")
+            }
+
+            // by Claude - Debug first 50 frames to see state changes
+            if (frame < 50) {
+                val task = memory[OperMode_Task].toInt()
+                val joy = memory[SavedJoypad1Bits].toInt()
+                val scrTask = memory[ScreenRoutineTask].toInt()
+                val intCtrl = memory[IntervalTimerControl].toInt()
+                if (joy != 0 || frame < 15 || task != 1) {
+                    println("  Frame $frame: Mode=$operMode, Task=$task, ScrTask=$scrTask, IntCtrl=$intCtrl, Joy=0x${joy.toString(16).padStart(2,'0')}, FC=${memory[FrameCounter]}")
+                }
             }
 
             // Timeout detection - if no progress for 1000 frames after reaching at least W1-1
@@ -255,6 +339,7 @@ class DecompiledTASTest {
 
         println("Initialization complete")
         println("Initial state: W${memory[WorldNumber].toInt() + 1}-${memory[LevelNumber].toInt() + 1}")
+        println("OperMode=${memory[OperMode]}, OperMode_Task=${memory[OperMode_Task]}, FC=${memory[FrameCounter]}")
     }
 
     /**
