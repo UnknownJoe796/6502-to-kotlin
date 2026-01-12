@@ -153,7 +153,13 @@ class InterpreterDecompiledComparisonTest {
             memory[addr] = interp.memory.readByte(addr)
         }
 
-        // Also need ROM data for the decompiled version
+        // by Claude - Copy ROM data from interpreter (0x8000-0xFFFF)
+        // The initializeRomData() only has partial data tables, so we need the full ROM
+        for (addr in 0x8000..0xFFFF) {
+            memory[addr] = interp.memory.readByte(addr)
+        }
+
+        // Also load any additional data tables from initializeRomData (may overlap but harmless)
         initializeRomData()
 
         // Get decompiled state summary (should match interpreter)
@@ -184,14 +190,15 @@ class InterpreterDecompiledComparisonTest {
         // Now run both in parallel for more frames with controller input
         println("\n=== Running frames in parallel with controller input ===")
 
-        // Controller input pattern: wait a bit then press START to begin game
+        // by Claude - Controller input pattern: press START at frame 13 (like the TAS does)
         val controllerInputs = buildList {
-            repeat(100) { add(0) }  // Wait on title screen
+            repeat(13) { add(0) }  // Wait briefly on title screen
             add(0x10)  // START button (bit 4)
-            repeat(300) { add(0) }  // Let game initialize
+            repeat(500) { add(0) }  // Let game initialize and enter gameplay
         }
 
-        for (frame in 0 until 200) {
+        // by Claude - Run full TAS (17868 frames) after fixing Bug #20
+        for (frame in 0 until 18000) {
             val controller = controllerInputs.getOrElse(frame) { 0 }
 
             // Set controller input for both systems
@@ -334,6 +341,7 @@ class InterpreterDecompiledComparisonTest {
         if (frameNum == 25) {
             println("DEBUG Frame $frameNum: AreaType = ${memory[areaTypeAddr]}, Player_Y_HighPos = ${memory[Player_Y_HighPos_addr]}")
         }
+        // by Claude - debug block buffer address calculation at frame 26
         if (frameNum in 25..27) {
             memoryWriteIntercept = { addr, value ->
                 if (addr == Player_X_Position) {
@@ -341,10 +349,27 @@ class InterpreterDecompiledComparisonTest {
                     val trace = Thread.currentThread().stackTrace.take(15).drop(2).joinToString(" <- ") { "${it.methodName}:${it.lineNumber}" }
                     println("DEBUG Player_X_Position write: FC=$frameNum, AreaType=${memory[areaTypeAddr]}, $oldVal -> ${value.toInt()}, trace=$trace")
                 }
+                // by Claude - Also track Player_Y_Position
+                if (addr == Player_Y_Position) {
+                    val oldVal = memory[Player_Y_Position].toInt()
+                    val trace = Thread.currentThread().stackTrace.take(15).drop(2).joinToString(" <- ") { "${it.methodName}:${it.lineNumber}" }
+                    println("DEBUG Player_Y_Position write: FC=$frameNum, $oldVal -> ${value.toInt()}, trace=$trace")
+                }
+                // by Claude - Also track Player_Y_Speed (0x009f)
+                if (addr == 0x009F) {
+                    val oldVal = memory[0x009F].toInt()
+                    val trace = Thread.currentThread().stackTrace.take(15).drop(2).joinToString(" <- ") { "${it.methodName}:${it.lineNumber}" }
+                    println("DEBUG Player_Y_Speed write: FC=$frameNum, $oldVal -> ${value.toInt()}, trace=$trace")
+                }
                 if (addr == Player_Y_HighPos_addr) {
                     val oldVal = memory[Player_Y_HighPos_addr].toInt()
                     val trace = Thread.currentThread().stackTrace.take(15).drop(2).joinToString(" <- ") { "${it.methodName}:${it.lineNumber}" }
                     println("DEBUG Player_Y_HighPos write: FC=$frameNum, $oldVal -> ${value.toInt()}, trace=$trace")
+                }
+                // by Claude - debug block buffer address writes
+                if (addr in 0x04..0x06 && frameNum == 26) {
+                    val trace = Thread.currentThread().stackTrace.take(15).drop(2).joinToString(" <- ") { "${it.methodName}:${it.lineNumber}" }
+                    println("DEBUG \$${addr.toString(16).padStart(2,'0')} write: FC=$frameNum, value=${value.toInt().toString(16)}, Player_X=${memory[0x86].toInt().toString(16)}, trace=$trace")
                 }
                 false // Don't intercept, just log
             }

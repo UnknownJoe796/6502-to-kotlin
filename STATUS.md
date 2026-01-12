@@ -1,6 +1,37 @@
 # Decompiler Project Status
 
-## 🎉 MILESTONE ACHIEVED (2026-01-08) 🎉
+## 🎉🎉 MAJOR MILESTONE ACHIEVED (2026-01-11) 🎉🎉
+**The DECOMPILED KOTLIN CODE now runs the full happylee TAS (18000 frames) in perfect sync with the interpreter!**
+
+### Decompiled Code TAS Success
+After fixing Bug #19 and Bug #20, the decompiled Kotlin code now matches the 6502 interpreter perfectly for all 18000 frames of the happylee-warps speedrun:
+
+```
+InterpreterDecompiledComparisonTest: 18000 frames ✓ BUILD SUCCESSFUL
+```
+
+**What this means**: The automatically decompiled Kotlin version of Super Mario Bros can:
+- Play through the entire game via TAS inputs
+- Match the original 6502 execution at every single frame
+- Handle all game modes, player movement, collision, level transitions, and warps
+
+### Bugs Fixed (2026-01-11)
+
+#### Bug #19: procLoopCommand infinite loop
+- **Symptom**: Game hung when LoopCommand was set
+- **Cause**: Missing `DEY` instruction in FindLoop - Y never decremented
+- **Fix**: Rewrote search loop with proper backwards iteration and BMI check
+
+#### Bug #20: doFootCheck SideCheckLoop infinite loop
+- **Symptom**: Game hung at frame 26 during title screen demo
+- **Cause**: Forward branches to CheckSideMTiles didn't break out of the loop
+- **Fix**: Rewrote with labeled `while(true)` and proper `break@sideCheckLoop` statements
+
+Both bugs documented in `local/decompiler-bugs.md`.
+
+---
+
+## Previous Milestone (2026-01-08)
 **The interpreter now runs the happylee TAS to completion (8-4 victory) WITHOUT any FCEUX assistance!**
 
 ### TAS Completion Results

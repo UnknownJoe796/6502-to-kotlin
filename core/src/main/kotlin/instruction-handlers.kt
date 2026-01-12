@@ -579,7 +579,42 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
         // Jump/subroutine instructions
         // ===========================
         AssemblyOp.JMP -> {
-            // Handled by control flow
+            // by Claude - Bug #1 fix: Generate tail call to target function when JMP points to a known function
+            // This handles cases like `jmp ChkContinue` where ChkContinue is a separate function
+            val addr = this.address
+            if (addr is AssemblyAddressing.Direct) {
+                val targetLabel = addr.label
+                val targetName = assemblyLabelToKotlinName(targetLabel)
+                val targetFunction = ctx.functionRegistry[targetName]
+                val currentFunctionName = ctx.currentFunction?.let { assemblyLabelToKotlinName(it.startingBlock.label ?: "") }
+
+                // by Claude - Bug #7 fix: Don't generate tail call to self (would cause infinite recursion)
+                // This happens when SetAttrib is both an internal label AND a registered function
+                if (targetFunction != null && targetName != currentFunctionName) {
+                    // Generate tail call to the target function
+                    val args = mutableListOf<KotlinExpr>()
+                    if (targetFunction.inputs?.contains(TrackedAsIo.A) == true) {
+                        args.add(ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A"))
+                    }
+                    if (targetFunction.inputs?.contains(TrackedAsIo.X) == true) {
+                        args.add(ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X"))
+                    }
+                    if (targetFunction.inputs?.contains(TrackedAsIo.Y) == true) {
+                        args.add(ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y"))
+                    }
+
+                    stmts.add(KExprStmt(KCall(targetName, args)))
+                    stmts.add(KReturn())
+                } else if (targetFunction == null) {
+                    // Target is not a known function - add comment for debugging
+                    stmts.add(KComment("jmp $targetLabel (not a known function)", commentTypeIndicator = ">"))
+                }
+                // else: targetName == currentFunctionName, this is an internal goto - control flow handles it
+            } else if (addr is AssemblyAddressing.IndirectAbsolute) {
+                // Indirect JMP - can't resolve at compile time
+                stmts.add(KComment("jmp (${addr.label}) - indirect jump", commentTypeIndicator = ">"))
+            }
+            // Note: For JMPs within the same function (loops, gotos), control flow analysis handles them
         }
 
         AssemblyOp.JSR -> {

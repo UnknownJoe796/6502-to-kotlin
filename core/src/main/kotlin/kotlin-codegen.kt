@@ -661,9 +661,10 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
             }
         }
 
-        // Generate Kotlin code for the instruction (if it's not a branch/jump)
+        // Generate Kotlin code for the instruction (if it's not a branch)
+        // by Claude - Bug #1 fix: Removed JMP exclusion - JMP now handled by instruction handler to generate tail calls
         val instr = line.instruction
-        if (instr != null && !instr.op.isBranch && instr.op != AssemblyOp.JMP) {
+        if (instr != null && !instr.op.isBranch) {
             // by Claude - Check if we should skip this instruction due to BIT skip-byte pattern
             if (skipNextInstruction) {
                 // The BIT instruction consumes 2 bytes, which is typically the first instruction
@@ -683,23 +684,55 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
         val branchTarget = this.branchExit
         val fallthrough = this.fallThroughExit
 
-        // Check if branch target is outside this function or is an exit block (contains JMP)
-        val targetIsExit = branchTarget?.function != this.function ||
-                           branchTarget?.lines?.any { it.instruction?.op == AssemblyOp.JMP } == true
+        // by Claude - Bug #5 fix: Only handle truly orphaned branches - those targeting outside this function
+        // If the branch target is inside the function (same CFG), control flow analysis will handle it via IfNode
+        // Previous code incorrectly also triggered for internal blocks containing JMP, causing double-handling
+        val targetIsExit = branchTarget?.function != this.function
 
         if (targetIsExit && branchTarget != null) {
             // Generate an if-statement for this orphaned branch
             // The condition is based on the branch type
             val condition = buildOrphanedBranchCondition(lastInstr, ctx)
             if (condition != null) {
-                // Branch taken = exit, so generate: if (condition) { return }
                 val targetLabel = branchTarget.label ?: "exit"
-                stmts.add(KIf(
-                    condition = condition,
-                    thenBranch = listOf(
+
+                // by Claude - Bug #1 fix: Check if branchTarget contains JMP to another function
+                // If so, generate a tail call to that function instead of just returning
+                val jmpInstr = branchTarget.lines.find { it.instruction?.op == AssemblyOp.JMP }?.instruction
+                val jmpTarget = (jmpInstr?.address as? AssemblyAddressing.Direct)?.label
+                val jmpTargetFunction = jmpTarget?.let { label ->
+                    ctx.functionRegistry[assemblyLabelToKotlinName(label)]
+                }
+
+                val thenBody = if (jmpTargetFunction != null && jmpTarget != null) {
+                    // Generate tail call to the JMP target function
+                    val targetName = assemblyLabelToKotlinName(jmpTarget)
+                    val args = mutableListOf<KotlinExpr>()
+                    if (jmpTargetFunction.inputs?.contains(TrackedAsIo.A) == true) {
+                        args.add(ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A"))
+                    }
+                    if (jmpTargetFunction.inputs?.contains(TrackedAsIo.X) == true) {
+                        args.add(ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X"))
+                    }
+                    if (jmpTargetFunction.inputs?.contains(TrackedAsIo.Y) == true) {
+                        args.add(ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y"))
+                    }
+                    listOf(
+                        KComment("goto $targetLabel -> $targetName", commentTypeIndicator = " "),
+                        KExprStmt(KCall(targetName, args)),
+                        KReturn()
+                    )
+                } else {
+                    // No JMP target found, just return
+                    listOf(
                         KComment("goto $targetLabel", commentTypeIndicator = " "),
                         KReturn()
-                    ),
+                    )
+                }
+
+                stmts.add(KIf(
+                    condition = condition,
+                    thenBranch = thenBody,
                     elseBranch = emptyList()
                 ))
             }
