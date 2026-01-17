@@ -8,6 +8,8 @@ import com.ivieleague.decompiler6502tokotlin.interpreter.FM2Parser
 import com.ivieleague.decompiler6502tokotlin.interpreter.NESLoader
 import com.ivieleague.decompiler6502tokotlin.smb.generated.*
 import java.io.File
+import java.util.concurrent.TimeUnit
+import org.junit.jupiter.api.Timeout
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -76,6 +78,8 @@ class DecompiledTASTest {
      * Run the full TAS through decompiled code and verify W8-4 completion.
      * by Claude - Simplified to use direct SavedJoypad1Bits writes like InterpreterDecompiledComparisonTest
      */
+    // by Claude - 60 second timeout to catch infinite loops
+    @Timeout(value = 60, unit = TimeUnit.SECONDS)
     @Test
     fun `decompiled code completes TAS to W8-4`() {
         System.err.println("TEST START - finding ROM")
@@ -140,15 +144,15 @@ class DecompiledTASTest {
                 println("❌ Global timeout after ${globalTimeoutMs / 1000}s - aborting at frame $frame")
                 break
             }
-            // by Claude - Write controller input directly to SavedJoypad1Bits
-            // This bypasses readJoypads() which may have issues
+            // by Claude - Get TAS input for this frame
             val buttons = tasInputs[frame].buttons
-            memory[SavedJoypad1Bits] = buttons.toUByte()
 
             // by Claude - Run decompiled NMI with timeout detection
+            // NOTE: Write controller input AFTER runDecompiledNMI() because readJoypads()
+            // inside NMI overwrites SavedJoypad1Bits by reading from hardware (which returns 0)
             val startTime = System.currentTimeMillis()
             try {
-                runDecompiledNMI()
+                runDecompiledNMI(buttons)
             } catch (e: Exception) {
                 println("❌ Error at frame $frame: ${e.message}")
                 e.printStackTrace()
@@ -193,14 +197,17 @@ class DecompiledTASTest {
                 println("Frame $frame/${tasInputs.size}: W$world-$level, OperMode=$operMode, FC=${memory[FrameCounter]}")
             }
 
-            // by Claude - Debug first 50 frames to see state changes
-            if (frame < 50) {
+            // by Claude - Debug first 100 frames to see state changes, especially around START press
+            if (frame < 100) {
                 val task = memory[OperMode_Task].toInt()
                 val joy = memory[SavedJoypad1Bits].toInt()
                 val scrTask = memory[ScreenRoutineTask].toInt()
                 val intCtrl = memory[IntervalTimerControl].toInt()
-                if (joy != 0 || frame < 15 || task != 1) {
-                    println("  Frame $frame: Mode=$operMode, Task=$task, ScrTask=$scrTask, IntCtrl=$intCtrl, Joy=0x${joy.toString(16).padStart(2,'0')}, FC=${memory[FrameCounter]}")
+                val joypadBits = memory[0x00F5].toInt()  // JoypadBitMask
+                val savedJoy2 = memory[0x06FD].toInt()  // SavedJoypad2Bits
+                // Print: first 15 frames, any frame with button press, task changes, or around frame 41 (START press)
+                if (frame < 15 || joy != 0 || buttons != 0 || task != 1 || (frame in 38..55)) {
+                    println("  Frame $frame: Mode=$operMode, Task=$task, ScrTask=$scrTask, IntCtrl=$intCtrl, Joy=0x${joy.toString(16).padStart(2,'0')}, TASInput=0x${buttons.toString(16).padStart(2,'0')}, FC=${memory[FrameCounter]}, JoyBits=0x${joypadBits.toString(16).padStart(2,'0')}")
                 }
             }
 
@@ -216,9 +223,16 @@ class DecompiledTASTest {
         println("Max level reached: W$maxWorld-$maxLevel")
         println("Reached W8-4: $reachedW84")
         println("Game completed: $gameCompleted")
+        println("Final OperMode: ${memory[OperMode]}")
 
-        // Assert we at least made progress
-        assertTrue(maxWorld >= 1 && maxLevel >= 1, "Should at least complete W1-1")
+        // by Claude - Assert the game actually started (transitioned out of title screen)
+        // After frame 41 when START is pressed, OperMode should transition from 0 to 1
+        assertTrue(memory[OperMode].toInt() != 0 || gameCompleted,
+            "Game should have started (OperMode should not be 0). Game stuck on title/demo screen.")
+
+        // Assert we at least made progress past W1-1
+        assertTrue(maxWorld > 1 || (maxWorld == 1 && maxLevel > 1) || gameCompleted,
+            "Should make progress past W1-1 start position")
 
         if (gameCompleted) {
             println("\n✅ SUCCESS: Decompiled code completed the TAS!")
@@ -336,10 +350,13 @@ class DecompiledTASTest {
     /**
      * Run the decompiled NMI equivalent.
      * Based on InterpreterDecompiledComparisonTest.runDecompiledNMI()
+     *
+     * @param controllerButtons TAS input for this frame - written AFTER readJoypads()
+     *        since readJoypads() reads from hardware registers (which return 0 in tests)
      */
-    private fun runDecompiledNMI() {
+    private fun runDecompiledNMI(controllerButtons: Int) {
         // by Claude - Debug frame 26+ to find hang
-        val debugFrame = currentFrame >= 25
+        val debugFrame = currentFrame >= 25 && currentFrame <= 50
         if (debugFrame) {
             System.err.println("DEBUG Frame $currentFrame start: Mode=${memory[OperMode]}, Task=${memory[OperMode_Task]}")
             System.err.flush()
@@ -351,10 +368,13 @@ class DecompiledTASTest {
         soundEngine()
         if (debugFrame) { System.err.println("ok"); System.err.flush() }
 
-        // Read joypads
+        // Read joypads (reads from hardware which returns 0 in tests)
         if (debugFrame) { System.err.print("readJoypads..."); System.err.flush() }
         readJoypads()
         if (debugFrame) { System.err.println("ok"); System.err.flush() }
+
+        // by Claude - Write TAS controller input AFTER readJoypads() to override the 0 values
+        memory[SavedJoypad1Bits] = controllerButtons.toUByte()
 
         // Pause routine
         if (debugFrame) { System.err.print("pauseRoutine..."); System.err.flush() }

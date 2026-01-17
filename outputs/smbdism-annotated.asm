@@ -941,7 +941,7 @@ MoveAllSpritesOffscreen:                                                        
 LDY #$00                      ; this routine moves all sprites off the screen                       ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-MoveSpritesOffscreen:                                                                               ;  B
+MoveSpritesOffscreen:                                                                               ; fun():  B
 LDY #$04                      ; this routine moves all but sprite 0                                 ; 
 LDA #$f8                      ; off the screen                                                      ; 
 SprInitLoop:  STA Sprite_Y_Position,Y; write 248 into OAM data's Y coordinate                       ;  B
@@ -3925,7 +3925,7 @@ QuestionBlockRow_High:                                                          
 LDA #$03                      ; start on the fourth row                                             ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-QuestionBlockRow_Low:                                                                               ; fun(X):  B
+QuestionBlockRow_Low:                                                                               ;  B
 LDA #$07                      ; start on the eighth row                                             ; 
 PHA                           ; save whatever row to the stack for now                              ; 
 JSR ChkLrgObjLength           ; get low nybble and save as length                                   ; 
@@ -3941,7 +3941,7 @@ Bridge_High:                                                                    
 LDA #$06                      ; start on the seventh row from top of screen                         ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-Bridge_Middle:                                                                                      ; fun(X):  B
+Bridge_Middle:                                                                                      ;  B
 LDA #$07                      ; start on the eighth row                                             ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
@@ -4277,7 +4277,7 @@ ExitUPartR:  RTS                                                                
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-ChkLrgObjLength:                                                                                    ; fun(X):  B
+ChkLrgObjLength:                                                                                    ; fun(X): Y B
 JSR GetLrgObjAttrib           ; get row location and size (length if branched to from here)         ; 
                                                                                                     ; 
 ChkLrgObjFixedLength:                                                                               ; fun(XY): CarryFlag B
@@ -4358,7 +4358,7 @@ DATA: ByteValue(value=18), ByteValue(value=54), ByteValue(value=14), ByteValue(v
                                                                                                     ; 
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-LoadAreaPointer:                                                                                    ; fun(A):  B
+LoadAreaPointer:                                                                                    ; fun(A): A B
 JSR FindAreaPointer           ; find it and store it here                                           ; 
 STA AreaPointer                                                                                     ; 
 GetAreaType:  AND #%01100000  ; mask out all but d6 and d5                                          ; fun(A): A B
@@ -7344,11 +7344,11 @@ MushFlowerBlock:                                                                
 LDA #$00                      ; load mushroom/fire flower into power-up type                        ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-StarBlock:                                                                                          ; fun():  B
+StarBlock:                                                                                          ;  B
 LDA #$02                      ; load star into power-up type                                        ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-ExtraLifeMushBlock:                                                                                 ;  B
+ExtraLifeMushBlock:                                                                                 ; fun():  B
 LDA #$03                      ; load 1-up mushroom into power-up type                               ; 
 STA $39                       ; store correct power-up type                                         ; 
 JMP SetupPowerUp                                                                                    ; 
@@ -7397,7 +7397,7 @@ RTS                                                                             
                                                                                                     ;  B
                               ; --------------------------------                                    ; 
                                                                                                     ; 
-CheckTopOfBlock:                                                                                    ; fun($02$06): CarryFlag B
+CheckTopOfBlock:                                                                                    ; fun($02$06): $05CarryFlag B
 LDX SprDataOffset_Ctrl        ; load control bit                                                    ; 
 LDY $02                       ; get vertical high nybble offset used in block buffer                ; 
 BEQ TopEx                     ; branch to leave if set to zero, because we're at the top            ; 
@@ -7532,7 +7532,7 @@ RTS                           ; then leave                                      
                               ; $01 - used to store low nybble of horizontal speed                  ; 
                               ; $02 - used to store adder to page location                          ; 
                                                                                                     ; 
-MoveEnemyHorizontally:                                                                              ; fun(X):  B
+MoveEnemyHorizontally:                                                                              ; fun(X): A B
 INX                           ; increment offset for enemy offset                                   ; 
 JSR MoveObjectHorizontally    ; position object horizontally according to                           ; 
 LDX ObjectOffset              ; counters, return with saved value in A,                             ; 
@@ -7765,7 +7765,7 @@ ExVMove:  RTS                 ; leave!                                          
                                                                                                     ;  B
                               ; -------------------------------------------------------------------------------------; 
                                                                                                     ; 
-EnemiesAndLoopsCore:                                                                                ; fun(X):  B
+EnemiesAndLoopsCore:                                                                                ; fun(X): X B
 LDA Enemy_Flag,X              ; check data here for MSB set                                         ; 
 PHA                           ; save in stack                                                       ; 
 ASL                                                                                                 ; 
@@ -11848,7 +11848,7 @@ CLC                           ; add positioning data using offset to the vertica
 ADC PlayerPosSPlatData-1,Y    ; coordinate                                                          ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-PositionPlayerOnVPlat:                                                                              ; fun(X):  B
+PositionPlayerOnVPlat:                                                                              ;  B
 LDA Enemy_Y_Position,X        ; get vertical coordinate                                             ; 
 LDY GameEngineSubroutine                                                                            ; 
 CPY #$0b                      ; if certain routine being executed on this frame,                    ; 
@@ -14070,7 +14070,7 @@ LDA EnemyGraphicsTable,X      ; load two tiles of enemy graphics                
 STA $00                                                                                             ; 
 LDA EnemyGraphicsTable+1,X                                                                          ; 
                                                                                                     ; 
-DrawOneSpriteRow:                                                                                   ; fun(A):  B
+DrawOneSpriteRow:                                                                                   ; fun(A): X B
 STA $01                                                                                             ; 
 JMP DrawSpriteObject          ; draw them                                                           ; 
                                                                                                     ;  B
@@ -14768,7 +14768,7 @@ LDX #$00                      ; set offsets for relative cooordinates           
 LDY #$00                      ; routine to correspond to player object                              ; 
 JMP RelWOfs                   ; get the coordinates                                                 ; 
                                                                                                     ;  B
-RelativeBubblePosition:                                                                             ; fun(X):  B
+RelativeBubblePosition:                                                                             ; fun(X): X B
 LDY #$01                      ; set for air bubble offsets                                          ; 
 JSR GetProperObjOffset        ; modify X to get proper air bubble offset                            ; 
 LDY #$03                                                                                            ; 
@@ -14834,7 +14834,7 @@ JSR GetProperObjOffset        ; modify X to get proper fireball offset          
 LDY #$02                      ; set other offset for fireball's offscreen bits                      ; 
 JMP GetOffScreenBitsSet       ; and get offscreen information about fireball                        ; 
                                                                                                     ;  B
-GetBubbleOffscreenBits:                                                                             ; fun(X):  B
+GetBubbleOffscreenBits:                                                                             ; fun(X): X B
 LDY #$01                      ; set for air bubble offsets                                          ; 
 JSR GetProperObjOffset        ; modify X to get proper air bubble offset                            ; 
 LDY #$03                      ; set other offset for airbubble's offscreen bits                     ; 

@@ -6,6 +6,8 @@ import com.ivieleague.decompiler6502tokotlin.hand.*
 import com.ivieleague.decompiler6502tokotlin.interpreter.BinaryInterpreter6502
 import com.ivieleague.decompiler6502tokotlin.smb.generated.*
 import java.io.File
+import java.util.concurrent.TimeUnit
+import org.junit.jupiter.api.Timeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -40,6 +42,8 @@ class InterpreterDecompiledComparisonTest {
     /**
      * Test: Initialize interpreter, copy state to decompiled, run a few frames in parallel.
      */
+    // by Claude - 60 second timeout to catch infinite loops
+    @Timeout(value = 60, unit = TimeUnit.SECONDS)
     @Test
     fun `interpreter initialized comparison`() {
         val romFile = listOf("../local/roms/smb.nes", "local/roms/smb.nes", "../smb.nes", "smb.nes")

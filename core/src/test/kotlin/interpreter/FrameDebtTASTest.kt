@@ -3,6 +3,8 @@
 package com.ivieleague.decompiler6502tokotlin.interpreter
 
 import java.io.File
+import java.util.concurrent.TimeUnit
+import org.junit.jupiter.api.Timeout
 import kotlin.test.Test
 
 /**
@@ -92,6 +94,8 @@ class FrameDebtTASTest {
         }
     }
 
+    // by Claude - 60 second timeout to catch infinite loops
+    @Timeout(value = 60, unit = TimeUnit.SECONDS)
     @Test
     fun `run TAS with frame debt system`() {
         val romFile = listOf("local/roms/smb.nes", "smb.nes", "../smb.nes")

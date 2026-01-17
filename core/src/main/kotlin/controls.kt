@@ -707,8 +707,19 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
     val naturalLoops = reachable.toList().detectNaturalLoops()
     val loopByHeader = naturalLoops.associateBy { it.header }
 
-    // Use source/layout order to detect structured patterns (typical 6502 style)
-    val layout = reachable.sortedBy { it.originalLineIndex }
+    // by Claude - Use source/layout order to detect structured patterns (typical 6502 style)
+    // CRITICAL FIX (Bug #4): Entry block MUST come first in layout, regardless of memory address.
+    // When a function has backward branches (e.g., ChkContinue's `beq ResetTitle`), the branch target
+    // may come BEFORE the entry block in memory order. Without this fix, the target block's code
+    // (including its RTS) would be processed first, causing the function to return early without
+    // executing the actual entry point code.
+    val sortedByAddress = reachable.sortedBy { it.originalLineIndex }
+    val layout = if (sortedByAddress.firstOrNull() == startingBlock) {
+        sortedByAddress  // Entry block already first, no change needed
+    } else {
+        // Move entry block to front, keep others in memory order
+        listOf(startingBlock) + sortedByAddress.filter { it != startingBlock }
+    }
     val indexOf = HashMap<AssemblyBlock, Int>(layout.size).also { map ->
         for ((i, b) in layout.withIndex()) map[b] = i
     }
@@ -747,9 +758,20 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
 
     fun buildRange(start: Int, endExclusive: Int): MutableList<ControlNode> {
         val out = mutableListOf<ControlNode>()
+        // by Claude - Track backward branch targets that have been inlined into if-then structures
+        // These should be skipped when encountered later in the iteration to avoid duplicate emission
+        val inlinedBackwardTargets = mutableSetOf<AssemblyBlock>()
+
         var i = start
         while (i < endExclusive) {
             val b = layout[i]
+
+            // by Claude - Skip blocks that were inlined as backward branch targets
+            if (b in inlinedBackwardTargets) {
+                i++
+                continue
+            }
+
             val last = b.lastInstructionLine()
 
             // Natural loop detection: If this block is a loop header, create a LoopNode
@@ -862,21 +884,38 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                     // Find the condition block (last block with back-edge)
                     // For Infinite loops, condition is null
                     // CRITICAL: For nested loops with shared header, use the NON-self-loop back-edge for the outer condition
+                    // by Claude - For PreTest loops where the HEADER has the exit condition (not internal branch),
+                    // use the header as the condition block. This handles: Loop: body; BEQ exit; JMP Loop
+                    // where the exit condition is in the header (BEQ), not the back-edge source (JMP).
                     val cond = if (loopKind == LoopKind.Infinite) {
                         null
                     } else {
-                        val conditionBlock = if (isNestedLoopWithSharedHeader) {
-                            // Use the non-self-loop back-edge for the outer loop condition
-                            otherBackEdges.firstOrNull()?.first ?: b
-                        } else {
-                            naturalLoop.backEdges.firstOrNull()?.first ?: b
+                        val conditionBlock = when {
+                            isNestedLoopWithSharedHeader -> {
+                                // Use the non-self-loop back-edge for the outer loop condition
+                                otherBackEdges.firstOrNull()?.first ?: b
+                            }
+                            // by Claude - PreTest with header exit condition: use header as condition block
+                            loopKind == LoopKind.PreTest && headerIsConditional && !headerHasInternalBranch -> {
+                                b // The header has the exit condition
+                            }
+                            else -> {
+                                naturalLoop.backEdges.firstOrNull()?.first ?: b
+                            }
                         }
-                        // Determine sense: if branch-taken goes to header, sense=true; if fall-through goes to header, sense=false
+                        // Determine sense: for PreTest with header condition, sense=false means
+                        // "continue while branch NOT taken" (branch exits loop)
                         val branchGoesToHeader = conditionBlock.branchExit == b
+                        val sense = if (conditionBlock == b && loopKind == LoopKind.PreTest) {
+                            // Header condition: branch exits, so sense=false (continue while NOT branching)
+                            false
+                        } else {
+                            branchGoesToHeader
+                        }
                         Condition(
                             branchBlock = conditionBlock,
                             branchLine = conditionBlock.lastInstructionLine() ?: b.lastInstructionLine()!!,
-                            sense = branchGoesToHeader,
+                            sense = sense,
                         )
                     }
 
@@ -1008,6 +1047,43 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                 val ftIdx = ft?.let { indexOf[it] } ?: -1
                 val brIdx = br?.let { indexOf[it] } ?: -1
 
+                // by Claude - CRITICAL FIX (Bug #4): Handle backward branches to exit blocks
+                // When a conditional block branches BACKWARD to a block that exits (RTS/RTI),
+                // we should inline that block as an if-then structure instead of relying on
+                // the normal forward-branch logic which would skip it.
+                val isBackwardBranch = br != null && br.originalLineIndex < b.originalLineIndex
+                val backwardTargetExits = isBackwardBranch && br?.isExitLike() == true
+
+                if (backwardTargetExits && br != null && ft != null) {
+                    // Generate: if (condition) { backward-target-code; return }
+                    // This handles patterns like:
+                    //   ChkContinue:  ldy DemoTimer
+                    //                 beq ResetTitle   ; <-- backward branch to exit block
+                    //                 ... more code ...
+                    //   ResetTitle:   lda #$00
+                    //                 sta OperMode
+                    //                 rts
+                    val thenNodes = mutableListOf<ControlNode>(BlockNode(id = nextId++, block = br))
+                    val cond = Condition(
+                        branchBlock = b,
+                        branchLine = last!!,
+                        sense = true, // branch-taken = then branch (the backward target)
+                    )
+                    out.add(
+                        IfNode(
+                            id = nextId++,
+                            condition = cond,
+                            thenBranch = thenNodes,
+                            elseBranch = mutableListOf(),
+                            join = null
+                        )
+                    )
+                    // Mark the backward target as inlined so we skip it later
+                    inlinedBackwardTargets.add(br)
+                    i++
+                    continue
+                }
+
                 // CRITICAL FIX: Constrain branch index to current range's endExclusive
                 // This prevents inner if-then patterns from including blocks that belong
                 // to outer structures (like branch targets of earlier branches)
@@ -1053,7 +1129,29 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                     // IF-THEN: branch target is the join right after then
                     // When branch target is outside current range, constrain then-branch to endExclusive
                     val effectiveThenEnd = if (hasOutOfRangeBranch) endExclusive else constrainedBrIdx
+
+                    // by Claude - Bug fix: When effectiveThenEnd <= i + 1, the then-range would be empty.
+                    // This happens when a conditional block's fall-through is at the boundary of our range.
+                    // In this case, don't create an if-then structure - just emit the block as a BlockNode.
+                    // The block's conditional branch will be handled by the orphaned branch handler in kotlin-codegen.kt.
+                    if (effectiveThenEnd <= i + 1) {
+                        // DEBUG: Log when this fix triggers
+                        if (b.label?.contains("A_Button") == true || b.lines.any { it.instruction?.address?.toString()?.contains("A_Button") == true }) {
+                            System.err.println("DEBUG controls.kt: Empty then-range fix triggered for block ${b.label} at line ${b.originalLineIndex}")
+                        }
+                        out.add(BlockNode(id = nextId++, block = b))
+                        i++
+                        continue
+                    }
+
                     val thenNodes = buildRange(i + 1, effectiveThenEnd)
+                    // DEBUG: Log thenNodes for GameMenuRoutine
+                    if (b.label == "GameMenuRoutine") {
+                        System.err.println("DEBUG controls.kt: GameMenuRoutine IfNode thenNodes count = ${thenNodes.size}")
+                        thenNodes.forEach { node ->
+                            System.err.println("DEBUG controls.kt:   - ${node::class.simpleName}: ${(node as? BlockNode)?.block?.label ?: (node as? BlockNode)?.block?.originalLineIndex}")
+                        }
+                    }
                     val cond = Condition(
                         branchBlock = b,
                         branchLine = last!!,
@@ -1068,11 +1166,46 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                     // by Claude - use isExitLike to also catch JMP to external function (tail call)
                     val branchTargetReturns = branchTargetBlock.isExitLike()
 
-                    // by Claude - isAlternativePath should check if branch target is truly a SEPARATE path
-                    // not just whether indices match. If branchTarget exits (via RTS or JMP to external),
-                    // it's definitely an alternative path, not a reconvergence.
-                    // The old check (branchTargetIdx != effectiveThenEnd) was always false for in-range branches.
-                    val isAlternativePath = branchTargetReturns // if it exits, it's an alternative path
+                    // by Claude - Bug #17 fix: Check if the branch target is a JOIN POINT
+                    // A join point is reachable from BOTH the branch AND the fall-through path.
+                    // If fall-through eventually reaches the branch target, it's a join, not an else.
+                    //
+                    // Pattern: bne Target / jsr Something / Target: ...
+                    // Here both paths reach Target - branch directly, fall-through after JSR.
+                    // This should be: if (cond) { call Something } / Target code
+                    // NOT: if (cond) { call Something } else { Target code }
+                    val fallThroughReachesBranchTarget = run {
+                        // Trace from fall-through block to see if we reach branchTargetIdx
+                        var current = ft
+                        var currentIdx = ftIdx
+                        var steps = 0
+                        val maxSteps = 10 // Limit search depth to avoid infinite loops
+                        while (current != null && currentIdx < branchTargetIdx && steps < maxSteps) {
+                            // Does this block fall through or branch to the target?
+                            val nextFt = current.fallThroughExit
+                            val nextFtIdx = nextFt?.let { indexOf[it] } ?: -1
+                            if (nextFtIdx == branchTargetIdx) {
+                                // Fall-through reaches the branch target - it's a join point
+                                break
+                            }
+                            // If current block is conditional, check if EITHER path reaches target
+                            if (current.isConditional()) {
+                                val brExit = current.branchExit
+                                val brExitIdx = brExit?.let { indexOf[it] } ?: -1
+                                if (brExitIdx == branchTargetIdx) {
+                                    // Branch reaches the target - check if fall-through continues
+                                    // If fall-through continues, we need to follow it
+                                }
+                            }
+                            current = nextFt
+                            currentIdx = nextFtIdx
+                            steps++
+                        }
+                        currentIdx == branchTargetIdx || (current?.fallThroughExit?.let { indexOf[it] } == branchTargetIdx)
+                    }
+
+                    // by Claude - isAlternativePath: branch target is ONLY reachable via branch, not fall-through
+                    val isAlternativePath = branchTargetReturns && !fallThroughReachesBranchTarget
 
                     if (branchTargetReturns && isAlternativePath) {
                         // The branch target is an alternative path that returns, not a reconvergence point
@@ -1098,16 +1231,120 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                         // Skip past both then and else ranges
                         i = maxOf(effectiveThenEnd, elseEnd)
                     } else {
-                        out.add(
-                            IfNode(
-                                id = nextId++,
-                                condition = cond,
-                                thenBranch = thenNodes,
-                                elseBranch = mutableListOf(),
-                                join = branchTargetBlock
+                        // by Claude - Bug fix: Check if then-branch has forward branches PAST the join
+                        // If so, we can't use a simple if-then-join because the branch targets would
+                        // become unreachable after the join's return statement.
+                        // Example: BEQ StartGame / CMP / BNE ChkSelect / StartGame: jmp / ChkSelect: ...
+                        // Here ChkSelect is AFTER StartGame (the join), so using StartGame as join
+                        // makes ChkSelect unreachable.
+                        //
+                        // Fix: Create if-else structure where the join becomes the else-branch,
+                        // and extend the then-branch to include the forward branch targets.
+                        val thenHasForwardBranchPastJoin = run {
+                            // Check blocks in thenNodes for forward branches past branchTargetIdx
+                            fun checkNodes(nodes: List<ControlNode>): Boolean {
+                                for (node in nodes) {
+                                    when (node) {
+                                        is BlockNode -> {
+                                            val block = node.block
+                                            if (block.isConditional()) {
+                                                val brExit = block.branchExit
+                                                val brExitIdx = brExit?.let { indexOf[it] } ?: -1
+                                                // Forward branch past the join?
+                                                if (brExitIdx > branchTargetIdx) {
+                                                    return true
+                                                }
+                                            }
+                                        }
+                                        is IfNode -> {
+                                            if (checkNodes(node.thenBranch) || checkNodes(node.elseBranch)) {
+                                                return true
+                                            }
+                                        }
+                                        is LoopNode -> {
+                                            if (checkNodes(node.body)) {
+                                                return true
+                                            }
+                                        }
+                                        else -> { /* Other node types don't have nested blocks to check */ }
+                                    }
+                                }
+                                return false
+                            }
+                            checkNodes(thenNodes)
+                        }
+
+                        if (thenHasForwardBranchPastJoin && branchTargetBlock.isExitLike()) {
+                            // by Claude - Restructure: join becomes else-branch (it returns anyway)
+                            // Then find the furthest forward branch target in thenNodes and extend to there
+                            val furthestBranchTarget = run {
+                                var maxIdx = branchTargetIdx
+                                fun findMax(nodes: List<ControlNode>) {
+                                    for (node in nodes) {
+                                        when (node) {
+                                            is BlockNode -> {
+                                                val block = node.block
+                                                if (block.isConditional()) {
+                                                    val brExit = block.branchExit
+                                                    val brExitIdx = brExit?.let { indexOf[it] } ?: -1
+                                                    if (brExitIdx > maxIdx) maxIdx = brExitIdx
+                                                }
+                                            }
+                                            is IfNode -> { findMax(node.thenBranch); findMax(node.elseBranch) }
+                                            is LoopNode -> { findMax(node.body) }
+                                            else -> { /* Other node types don't have nested blocks */ }
+                                        }
+                                    }
+                                }
+                                findMax(thenNodes)
+                                maxIdx
+                            }
+
+                            // Include the join block as the else-branch
+                            val elseNodes = buildRange(branchTargetIdx, branchTargetIdx + 1)
+
+                            // Now we need to extend thenNodes to include blocks from effectiveThenEnd
+                            // to furthestBranchTarget (so the forward branch targets are reachable)
+                            // But we already built thenNodes, so rebuild with extended range
+                            val extendedThenEnd = minOf(furthestBranchTarget + 1, layout.size)
+                            val extendedThenNodes = if (extendedThenEnd > effectiveThenEnd) {
+                                // Rebuild thenNodes with extended range, but skip the join block
+                                val extended = mutableListOf<ControlNode>()
+                                extended.addAll(thenNodes)
+                                // Add blocks from effectiveThenEnd to extendedThenEnd, skipping join
+                                for (j in effectiveThenEnd until extendedThenEnd) {
+                                    if (j != branchTargetIdx) {
+                                        extended.addAll(buildRange(j, j + 1))
+                                    }
+                                }
+                                extended
+                            } else {
+                                thenNodes
+                            }
+
+                            out.add(
+                                IfNode(
+                                    id = nextId++,
+                                    condition = cond,
+                                    thenBranch = extendedThenNodes,
+                                    elseBranch = elseNodes,
+                                    join = null
+                                )
                             )
-                        )
-                        i = effectiveThenEnd
+                            // Skip past both branches
+                            i = maxOf(extendedThenEnd, branchTargetIdx + 1)
+                        } else {
+                            out.add(
+                                IfNode(
+                                    id = nextId++,
+                                    condition = cond,
+                                    thenBranch = thenNodes,
+                                    elseBranch = mutableListOf(),
+                                    join = branchTargetBlock
+                                )
+                            )
+                            i = effectiveThenEnd
+                        }
                     }
                     continue
                 }
@@ -1249,6 +1486,20 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                 // Jump backward = infinite loop (includes self-loops)
                 if (targetIdx >= 0 && targetIdx <= i) {
                     val loopHeader = layout[targetIdx]
+
+                    // by Claude - CRITICAL FIX: Skip if the loop header is already being processed
+                    // by natural loop detection. This prevents creating duplicate nested loops
+                    // when a JMP back to the loop header is inside the loop body.
+                    // Pattern: Loop: body; BEQ exit; JMP Loop
+                    // The JMP Loop is the loop continuation, not a separate infinite loop.
+                    if (loopHeader in processingLoopHeaders) {
+                        // This JMP is a "continue" to the outer loop, not a new loop
+                        // Just emit as a BlockNode - the loop structure is already captured
+                        out.add(BlockNode(id = nextId++, block = b))
+                        i++
+                        continue
+                    }
+
                     // Body is from targetIdx to i (inclusive) - just wrap as BlockNodes
                     val bodyNodes: MutableList<ControlNode> = (targetIdx..i).map { idx ->
                         BlockNode(id = nextId++, block = layout[idx])

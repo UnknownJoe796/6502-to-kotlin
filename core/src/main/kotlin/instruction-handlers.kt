@@ -113,32 +113,44 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
         // Transfer instructions
         // All transfer instructions set Z and N flags based on value transferred
         // ===========================
+        // by Claude - Bug #13/#14/#18 fix: Always emit assignment for transfer instructions
+        // The previous implementation just aliased registers (ctx.registerY = ctx.registerA),
+        // but this breaks when the source register is later modified before the target is used.
+        // Example: TAY followed by PLA - Y should keep the pre-PLA value of A.
         AssemblyOp.TAX -> {
             val value = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
-            ctx.registerX = value
-            ctx.zeroFlag = KBinaryOp(value, "==", KLiteral("0"))
-            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(value, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            // by Claude - Always emit X = A to materialize the transfer
+            stmts.add(KAssignment(KVar("X"), value))
+            ctx.registerX = KVar("X")
+            ctx.zeroFlag = KBinaryOp(KVar("X"), "==", KLiteral("0"))
+            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(KVar("X"), "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
 
         AssemblyOp.TAY -> {
             val value = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
-            ctx.registerY = value
-            ctx.zeroFlag = KBinaryOp(value, "==", KLiteral("0"))
-            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(value, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            // by Claude - Always emit Y = A to materialize the transfer
+            stmts.add(KAssignment(KVar("Y"), value))
+            ctx.registerY = KVar("Y")
+            ctx.zeroFlag = KBinaryOp(KVar("Y"), "==", KLiteral("0"))
+            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(KVar("Y"), "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
 
         AssemblyOp.TXA -> {
             val value = ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X")
-            ctx.registerA = value
-            ctx.zeroFlag = KBinaryOp(value, "==", KLiteral("0"))
-            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(value, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            // by Claude - Always emit A = X to materialize the transfer
+            stmts.add(KAssignment(KVar("A"), value))
+            ctx.registerA = KVar("A")
+            ctx.zeroFlag = KBinaryOp(KVar("A"), "==", KLiteral("0"))
+            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(KVar("A"), "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
 
         AssemblyOp.TYA -> {
             val value = ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y")
-            ctx.registerA = value
-            ctx.zeroFlag = KBinaryOp(value, "==", KLiteral("0"))
-            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(value, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            // by Claude - Always emit A = Y to materialize the transfer
+            stmts.add(KAssignment(KVar("A"), value))
+            ctx.registerA = KVar("A")
+            ctx.zeroFlag = KBinaryOp(KVar("A"), "==", KLiteral("0"))
+            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(KVar("A"), "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
 
         // ===========================
@@ -149,12 +161,13 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
             val a = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
             val carryIn = ctx.carryFlag ?: KLiteral("false")
 
+            // by Claude - Fixed to use proper KIfExpr instead of embedding raw syntax in KLiteral
             // Simplify carry to int: if carry is literal true/false, just use 1 or 0
             // Otherwise generate: if (carry) 1 else 0
             val carryInt: KotlinExpr = when {
                 carryIn is KLiteral && carryIn.value in listOf("0", "false") -> KLiteral("0")
                 carryIn is KLiteral && carryIn.value in listOf("1", "true") -> KLiteral("1")
-                else -> KParen(KLiteral("if (${carryIn.toKotlin()}) 1 else 0"))
+                else -> KIfExpr(carryIn, KLiteral("1"), KLiteral("0"))
             }
 
             // Full sum (may exceed 255)
@@ -187,6 +200,15 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
             ctx.carryFlag = KBinaryOp(sumVar, ">", KLiteral("0xFF"))
             ctx.zeroFlag = KBinaryOp(result, "==", KLiteral("0"))
             ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(result, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+
+            // by Claude - Overflow flag for ADC: set when adding two positives gives negative,
+            // or adding two negatives gives positive. Formula: V = (A ^ result) & (operand ^ result) & 0x80
+            // This detects when the sign of the result differs from what you'd expect from the operand signs.
+            val operandWrapped = wrapPropertyRead(operand)
+            val aXorResult = KBinaryOp(a, "xor", result)
+            val opXorResult = KBinaryOp(operandWrapped, "xor", result)
+            val overflowExpr = KBinaryOp(KParen(KBinaryOp(aXorResult, "and", opXorResult)), "and", KLiteral("0x80"))
+            ctx.overflowFlag = KBinaryOp(overflowExpr, "!=", KLiteral("0"))
         }
 
         AssemblyOp.SBC -> {
@@ -194,12 +216,13 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
             val a = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
             val carryIn = ctx.carryFlag ?: KLiteral("true")
 
+            // by Claude - Fixed to use proper KIfExpr instead of embedding raw syntax in KLiteral
             // Simplify borrow: if carry is literal true/false, just use 0 or 1
             // borrow = NOT carry, so: carry=true -> borrow=0, carry=false -> borrow=1
             val borrowInt: KotlinExpr = when {
                 carryIn is KLiteral && carryIn.value in listOf("1", "true") -> KLiteral("0")
                 carryIn is KLiteral && carryIn.value in listOf("0", "false") -> KLiteral("1")
-                else -> KParen(KLiteral("if (${carryIn.toKotlin()}) 0 else 1"))
+                else -> KIfExpr(carryIn, KLiteral("0"), KLiteral("1"))
             }
 
             // Full difference (may go negative)
@@ -228,6 +251,16 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
             ctx.carryFlag = KBinaryOp(diffVar, ">=", KLiteral("0"))
             ctx.zeroFlag = KBinaryOp(result, "==", KLiteral("0"))
             ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(result, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+
+            // by Claude - Overflow flag for SBC: set when subtracting creates unexpected sign change.
+            // For SBC, V = (A ^ result) & (A ^ operand) & 0x80
+            // This detects cases like: positive - negative = negative (should be positive)
+            // or: negative - positive = positive (should be negative)
+            val operandWrapped = wrapPropertyRead(operand)
+            val aXorResult = KBinaryOp(a, "xor", result)
+            val aXorOperand = KBinaryOp(a, "xor", operandWrapped)
+            val overflowExpr = KBinaryOp(KParen(KBinaryOp(aXorResult, "and", aXorOperand)), "and", KLiteral("0x80"))
+            ctx.overflowFlag = KBinaryOp(overflowExpr, "!=", KLiteral("0"))
         }
 
         AssemblyOp.INC -> {
@@ -315,41 +348,89 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
         // All logical instructions set Z and N flags based on result
         // Emit explicit assignments to make data flow visible
         // ===========================
+        // by Claude - Fixed AND/ORA/EOR to emit assignment statement like ADC/SBC do
         AssemblyOp.AND -> {
             val operand = wrapPropertyRead(this.address.toKotlinExpr(ctx))
             val a = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
             val resultExpr = KBinaryOp(a, "and", operand)
-            // Emit assignment to make data flow visible
-            val varName = ctx.nextTempVar()
-            stmts.add(KVarDecl(varName, "Int", resultExpr, mutable = false))
-            val varRef = KVar(varName)
-            ctx.registerA = varRef
-            ctx.zeroFlag = KBinaryOp(varRef, "==", KLiteral("0"))
-            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(varRef, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+
+            // CRITICAL FIX: If there's a function-level variable for A, we need to update it
+            // so that stores after merged branches use the correct value.
+            val funcLevelVar = ctx.getFunctionLevelVar("A")
+            if (funcLevelVar != null) {
+                stmts.add(KAssignment(funcLevelVar, resultExpr))
+                ctx.registerA = funcLevelVar
+                ctx.zeroFlag = KBinaryOp(funcLevelVar, "==", KLiteral("0"))
+                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(funcLevelVar, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            } else if (a is KVar) {
+                // A is already a mutable variable, just assign to it
+                stmts.add(KAssignment(a, resultExpr))
+                ctx.registerA = a
+                ctx.zeroFlag = KBinaryOp(a, "==", KLiteral("0"))
+                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            } else {
+                // Use temp variable (for expressions)
+                val varName = ctx.nextTempVar()
+                stmts.add(KVarDecl(varName, "Int", resultExpr, mutable = false))
+                val varRef = KVar(varName)
+                ctx.registerA = varRef
+                ctx.zeroFlag = KBinaryOp(varRef, "==", KLiteral("0"))
+                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(varRef, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            }
         }
 
+        // by Claude - Fixed ORA to emit assignment statement
         AssemblyOp.ORA -> {
             val operand = wrapPropertyRead(this.address.toKotlinExpr(ctx))
             val a = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
             val resultExpr = KBinaryOp(a, "or", operand)
-            val varName = ctx.nextTempVar()
-            stmts.add(KVarDecl(varName, "Int", resultExpr, mutable = false))
-            val varRef = KVar(varName)
-            ctx.registerA = varRef
-            ctx.zeroFlag = KBinaryOp(varRef, "==", KLiteral("0"))
-            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(varRef, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+
+            val funcLevelVar = ctx.getFunctionLevelVar("A")
+            if (funcLevelVar != null) {
+                stmts.add(KAssignment(funcLevelVar, resultExpr))
+                ctx.registerA = funcLevelVar
+                ctx.zeroFlag = KBinaryOp(funcLevelVar, "==", KLiteral("0"))
+                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(funcLevelVar, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            } else if (a is KVar) {
+                stmts.add(KAssignment(a, resultExpr))
+                ctx.registerA = a
+                ctx.zeroFlag = KBinaryOp(a, "==", KLiteral("0"))
+                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            } else {
+                val varName = ctx.nextTempVar()
+                stmts.add(KVarDecl(varName, "Int", resultExpr, mutable = false))
+                val varRef = KVar(varName)
+                ctx.registerA = varRef
+                ctx.zeroFlag = KBinaryOp(varRef, "==", KLiteral("0"))
+                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(varRef, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            }
         }
 
+        // by Claude - Fixed EOR to emit assignment statement
         AssemblyOp.EOR -> {
             val operand = wrapPropertyRead(this.address.toKotlinExpr(ctx))
             val a = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
             val resultExpr = KBinaryOp(a, "xor", operand)
-            val varName = ctx.nextTempVar()
-            stmts.add(KVarDecl(varName, "Int", resultExpr, mutable = false))
-            val varRef = KVar(varName)
-            ctx.registerA = varRef
-            ctx.zeroFlag = KBinaryOp(varRef, "==", KLiteral("0"))
-            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(varRef, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+
+            val funcLevelVar = ctx.getFunctionLevelVar("A")
+            if (funcLevelVar != null) {
+                stmts.add(KAssignment(funcLevelVar, resultExpr))
+                ctx.registerA = funcLevelVar
+                ctx.zeroFlag = KBinaryOp(funcLevelVar, "==", KLiteral("0"))
+                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(funcLevelVar, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            } else if (a is KVar) {
+                stmts.add(KAssignment(a, resultExpr))
+                ctx.registerA = a
+                ctx.zeroFlag = KBinaryOp(a, "==", KLiteral("0"))
+                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(a, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            } else {
+                val varName = ctx.nextTempVar()
+                stmts.add(KVarDecl(varName, "Int", resultExpr, mutable = false))
+                val varRef = KVar(varName)
+                ctx.registerA = varRef
+                ctx.zeroFlag = KBinaryOp(varRef, "==", KLiteral("0"))
+                ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(varRef, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            }
         }
 
         // ===========================
@@ -542,29 +623,35 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
         // ===========================
         // Compare instructions
         // ===========================
+        // by Claude - Compare instructions set Z, C, N flags based on (reg - operand)
+        // Z = 1 if result == 0 (reg == operand)
+        // C = 1 if reg >= operand (no borrow)
+        // N = 1 if bit 7 of (reg - operand) & 0xFF is set
         AssemblyOp.CMP -> {
             val operand = wrapPropertyRead(this.address.toKotlinExpr(ctx))
             val a = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
-
-            // Set flags based on comparison
-            val diff = KBinaryOp(a, "-", operand)
-            ctx.zeroFlag = KBinaryOp(diff, "==", KLiteral("0"))
+            val diff = KBinaryOp(KParen(KBinaryOp(a, "-", operand)), "and", KLiteral("0xFF"))
+            ctx.zeroFlag = KBinaryOp(a, "==", operand)
             ctx.carryFlag = KBinaryOp(a, ">=", operand)
-            ctx.negativeFlag = KBinaryOp(diff, "<", KLiteral("0"))
+            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(diff, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
 
         AssemblyOp.CPX -> {
             val operand = wrapPropertyRead(this.address.toKotlinExpr(ctx))
             val x = ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X")
+            val diff = KBinaryOp(KParen(KBinaryOp(x, "-", operand)), "and", KLiteral("0xFF"))
             ctx.zeroFlag = KBinaryOp(x, "==", operand)
             ctx.carryFlag = KBinaryOp(x, ">=", operand)
+            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(diff, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
 
         AssemblyOp.CPY -> {
             val operand = wrapPropertyRead(this.address.toKotlinExpr(ctx))
             val y = ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y")
+            val diff = KBinaryOp(KParen(KBinaryOp(y, "-", operand)), "and", KLiteral("0xFF"))
             ctx.zeroFlag = KBinaryOp(y, "==", operand)
             ctx.carryFlag = KBinaryOp(y, ">=", operand)
+            ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(diff, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
         }
 
         // ===========================
@@ -686,6 +773,8 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                 // by Claude - Capture register outputs from functions that return values
                 val hasAOutput = targetFunction?.outputs?.contains(TrackedAsIo.A) == true
                 val hasYOutput = targetFunction?.outputs?.contains(TrackedAsIo.Y) == true
+                // by Claude - Bug #2 fix: detect carry flag as boolean return
+                val hasCarryOutput = targetFunction?.outputs?.contains(TrackedAsIo.CarryFlag) == true
 
                 when {
                     hasAOutput && hasYOutput -> {
@@ -712,6 +801,12 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                         stmts.add(KVarDecl(resultVar, mutable = true, value = KCall(functionName, args)))
                         ctx.registerY = KVar(resultVar)
                     }
+                    // by Claude - Bug #2 fix: capture carry flag boolean return
+                    hasCarryOutput -> {
+                        // Function returns Boolean (carry flag) - capture it
+                        // The carry flag expression is set so subsequent BCS/BCC use the result
+                        ctx.carryFlag = KCall(functionName, args)
+                    }
                     else -> {
                         // Void function - just call it
                         stmts.add(KExprStmt(KCall(functionName, args)))
@@ -730,6 +825,8 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
             val funcOutputs = ctx.currentFunction?.outputs
             val hasAOutput = funcOutputs?.contains(TrackedAsIo.A) == true
             val hasYOutput = funcOutputs?.contains(TrackedAsIo.Y) == true
+            // by Claude - Bug #2 fix: detect carry flag as boolean return
+            val hasCarryOutput = funcOutputs?.contains(TrackedAsIo.CarryFlag) == true
 
             val returnValue = when {
                 hasAOutput && hasYOutput -> {
@@ -745,6 +842,12 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                 hasYOutput -> {
                     // Return Y value
                     ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y")
+                }
+                // by Claude - Bug #2 fix: return carry flag as boolean
+                hasCarryOutput -> {
+                    // Return carry flag expression as boolean
+                    // This is set by CMP, CPX, CPY, ADC, SBC, etc.
+                    ctx.carryFlag ?: KLiteral("false")
                 }
                 else -> {
                     // Void function - return with no value (will be stripped by function generator)

@@ -73,10 +73,12 @@ class TransferInstructionAliasingTest {
             "Condition should compare the preserved Y value (from ASL), not the LDA #$20 value (temp0)"
         )
 
-        // The condition should reference A (the shifted value) or a temp variable derived from it
+        // The condition should reference A, Y, or a temp variable derived from them
+        // After TAY, the Y register holds the shifted A value, so comparing Y is correct
         assertTrue(
-            kotlinCode.contains("if (A") || kotlinCode.contains("if (temp1") || kotlinCode.contains("(A =="),
-            "Condition should compare the shifted A value (preserved as Y) with 0"
+            kotlinCode.contains("if (A") || kotlinCode.contains("if (temp1") ||
+            kotlinCode.contains("(A ==") || kotlinCode.contains("if (Y") || kotlinCode.contains("(Y =="),
+            "Condition should compare the preserved value (A or Y after TAY) with 0"
         )
     }
 

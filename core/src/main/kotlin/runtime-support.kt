@@ -149,26 +149,12 @@ class MemoryByteArray(private val baseAddress: Int) {
 }
 
 // =============================================================================
-// CPU REGISTERS
+// CPU STATE (Stack only - registers are local variables in decompiled functions)
 // =============================================================================
 
-/**
- * Accumulator - main register for arithmetic and logical operations.
- * All arithmetic results go here.
- */
-var A: Int = 0
-
-/**
- * Index Register X - used for indexed addressing and loop counters.
- * Can be used as an offset or as a general-purpose counter.
- */
-var X: Int = 0
-
-/**
- * Index Register Y - used for indexed addressing and loop counters.
- * Similar to X, but some addressing modes only work with Y.
- */
-var Y: Int = 0
+// by Claude - Removed global A, X, Y registers. The decompiled code uses local variables
+// and parameter passing for registers, which is the correct functional approach.
+// Global registers would make this an interpreter, not a decompilation.
 
 /**
  * Stack Pointer - points to current top of stack in page $01.
@@ -352,11 +338,11 @@ fun updateFlagsCompare(reg: Int, operand: Int) {
 
 /**
  * Reset the CPU state to power-on defaults.
+ * Note: A, X, Y registers are local variables in decompiled functions,
+ * so only stack pointer and flags need resetting here.
  */
 fun resetCPU() {
-    A = 0
-    X = 0
-    Y = 0
+    // by Claude - Removed A, X, Y resets (now local variables in functions)
     SP = 0xFF
     flagN = false
     flagV = false

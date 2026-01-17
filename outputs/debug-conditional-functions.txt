@@ -7,13 +7,18 @@ Inputs:
 Outputs: CarryFlag
 Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y
 
---- Control Flow Nodes (1 nodes) ---
+--- Control Flow Nodes (2 nodes) ---
 
 [0] IfNode
   Condition block: CheckPlayerVertical
   Sense: false
   Then branch: 1 nodes
-  Else branch: 1 nodes
+  Else branch: 0 nodes
+
+[1] BlockNode
+  Block: ExCPV
+  Lines: 1
+    RTS 
 
 --- Blocks Graph ---
 
@@ -55,13 +60,18 @@ Inputs: $00, $01
 Outputs: 
 Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, X, Y
 
---- Control Flow Nodes (1 nodes) ---
+--- Control Flow Nodes (2 nodes) ---
 
 [0] IfNode
   Condition block: HandlePipeEntry
   Sense: false
   Then branch: 1 nodes
-  Else branch: 1 nodes
+  Else branch: 0 nodes
+
+[1] BlockNode
+  Block: ExPipeE
+  Lines: 1
+    RTS 
 
 --- Blocks Graph ---
 
@@ -138,13 +148,18 @@ Inputs: X
 Outputs: 
 Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, OverflowFlag, $01, $00, $03, $02
 
---- Control Flow Nodes (1 nodes) ---
+--- Control Flow Nodes (2 nodes) ---
 
 [0] IfNode
   Condition block: OffscreenBoundsCheck
   Sense: false
   Then branch: 4 nodes
-  Else branch: 1 nodes
+  Else branch: 0 nodes
+
+[1] BlockNode
+  Block: ExScrnBd
+  Lines: 1
+    RTS 
 
 --- Blocks Graph ---
 
@@ -249,24 +264,29 @@ Inputs: X
 Outputs: 
 Clobbers: A, NegativeFlag, ZeroFlag, $07, CarryFlag, Y, OverflowFlag
 
---- Control Flow Nodes (3 nodes) ---
+--- Control Flow Nodes (4 nodes) ---
 
-[0] BlockNode
-  Block: BubbleCheck
-  Lines: 7
-    LDA PseudoRandomBitReg+1,X
-    AND #$01
-    ... (4 more)
+[0] IfNode
+  Condition block: BubbleCheck
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
 
-[1] BlockNode
-  Block: @6395
-  Lines: 2
-    LDA AirBubbleTimer
-    BNE ExitBubl
+[1] IfNode
+  Condition block: MoveBubl
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
 
 [2] BlockNode
-  Block: @6397
+  Block: Y_Bubl
   Lines: 1
+    STA Bubble_Y_Position,X
+
+[3] BlockNode
+  Block: ExitBubl
+  Lines: 1
+    RTS 
 
 --- Blocks Graph ---
 

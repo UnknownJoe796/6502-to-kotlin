@@ -4,6 +4,8 @@ package com.ivieleague.decompiler6502tokotlin.interpreter
 
 import java.io.File
 import java.util.zip.GZIPInputStream
+import java.util.concurrent.TimeUnit
+import org.junit.jupiter.api.Timeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -72,15 +74,16 @@ class FM2Parser {
             var result = 0
 
             // FM2 order: R L D U T S B A (positions 0-7)
-            // NES bit order: A=0, B=1, Select=2, Start=3, Up=4, Down=5, Left=6, Right=7
-            if (buttons[0] != '.') result = result or 0x80  // R -> bit 7
-            if (buttons[1] != '.') result = result or 0x40  // L -> bit 6
-            if (buttons[2] != '.') result = result or 0x20  // D -> bit 5
-            if (buttons[3] != '.') result = result or 0x10  // U -> bit 4
-            if (buttons[4] != '.') result = result or 0x08  // T (Start) -> bit 3
-            if (buttons[5] != '.') result = result or 0x04  // S (Select) -> bit 2
-            if (buttons[6] != '.') result = result or 0x02  // B -> bit 1
-            if (buttons[7] != '.') result = result or 0x01  // A -> bit 0
+            // by Claude - SMB uses ROL to read buttons serially, so first bit (A) ends up at bit 7
+            // SMB button encoding: A=0x80, B=0x40, Select=0x20, Start=0x10, Up=0x08, Down=0x04, Left=0x02, Right=0x01
+            if (buttons[0] != '.') result = result or 0x01  // R -> bit 0 (Right)
+            if (buttons[1] != '.') result = result or 0x02  // L -> bit 1 (Left)
+            if (buttons[2] != '.') result = result or 0x04  // D -> bit 2 (Down)
+            if (buttons[3] != '.') result = result or 0x08  // U -> bit 3 (Up)
+            if (buttons[4] != '.') result = result or 0x10  // T (Start) -> bit 4
+            if (buttons[5] != '.') result = result or 0x20  // S (Select) -> bit 5
+            if (buttons[6] != '.') result = result or 0x40  // B -> bit 6
+            if (buttons[7] != '.') result = result or 0x80  // A -> bit 7
 
             return Frame(result)
         }
@@ -378,6 +381,8 @@ class FullTASValidationTest {
         return frames
     }
 
+    // by Claude - 60 second timeout to catch infinite loops
+    @Timeout(value = 60, unit = TimeUnit.SECONDS)
     @Test
     fun `run game with TAS input - start game and play`() {
         val romFile = findRom()
@@ -1058,6 +1063,8 @@ class FullTASValidationTest {
         }
     }
 
+    // by Claude - 60 second timeout to catch infinite loops
+    @Timeout(value = 60, unit = TimeUnit.SECONDS)
     @Test
     fun `verify game state addresses work`() {
         val romFile = findRom()

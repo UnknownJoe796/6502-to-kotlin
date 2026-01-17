@@ -126,7 +126,16 @@ fun AssemblyAddressing?.toKotlinExpr(ctx: CodeGenContext): KotlinExpr {
         }
 
         is AssemblyAddressing.ConstantReference -> {
-            KVar(this.name)
+            // by Claude - Bug fix: Wrap compound expressions in parentheses
+            // When the constant name contains operators (like A_Button+Start_Button),
+            // we need parentheses to preserve correct evaluation order in expressions like
+            // `A - A_Button+Start_Button` which should be `A - (A_Button+Start_Button)`
+            val expr = KVar(this.name)
+            if (this.name.contains('+') || this.name.contains('-')) {
+                KParen(expr)
+            } else {
+                expr
+            }
         }
 
         is AssemblyAddressing.Direct -> {

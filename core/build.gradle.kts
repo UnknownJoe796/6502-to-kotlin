@@ -15,8 +15,10 @@ tasks.withType<Test> {
     // More memory for large TAS captures
     maxHeapSize = "4g"
 
-    // Longer timeout for full TAS tests (10 minutes)
-    systemProperty("junit.jupiter.execution.timeout.default", "10m")
+    // by Claude - Reduced default timeout from 10m to 1m to catch infinite loops
+    // TAS is ~5 min long, but tests should complete much faster. Individual tests
+    // can extend with @Timeout if needed.
+    systemProperty("junit.jupiter.execution.timeout.default", "1m")
 
     // Show test output in console
     testLogging {

@@ -731,6 +731,83 @@ fun List<AssemblyBlock>.functionify(
         }
     }
 
+    // by Claude - Bug #11 fix: Step 5: Propagate transitive clobbers through function calls
+    // When function A calls function B (JSR) or tail-calls B (JMP), A inherits B's clobbers
+    // This is needed so output detection works for functions that only contain calls
+    changed = true
+    iterations = 0
+
+    while (changed && iterations < maxIterations) {
+        changed = false
+        iterations++
+
+        for (func in functions) {
+            val funcBlocks = func.blocks ?: continue
+            val currentClobbers = func.clobbers?.toMutableSet() ?: mutableSetOf()
+            val originalSize = currentClobbers.size
+
+            for (block in funcBlocks) {
+                for (line in block.lines) {
+                    val instr = line.instruction ?: continue
+
+                    // For JSR and JMP, inherit callee's clobbers
+                    if (instr.op == AssemblyOp.JSR || instr.op == AssemblyOp.JMP) {
+                        val targetLabel = (instr.address as? AssemblyAddressing.Direct)?.label
+                        val calledFunction = if (targetLabel != null) labelToFunction[targetLabel] else null
+
+                        if (calledFunction != null) {
+                            val calleeClobbers = calledFunction.clobbers ?: emptySet()
+                            currentClobbers.addAll(calleeClobbers)
+                        }
+                    }
+                }
+            }
+
+            if (currentClobbers.size != originalSize) {
+                func.clobbers = currentClobbers
+                changed = true
+            }
+        }
+    }
+
+    // by Claude - Bug #11 fix: Step 6: Re-analyze outputs with updated clobbers
+    // Now that clobbers include transitive effects, re-detect outputs
+    for (func in functions) {
+        val candidateDefs = func.clobbers ?: emptySet()
+        val detectedOutputs = mutableSetOf<TrackedAsIo>()
+
+        fun trackUse(state: TrackedAsIo, killed: Set<TrackedAsIo>) {
+            if (state in candidateDefs && state !in killed) detectedOutputs.add(state)
+        }
+
+        for (caller in func.callers) {
+            val block = caller.block ?: continue
+            val idx = block.lines.indexOf(caller)
+            if (idx == -1) continue
+
+            val killed = mutableSetOf<TrackedAsIo>()
+            // Scan forward within the same block after the JSR to see what the caller uses
+            for (i in (idx + 1) until block.lines.size) {
+                val line = block.lines[i]
+                val instruction = line.instruction ?: continue
+                val op = instruction.op
+
+                op.reads(instruction.address?.let { it::class })
+                    .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
+                    .forEach { state ->
+                        trackUse(state, killed)
+                    }
+                op.modifies(instruction.address?.let { it::class })
+                    .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
+                    .forEach { state ->
+                        killed.add(state)
+                    }
+            }
+        }
+
+        func.outputs = detectedOutputs
+    }
+
     return functions
 }
 

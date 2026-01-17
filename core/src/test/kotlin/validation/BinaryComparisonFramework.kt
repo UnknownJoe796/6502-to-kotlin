@@ -53,13 +53,20 @@ class BinaryComparisonFramework {
             }
 
             /**
-             * Capture state from the decompiled code's runtime (global state).
+             * Capture state from the decompiled code's runtime.
+             * by Claude - Changed from using globals to explicit parameters since
+             * decompiled code uses local variables, not globals.
              */
-            fun fromDecompiledRuntime(addresses: List<Int>): State {
+            fun fromDecompiledRuntime(
+                a: Int,
+                x: Int,
+                y: Int,
+                addresses: List<Int>
+            ): State {
                 return State(
-                    a = A,
-                    x = X,
-                    y = Y,
+                    a = a,
+                    x = x,
+                    y = y,
                     sp = SP,
                     n = flagN,
                     v = flagV,
@@ -129,15 +136,16 @@ class BinaryComparisonFramework {
 
     /**
      * Sync state from binary interpreter to decompiled runtime.
+     * by Claude - Returns register values since decompiled code uses local variables.
+     * Memory and flags are still synced via globals.
      */
-    fun syncInterpreterToDecompiled(interp: BinaryInterpreter6502, memoryRanges: List<IntRange> = emptyList()) {
-        // Sync registers
-        A = interp.cpu.A.toInt()
-        X = interp.cpu.X.toInt()
-        Y = interp.cpu.Y.toInt()
+    data class RegisterState(val a: Int, val x: Int, val y: Int)
+
+    fun syncInterpreterToDecompiled(interp: BinaryInterpreter6502, memoryRanges: List<IntRange> = emptyList()): RegisterState {
+        // Sync stack pointer (still global)
         SP = interp.cpu.SP.toInt()
 
-        // Sync flags
+        // Sync flags (still global)
         flagN = interp.cpu.N
         flagV = interp.cpu.V
         flagZ = interp.cpu.Z
@@ -151,19 +159,33 @@ class BinaryComparisonFramework {
                 memory[addr] = interp.memory.readByte(addr)
             }
         }
+
+        // Return register values for caller to pass to decompiled function
+        return RegisterState(
+            a = interp.cpu.A.toInt(),
+            x = interp.cpu.X.toInt(),
+            y = interp.cpu.Y.toInt()
+        )
     }
 
     /**
      * Sync state from decompiled runtime to binary interpreter.
+     * by Claude - Takes register values as parameters since decompiled code uses local variables.
      */
-    fun syncDecompiledToInterpreter(interp: BinaryInterpreter6502, memoryRanges: List<IntRange> = emptyList()) {
-        // Sync registers
-        interp.cpu.A = A.toUByte()
-        interp.cpu.X = X.toUByte()
-        interp.cpu.Y = Y.toUByte()
+    fun syncDecompiledToInterpreter(
+        interp: BinaryInterpreter6502,
+        a: Int,
+        x: Int,
+        y: Int,
+        memoryRanges: List<IntRange> = emptyList()
+    ) {
+        // Sync registers (from parameters)
+        interp.cpu.A = a.toUByte()
+        interp.cpu.X = x.toUByte()
+        interp.cpu.Y = y.toUByte()
         interp.cpu.SP = SP.toUByte()
 
-        // Sync flags
+        // Sync flags (still global)
         interp.cpu.N = flagN
         interp.cpu.V = flagV
         interp.cpu.Z = flagZ
@@ -277,10 +299,10 @@ class BinaryComparisonFramework {
         val rom = NESLoader.load(romFile)
         loadROM(rom.prgRom, 0x8000)
 
-        // Sync initial state to decompiled runtime
-        A = initialState.a
-        X = initialState.x
-        Y = initialState.y
+        // by Claude - TODO: This framework needs redesign for local-variable register approach
+        // The decompiled functions now take registers as parameters and return values,
+        // not via globals. For now, sync global state (flags, memory) and note that
+        // register comparison won't work correctly until this framework is updated.
         SP = initialState.sp
         flagN = initialState.n
         flagV = initialState.v
@@ -291,6 +313,8 @@ class BinaryComparisonFramework {
         }
 
         // Run decompiled function
+        // TODO: Need to pass initialState.a, initialState.x, initialState.y as parameters
+        // and capture return values for proper comparison
         try {
             decompiledFunction()
         } catch (e: Exception) {
@@ -298,7 +322,13 @@ class BinaryComparisonFramework {
         }
 
         // Capture decompiled state
-        val decompiledState = State.fromDecompiledRuntime(memoryToCheck)
+        // TODO: Need to capture return values from decompiledFunction, not globals
+        val decompiledState = State.fromDecompiledRuntime(
+            a = initialState.a,  // Placeholder - should be return value
+            x = initialState.x,  // Placeholder - should be return value
+            y = initialState.y,  // Placeholder - should be return value
+            addresses = memoryToCheck
+        )
 
         // Compare states
         return try {

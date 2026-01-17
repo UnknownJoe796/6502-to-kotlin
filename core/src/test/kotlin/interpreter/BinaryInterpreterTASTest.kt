@@ -3,6 +3,8 @@
 package com.ivieleague.decompiler6502tokotlin.interpreter
 
 import java.io.File
+import java.util.concurrent.TimeUnit
+import org.junit.jupiter.api.Timeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -223,6 +225,8 @@ class BinaryInterpreterTASTest {
         return paths.map { File(it) }.firstOrNull { it.exists() }
     }
 
+    // by Claude - 60 second timeout to catch infinite loops
+    @Timeout(value = 60, unit = TimeUnit.SECONDS)
     @Test
     fun `test ROM loading`() {
         val romFile = findFile(romPaths)
@@ -243,6 +247,8 @@ class BinaryInterpreterTASTest {
         println("   Mapper: ${rom.mapper}")
     }
 
+    // by Claude - 60 second timeout to catch infinite loops
+    @Timeout(value = 60, unit = TimeUnit.SECONDS)
     @Test
     fun `test interpreter with ROM - boot sequence`() {
         val romFile = findFile(romPaths)
@@ -302,6 +308,8 @@ class BinaryInterpreterTASTest {
         println("   Y: $${interp.cpu.Y.toString(16).uppercase()}")
     }
 
+    // by Claude - 60 second timeout to catch infinite loops
+    @Timeout(value = 60, unit = TimeUnit.SECONDS)
     @Test
     fun `test interpreter with ROM - run frames`() {
         val romFile = findFile(romPaths)
@@ -385,6 +393,8 @@ class BinaryInterpreterTASTest {
         assertTrue(frames == 60, "Should have run 60 frames")
     }
 
+    // by Claude - 60 second timeout to catch infinite loops
+    @Timeout(value = 60, unit = TimeUnit.SECONDS)
     @Test
     fun `test TAS playback - first 1000 frames`() {
         val romFile = findFile(romPaths)

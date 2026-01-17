@@ -17,6 +17,8 @@ subprojects {
 
     dependencies {
         "testImplementation"(kotlin("test"))
+        // by Claude - JUnit 5 timeout annotations for preventing infinite loops
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.10.2")
     }
 
     tasks.withType<Test> {

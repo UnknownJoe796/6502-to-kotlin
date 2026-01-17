@@ -9,45 +9,49 @@ Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, X, OverflowFlag
 
 --- Control Flow Nodes (7 nodes) ---
 
-[0] BlockNode
-  Block: EndExitOne
-  Lines: 1
-    RTS 
+[0] IfNode
+  Condition block: FloateyNumbersRoutine
+  Sense: true
+  Then branch: 1 nodes
+  Else branch: 0 nodes
 
-[1] LoopNode
-  Type: LoopNode
-  Body nodes: 2
-  Entry: EndExitOne
-
-[2] IfNode
+[1] IfNode
   Condition block: @1285
   Sense: false
   Then branch: 1 nodes
   Else branch: 0 nodes
 
-[3] IfNode
+[2] IfNode
   Condition block: ChkNumTimer
   Sense: false
   Then branch: 1 nodes
   Else branch: 0 nodes
 
-[4] IfNode
+[3] IfNode
   Condition block: DecNumTimer
   Sense: false
   Then branch: 2 nodes
   Else branch: 0 nodes
 
-[5] IfNode
+[4] IfNode
   Condition block: ChkTallEnemy
   Sense: false
   Then branch: 1 nodes
   Else branch: 0 nodes
 
-[6] IfNode
+[5] IfNode
   Condition block: FloateyPart
   Sense: false
   Then branch: 1 nodes
-  Else branch: 1 nodes
+  Else branch: 0 nodes
+
+[6] BlockNode
+  Block: SetupNumSpr
+  Lines: 20
+    LDA FloateyNum_Y_Pos,X
+    SBC #$08
+    JSR DumpTwoSpr
+    ... (17 more)
 
 --- Blocks Graph ---
 
@@ -206,7 +210,7 @@ EndExitOne
 Entry: MusicHandler
 Inputs: 
 Outputs: 
-Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y
+Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, X, OverflowFlag
 
 --- Control Flow Nodes (4 nodes) ---
 
@@ -222,12 +226,11 @@ Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y
     LDA AreaMusicQueue
     BNE LoadAreaMusic
 
-[2] BlockNode
-  Block: @15619
-  Lines: 3
-    LDA EventMusicBuffer
-    ORA AreaMusicBuffer
-    BNE ContinueMusic
+[2] IfNode
+  Condition block: @15619
+  Sense: true
+  Then branch: 1 nodes
+  Else branch: 0 nodes
 
 [3] BlockNode
   Block: @15622
@@ -909,27 +912,29 @@ ExitMusicHandler
 Entry: ImpedePlayerMove
 Inputs: $00
 Outputs: 
-Clobbers: A, NegativeFlag, ZeroFlag, Y, X, CarryFlag
+Clobbers: A, NegativeFlag, ZeroFlag, Y, X, CarryFlag, $00, OverflowFlag
 
 --- Control Flow Nodes (3 nodes) ---
 
 [0] IfNode
   Condition block: ImpedePlayerMove
   Sense: false
-  Then branch: 2 nodes
+  Then branch: 1 nodes
   Else branch: 0 nodes
 
-[1] BlockNode
-  Block: RImpd
-  Lines: 3
-    LDX #$02
-    CPY #$01
-    BPL ExIPM
+[1] IfNode
+  Condition block: RImpd
+  Sense: false
+  Then branch: 1 nodes
+  Else branch: 0 nodes
 
 [2] BlockNode
-  Block: @12336
-  Lines: 1
-    LDA #$01
+  Block: ExIPM
+  Lines: 5
+    TXA 
+    EOR #$ff
+    AND Player_CollisionBits
+    ... (2 more)
 
 --- Blocks Graph ---
 
