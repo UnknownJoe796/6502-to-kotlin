@@ -863,6 +863,8 @@ fun List<AssemblyBlock>.functionify(
 
     // by Claude - Bug #11 fix: Step 6: Re-analyze outputs with updated clobbers
     // Now that clobbers include transitive effects, re-detect outputs
+    // by Claude - CRITICAL FIX: This second pass must include fall-through scanning and indexed addressing
+    // tracking, otherwise it will overwrite the first output detection without those improvements
     for (func in functions) {
         val candidateDefs = func.clobbers ?: emptySet()
         val detectedOutputs = mutableSetOf<TrackedAsIo>()
@@ -888,11 +890,74 @@ fun List<AssemblyBlock>.functionify(
                     .forEach { state ->
                         trackUse(state, killed)
                     }
+
+                // by Claude - Track indexed addressing mode register uses
+                when (instruction.address) {
+                    is AssemblyAddressing.DirectX,
+                    is AssemblyAddressing.IndirectX -> {
+                        trackUse(TrackedAsIo.X, killed)
+                    }
+                    is AssemblyAddressing.DirectY,
+                    is AssemblyAddressing.IndirectY -> {
+                        trackUse(TrackedAsIo.Y, killed)
+                    }
+                    else -> {}
+                }
+
                 op.modifies(instruction.address?.let { it::class })
                     .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
                     .forEach { state ->
                         killed.add(state)
                     }
+            }
+
+            // by Claude - Scan fall-through blocks for output detection
+            // When a block ends with a JSR and the next block starts with a label,
+            // the fall-through block may use registers that were set by the called function.
+            var currentBlock: AssemblyBlock? = block.fallThroughExit
+            val maxFallThroughBlocks = 5
+            var fallThroughCount = 0
+
+            while (currentBlock != null && fallThroughCount < maxFallThroughBlocks) {
+                fallThroughCount++
+                var foundTerminator = false
+
+                for (line in currentBlock.lines) {
+                    val instruction = line.instruction ?: continue
+                    val op = instruction.op
+
+                    op.reads(instruction.address?.let { it::class })
+                        .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
+                        .forEach { state ->
+                            trackUse(state, killed)
+                        }
+
+                    when (instruction.address) {
+                        is AssemblyAddressing.DirectX,
+                        is AssemblyAddressing.IndirectX -> {
+                            trackUse(TrackedAsIo.X, killed)
+                        }
+                        is AssemblyAddressing.DirectY,
+                        is AssemblyAddressing.IndirectY -> {
+                            trackUse(TrackedAsIo.Y, killed)
+                        }
+                        else -> {}
+                    }
+
+                    op.modifies(instruction.address?.let { it::class })
+                        .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
+                        .forEach { state ->
+                            killed.add(state)
+                        }
+
+                    if (op.isBranch || op == AssemblyOp.JMP || op == AssemblyOp.RTS || op == AssemblyOp.RTI) {
+                        foundTerminator = true
+                        break
+                    }
+                }
+
+                if (foundTerminator) break
+                currentBlock = currentBlock.fallThroughExit
             }
         }
 

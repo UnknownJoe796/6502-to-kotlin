@@ -1425,6 +1425,7 @@ fun AssemblyFunction.toKotlinFunction(
 
     // by Claude - Detect output registers early (needed for register declaration logic)
     val hasAOutput = this.outputs?.contains(TrackedAsIo.A) == true
+    val hasXOutput = this.outputs?.contains(TrackedAsIo.X) == true
     val hasYOutput = this.outputs?.contains(TrackedAsIo.Y) == true
 
     // Use the analyzed inputs from AssemblyFunction if available, otherwise fall back to read-before-write analysis
@@ -1469,7 +1470,8 @@ fun AssemblyFunction.toKotlinFunction(
     } else if (aIsReassigned) {
         finalBody.add(KVarDecl("A", "Int", KVar("A"), mutable = true))
     }
-    if ((usesX) && !xIsParam) {
+    // by Claude - Also check hasXOutput to ensure X is declared when returned
+    if ((usesX || hasXOutput) && !xIsParam) {
         finalBody.add(KVarDecl("X", "Int", KLiteral("0"), mutable = true))
     } else if (xIsReassigned) {
         finalBody.add(KVarDecl("X", "Int", KVar("X"), mutable = true))
@@ -1596,11 +1598,14 @@ fun AssemblyFunction.toKotlinFunction(
         assemblyLabelToKotlinName(label)
     } ?: "func_${this.startingBlock.originalLineIndex}"
 
-    // by Claude - Detect return type from outputs (hasAOutput/hasYOutput already defined earlier)
+    // by Claude - Detect return type from outputs (hasAOutput/hasXOutput/hasYOutput already defined earlier)
     val hasCarryOutput = this.outputs?.contains(TrackedAsIo.CarryFlag) == true
+    // by Claude - Count how many registers are outputs to determine return type
+    val outputRegisterCount = listOf(hasAOutput, hasXOutput, hasYOutput).count { it }
     val returnType = when {
-        hasAOutput && hasYOutput -> "Pair<Int, Int>"  // Both A and Y
+        outputRegisterCount >= 2 -> "Pair<Int, Int>"  // Two or more registers - return as pair
         hasAOutput -> "Int"  // A only
+        hasXOutput -> "Int"  // X only (e.g., dividePDiff returns X as index)
         hasYOutput -> "Int"  // Y only (returns Y value)
         hasCarryOutput -> "Boolean"  // Carry flag only (for branch condition returns)
         else -> null  // Void
@@ -1609,14 +1614,30 @@ fun AssemblyFunction.toKotlinFunction(
     // by Claude - Handle return values based on output type
     // RTS handler now generates correct return values, so we just need to ensure paths have returns
     val bodyWithReturns = when {
-        hasAOutput && hasYOutput -> {
-            // Pair return: RTS generates Pair(A, Y) - just ensure all paths have returns
-            val fallbackReturn = KReturn(KCall("Pair", listOf(KVar("A"), KVar("Y"))))
+        outputRegisterCount >= 2 -> {
+            // Pair return: determine which two registers to return
+            val firstReg = when {
+                hasAOutput -> "A"
+                hasXOutput -> "X"
+                else -> "Y"
+            }
+            val secondReg = when {
+                hasYOutput -> "Y"
+                hasXOutput && firstReg != "X" -> "X"
+                else -> "Y" // fallback
+            }
+            val fallbackReturn = KReturn(KCall("Pair", listOf(KVar(firstReg), KVar(secondReg))))
             finalBody.ensureReturnsPresent(fallbackReturn)
         }
         hasAOutput -> {
             // A-only return: RTS generates A value - ensure all paths have returns
             val fallbackReturn = KReturn(KVar("A"))
+            finalBody.ensureReturnsPresent(fallbackReturn)
+        }
+        hasXOutput -> {
+            // by Claude - X-only return: RTS generates X value - ensure all paths have returns
+            // Common pattern: functions like dividePDiff that return an index in X
+            val fallbackReturn = KReturn(KVar("X"))
             finalBody.ensureReturnsPresent(fallbackReturn)
         }
         hasYOutput -> {

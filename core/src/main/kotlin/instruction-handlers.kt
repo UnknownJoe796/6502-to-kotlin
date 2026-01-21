@@ -841,28 +841,64 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
 
                 // by Claude - Capture register outputs from functions that return values
                 val hasAOutput = targetFunction?.outputs?.contains(TrackedAsIo.A) == true
+                val hasXOutput = targetFunction?.outputs?.contains(TrackedAsIo.X) == true
                 val hasYOutput = targetFunction?.outputs?.contains(TrackedAsIo.Y) == true
                 // by Claude - Bug #2 fix: detect carry flag as boolean return
                 val hasCarryOutput = targetFunction?.outputs?.contains(TrackedAsIo.CarryFlag) == true
+                // by Claude - Count register outputs to determine how many values are returned
+                val outputRegisterCount = listOf(hasAOutput, hasXOutput, hasYOutput).count { it }
 
                 when {
-                    hasAOutput && hasYOutput -> {
-                        // by Claude - Function returns Pair<Int, Int> (A, Y) - capture both
-                        // Use nextPairVar for Pair (won't be hoisted as Int), nextTempVar for extracted values
-                        val pairVar = ctx.nextPairVar()  // "pair0" - not hoisted
-                        val aVar = ctx.nextTempVar()     // "tempN" - hoisted as Int
-                        val yVar = ctx.nextTempVar()     // "tempM" - hoisted as Int
+                    outputRegisterCount >= 2 -> {
+                        // by Claude - Function returns Pair<Int, Int> - capture both
+                        // Determine which two registers are being returned
+                        val pairVar = ctx.nextPairVar()
                         stmts.add(KVarDecl(pairVar, mutable = false, value = KCall(functionName, args)))
-                        stmts.add(KVarDecl(aVar, mutable = true, value = KMemberAccess(KVar(pairVar), KVar("first"))))
-                        stmts.add(KVarDecl(yVar, mutable = true, value = KMemberAccess(KVar(pairVar), KVar("second"))))
-                        ctx.registerA = KVar(aVar)
-                        ctx.registerY = KVar(yVar)
+
+                        // First element of pair
+                        val firstVar = ctx.nextTempVar()
+                        stmts.add(KVarDecl(firstVar, mutable = true, value = KMemberAccess(KVar(pairVar), KVar("first"))))
+                        when {
+                            hasAOutput -> ctx.registerA = KVar(firstVar)
+                            hasXOutput -> ctx.registerX = KVar(firstVar)
+                            else -> ctx.registerY = KVar(firstVar)
+                        }
+
+                        // Second element of pair
+                        val secondVar = ctx.nextTempVar()
+                        stmts.add(KVarDecl(secondVar, mutable = true, value = KMemberAccess(KVar(pairVar), KVar("second"))))
+                        when {
+                            hasYOutput -> ctx.registerY = KVar(secondVar)
+                            hasXOutput && !hasAOutput -> ctx.registerX = KVar(secondVar)
+                            else -> ctx.registerY = KVar(secondVar)
+                        }
+
+                        // by Claude - CRITICAL: Also update register variables directly
+                        // This is needed because ctx tracking doesn't persist across control flow boundaries
+                        if (hasXOutput) {
+                            val xTempVar = if (hasAOutput) secondVar else firstVar
+                            val (xVarName, _) = ctx.getOrCreateFunctionLevelVar("X")
+                            stmts.add(KAssignment(KVar(xVarName), KVar(xTempVar)))
+                        }
                     }
                     hasAOutput -> {
                         // by Claude - Function returns Int (A value) - capture it
                         val resultVar = ctx.nextTempVar()
                         stmts.add(KVarDecl(resultVar, mutable = true, value = KCall(functionName, args)))
                         ctx.registerA = KVar(resultVar)
+                    }
+                    hasXOutput -> {
+                        // by Claude - Function returns Int (X value) - capture it
+                        // Common pattern: functions like dividePDiff that return an index in X
+                        val resultVar = ctx.nextTempVar()
+                        stmts.add(KVarDecl(resultVar, mutable = true, value = KCall(functionName, args)))
+                        ctx.registerX = KVar(resultVar)
+                        // by Claude - CRITICAL: Also update the X variable directly
+                        // This is needed because ctx.registerX tracking doesn't persist across
+                        // control flow boundaries (if-else merge). When the X value is used later
+                        // outside the if block, it needs to find the updated value in X.
+                        val (xVarName, _) = ctx.getOrCreateFunctionLevelVar("X")
+                        stmts.add(KAssignment(KVar(xVarName), KVar(resultVar)))
                     }
                     hasYOutput -> {
                         // by Claude - Function returns Int (Y value) - capture it
@@ -896,20 +932,36 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
         AssemblyOp.RTS, AssemblyOp.RTI -> {
             val funcOutputs = ctx.currentFunction?.outputs
             val hasAOutput = funcOutputs?.contains(TrackedAsIo.A) == true
+            val hasXOutput = funcOutputs?.contains(TrackedAsIo.X) == true
             val hasYOutput = funcOutputs?.contains(TrackedAsIo.Y) == true
             // by Claude - Bug #2 fix: detect carry flag as boolean return
             val hasCarryOutput = funcOutputs?.contains(TrackedAsIo.CarryFlag) == true
+            // by Claude - Count register outputs
+            val outputRegisterCount = listOf(hasAOutput, hasXOutput, hasYOutput).count { it }
 
             val returnValue = when {
-                hasAOutput && hasYOutput -> {
-                    // Return Pair(A, Y) for functions that output both
-                    val aValue = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
-                    val yValue = ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y")
-                    KCall("Pair", listOf(aValue, yValue))
+                outputRegisterCount >= 2 -> {
+                    // Return Pair for functions that output multiple registers
+                    // Determine which registers to return
+                    val firstValue = when {
+                        hasAOutput -> ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
+                        hasXOutput -> ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X")
+                        else -> ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y")
+                    }
+                    val secondValue = when {
+                        hasYOutput -> ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y")
+                        hasXOutput && !hasAOutput -> ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X")
+                        else -> ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y")
+                    }
+                    KCall("Pair", listOf(firstValue, secondValue))
                 }
                 hasAOutput -> {
                     // Return A value
                     ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
+                }
+                hasXOutput -> {
+                    // by Claude - Return X value (e.g., dividePDiff returns index in X)
+                    ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X")
                 }
                 hasYOutput -> {
                     // Return Y value
