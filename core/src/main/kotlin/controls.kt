@@ -703,9 +703,17 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
         return emptyList()
     }
 
+    // by Claude - CRITICAL FIX: Recompute dominators for THIS function's reachable blocks.
+    // The global dominators() call computes dominators across the entire assembly, which gives
+    // incorrect results for intra-function analysis. For example, ProcessCannons' blocks have
+    // idom=null because they're dominated by external blocks in the global dominator tree.
+    // We need dominators computed FROM the function entry point to detect loops correctly.
+    reachable.toList().dominators()
+
     // Detect natural loops using dominator analysis
     val naturalLoops = reachable.toList().detectNaturalLoops()
     val loopByHeader = naturalLoops.associateBy { it.header }
+
 
     // by Claude - Use source/layout order to detect structured patterns (typical 6502 style)
     // CRITICAL FIX (Bug #4): Entry block MUST come first in layout, regardless of memory address.
@@ -779,9 +787,15 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
             val naturalLoop = loopByHeader[b]?.takeIf { b !in processingLoopHeaders }
             if (naturalLoop != null) {
                 // Find the extent of the loop body in the layout
-                val loopBodyBlocks = naturalLoop.body.sortedBy { indexOf[it] ?: Int.MAX_VALUE }
-                val loopStart = indexOf[loopBodyBlocks.first()] ?: i
-                val loopEnd = indexOf[loopBodyBlocks.last()]?.plus(1) ?: (i + 1)
+                // by Claude - CRITICAL FIX: Filter out blocks not in the current function's layout.
+                // The natural loop detection uses enteredFrom which may include blocks from other
+                // functions. We only want blocks that are actually in this function's reachable set.
+                val loopBodyBlocks = naturalLoop.body
+                    .filter { indexOf[it] != null }  // Only include blocks in this function
+                    .sortedBy { indexOf[it]!! }
+                val loopStart = indexOf[loopBodyBlocks.firstOrNull()] ?: i
+                val loopEnd = indexOf[loopBodyBlocks.lastOrNull()]?.plus(1) ?: (i + 1)
+
 
                 // Skip this loop if it contains other loop headers (process inner loops first)
                 val containsOtherLoopHeaders = naturalLoop.body.any { block ->
@@ -1205,7 +1219,15 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
                     }
 
                     // by Claude - isAlternativePath: branch target is ONLY reachable via branch, not fall-through
-                    val isAlternativePath = branchTargetReturns && !fallThroughReachesBranchTarget
+                    // Bug fix: Also check if branch target has multiple entry points.
+                    // If the target is reached from blocks OTHER than the current branch,
+                    // it's a join point (like loop exit) not an alternative path.
+                    // Example: ProcessCannons has `beq ExCannon` but ExCannon is ALSO reached from
+                    // `Next3Slt` via fall-through after the loop. So ExCannon is a join, not else.
+                    val branchTargetHasMultipleEntries = br.enteredFrom.any { entryBlock ->
+                        entryBlock != b && entryBlock.function == fn
+                    }
+                    val isAlternativePath = branchTargetReturns && !fallThroughReachesBranchTarget && !branchTargetHasMultipleEntries
 
                     if (branchTargetReturns && isAlternativePath) {
                         // The branch target is an alternative path that returns, not a reconvergence point

@@ -30,14 +30,28 @@ fun List<AssemblyBlock>.detectNaturalLoops(): List<NaturalLoop> {
     val allLoops = mutableMapOf<AssemblyBlock, MutableList<Pair<AssemblyBlock, AssemblyBlock>>>()
 
     // Step 1: Find all back-edges
+    // by Claude - CRITICAL FIX: Only consider CONDITIONAL back-edges for loop detection.
+    // JMP back-edges (unconditional) are usually GOTO patterns within structured code,
+    // not proper loops. Including them causes spurious "while(true)" loops to be detected.
+    // Proper loops in 6502 code almost always use conditional branches (BNE, BPL, etc.)
+    // for the back-edge, with the loop condition being the branch condition.
     for (block in this) {
-        val successors = listOfNotNull(block.fallThroughExit, block.branchExit)
-        for (successor in successors) {
-            // A back-edge is an edge to a block that dominates the current block
-            if (isDominatedBy(block, successor)) {
-                // successor dominates block, so (block → successor) is a back-edge
-                allLoops.getOrPut(successor) { mutableListOf() }.add(block to successor)
+        // Check the last instruction to see if this block ends with a conditional branch
+        val lastInstr = block.lines.lastOrNull { it.instruction != null }?.instruction
+        val isConditionalBlock = lastInstr?.op?.isBranch == true
+
+        // For conditional blocks, check if the branch target dominates us (back-edge)
+        if (isConditionalBlock) {
+            val branchTarget = block.branchExit
+            if (branchTarget != null && isDominatedBy(block, branchTarget)) {
+                allLoops.getOrPut(branchTarget) { mutableListOf() }.add(block to branchTarget)
             }
+        }
+
+        // For fall-through, also check if it creates a back-edge (rare but possible)
+        val fallthrough = block.fallThroughExit
+        if (fallthrough != null && isDominatedBy(block, fallthrough)) {
+            allLoops.getOrPut(fallthrough) { mutableListOf() }.add(block to fallthrough)
         }
     }
 

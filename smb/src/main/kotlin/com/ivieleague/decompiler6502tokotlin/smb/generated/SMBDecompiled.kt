@@ -694,9 +694,6 @@ fun pauseRoutine() {
             A = opermodeTask
             //> cmp #$03
             //> bne ExitPause          ;if not, leave
-        } else {
-            //> ExitPause:     rts
-            return
         }
     }
     //> ChkPauseTimer: lda GamePauseTimer     ;check if pause timer is still counting down
@@ -746,6 +743,8 @@ fun pauseRoutine() {
     A = A and 0x7F
     //> SetPause:      sta GamePauseStatus
     gamePauseStatus = A
+    //> ExitPause:     rts
+    return
 }
 
 // Decompiled from SpriteShuffler
@@ -997,19 +996,6 @@ fun gameMenuRoutine() {
             //> jmp RunDemo                 ;otherwise, run game engine for demo
             runDemo()
             return
-        } else {
-            //> ResetTitle:   lda #$00                    ;reset game modes, disable
-            A = 0x00
-            //> sta OperMode                ;sprite 0 check and disable
-            operMode = A
-            //> sta OperMode_Task           ;screen output
-            opermodeTask = A
-            //> sta Sprite0HitDetectFlag
-            sprite0HitDetectFlag = A
-            //> inc DisableScreenFlag
-            disableScreenFlag = (disableScreenFlag + 1) and 0xFF
-            //> rts
-            return
         }
     }
     //> ChkWorldSel:  ldx WorldSelectEnableFlag   ;check to see if world selection has been enabled
@@ -1098,10 +1084,20 @@ fun gameMenuRoutine() {
         //  Fall-through tail call to nullJoypad
         nullJoypad()
         return
+    } else {
+        //> ResetTitle:   lda #$00                    ;reset game modes, disable
+        A = 0x00
+        //> sta OperMode                ;sprite 0 check and disable
+        operMode = A
+        //> sta OperMode_Task           ;screen output
+        opermodeTask = A
+        //> sta Sprite0HitDetectFlag
+        sprite0HitDetectFlag = A
+        //> inc DisableScreenFlag
+        disableScreenFlag = (disableScreenFlag + 1) and 0xFF
+        //> rts
+        return
     }
-    // Fall-through tail call to nullJoypad
-    nullJoypad()
-    return
 }
 
 // Decompiled from NullJoypad
@@ -2326,13 +2322,6 @@ fun displayIntermediate() {
                 //  Fall-through tail call to outputInter
                 outputInter(A)
                 return
-            } else {
-                //> NoInter:       lda #$08                     ;set for specific task and leave
-                A = 0x08
-                //> sta ScreenRoutineTask
-                screenRoutineTask = A
-                //> rts
-                return
             }
         } else {
             //> GameOverInter: lda #$12                     ;set screen timer
@@ -2353,13 +2342,6 @@ fun displayIntermediate() {
             //> rts
             return
         }
-    } else {
-        //> NoInter:       lda #$08                     ;set for specific task and leave
-        A = 0x08
-        //> sta ScreenRoutineTask
-        screenRoutineTask = A
-        //> rts
-        return
     }
     // Fall-through tail call to outputInter
     outputInter(A)
@@ -2778,6 +2760,7 @@ fun renderAreaGraphics() {
     var currentntaddrHigh by MemoryByte(CurrentNTAddr_High)
     var currentntaddrLow by MemoryByte(CurrentNTAddr_Low)
     var vramBuffer2Offset by MemoryByte(VRAM_Buffer2_Offset)
+    val attributeBuffer by MemoryByteIndexed(AttributeBuffer)
     val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
     val metatilegraphicsHigh by MemoryByteIndexed(MetatileGraphics_High)
     val metatilegraphicsLow by MemoryByteIndexed(MetatileGraphics_Low)
@@ -2811,158 +2794,8 @@ fun renderAreaGraphics() {
     memory[0x4] = A.toUByte()
     //> tax
     X = A
-    //> DrawMTLoop: stx $01                      ;store init value of 0 or incremented offset for buffer
-    memory[0x1] = X.toUByte()
-    //> lda MetatileBuffer,x         ;get first metatile number, and mask out all but 2 MSB
-    A = metatileBuffer[X]
-    //> and #%11000000
-    A = A and 0xC0
-    //> sta $03                      ;store attribute table bits here
-    memory[0x3] = A.toUByte()
-    //> asl                          ;note that metatile format is:
-    val orig0: Int = A
-    A = (orig0 shl 1) and 0xFF
-    //> rol                          ;%xx000000 - attribute table bits,
-    val orig1: Int = A
-    A = (orig1 shl 1) and 0xFE or if ((orig0 and 0x80) != 0) 1 else 0
-    //> rol                          ;%00xxxxxx - metatile number
-    val orig2: Int = A
-    A = (orig2 shl 1) and 0xFE or if ((orig1 and 0x80) != 0) 1 else 0
-    //> tay                          ;rotate bits to d1-d0 and use as offset here
-    Y = A
-    //> lda MetatileGraphics_Low,y   ;get address to graphics table from here
-    A = metatilegraphicsLow[Y]
-    //> sta $06
-    memory[0x6] = A.toUByte()
-    //> lda MetatileGraphics_High,y
-    A = metatilegraphicsHigh[Y]
-    //> sta $07
-    memory[0x7] = A.toUByte()
-    //> lda MetatileBuffer,x         ;get metatile number again
-    A = metatileBuffer[X]
-    //> asl                          ;multiply by 4 and use as tile offset
-    val orig3: Int = A
-    A = (orig3 shl 1) and 0xFF
-    //> asl
-    val orig4: Int = A
-    A = (orig4 shl 1) and 0xFF
-    //> sta $02
-    memory[0x2] = A.toUByte()
-    //> lda AreaParserTaskNum        ;get current task number for level processing and
-    A = areaParserTaskNum
-    //> and #%00000001               ;mask out all but LSB, then invert LSB, multiply by 2
-    A = A and 0x01
-    //> eor #%00000001               ;to get the correct column position in the metatile,
-    A = A xor 0x01
-    //> asl                          ;then add to the tile offset so we can draw either side
-    val orig5: Int = A
-    A = (orig5 shl 1) and 0xFF
-    //> adc $02                      ;of the metatiles
-    temp0 = A + memory[0x2].toInt() + if ((orig5 and 0x80) != 0) 1 else 0
-    A = temp0 and 0xFF
-    //> tay
-    Y = A
-    //> ldx $00                      ;use vram buffer offset from before as X
-    X = memory[0x0].toInt()
-    //> lda ($06),y
-    A = memory[readWord(0x6) + Y].toInt()
-    //> sta VRAM_Buffer2+3,x         ;get first tile number (top left or top right) and store
-    vramBuffer2[3 + X] = A
-    //> iny
-    Y = (Y + 1) and 0xFF
-    //> lda ($06),y                  ;now get the second (bottom left or bottom right) and store
-    A = memory[readWord(0x6) + Y].toInt()
-    //> sta VRAM_Buffer2+4,x
-    vramBuffer2[4 + X] = A
-    //> ldy $04                      ;get current attribute row
-    Y = memory[0x4].toInt()
-    //> lda $05                      ;get LSB of current column where we're at, and
-    A = memory[0x5].toInt()
-    //> bne RightCheck               ;branch if set (clear = left attrib, set = right)
-    if (A == 0) {
-        //> lda $01                      ;get current row we're rendering
-        A = memory[0x1].toInt()
-        //> lsr                          ;branch if LSB set (clear = top left, set = bottom left)
-        val orig6: Int = A
-        A = orig6 shr 1
-        //> bcs LLeft
-        if ((orig6 and 0x01) == 0) {
-            //> rol $03                      ;rotate attribute bits 3 to the left
-            memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((orig6 and 0x01) != 0) 1 else 0) and 0xFF).toUByte()
-            //> rol $03                      ;thus in d1-d0, for upper left square
-            memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
-            //> rol $03
-            memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
-            //> jmp SetAttrib
-            setAttrib(Y)
-            return
-        }
-    }
-    //> RightCheck: lda $01                      ;get LSB of current row we're rendering
-    A = memory[0x1].toInt()
-    //> lsr                          ;branch if set (clear = top right, set = bottom right)
-    val orig7: Int = A
-    A = orig7 shr 1
-    //> bcs NextMTRow
-    if ((orig7 and 0x01) == 0) {
-        //> lsr $03                      ;shift attribute bits 4 to the right
-        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
-        //> lsr $03                      ;thus in d3-d2, for upper right square
-        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
-        //> lsr $03
-        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
-        //> lsr $03
-        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
-        //> jmp SetAttrib
-        setAttrib(Y)
-        return
-        //> LLeft:      lsr $03                      ;shift attribute bits 2 to the right
-        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
-        //> lsr $03                      ;thus in d5-d4 for lower left square
-        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
-    }
-    //> NextMTRow:  inc $04                      ;move onto next attribute row
-    memory[0x4] = ((memory[0x4].toInt() + 1) and 0xFF).toUByte()
-    //  Fall-through tail call to setAttrib
-    setAttrib(Y)
-    return
-}
-
-// Decompiled from SetAttrib
-fun setAttrib(Y: Int) {
-    var A: Int = 0
-    var X: Int = 0
-    var Y: Int = Y
-    var temp0: Int = 0
-    var areaParserTaskNum by MemoryByte(AreaParserTaskNum)
-    var currentntaddrHigh by MemoryByte(CurrentNTAddr_High)
-    var currentntaddrLow by MemoryByte(CurrentNTAddr_Low)
-    var vramBuffer2Offset by MemoryByte(VRAM_Buffer2_Offset)
-    val attributeBuffer by MemoryByteIndexed(AttributeBuffer)
-    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
-    val metatilegraphicsHigh by MemoryByteIndexed(MetatileGraphics_High)
-    val metatilegraphicsLow by MemoryByteIndexed(MetatileGraphics_Low)
-    val vramBuffer2 by MemoryByteIndexed(VRAM_Buffer2)
-    //> SetAttrib:  lda AttributeBuffer,y        ;get previously saved bits from before
-    A = attributeBuffer[Y]
-    //> ora $03                      ;if any, and put new bits, if any, onto
-    A = A or memory[0x3].toInt()
-    //> sta AttributeBuffer,y        ;the old, and store
-    attributeBuffer[Y] = A
-    //> inc $00                      ;increment vram buffer offset by 2
-    memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
-    //> inc $00
-    memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
-    //> ldx $01                      ;get current gfx buffer row, and check for
-    X = memory[0x1].toInt()
-    //> inx                          ;the bottom of the screen
-    X = (X + 1) and 0xFF
-    //> cpx #$0d
-    //> bcc DrawMTLoop               ;if not there yet, loop back
-    if (!(X >= 0x0D)) {
-        //  goto DrawMTLoop
-        return
-    } else {
+    X = X
+    loop0@ do {
         //> DrawMTLoop: stx $01                      ;store init value of 0 or incremented offset for buffer
         memory[0x1] = X.toUByte()
         //> lda MetatileBuffer,x         ;get first metatile number, and mask out all but 2 MSB
@@ -3031,8 +2864,6 @@ fun setAttrib(Y: Int) {
         //> lda $05                      ;get LSB of current column where we're at, and
         A = memory[0x5].toInt()
         //> bne RightCheck               ;branch if set (clear = left attrib, set = right)
-        //  SKIPPED: Fall-through to renderAreaGraphics would create mutual recursion cycle
-        return
         if (A == 0) {
             //> lda $01                      ;get current row we're rendering
             A = memory[0x1].toInt()
@@ -3040,51 +2871,59 @@ fun setAttrib(Y: Int) {
             val orig6: Int = A
             A = orig6 shr 1
             //> bcs LLeft
-            //  SKIPPED: Fall-through to renderAreaGraphics would create mutual recursion cycle
-            return
             if ((orig6 and 0x01) == 0) {
-                while (true) {
-                    //> rol $03                      ;rotate attribute bits 3 to the left
-                    memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((orig6 and 0x01) != 0) 1 else 0) and 0xFF).toUByte()
-                    //> rol $03                      ;thus in d1-d0, for upper left square
-                    memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
-                    //> rol $03
-                    memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
-                    //> jmp SetAttrib
-                }
+                //> rol $03                      ;rotate attribute bits 3 to the left
+                memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((orig6 and 0x01) != 0) 1 else 0) and 0xFF).toUByte()
+                //> rol $03                      ;thus in d1-d0, for upper left square
+                memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
+                //> rol $03
+                memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
+                //> jmp SetAttrib
+                //> jmp SetAttrib (not a known function)
             }
+        } else {
+            //> RightCheck: lda $01                      ;get LSB of current row we're rendering
+            A = memory[0x1].toInt()
+            //> lsr                          ;branch if set (clear = top right, set = bottom right)
+            val orig7: Int = A
+            A = orig7 shr 1
+            //> bcs NextMTRow
+            if ((orig7 and 0x01) == 0) {
+                //> lsr $03                      ;shift attribute bits 4 to the right
+                memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+                //> lsr $03                      ;thus in d3-d2, for upper right square
+                memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+                //> lsr $03
+                memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+                //> lsr $03
+                memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+                //> jmp SetAttrib
+                //> jmp SetAttrib (not a known function)
+                //> LLeft:      lsr $03                      ;shift attribute bits 2 to the right
+                memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+                //> lsr $03                      ;thus in d5-d4 for lower left square
+                memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+            }
+            //> NextMTRow:  inc $04                      ;move onto next attribute row
+            memory[0x4] = ((memory[0x4].toInt() + 1) and 0xFF).toUByte()
         }
-    }
-    //> RightCheck: lda $01                      ;get LSB of current row we're rendering
-    A = memory[0x1].toInt()
-    //> lsr                          ;branch if set (clear = top right, set = bottom right)
-    val orig7: Int = A
-    A = orig7 shr 1
-    //> bcs NextMTRow
-    //  SKIPPED: Fall-through to renderAreaGraphics would create mutual recursion cycle
-    return
-    if ((orig7 and 0x01) == 0) {
-        while (true) {
-            //> lsr $03                      ;shift attribute bits 4 to the right
-            memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
-            //> lsr $03                      ;thus in d3-d2, for upper right square
-            memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
-            //> lsr $03
-            memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
-            //> lsr $03
-            memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
-            //> jmp SetAttrib
-        }
-        //> LLeft:      lsr $03                      ;shift attribute bits 2 to the right
-        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
-        //> lsr $03                      ;thus in d5-d4 for lower left square
-        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
-        //  SKIPPED: Fall-through to renderAreaGraphics would create mutual recursion cycle
-        return
-    } else {
-        //> NextMTRow:  inc $04                      ;move onto next attribute row
-        memory[0x4] = ((memory[0x4].toInt() + 1) and 0xFF).toUByte()
-    }
+        //> SetAttrib:  lda AttributeBuffer,y        ;get previously saved bits from before
+        A = attributeBuffer[Y]
+        //> ora $03                      ;if any, and put new bits, if any, onto
+        A = A or memory[0x3].toInt()
+        //> sta AttributeBuffer,y        ;the old, and store
+        attributeBuffer[Y] = A
+        //> inc $00                      ;increment vram buffer offset by 2
+        memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
+        //> inc $00
+        memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
+        //> ldx $01                      ;get current gfx buffer row, and check for
+        X = memory[0x1].toInt()
+        //> inx                          ;the bottom of the screen
+        X = (X + 1) and 0xFF
+        //> cpx #$0d
+        //> bcc DrawMTLoop               ;if not there yet, loop back
+    } while (!(X >= 0x0D))
     //> ldy $00                      ;get current vram buffer offset, increment by 3
     Y = memory[0x0].toInt()
     //> iny                          ;(for name table address and length bytes)
@@ -3829,15 +3668,106 @@ fun updateScreen() {
     var A: Int = 0
     var X: Int = 0
     var Y: Int = 0
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var mirrorPpuCtrlReg1 by MemoryByte(Mirror_PPU_CTRL_REG1)
+    var ppuAddress by MemoryByte(PPU_ADDRESS)
+    var ppuData by MemoryByte(PPU_DATA)
     val ppuStatus by MemoryByteIndexed(PPU_STATUS)
-    //> UpdateScreen:  ldx PPU_STATUS            ;reset flip-flop
-    X = ppuStatus[0]
-    //> ldy #$00                  ;load first byte from indirect as a pointer
-    Y = 0x00
-    //> lda ($00),y
-    A = memory[readWord(0x0) + Y].toInt()
-    //> bne WriteBufferToScreen   ;if byte is zero we have no further updates to make here
-    //  Fall-through tail call to initScroll
+    loop0@ while (!true /* unknown branch STA */) {
+        //> WriteBufferToScreen:
+        //> sta PPU_ADDRESS           ;store high byte of vram address
+        ppuAddress = A
+        //> iny
+        Y = (Y + 1) and 0xFF
+        //> lda ($00),y               ;load next byte (second)
+        A = memory[readWord(0x0) + Y].toInt()
+        //> sta PPU_ADDRESS           ;store low byte of vram address
+        ppuAddress = A
+        //> iny
+        Y = (Y + 1) and 0xFF
+        //> lda ($00),y               ;load next byte (third)
+        A = memory[readWord(0x0) + Y].toInt()
+        //> asl                       ;shift to left and save in stack
+        val orig0: Int = A
+        A = (orig0 shl 1) and 0xFF
+        //> pha
+        push(A)
+        //> lda Mirror_PPU_CTRL_REG1  ;load mirror of $2000,
+        A = mirrorPpuCtrlReg1
+        //> ora #%00000100            ;set ppu to increment by 32 by default
+        A = A or 0x04
+        //> bcs SetupWrites           ;if d7 of third byte was clear, ppu will
+        if ((orig0 and 0x80) == 0) {
+            //> and #%11111011            ;only increment by 1
+            A = A and 0xFB
+        }
+        //> SetupWrites:   jsr WritePPUReg1          ;write to register
+        writePPUReg1(A)
+        //> pla                       ;pull from stack and shift to left again
+        A = pull()
+        //> asl
+        val orig1: Int = A
+        A = (orig1 shl 1) and 0xFF
+        //> bcc GetLength             ;if d6 of third byte was clear, do not repeat byte
+        if ((orig1 and 0x80) != 0) {
+            //> ora #%00000010            ;otherwise set d1 and increment Y
+            A = A or 0x02
+            //> iny
+            Y = (Y + 1) and 0xFF
+        }
+        //> GetLength:     lsr                       ;shift back to the right to get proper length
+        val orig2: Int = A
+        A = orig2 shr 1
+        //> lsr                       ;note that d1 will now be in carry
+        val orig3: Int = A
+        A = orig3 shr 1
+        //> tax
+        X = A
+        X = X
+        loop1@ do {
+            //> OutputToVRAM:  bcs RepeatByte            ;if carry set, repeat loading the same byte
+            if ((orig3 and 0x01) == 0) {
+                //> iny                       ;otherwise increment Y to load next byte
+                Y = (Y + 1) and 0xFF
+            }
+            //> RepeatByte:    lda ($00),y               ;load more data from buffer and write to vram
+            A = memory[readWord(0x0) + Y].toInt()
+            //> sta PPU_DATA
+            ppuData = A
+            //> dex                       ;done writing?
+            X = (X - 1) and 0xFF
+            //> bne OutputToVRAM
+        } while (X != 0)
+        //> sec
+        //> tya
+        A = Y
+        //> adc $00                   ;add end length plus one to the indirect at $00
+        temp0 = A + memory[0x0].toInt() + 1
+        A = temp0 and 0xFF
+        //> sta $00                   ;to allow this routine to read another set of updates
+        memory[0x0] = A.toUByte()
+        //> lda #$00
+        A = 0x00
+        //> adc $01
+        temp1 = A + memory[0x1].toInt() + if (temp0 > 0xFF) 1 else 0
+        A = temp1 and 0xFF
+        //> sta $01
+        memory[0x1] = A.toUByte()
+        //> lda #$3f                  ;sets vram address to $3f00
+        A = 0x3F
+        //> sta PPU_ADDRESS
+        ppuAddress = A
+        //> lda #$00
+        A = 0x00
+        //> sta PPU_ADDRESS
+        ppuAddress = A
+        //> sta PPU_ADDRESS           ;then reinitializes it for some reason
+        ppuAddress = A
+        //> sta PPU_ADDRESS
+        ppuAddress = A
+    }
+    // Fall-through tail call to initScroll
     initScroll(A)
     return
 }
@@ -4049,51 +3979,50 @@ fun storeNewD(A: Int, X: Int, Y: Int) {
     var temp1: Int = 0
     val digitModifier by MemoryByteIndexed(DigitModifier)
     val displayDigits by MemoryByteIndexed(DisplayDigits)
-    //> StoreNewD:  sta DisplayDigits,y       ;store as new score or game timer digit
-    displayDigits[Y] = A
-    //> dey                       ;move onto next digits in score or game timer
-    Y = (Y - 1) and 0xFF
-    //> dex                       ;and digit amounts to increment
-    X = (X - 1) and 0xFF
-    //> bpl AddModLoop            ;loop back if we're not done yet
-    //> AddModLoop: lda DigitModifier,x       ;load digit amount to increment
-    A = digitModifier[X]
-    //> clc
-    //> adc DisplayDigits,y       ;add to current digit
-    temp0 = A + displayDigits[Y]
-    A = temp0 and 0xFF
-    //> bmi BorrowOne             ;if result is a negative number, branch to subtract
     X = X
     Y = Y
-    if ((temp0 and 0xFF and 0x80) == 0) {
-        loop0@ do {
+    loop0@ do {
+        //> StoreNewD:  sta DisplayDigits,y       ;store as new score or game timer digit
+        displayDigits[Y] = A
+        //> dey                       ;move onto next digits in score or game timer
+        Y = (Y - 1) and 0xFF
+        //> dex                       ;and digit amounts to increment
+        X = (X - 1) and 0xFF
+        //> bpl AddModLoop            ;loop back if we're not done yet
+        //> AddModLoop: lda DigitModifier,x       ;load digit amount to increment
+        A = digitModifier[X]
+        //> clc
+        //> adc DisplayDigits,y       ;add to current digit
+        temp0 = A + displayDigits[Y]
+        A = temp0 and 0xFF
+        //> bmi BorrowOne             ;if result is a negative number, branch to subtract
+        if ((temp0 and 0xFF and 0x80) == 0) {
             //> cmp #10
             //> bcs CarryOne              ;if digit greater than $09, branch to add
             if (A >= 0x0A) {
                 //  goto CarryOne
                 break@loop0
             }
-        } while (!(A >= 0x0A))
-        //> EraseDMods: lda #$00                  ;store zero here
-        A = 0x00
-        //> ldx #$06                  ;start with the last digit
-        X = 0x06
-        loop1@ do {
-            //> EraseMLoop: sta DigitModifier-1,x     ;initialize the digit amounts to increment
-            digitModifier[-1 + X] = A
-            //> dex
-            X = (X - 1) and 0xFF
-            //> bpl EraseMLoop            ;do this until they're all reset, then leave
-        } while ((X and 0x80) == 0)
-        //> rts
-        return
-    } else {
+            //> EraseDMods: lda #$00                  ;store zero here
+            A = 0x00
+            //> ldx #$06                  ;start with the last digit
+            X = 0x06
+            loop1@ do {
+                //> EraseMLoop: sta DigitModifier-1,x     ;initialize the digit amounts to increment
+                digitModifier[-1 + X] = A
+                //> dex
+                X = (X - 1) and 0xFF
+                //> bpl EraseMLoop            ;do this until they're all reset, then leave
+            } while ((X and 0x80) == 0)
+            //> rts
+            return
+        }
         //> BorrowOne:  dec DigitModifier-1,x     ;decrement the previous digit, then put $09 in
         digitModifier[-1 + X] = (digitModifier[-1 + X] - 1) and 0xFF
         //> lda #$09                  ;the game timer digit we're currently on to "borrow
         A = 0x09
         //> bne StoreNewD             ;the one", then do an unconditional branch back
-    }
+    } while (!(temp0 > 0xFF))
     while (true) {
         //> CarryOne:   sec                       ;subtract ten from our digit to make it a
         //> sbc #10                   ;proper BCD number, then increment the digit
@@ -5514,253 +5443,125 @@ fun processAreaData() {
     var currentPageLoc by MemoryByte(CurrentPageLoc)
     var objectOffset by MemoryByte(ObjectOffset)
     val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
-    //> ProcessAreaData:
-    //> ldx #$02                 ;start at the end of area object buffer
-    X = 0x02
-    //> ProcADLoop: stx ObjectOffset
-    objectOffset = X
-    //> lda #$00                 ;reset flag
-    A = 0x00
-    //> sta BehindAreaParserFlag
-    behindAreaParserFlag = A
-    //> ldy AreaDataOffset       ;get offset of area data pointer
-    Y = areaDataOffset
-    //> lda (AreaData),y         ;get first byte of area object
-    A = memory[readWord(AreaData) + Y].toInt()
-    //> cmp #$fd                 ;if end-of-area, skip all this crap
-    //> beq RdyDecode
-    if (A != 0xFD) {
-        //> lda AreaObjectLength,x   ;check area object buffer flag
-        A = areaObjectLength[X]
-        //> bpl RdyDecode            ;if buffer not negative, branch, otherwise
-        if ((A and 0x80) != 0) {
-            //> iny
-            Y = (Y + 1) and 0xFF
-            //> lda (AreaData),y         ;get second byte of area object
+    loop0@ do {
+        loop1@ do {
+            //> ProcADLoop: stx ObjectOffset
+            objectOffset = X
+            //> lda #$00                 ;reset flag
+            A = 0x00
+            //> sta BehindAreaParserFlag
+            behindAreaParserFlag = A
+            //> ldy AreaDataOffset       ;get offset of area data pointer
+            Y = areaDataOffset
+            //> lda (AreaData),y         ;get first byte of area object
             A = memory[readWord(AreaData) + Y].toInt()
-            //> asl                      ;check for page select bit (d7), branch if not set
-            val orig0: Int = A
-            A = (orig0 shl 1) and 0xFF
-            //> bcc Chk1Row13
-            if ((orig0 and 0x80) != 0) {
-                //> lda AreaObjectPageSel    ;check page select
-                A = areaObjectPageSel
-                //> bne Chk1Row13
-                if (A == 0) {
-                    //> inc AreaObjectPageSel    ;if not already set, set it now
-                    areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
-                    //> inc AreaObjectPageLoc    ;and increment page location
-                    areaObjectPageLoc = (areaObjectPageLoc + 1) and 0xFF
-                }
-            }
-            //> Chk1Row13:  dey
-            Y = (Y - 1) and 0xFF
-            //> lda (AreaData),y         ;reread first byte of level object
-            A = memory[readWord(AreaData) + Y].toInt()
-            //> and #$0f                 ;mask out high nybble
-            A = A and 0x0F
-            //> cmp #$0d                 ;row 13?
-            //> bne Chk1Row14
-            if (A == 0x0D) {
-                //> iny                      ;if so, reread second byte of level object
-                Y = (Y + 1) and 0xFF
-                //> lda (AreaData),y
-                A = memory[readWord(AreaData) + Y].toInt()
-                //> dey                      ;decrement to get ready to read first byte
-                Y = (Y - 1) and 0xFF
-                //> and #%01000000           ;check for d6 set (if not, object is page control)
-                A = A and 0x40
-                //> bne CheckRear
-                if (A == 0) {
-                    //> lda AreaObjectPageSel    ;if page select is set, do not reread
-                    A = areaObjectPageSel
-                    //> bne CheckRear
-                    if (A == 0) {
-                        //> iny                      ;if d6 not set, reread second byte
+            //> cmp #$fd                 ;if end-of-area, skip all this crap
+            //> beq RdyDecode
+            if (A != 0xFD) {
+                //> lda AreaObjectLength,x   ;check area object buffer flag
+                A = areaObjectLength[X]
+                //> bpl RdyDecode            ;if buffer not negative, branch, otherwise
+                if ((A and 0x80) != 0) {
+                    //> iny
+                    Y = (Y + 1) and 0xFF
+                    //> lda (AreaData),y         ;get second byte of area object
+                    A = memory[readWord(AreaData) + Y].toInt()
+                    //> asl                      ;check for page select bit (d7), branch if not set
+                    val orig0: Int = A
+                    A = (orig0 shl 1) and 0xFF
+                    //> bcc Chk1Row13
+                    if ((orig0 and 0x80) != 0) {
+                        //> lda AreaObjectPageSel    ;check page select
+                        A = areaObjectPageSel
+                        //> bne Chk1Row13
+                        if (A == 0) {
+                            //> inc AreaObjectPageSel    ;if not already set, set it now
+                            areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
+                            //> inc AreaObjectPageLoc    ;and increment page location
+                            areaObjectPageLoc = (areaObjectPageLoc + 1) and 0xFF
+                        }
+                    }
+                    //> Chk1Row13:  dey
+                    Y = (Y - 1) and 0xFF
+                    //> lda (AreaData),y         ;reread first byte of level object
+                    A = memory[readWord(AreaData) + Y].toInt()
+                    //> and #$0f                 ;mask out high nybble
+                    A = A and 0x0F
+                    //> cmp #$0d                 ;row 13?
+                    //> bne Chk1Row14
+                    if (A == 0x0D) {
+                        //> iny                      ;if so, reread second byte of level object
                         Y = (Y + 1) and 0xFF
                         //> lda (AreaData),y
                         A = memory[readWord(AreaData) + Y].toInt()
-                        //> and #%00011111           ;mask out all but 5 LSB and store in page control
-                        A = A and 0x1F
-                        //> sta AreaObjectPageLoc
-                        areaObjectPageLoc = A
-                        //> inc AreaObjectPageSel    ;increment page select
-                        areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
-                        //> jmp NextAObj
-                        nextAObj()
-                        return
+                        //> dey                      ;decrement to get ready to read first byte
+                        Y = (Y - 1) and 0xFF
+                        //> and #%01000000           ;check for d6 set (if not, object is page control)
+                        A = A and 0x40
+                        //> bne CheckRear
+                        if (A == 0) {
+                            //> lda AreaObjectPageSel    ;if page select is set, do not reread
+                            A = areaObjectPageSel
+                            //> bne CheckRear
+                            if (A == 0) {
+                                //> iny                      ;if d6 not set, reread second byte
+                                Y = (Y + 1) and 0xFF
+                                //> lda (AreaData),y
+                                A = memory[readWord(AreaData) + Y].toInt()
+                                //> and #%00011111           ;mask out all but 5 LSB and store in page control
+                                A = A and 0x1F
+                                //> sta AreaObjectPageLoc
+                                areaObjectPageLoc = A
+                                //> inc AreaObjectPageSel    ;increment page select
+                                areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
+                                //> jmp NextAObj
+                                //> jmp NextAObj (not a known function)
+                            }
+                        }
                     }
+                    //> Chk1Row14:  cmp #$0e                 ;row 14?
+                    //> bne CheckRear
+                    if (A == 0x0E) {
+                        //> lda BackloadingFlag      ;check flag for saved page number and branch if set
+                        A = backloadingFlag
+                        //> bne RdyDecode            ;to render the object (otherwise bg might not look right)
+                    }
+                    //> CheckRear:  lda AreaObjectPageLoc    ;check to see if current page of level object is
+                    A = areaObjectPageLoc
+                    //> cmp CurrentPageLoc       ;behind current page of renderer
+                    //> bcc SetBehind            ;if so branch
                 }
             }
-            //> Chk1Row14:  cmp #$0e                 ;row 14?
-            //> bne CheckRear
-            if (A == 0x0E) {
-                //> lda BackloadingFlag      ;check flag for saved page number and branch if set
-                A = backloadingFlag
-                //> bne RdyDecode            ;to render the object (otherwise bg might not look right)
-            }
-            //> CheckRear:  lda AreaObjectPageLoc    ;check to see if current page of level object is
-            A = areaObjectPageLoc
-            //> cmp CurrentPageLoc       ;behind current page of renderer
-            //> bcc SetBehind            ;if so branch
-        } else {
             //> RdyDecode:  jsr DecodeAreaData       ;do sub and do not turn on flag
-            decodeAreaData(X)
+            decodeAreaData(0)
             //> jmp ChkLength
-            chkLength()
-            return
-        }
-    } else {
-        //> RdyDecode:  jsr DecodeAreaData       ;do sub and do not turn on flag
-        decodeAreaData(X)
-        //> jmp ChkLength
-        chkLength()
-        return
-    }
-    //> SetBehind:  inc BehindAreaParserFlag ;turn on flag if object is behind renderer
-    behindAreaParserFlag = (behindAreaParserFlag + 1) and 0xFF
-    //  Fall-through tail call to nextAObj
-    nextAObj()
-    return
-}
-
-// Decompiled from NextAObj
-fun nextAObj() {
-    //> NextAObj:   jsr IncAreaObjOffset     ;increment buffer offset and move on
-    incAreaObjOffset()
-    //  Fall-through tail call to chkLength
-    chkLength()
-    return
-}
-
-// Decompiled from ChkLength
-fun chkLength() {
-    var A: Int = 0
-    var X: Int = 0
-    var Y: Int = 0
-    var areaDataOffset by MemoryByte(AreaDataOffset)
-    var areaObjectPageLoc by MemoryByte(AreaObjectPageLoc)
-    var areaObjectPageSel by MemoryByte(AreaObjectPageSel)
-    var backloadingFlag by MemoryByte(BackloadingFlag)
-    var behindAreaParserFlag by MemoryByte(BehindAreaParserFlag)
-    var currentPageLoc by MemoryByte(CurrentPageLoc)
-    var objectOffset by MemoryByte(ObjectOffset)
-    val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
-    //> ChkLength:  ldx ObjectOffset         ;get buffer offset
-    X = objectOffset
-    //> lda AreaObjectLength,x   ;check object length for anything stored here
-    A = areaObjectLength[X]
-    //> bmi ProcLoopb            ;if not, branch to handle loopback
-    //> ProcADLoop: stx ObjectOffset
-    objectOffset = X
-    //> lda #$00                 ;reset flag
-    A = 0x00
-    //> sta BehindAreaParserFlag
-    behindAreaParserFlag = A
-    //> ldy AreaDataOffset       ;get offset of area data pointer
-    Y = areaDataOffset
-    //> lda (AreaData),y         ;get first byte of area object
-    A = memory[readWord(AreaData) + Y].toInt()
-    //> cmp #$fd                 ;if end-of-area, skip all this crap
-    //> beq RdyDecode
-    //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
-    return
-    if (A != 0xFD) {
-        //> lda AreaObjectLength,x   ;check area object buffer flag
-        A = areaObjectLength[X]
-        //> bpl RdyDecode            ;if buffer not negative, branch, otherwise
-        //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
-        return
-        if ((A and 0x80) != 0) {
-            //> iny
-            Y = (Y + 1) and 0xFF
-            //> lda (AreaData),y         ;get second byte of area object
-            A = memory[readWord(AreaData) + Y].toInt()
-            //> asl                      ;check for page select bit (d7), branch if not set
-            val orig0: Int = A
-            A = (orig0 shl 1) and 0xFF
-            //> bcc Chk1Row13
-            //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
-            return
-            if ((orig0 and 0x80) != 0) {
-                //> lda AreaObjectPageSel    ;check page select
-                A = areaObjectPageSel
-                //> bne Chk1Row13
-                //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
-                return
-                if (A == 0) {
-                    //> inc AreaObjectPageSel    ;if not already set, set it now
-                    areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
-                    //> inc AreaObjectPageLoc    ;and increment page location
-                    areaObjectPageLoc = (areaObjectPageLoc + 1) and 0xFF
-                    //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
-                    return
-                }
+            //> jmp ChkLength (not a known function)
+            //> SetBehind:  inc BehindAreaParserFlag ;turn on flag if object is behind renderer
+            behindAreaParserFlag = (behindAreaParserFlag + 1) and 0xFF
+            //> NextAObj:   jsr IncAreaObjOffset     ;increment buffer offset and move on
+            incAreaObjOffset()
+            //> ChkLength:  ldx ObjectOffset         ;get buffer offset
+            X = objectOffset
+            //> lda AreaObjectLength,x   ;check object length for anything stored here
+            A = areaObjectLength[X]
+            //> bmi ProcLoopb            ;if not, branch to handle loopback
+            if ((A and 0x80) == 0) {
+                //> dec AreaObjectLength,x   ;otherwise decrement length or get rid of it
+                areaObjectLength[X] = (areaObjectLength[X] - 1) and 0xFF
             }
-            //> Chk1Row13:  dey
-            Y = (Y - 1) and 0xFF
-            //> lda (AreaData),y         ;reread first byte of level object
-            A = memory[readWord(AreaData) + Y].toInt()
-            //> and #$0f                 ;mask out high nybble
-            A = A and 0x0F
-            //> cmp #$0d                 ;row 13?
-            //> bne Chk1Row14
-            //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
-            return
-            if (A == 0x0D) {
-                //> iny                      ;if so, reread second byte of level object
-                Y = (Y + 1) and 0xFF
-                //> lda (AreaData),y
-                A = memory[readWord(AreaData) + Y].toInt()
-                //> dey                      ;decrement to get ready to read first byte
-                Y = (Y - 1) and 0xFF
-                //> and #%01000000           ;check for d6 set (if not, object is page control)
-                A = A and 0x40
-                //> bne CheckRear
-                //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
-                return
-                if (A == 0) {
-                    //> lda AreaObjectPageSel    ;if page select is set, do not reread
-                    A = areaObjectPageSel
-                    //> bne CheckRear
-                    //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
-                    return
-                    if (A == 0) {
-                        //> iny                      ;if d6 not set, reread second byte
-                        Y = (Y + 1) and 0xFF
-                        //> lda (AreaData),y
-                        A = memory[readWord(AreaData) + Y].toInt()
-                        //> and #%00011111           ;mask out all but 5 LSB and store in page control
-                        A = A and 0x1F
-                        //> sta AreaObjectPageLoc
-                        areaObjectPageLoc = A
-                        //> inc AreaObjectPageSel    ;increment page select
-                        areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
-                        //> jmp NextAObj
-                        nextAObj()
-                        return
-                    }
-                }
-            }
-            //> Chk1Row14:  cmp #$0e                 ;row 14?
-            //> bne CheckRear
-            //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
-            return
-            if (A == 0x0E) {
-                //> lda BackloadingFlag      ;check flag for saved page number and branch if set
-                A = backloadingFlag
-                //> bne RdyDecode            ;to render the object (otherwise bg might not look right)
-                //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
-                return
-            }
-            //> CheckRear:  lda AreaObjectPageLoc    ;check to see if current page of level object is
-            A = areaObjectPageLoc
-            //> cmp CurrentPageLoc       ;behind current page of renderer
-            //> bcc SetBehind            ;if so branch
-            //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
-            return
-        }
-    }
+            //> ProcLoopb:  dex                      ;decrement buffer offset
+            X = (X - 1) and 0xFF
+            //> bpl ProcADLoop           ;and loopback unless exceeded buffer
+        } while ((X and 0x80) == 0)
+        //> lda BehindAreaParserFlag ;check for flag set if objects were behind renderer
+        A = behindAreaParserFlag
+        //> bne ProcessAreaData      ;branch if true to load more level data, otherwise
+        //> lda BackloadingFlag      ;check for flag set if starting right of page $00
+        A = backloadingFlag
+        //> bne ProcessAreaData      ;branch if true to load more level data, otherwise leave
+    } while (A != 0)
+    //> EndAParse:  rts
+    return
 }
 
 // Decompiled from IncAreaObjOffset
@@ -6319,42 +6120,18 @@ fun treeLedge(X: Int, Y: Int): Int {
                 //> jmp NoUnder
                 noUnder(A)
                 return X
-            } else {
-                //> MidTreeL: ldx $07
-                X = memory[0x7].toInt()
-                //> lda #$17                ;render middle of tree ledge
-                A = 0x17
-                //> sta MetatileBuffer,x    ;note that this is also used if ledge position is
-                metatileBuffer[X] = A
-                //> lda #$4c                ;at the start of level for continuous effect
-                A = 0x4C
-                //> jmp AllUnder            ;now render the part underneath
-                allUnder(A, X)
-                return X
-                //> EndTreeL: lda #$18                ;render end of tree ledge
-                A = 0x18
-                //> jmp NoUnder
-                noUnder(A)
-                return X
             }
-        } else {
-            //> MidTreeL: ldx $07
-            X = memory[0x7].toInt()
-            //> lda #$17                ;render middle of tree ledge
-            A = 0x17
-            //> sta MetatileBuffer,x    ;note that this is also used if ledge position is
-            metatileBuffer[X] = A
-            //> lda #$4c                ;at the start of level for continuous effect
-            A = 0x4C
-            //> jmp AllUnder            ;now render the part underneath
-            allUnder(A, X)
-            return X
-            //> EndTreeL: lda #$18                ;render end of tree ledge
-            A = 0x18
-            //> jmp NoUnder
-            noUnder(A)
-            return X
         }
+        //> MidTreeL: ldx $07
+        X = memory[0x7].toInt()
+        //> lda #$17                ;render middle of tree ledge
+        A = 0x17
+        //> sta MetatileBuffer,x    ;note that this is also used if ledge position is
+        metatileBuffer[X] = A
+        //> lda #$4c                ;at the start of level for continuous effect
+        A = 0x4C
+        //> jmp AllUnder            ;now render the part underneath
+        allUnder(A, X)
         return X
     } else {
         //> EndTreeL: lda #$18                ;render end of tree ledge
@@ -6625,20 +6402,15 @@ fun castleObject(X: Int, Y: Int): Int {
                 enemyId[X] = A
                 //> rts
                 return X
-            } else {
-                //> ExitCastle: rts
-                return X
             }
         }
         //> PlayerStop: ldy #$52                 ;put brick at floor to stop player at end of level
         Y = 0x52
         //> sty MetatileBuffer+10    ;this is only done if we're on the second column
         metatileBuffer[10] = Y
-        return X
-    } else {
-        //> ExitCastle: rts
-        return X
     }
+    //> ExitCastle: rts
+    return X
 }
 
 // Decompiled from WaterPipe
@@ -8942,9 +8714,6 @@ fun playerEntrance() {
             //> jmp NextArea              ;jump to increment to next area and set modes
             nextArea(A)
             return
-        } else {
-            //> ExitEntr:   rts                       ;leave!
-            return
         }
     }
     //> EntrMode2:  lda JoypadOverride        ;if controller override bits set here,
@@ -9017,6 +8786,8 @@ fun playerEntrance() {
             joypadOverride = A
         }
     }
+    //> ExitEntr:   rts                       ;leave!
+    return
 }
 
 // Decompiled from AutoControlPlayer
@@ -11006,16 +10777,9 @@ fun fireballObjCore(X: Int) {
             A = 0x00
             //> sta Fireball_State,x
             fireballState[X] = A
-        } else {
-            //> NoFBall: rts                          ;leave
-            return
-            //> FireballExplosion:
-            //> jsr RelativeFireballPosition
-            relativeFireballPosition(X)
-            //> jmp DrawExplosion_Fireball
-            drawexplosionFireball(X)
-            return
         }
+        //> NoFBall: rts                          ;leave
+        return
     } else {
         //> FireballExplosion:
         //> jsr RelativeFireballPosition
@@ -11241,26 +11005,13 @@ fun runGameTimer() {
                         forceInjury(A)
                         //> inc GameTimerExpiredFlag   ;set game timer expiration flag
                         gameTimerExpiredFlag = (gameTimerExpiredFlag + 1) and 0xFF
-                    } else {
-                        //> ExGTimer:  rts                        ;leave
-                        return
                     }
-                } else {
-                    //> ExGTimer:  rts                        ;leave
-                    return
                 }
-            } else {
-                //> ExGTimer:  rts                        ;leave
-                return
             }
-        } else {
-            //> ExGTimer:  rts                        ;leave
-            return
         }
-    } else {
-        //> ExGTimer:  rts                        ;leave
-        return
     }
+    //> ExGTimer:  rts                        ;leave
+    return
 }
 
 // Decompiled from WarpZoneObject
@@ -12018,12 +11769,11 @@ fun vineObjectHandler(X: Int) {
                 }
             }
         }
-    } else {
-        //> ExitVH:    ldx ObjectOffset          ;get enemy object offset and leave
-        X = objectOffset
-        //> rts
-        return
     }
+    //> ExitVH:    ldx ObjectOffset          ;get enemy object offset and leave
+    X = objectOffset
+    //> rts
+    return
 }
 
 // Decompiled from ProcessCannons
@@ -12033,6 +11783,9 @@ fun processCannons() {
     var Y: Int = 0
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
     var areaType by MemoryByte(AreaType)
     var objectOffset by MemoryByte(ObjectOffset)
     var secondaryHardMode by MemoryByte(SecondaryHardMode)
@@ -12058,163 +11811,119 @@ fun processCannons() {
     if (A != 0) {
         //> ldx #$02
         X = 0x02
-        //> ThreeSChk: stx ObjectOffset            ;start at third enemy slot
-        objectOffset = X
-        //> lda Enemy_Flag,x            ;check enemy buffer flag
-        A = enemyFlag[X]
-        //> bne Chk_BB                  ;if set, branch to check enemy
-        if (!(A == 0)) {
-            //  goto Chk_BB -> chkBb
-            chkBb(X, 0)
-            return
-        }
-        //> lda PseudoRandomBitReg+1,x  ;otherwise get part of LSFR
-        A = pseudoRandomBitReg[1 + X]
-        //> ldy SecondaryHardMode       ;get secondary hard mode flag, use as offset
-        Y = secondaryHardMode
-        //> and CannonBitmasks,y        ;mask out bits of LSFR as decided by flag
-        A = A and cannonBitmasks[Y]
-        //> cmp #$06                    ;check to see if lower nybble is above certain value
-        //> bcs Chk_BB                  ;if so, branch to check enemy
-        if (A >= 0x06) {
-            //  goto Chk_BB -> chkBb
-            chkBb(X, Y)
-            return
-        }
-        //> tay                         ;transfer masked contents of LSFR to Y as pseudorandom offset
-        Y = A
-        //> lda Cannon_PageLoc,y        ;get page location
-        A = cannonPageloc[Y]
-        //> beq Chk_BB                  ;if not set or on page 0, branch to check enemy
-        if (A == 0) {
-            //  goto Chk_BB -> chkBb
-            chkBb(X, Y)
-            return
-        }
-        //> lda Cannon_Timer,y          ;get cannon timer
-        A = cannonTimer[Y]
-        //> beq FireCannon              ;if expired, branch to fire cannon
-        if (A != 0) {
-            //> sbc #$00                    ;otherwise subtract borrow (note carry will always be clear here)
-            temp0 = A - if (A >= 0x06) 0 else 1
-            A = temp0 and 0xFF
-            //> sta Cannon_Timer,y          ;to count timer down
-            cannonTimer[Y] = A
-            //> jmp Chk_BB                  ;then jump ahead to check enemy
-            chkBb(X, Y)
-            return
-        }
-        //> FireCannon:
-        //> lda TimerControl           ;if master timer control set,
-        A = timerControl
-        //> bne Chk_BB                 ;branch to check enemy
-        if (!(A == 0)) {
-            //  goto Chk_BB -> chkBb
-            chkBb(X, Y)
-            return
-        }
-        //> lda #$0e                   ;otherwise we start creating one
-        A = 0x0E
-        //> sta Cannon_Timer,y         ;first, reset cannon timer
-        cannonTimer[Y] = A
-        //> lda Cannon_PageLoc,y       ;get page location of cannon
-        A = cannonPageloc[Y]
-        //> sta Enemy_PageLoc,x        ;save as page location of bullet bill
-        enemyPageloc[X] = A
-        //> lda Cannon_X_Position,y    ;get horizontal coordinate of cannon
-        A = cannonXPosition[Y]
-        //> sta Enemy_X_Position,x     ;save as horizontal coordinate of bullet bill
-        enemyXPosition[X] = A
-        //> lda Cannon_Y_Position,y    ;get vertical coordinate of cannon
-        A = cannonYPosition[Y]
-        //> sec
-        //> sbc #$08                   ;subtract eight pixels (because enemies are 24 pixels tall)
-        temp1 = A - 0x08
-        A = temp1 and 0xFF
-        //> sta Enemy_Y_Position,x     ;save as vertical coordinate of bullet bill
-        enemyYPosition[X] = A
-        //> lda #$01
-        A = 0x01
-        //> sta Enemy_Y_HighPos,x      ;set vertical high byte of bullet bill
-        enemyYHighpos[X] = A
-        //> sta Enemy_Flag,x           ;set buffer flag
-        enemyFlag[X] = A
-        //> lsr                        ;shift right once to init A
-        val orig0: Int = A
-        A = orig0 shr 1
-        //> sta Enemy_State,x          ;then initialize enemy's state
-        enemyState[X] = A
-        //> lda #$09
-        A = 0x09
-        //> sta Enemy_BoundBoxCtrl,x   ;set bounding box size control for bullet bill
-        enemyBoundboxctrl[X] = A
-        //> lda #BulletBill_CannonVar
-        A = BulletBill_CannonVar
-        //> sta Enemy_ID,x             ;load identifier for bullet bill (cannon variant)
-        enemyId[X] = A
-        //> jmp Next3Slt               ;move onto next slot
-        next3Slt(X)
-        return
-    } else {
-        //> ExCannon: rts                        ;then leave
-        return
+        loop0@ do {
+            //> ThreeSChk: stx ObjectOffset            ;start at third enemy slot
+            objectOffset = X
+            //> lda Enemy_Flag,x            ;check enemy buffer flag
+            A = enemyFlag[X]
+            //> bne Chk_BB                  ;if set, branch to check enemy
+            if (A == 0) {
+                //> lda PseudoRandomBitReg+1,x  ;otherwise get part of LSFR
+                A = pseudoRandomBitReg[1 + X]
+                //> ldy SecondaryHardMode       ;get secondary hard mode flag, use as offset
+                Y = secondaryHardMode
+                //> and CannonBitmasks,y        ;mask out bits of LSFR as decided by flag
+                A = A and cannonBitmasks[Y]
+                //> cmp #$06                    ;check to see if lower nybble is above certain value
+                //> bcs Chk_BB                  ;if so, branch to check enemy
+                if (!(A >= 0x06)) {
+                    //> tay                         ;transfer masked contents of LSFR to Y as pseudorandom offset
+                    Y = A
+                    //> lda Cannon_PageLoc,y        ;get page location
+                    A = cannonPageloc[Y]
+                    //> beq Chk_BB                  ;if not set or on page 0, branch to check enemy
+                    if (A != 0) {
+                        //> lda Cannon_Timer,y          ;get cannon timer
+                        A = cannonTimer[Y]
+                        //> beq FireCannon              ;if expired, branch to fire cannon
+                        if (A != 0) {
+                            //> sbc #$00                    ;otherwise subtract borrow (note carry will always be clear here)
+                            temp0 = A - if (A >= 0x06) 0 else 1
+                            A = temp0 and 0xFF
+                            //> sta Cannon_Timer,y          ;to count timer down
+                            cannonTimer[Y] = A
+                            //> jmp Chk_BB                  ;then jump ahead to check enemy
+                            //> jmp Chk_BB (not a known function)
+                        } else {
+                            //> FireCannon:
+                            //> lda TimerControl           ;if master timer control set,
+                            A = timerControl
+                            //> bne Chk_BB                 ;branch to check enemy
+                            if (A == 0) {
+                                //> lda #$0e                   ;otherwise we start creating one
+                                A = 0x0E
+                                //> sta Cannon_Timer,y         ;first, reset cannon timer
+                                cannonTimer[Y] = A
+                                //> lda Cannon_PageLoc,y       ;get page location of cannon
+                                A = cannonPageloc[Y]
+                                //> sta Enemy_PageLoc,x        ;save as page location of bullet bill
+                                enemyPageloc[X] = A
+                                //> lda Cannon_X_Position,y    ;get horizontal coordinate of cannon
+                                A = cannonXPosition[Y]
+                                //> sta Enemy_X_Position,x     ;save as horizontal coordinate of bullet bill
+                                enemyXPosition[X] = A
+                                //> lda Cannon_Y_Position,y    ;get vertical coordinate of cannon
+                                A = cannonYPosition[Y]
+                                //> sec
+                                //> sbc #$08                   ;subtract eight pixels (because enemies are 24 pixels tall)
+                                temp1 = A - 0x08
+                                A = temp1 and 0xFF
+                                //> sta Enemy_Y_Position,x     ;save as vertical coordinate of bullet bill
+                                enemyYPosition[X] = A
+                                //> lda #$01
+                                A = 0x01
+                                //> sta Enemy_Y_HighPos,x      ;set vertical high byte of bullet bill
+                                enemyYHighpos[X] = A
+                                //> sta Enemy_Flag,x           ;set buffer flag
+                                enemyFlag[X] = A
+                                //> lsr                        ;shift right once to init A
+                                val orig0: Int = A
+                                A = orig0 shr 1
+                                //> sta Enemy_State,x          ;then initialize enemy's state
+                                enemyState[X] = A
+                                //> lda #$09
+                                A = 0x09
+                                //> sta Enemy_BoundBoxCtrl,x   ;set bounding box size control for bullet bill
+                                enemyBoundboxctrl[X] = A
+                                //> lda #BulletBill_CannonVar
+                                A = BulletBill_CannonVar
+                                //> sta Enemy_ID,x             ;load identifier for bullet bill (cannon variant)
+                                enemyId[X] = A
+                                //> jmp Next3Slt               ;move onto next slot
+                                //> jmp Next3Slt (not a known function)
+                            }
+                        }
+                    }
+                }
+            } else {
+                //> Chk_BB:   lda Enemy_ID,x             ;check enemy identifier for bullet bill (cannon variant)
+                A = enemyId[X]
+                //> cmp #BulletBill_CannonVar
+                //> bne Next3Slt               ;if not found, branch to get next slot
+                if (A == BulletBill_CannonVar) {
+                    //> jsr OffscreenBoundsCheck   ;otherwise, check to see if it went offscreen
+                    offscreenBoundsCheck(X)
+                    //> lda Enemy_Flag,x           ;check enemy buffer flag
+                    A = enemyFlag[X]
+                    //> beq Next3Slt               ;if not set, branch to get next slot
+                    if (A != 0) {
+                        //> jsr GetEnemyOffscreenBits  ;otherwise, get offscreen information
+                        val pair0 = getEnemyOffscreenBits(X)
+                        temp2 = pair0.first
+                        temp3 = pair0.second
+                        X = temp2
+                        //> jsr BulletBillHandler      ;then do sub to handle bullet bill
+                        temp4 = bulletBillHandler(temp2, temp3)
+                        X = temp4
+                    }
+                }
+            }
+            //> Next3Slt: dex                        ;move onto next slot
+            X = (X - 1) and 0xFF
+            //> bpl ThreeSChk              ;do this until first three slots are checked
+        } while ((X and 0x80) == 0)
     }
-}
-
-// Decompiled from Chk_BB
-fun chkBb(X: Int, Y: Int) {
-    var A: Int = 0
-    var X: Int = X
-    var temp0: Int = 0
-    var temp1: Int = 0
-    var temp2: Int = 0
-    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
-    val enemyId by MemoryByteIndexed(Enemy_ID)
-    //> Chk_BB:   lda Enemy_ID,x             ;check enemy identifier for bullet bill (cannon variant)
-    A = enemyId[X]
-    //> cmp #BulletBill_CannonVar
-    //> bne Next3Slt               ;if not found, branch to get next slot
-    if (!(A == BulletBill_CannonVar)) {
-        //  goto Next3Slt -> next3Slt
-        next3Slt(X)
-        return
-    } else {
-        //> jsr OffscreenBoundsCheck   ;otherwise, check to see if it went offscreen
-        offscreenBoundsCheck(X)
-        //> lda Enemy_Flag,x           ;check enemy buffer flag
-        A = enemyFlag[X]
-        //> beq Next3Slt               ;if not set, branch to get next slot
-        if (A == 0) {
-            //  goto Next3Slt -> next3Slt
-            next3Slt(X)
-            return
-        }
-    }
-    //> jsr GetEnemyOffscreenBits  ;otherwise, get offscreen information
-    val pair0 = getEnemyOffscreenBits(X)
-    temp0 = pair0.first
-    temp1 = pair0.second
-    X = temp0
-    //> jsr BulletBillHandler      ;then do sub to handle bullet bill
-    temp2 = bulletBillHandler(temp0, temp1)
-    X = temp2
-    //  Fall-through tail call to next3Slt
-    next3Slt(temp2)
-    return
-}
-
-// Decompiled from Next3Slt
-fun next3Slt(X: Int) {
-    var X: Int = X
-    //> Next3Slt: dex                        ;move onto next slot
-    X = (X - 1) and 0xFF
-    //> bpl ThreeSChk              ;do this until first three slots are checked
-    if (!((X and 0x80) != 0)) {
-        //  goto ThreeSChk
-        return
-    }
-    //  Fall-through tail call to processCannons
-    processCannons()
+    //> ExCannon: rts                        ;then leave
     return
 }
 
@@ -12230,8 +11939,6 @@ fun bulletBillHandler(X: Int, Y: Int): Int {
     var temp4: Int = 0
     var temp5: Int = 0
     var temp6: Int = 0
-    var temp7: Int = 0
-    var temp8: Int = 0
     var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
     var square2SoundQueue by MemoryByte(Square2SoundQueue)
     var timerControl by MemoryByte(TimerControl)
@@ -12295,17 +12002,7 @@ fun bulletBillHandler(X: Int, Y: Int): Int {
                     A = Sfx_Blast
                     //> sta Square2SoundQueue     ;play fireworks/gunfire sound
                     square2SoundQueue = A
-                } else {
-                    //> KillBB:    jsr EraseEnemyObject      ;kill bullet bill and leave
-                    temp1 = eraseEnemyObject(X)
-                    //> rts
-                    return X
                 }
-            } else {
-                //> KillBB:    jsr EraseEnemyObject      ;kill bullet bill and leave
-                temp2 = eraseEnemyObject(X)
-                //> rts
-                return X
             }
         }
         //> ChkDSte:   lda Enemy_State,x         ;check enemy state for d5 set
@@ -12319,25 +12016,25 @@ fun bulletBillHandler(X: Int, Y: Int): Int {
         }
         //> BBFly:     jsr MoveEnemyHorizontally ;do sub to move bullet bill horizontally
         val pair0 = moveEnemyHorizontally(A, X)
-        temp3 = pair0.first
-        temp4 = pair0.second
-        X = temp4
+        temp1 = pair0.first
+        temp2 = pair0.second
+        X = temp2
     }
     //> RunBBSubs: jsr GetEnemyOffscreenBits ;get offscreen information
     val pair1 = getEnemyOffscreenBits(X)
-    temp5 = pair1.first
-    temp6 = pair1.second
-    X = temp5
+    temp3 = pair1.first
+    temp4 = pair1.second
+    X = temp3
     //> jsr RelativeEnemyPosition ;get relative coordinates
-    temp7 = relativeEnemyPosition(temp5)
-    X = temp7
+    temp5 = relativeEnemyPosition(temp3)
+    X = temp5
     //> jsr GetEnemyBoundBox      ;get bounding box coordinates
-    getEnemyBoundBox(temp7)
+    getEnemyBoundBox(temp5)
     //> jsr PlayerEnemyCollision  ;handle player to enemy collisions
-    temp8 = playerEnemyCollision(temp7, temp6)
-    X = temp8
+    temp6 = playerEnemyCollision(temp5, temp4)
+    X = temp6
     //> jmp EnemyGfxHandler       ;draw the bullet bill and leave
-    enemyGfxHandler(temp8)
+    enemyGfxHandler(temp6)
     return X
 }
 
@@ -12395,20 +12092,12 @@ fun spawnHammerObj(): Int {
             //> sec                      ;return with carry set
             //> rts
             return X
-        } else {
-            //> NoHammer: ldx ObjectOffset         ;get original enemy object offset
-            X = objectOffset
-            //> clc                      ;return with carry clear
-            //> rts
-            return X
         }
-    } else {
-        //> NoHammer: ldx ObjectOffset         ;get original enemy object offset
-        X = objectOffset
-        //> clc                      ;return with carry clear
-        //> rts
-        return X
     }
+    //> NoHammer: ldx ObjectOffset         ;get original enemy object offset
+    X = objectOffset
+    //> clc                      ;return with carry clear
+    //> rts
     return X
 }
 
@@ -12725,161 +12414,117 @@ fun miscObjectsCore() {
     //> MiscObjectsCore:
     //> ldx #$08          ;set at end of misc object buffer
     X = 0x08
-    //> MiscLoop: stx ObjectOffset  ;store misc object offset here
-    objectOffset = X
-    //> lda Misc_State,x  ;check misc object state
-    A = miscState[X]
-    //> beq MiscLoopBack  ;branch to check next slot
-    if (A == 0) {
-        //  goto MiscLoopBack -> miscLoopBack
-        miscLoopBack(X)
-        return
-    } else {
-        //> asl               ;otherwise shift d7 into carry
-        val orig0: Int = A
-        A = (orig0 shl 1) and 0xFF
-        //> bcc ProcJumpCoin  ;if d7 not set, jumping coin, thus skip to rest of code here
-        if ((orig0 and 0x80) != 0) {
-            //> jsr ProcHammerObj ;otherwise go to process hammer,
-            procHammerObj(X)
-            //> jmp MiscLoopBack  ;then check next slot
-            miscLoopBack(X)
-            return
-        }
-    }
-    //> ProcJumpCoin:
-    //> ldy Misc_State,x          ;check misc object state
-    Y = miscState[X]
-    //> dey                       ;decrement to see if it's set to 1
-    Y = (Y - 1) and 0xFF
-    //> beq JCoinRun              ;if so, branch to handle jumping coin
-    if (Y != 0) {
-        //> inc Misc_State,x          ;otherwise increment state to either start off or as timer
-        miscState[X] = (miscState[X] + 1) and 0xFF
-        //> lda Misc_X_Position,x     ;get horizontal coordinate for misc object
-        A = miscXPosition[X]
-        //> clc                       ;whether its jumping coin (state 0 only) or floatey number
-        //> adc ScrollAmount          ;add current scroll speed
-        temp0 = A + scrollAmount
-        A = temp0 and 0xFF
-        //> sta Misc_X_Position,x     ;store as new horizontal coordinate
-        miscXPosition[X] = A
-        //> lda Misc_PageLoc,x        ;get page location
-        A = miscPageloc[X]
-        //> adc #$00                  ;add carry
-        temp1 = A + if (temp0 > 0xFF) 1 else 0
-        A = temp1 and 0xFF
-        //> sta Misc_PageLoc,x        ;store as new page location
-        miscPageloc[X] = A
-        //> lda Misc_State,x
+    loop0@ do {
+        //> MiscLoop: stx ObjectOffset  ;store misc object offset here
+        objectOffset = X
+        //> lda Misc_State,x  ;check misc object state
         A = miscState[X]
-        //> cmp #$30                  ;check state of object for preset value
-        //> bne RunJCSubs             ;if not yet reached, branch to subroutines
-        if (A == 0x30) {
-            //> lda #$00
-            A = 0x00
-            //> sta Misc_State,x          ;otherwise nullify object state
-            miscState[X] = A
-            //> jmp MiscLoopBack          ;and move onto next slot
-            miscLoopBack(X)
-            return
-        }
-    }
-    //> JCoinRun:  txa
-    A = X
-    //> clc                       ;add 13 bytes to offset for next subroutine
-    //> adc #$0d
-    temp2 = A + 0x0D
-    A = temp2 and 0xFF
-    //> tax
-    X = A
-    //> lda #$50                  ;set downward movement amount
-    A = 0x50
-    //> sta $00
-    memory[0x0] = A.toUByte()
-    //> lda #$06                  ;set maximum vertical speed
-    A = 0x06
-    //> sta $02
-    memory[0x2] = A.toUByte()
-    //> lsr                       ;divide by 2 and set
-    val orig1: Int = A
-    A = orig1 shr 1
-    //> sta $01                   ;as upward movement amount (apparently residual)
-    memory[0x1] = A.toUByte()
-    //> lda #$00                  ;set A to impose gravity on jumping coin
-    A = 0x00
-    //> jsr ImposeGravity         ;do sub to move coin vertically and impose gravity on it
-    imposeGravity(A, X)
-    //> ldx ObjectOffset          ;get original misc object offset
-    X = objectOffset
-    //> lda Misc_Y_Speed,x        ;check vertical speed
-    A = miscYSpeed[X]
-    //> cmp #$05
-    //> bne RunJCSubs             ;if not moving downward fast enough, keep state as-is
-    if (A == 0x05) {
-        //> inc Misc_State,x          ;otherwise increment state to change to floatey number
-        miscState[X] = (miscState[X] + 1) and 0xFF
-    }
-    //> RunJCSubs: jsr RelativeMiscPosition  ;get relative coordinates
-    temp3 = relativeMiscPosition(X)
-    X = temp3
-    //> jsr GetMiscOffscreenBits  ;get offscreen information
-    temp4 = getMiscOffscreenBits(temp3)
-    X = temp4
-    //> jsr GetMiscBoundBox       ;get bounding box coordinates (why?)
-    temp5 = getMiscBoundBox(temp4)
-    X = temp5
-    //> jsr JCoinGfxHandler       ;draw the coin or floatey number
-    temp6 = jCoinGfxHandler(temp5)
-    X = temp6
-    //  Fall-through tail call to miscLoopBack
-    miscLoopBack(temp6)
-    return
-}
-
-// Decompiled from MiscLoopBack
-fun miscLoopBack(X: Int) {
-    var A: Int = 0
-    var X: Int = X
-    var objectOffset by MemoryByte(ObjectOffset)
-    val miscState by MemoryByteIndexed(Misc_State)
-    //> MiscLoopBack:
-    //> dex                       ;decrement misc object offset
-    X = (X - 1) and 0xFF
-    //> bpl MiscLoop              ;loop back until all misc objects handled
-    if (!((X and 0x80) != 0)) {
-        //  goto MiscLoop
-        return
-    } else {
-        X = X
-        loop0@ do {
-            //> MiscLoop: stx ObjectOffset  ;store misc object offset here
-            objectOffset = X
-            //> lda Misc_State,x  ;check misc object state
-            A = miscState[X]
-            //> beq MiscLoopBack  ;branch to check next slot
-            if (A == 0) {
-                //  goto MiscLoopBack -> miscLoopBack
-                miscLoopBack(X)
-                return
+        //> beq MiscLoopBack  ;branch to check next slot
+        if (A != 0) {
+            //> asl               ;otherwise shift d7 into carry
+            val orig0: Int = A
+            A = (orig0 shl 1) and 0xFF
+            //> bcc ProcJumpCoin  ;if d7 not set, jumping coin, thus skip to rest of code here
+            if ((orig0 and 0x80) != 0) {
+                //> jsr ProcHammerObj ;otherwise go to process hammer,
+                procHammerObj(X)
+                //> jmp MiscLoopBack  ;then check next slot
+                //> jmp MiscLoopBack (not a known function)
+            } else {
+                //> ProcJumpCoin:
+                //> ldy Misc_State,x          ;check misc object state
+                Y = miscState[X]
+                //> dey                       ;decrement to see if it's set to 1
+                Y = (Y - 1) and 0xFF
+                //> beq JCoinRun              ;if so, branch to handle jumping coin
+                if (Y != 0) {
+                    //> inc Misc_State,x          ;otherwise increment state to either start off or as timer
+                    miscState[X] = (miscState[X] + 1) and 0xFF
+                    //> lda Misc_X_Position,x     ;get horizontal coordinate for misc object
+                    A = miscXPosition[X]
+                    //> clc                       ;whether its jumping coin (state 0 only) or floatey number
+                    //> adc ScrollAmount          ;add current scroll speed
+                    temp0 = A + scrollAmount
+                    A = temp0 and 0xFF
+                    //> sta Misc_X_Position,x     ;store as new horizontal coordinate
+                    miscXPosition[X] = A
+                    //> lda Misc_PageLoc,x        ;get page location
+                    A = miscPageloc[X]
+                    //> adc #$00                  ;add carry
+                    temp1 = A + if (temp0 > 0xFF) 1 else 0
+                    A = temp1 and 0xFF
+                    //> sta Misc_PageLoc,x        ;store as new page location
+                    miscPageloc[X] = A
+                    //> lda Misc_State,x
+                    A = miscState[X]
+                    //> cmp #$30                  ;check state of object for preset value
+                    //> bne RunJCSubs             ;if not yet reached, branch to subroutines
+                    if (A == 0x30) {
+                        //> lda #$00
+                        A = 0x00
+                        //> sta Misc_State,x          ;otherwise nullify object state
+                        miscState[X] = A
+                        //> jmp MiscLoopBack          ;and move onto next slot
+                        //> jmp MiscLoopBack (not a known function)
+                    }
+                } else {
+                    //> JCoinRun:  txa
+                    A = X
+                    //> clc                       ;add 13 bytes to offset for next subroutine
+                    //> adc #$0d
+                    temp2 = A + 0x0D
+                    A = temp2 and 0xFF
+                    //> tax
+                    X = A
+                    //> lda #$50                  ;set downward movement amount
+                    A = 0x50
+                    //> sta $00
+                    memory[0x0] = A.toUByte()
+                    //> lda #$06                  ;set maximum vertical speed
+                    A = 0x06
+                    //> sta $02
+                    memory[0x2] = A.toUByte()
+                    //> lsr                       ;divide by 2 and set
+                    val orig1: Int = A
+                    A = orig1 shr 1
+                    //> sta $01                   ;as upward movement amount (apparently residual)
+                    memory[0x1] = A.toUByte()
+                    //> lda #$00                  ;set A to impose gravity on jumping coin
+                    A = 0x00
+                    //> jsr ImposeGravity         ;do sub to move coin vertically and impose gravity on it
+                    imposeGravity(A, X)
+                    //> ldx ObjectOffset          ;get original misc object offset
+                    X = objectOffset
+                    //> lda Misc_Y_Speed,x        ;check vertical speed
+                    A = miscYSpeed[X]
+                    //> cmp #$05
+                    //> bne RunJCSubs             ;if not moving downward fast enough, keep state as-is
+                    if (A == 0x05) {
+                        //> inc Misc_State,x          ;otherwise increment state to change to floatey number
+                        miscState[X] = (miscState[X] + 1) and 0xFF
+                    }
+                    //> RunJCSubs: jsr RelativeMiscPosition  ;get relative coordinates
+                    temp3 = relativeMiscPosition(X)
+                    X = temp3
+                    //> jsr GetMiscOffscreenBits  ;get offscreen information
+                    temp4 = getMiscOffscreenBits(temp3)
+                    X = temp4
+                    //> jsr GetMiscBoundBox       ;get bounding box coordinates (why?)
+                    temp5 = getMiscBoundBox(temp4)
+                    X = temp5
+                    //> jsr JCoinGfxHandler       ;draw the coin or floatey number
+                    temp6 = jCoinGfxHandler(temp5)
+                    X = temp6
+                }
             }
-            //  SKIPPED: Fall-through to miscObjectsCore would create mutual recursion cycle
-            return
-        } while (A == 0)
-    }
-    //> asl               ;otherwise shift d7 into carry
-    val orig0: Int = A
-    A = (orig0 shl 1) and 0xFF
-    //> bcc ProcJumpCoin  ;if d7 not set, jumping coin, thus skip to rest of code here
-    //  SKIPPED: Fall-through to miscObjectsCore would create mutual recursion cycle
-    return
-    if ((orig0 and 0x80) != 0) {
-        while (true) {
-            //> jsr ProcHammerObj ;otherwise go to process hammer,
-            procHammerObj(X)
-            //> jmp MiscLoopBack  ;then check next slot
         }
-    }
+        //> MiscLoopBack:
+        //> dex                       ;decrement misc object offset
+        X = (X - 1) and 0xFF
+        //> bpl MiscLoop              ;loop back until all misc objects handled
+    } while ((X and 0x80) == 0)
+    //> rts                       ;then leave
+    return
 }
 
 // Decompiled from GiveOneCoin
@@ -13143,24 +12788,15 @@ fun powerUpObjHandler(Y: Int) {
                     //> jmp RunPUSubs              ;then jump to other power-up subroutines
                     runPUSubs(X, Y)
                     return
-                } else {
-                    //> ShroomM: jsr MoveNormalEnemy        ;do sub to make mushrooms move
-                    moveNormalEnemy(X)
-                    //> jsr EnemyToBGCollisionDet  ;deal with collisions
-                    enemyToBGCollisionDet(X)
-                    //> jmp RunPUSubs              ;run the other subroutines
-                    runPUSubs(X, Y)
-                    return
                 }
-            } else {
-                //> ShroomM: jsr MoveNormalEnemy        ;do sub to make mushrooms move
-                moveNormalEnemy(X)
-                //> jsr EnemyToBGCollisionDet  ;deal with collisions
-                enemyToBGCollisionDet(X)
-                //> jmp RunPUSubs              ;run the other subroutines
-                runPUSubs(X, Y)
-                return
             }
+            //> ShroomM: jsr MoveNormalEnemy        ;do sub to make mushrooms move
+            moveNormalEnemy(X)
+            //> jsr EnemyToBGCollisionDet  ;deal with collisions
+            enemyToBGCollisionDet(X)
+            //> jmp RunPUSubs              ;run the other subroutines
+            runPUSubs(X, Y)
+            return
         }
         //> GrowThePowerUp:
         //> lda FrameCounter           ;get frame counter
@@ -14617,9 +14253,6 @@ fun enemiesAndLoopsCore(X: Int): Int {
             //> jmp ProcLoopCommand      ;otherwise, jump to process loop command/load enemies
             procLoopCommand(X)
             return X
-        } else {
-            //> ExitELCore: rts
-            return X
         }
     }
     //> ChkBowserF: pla                      ;get data from stack
@@ -14635,10 +14268,9 @@ fun enemiesAndLoopsCore(X: Int): Int {
     if (A == 0) {
         //> sta Enemy_Flag,x         ;if second enemy flag not set, also clear first one
         enemyFlag[X] = A
-        return X
-    } else {
-        return X
     }
+    //> ExitELCore: rts
+    return X
 }
 
 // Decompiled from ExecGameLoopback
@@ -16582,13 +16214,16 @@ fun bulletBillCheepCheep(X: Int) {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
+    var temp0: Int = 0
     var areaType by MemoryByte(AreaType)
     var bitMFilter by MemoryByte(BitMFilter)
     var frenzyEnemyTimer by MemoryByte(FrenzyEnemyTimer)
-    var square2SoundQueue by MemoryByte(Square2SoundQueue)
     var worldNumber by MemoryByte(WorldNumber)
+    val bitmasks by MemoryByteIndexed(Bitmasks)
+    val enemy17YPosData by MemoryByteIndexed(Enemy17YPosData)
     val enemyFlag by MemoryByteIndexed(Enemy_Flag)
     val enemyId by MemoryByteIndexed(Enemy_ID)
+    val enemyYmfDummy by MemoryByteIndexed(Enemy_YMF_Dummy)
     val pseudoRandomBitReg by MemoryByteIndexed(PseudoRandomBitReg)
     val swimccIddata by MemoryByteIndexed(SwimCC_IDData)
     //> BulletBillCheepCheep:
@@ -16646,18 +16281,51 @@ fun bulletBillCheepCheep(X: Int) {
                 A = pseudoRandomBitReg[X]
                 //> and #%00000111            ;mask out all but 3 LSB
                 A = A and 0x07
-                //  Fall-through tail call to chkRBit
-                chkRBit(A, X)
-                return
-            } else {
-                //> ExF17:    rts                        ;if found, leave
+                loop0@ while (A != 0) {
+                    while (true) {
+                        //> ChkRBit: tay                       ;use as offset
+                        Y = A
+                        //> lda Bitmasks,y            ;load bitmask
+                        A = bitmasks[Y]
+                        //> bit BitMFilter            ;perform AND on filter without changing it
+                        //> beq AddFBit
+                        if ((A and bitMFilter) == 0) {
+                            //  goto AddFBit
+                            break@loop0
+                        }
+                        //> iny                       ;increment offset
+                        Y = (Y + 1) and 0xFF
+                        //> tya
+                        A = Y
+                        //> and #%00000111            ;mask out all but 3 LSB thus keeping it 0-7
+                        A = A and 0x07
+                        //> jmp ChkRBit               ;do another check
+                        //> jmp ChkRBit (not a known function)
+                    }
+                }
+                //> AddFBit: ora BitMFilter            ;add bit to already set bits in filter
+                A = A or bitMFilter
+                //> sta BitMFilter            ;and store
+                bitMFilter = A
+                //> lda Enemy17YPosData,y     ;load vertical position using offset
+                A = enemy17YPosData[Y]
+                //> jsr PutAtRightExtent      ;set vertical position and other values
+                temp0 = putAtRightExtent(A, X)
+                //> sta Enemy_YMF_Dummy,x     ;initialize dummy variable
+                enemyYmfDummy[X] = temp0
+                //> lda #$20                  ;set timer
+                A = 0x20
+                //> sta FrenzyEnemyTimer
+                frenzyEnemyTimer = A
+                //> jmp CheckpointEnemyID     ;process our new enemy object
+                checkpointEnemyID(X)
                 return
             }
         }
         //> DoBulletBills:
         //> ldy #$ff                   ;start at beginning of enemy slots
         Y = 0xFF
-        loop0@ while (!(Y >= 0x05)) {
+        loop2@ while (!(Y >= 0x05)) {
             //> lda Enemy_Flag,y           ;if enemy buffer flag not set,
             A = enemyFlag[Y]
             //> beq BB_SLoop               ;loop back and check another slot
@@ -16666,73 +16334,8 @@ fun bulletBillCheepCheep(X: Int) {
             //> cmp #BulletBill_FrenzyVar  ;check enemy identifier for
             //> bne BB_SLoop               ;bullet bill object (frenzy variant)
         }
-    } else {
-        //> ExF17:    rts                        ;if found, leave
-        return
     }
-    loop1@ do {
-        //> BB_SLoop: iny                        ;move onto the next slot
-        Y = (Y + 1) and 0xFF
-        //> cpy #$05                   ;branch to play sound if we've done all slots
-        //> bcs FireBulletBill
-        //> FireBulletBill:
-        //> lda Square2SoundQueue
-        A = square2SoundQueue
-        //> ora #Sfx_Blast            ;play fireworks/gunfire sound
-        A = A or Sfx_Blast
-        //> sta Square2SoundQueue
-        square2SoundQueue = A
-        //> lda #BulletBill_FrenzyVar ;load identifier for bullet bill object
-        A = BulletBill_FrenzyVar
-        //> bne Set17ID               ;unconditional branch
-    } while (A != 0)
-    //> ;--------------------------------
-    //> ;$00 - used to store Y position of group enemies
-    //> ;$01 - used to store enemy ID
-    //> ;$02 - used to store page location of right side of screen
-    //> ;$03 - used to store X position of right side of screen
-    //  Fall-through tail call to handleGroupEnemies
-    handleGroupEnemies(A)
-    return
-}
-
-// Decompiled from ChkRBit
-fun chkRBit(A: Int, X: Int) {
-    var A: Int = A
-    var X: Int = X
-    var Y: Int = 0
-    var temp0: Int = 0
-    var bitMFilter by MemoryByte(BitMFilter)
-    var frenzyEnemyTimer by MemoryByte(FrenzyEnemyTimer)
-    val bitmasks by MemoryByteIndexed(Bitmasks)
-    val enemy17YPosData by MemoryByteIndexed(Enemy17YPosData)
-    val enemyYmfDummy by MemoryByteIndexed(Enemy_YMF_Dummy)
-    X = X
-    loop0@ while (A != 0) {
-        //> iny                       ;increment offset
-        Y = (Y + 1) and 0xFF
-        //> tya
-        A = Y
-        //> and #%00000111            ;mask out all but 3 LSB thus keeping it 0-7
-        A = A and 0x07
-        //> jmp ChkRBit               ;do another check
-    }
-    //> AddFBit: ora BitMFilter            ;add bit to already set bits in filter
-    A = A or bitMFilter
-    //> sta BitMFilter            ;and store
-    bitMFilter = A
-    //> lda Enemy17YPosData,y     ;load vertical position using offset
-    A = enemy17YPosData[Y]
-    //> jsr PutAtRightExtent      ;set vertical position and other values
-    temp0 = putAtRightExtent(A, X)
-    //> sta Enemy_YMF_Dummy,x     ;initialize dummy variable
-    enemyYmfDummy[X] = temp0
-    //> lda #$20                  ;set timer
-    A = 0x20
-    //> sta FrenzyEnemyTimer
-    frenzyEnemyTimer = A
-    //> jmp CheckpointEnemyID     ;process our new enemy object
-    checkpointEnemyID(X)
+    //> ExF17:    rts                        ;if found, leave
     return
 }
 
@@ -17909,20 +17512,13 @@ fun procHammerBro(X: Int) {
                     //> jmp MoveHammerBroXDir      ;jump to move hammer bro
                     moveHammerBroXDir(X)
                     return
-                } else {
-                    //> DecHT: dec HammerThrowingTimer,x  ;decrement timer
-                    hammerThrowingTimer[X] = (hammerThrowingTimer[X] - 1) and 0xFF
-                    //> jmp MoveHammerBroXDir      ;jump to move hammer bro
-                    moveHammerBroXDir(X)
-                    return
                 }
-            } else {
-                //> DecHT: dec HammerThrowingTimer,x  ;decrement timer
-                hammerThrowingTimer[X] = (hammerThrowingTimer[X] - 1) and 0xFF
-                //> jmp MoveHammerBroXDir      ;jump to move hammer bro
-                moveHammerBroXDir(X)
-                return
             }
+            //> DecHT: dec HammerThrowingTimer,x  ;decrement timer
+            hammerThrowingTimer[X] = (hammerThrowingTimer[X] - 1) and 0xFF
+            //> jmp MoveHammerBroXDir      ;jump to move hammer bro
+            moveHammerBroXDir(X)
+            return
         }
     }
     //> HammerBroJumpCode:
@@ -18363,11 +17959,6 @@ fun xmovecntrPlatform(A: Int, X: Int) {
             if (Y != memory[0x1].toInt()) {
                 //> inc XMoveSecondaryCounter,x ;increment secondary counter and leave
                 xMoveSecondaryCounter[X] = (xMoveSecondaryCounter[X] + 1) and 0xFF
-            } else {
-                //> IncPXM:  inc XMovePrimaryCounter,x   ;increment primary counter and leave
-                xMovePrimaryCounter[X] = (xMovePrimaryCounter[X] + 1) and 0xFF
-                //> rts
-                return
             }
         }
     }
@@ -19044,10 +18635,9 @@ fun procFirebar(X: Int) {
             //> cmp $ed                     ;if we end up at the maximum part, go on and leave
             //> bcc DrawFbar                ;otherwise go back and do another
         } while (!(A >= memory[0xED].toInt()))
-    } else {
-        //> SkipFBar: rts
-        return
     }
+    //> SkipFBar: rts
+    return
 }
 
 // Decompiled from DrawFirebar_Collision
@@ -19165,7 +18755,6 @@ fun firebarCollision(X: Int, Y: Int): Int {
     var Y: Int = Y
     var temp0: Int = 0
     var temp1: Int = 0
-    var temp2: Int = 0
     var crouchingFlag by MemoryByte(CrouchingFlag)
     var objectOffset by MemoryByte(ObjectOffset)
     var playerSize by MemoryByte(PlayerSize)
@@ -19222,34 +18811,20 @@ fun firebarCollision(X: Int, Y: Int): Int {
             A = Y
             //  SKIPPED: Fall-through to fBCLoop would create mutual recursion cycle
             return X
-        } else {
-            //> NoColFB: pla                      ;get OAM data offset
-            A = pull()
-            //> clc                      ;add four to it and save
-            //> adc #$04
-            temp1 = A + 0x04
-            A = temp1 and 0xFF
-            //> sta $06
-            memory[0x6] = A.toUByte()
-            //> ldx ObjectOffset         ;get enemy object buffer offset and leave
-            X = objectOffset
-            //> rts
-            return X
         }
-    } else {
-        //> NoColFB: pla                      ;get OAM data offset
-        A = pull()
-        //> clc                      ;add four to it and save
-        //> adc #$04
-        temp2 = A + 0x04
-        A = temp2 and 0xFF
-        //> sta $06
-        memory[0x6] = A.toUByte()
-        //> ldx ObjectOffset         ;get enemy object buffer offset and leave
-        X = objectOffset
-        //> rts
-        return X
     }
+    //> NoColFB: pla                      ;get OAM data offset
+    A = pull()
+    //> clc                      ;add four to it and save
+    //> adc #$04
+    temp1 = A + 0x04
+    A = temp1 and 0xFF
+    //> sta $06
+    memory[0x6] = A.toUByte()
+    //> ldx ObjectOffset         ;get enemy object buffer offset and leave
+    X = objectOffset
+    //> rts
+    return X
     // SKIPPED: Fall-through to fBCLoop would create mutual recursion cycle
     return X
 }
@@ -19266,113 +18841,117 @@ fun fBCLoop(A: Int) {
     var temp4: Int = 0
     var temp5: Int = 0
     var temp6: Int = 0
+    var temp7: Int = 0
     var enemyMovingdir by MemoryByte(Enemy_MovingDir)
     var objectOffset by MemoryByte(ObjectOffset)
     var playerYPosition by MemoryByte(Player_Y_Position)
     val firebarYPos by MemoryByteIndexed(FirebarYPos)
     val spriteXPosition by MemoryByteIndexed(Sprite_X_Position)
-    loop0@ while (true /* unknown branch JMP */) {
+    //> FBCLoop: sec                      ;subtract vertical position of firebar
+    //> sbc $07                  ;from the vertical coordinate of the player
+    temp0 = A - memory[0x7].toInt()
+    //> bpl ChkVFBD              ;if player lower on the screen than firebar,
+    A = temp0 and 0xFF
+    if ((temp0 and 0xFF and 0x80) != 0) {
         //> eor #$ff                 ;skip two's compliment part
         A = A xor 0xFF
         //> clc                      ;otherwise get two's compliment
         //> adc #$01
-        temp0 = A + 0x01
-        //> ChkVFBD: cmp #$08                 ;if difference => 8 pixels, skip ahead of this part
+        temp1 = A + 0x01
+        A = temp1 and 0xFF
+    }
+    //> ChkVFBD: cmp #$08                 ;if difference => 8 pixels, skip ahead of this part
+    //> bcs Chk2Ofs
+    if (!(A >= 0x08)) {
+        //> lda $06                  ;if firebar on far right on the screen, skip this,
+        A = memory[0x6].toInt()
+        //> cmp #$f0                 ;because, really, what's the point?
         //> bcs Chk2Ofs
-        A = temp0 and 0xFF
-        if (!((temp0 and 0xFF) >= 0x08)) {
-            //> lda $06                  ;if firebar on far right on the screen, skip this,
-            A = memory[0x6].toInt()
-            //> cmp #$f0                 ;because, really, what's the point?
-            //> bcs Chk2Ofs
-            if (!(A >= 0xF0)) {
-                //> lda Sprite_X_Position+4  ;get OAM X coordinate for sprite #1
-                A = spriteXPosition[4]
-                //> clc
-                //> adc #$04                 ;add four pixels
-                temp1 = A + 0x04
-                A = temp1 and 0xFF
-                //> sta $04                  ;store here
-                memory[0x4] = A.toUByte()
-                //> sec                      ;subtract horizontal coordinate of firebar
-                //> sbc $06                  ;from the X coordinate of player's sprite 1
-                temp2 = A - memory[0x6].toInt()
-                A = temp2 and 0xFF
-                //> bpl ChkFBCl              ;if modded X coordinate to the right of firebar
-                if ((temp2 and 0xFF and 0x80) != 0) {
-                    //> eor #$ff                 ;skip two's compliment part
-                    A = A xor 0xFF
-                    //> clc                      ;otherwise get two's compliment
-                    //> adc #$01
-                    temp3 = A + 0x01
-                    A = temp3 and 0xFF
-                }
-                //> ChkFBCl: cmp #$08                 ;if difference < 8 pixels, collision, thus branch
-                //> bcc ChgSDir              ;to process
-                if (!(A >= 0x08)) {
-                    //  goto ChgSDir
-                    break@loop0
-                }
+        if (!(A >= 0xF0)) {
+            //> lda Sprite_X_Position+4  ;get OAM X coordinate for sprite #1
+            A = spriteXPosition[4]
+            //> clc
+            //> adc #$04                 ;add four pixels
+            temp2 = A + 0x04
+            A = temp2 and 0xFF
+            //> sta $04                  ;store here
+            memory[0x4] = A.toUByte()
+            //> sec                      ;subtract horizontal coordinate of firebar
+            //> sbc $06                  ;from the X coordinate of player's sprite 1
+            temp3 = A - memory[0x6].toInt()
+            A = temp3 and 0xFF
+            //> bpl ChkFBCl              ;if modded X coordinate to the right of firebar
+            if ((temp3 and 0xFF and 0x80) != 0) {
+                //> eor #$ff                 ;skip two's compliment part
+                A = A xor 0xFF
+                //> clc                      ;otherwise get two's compliment
+                //> adc #$01
+                temp4 = A + 0x01
+                A = temp4 and 0xFF
             }
+            //> ChkFBCl: cmp #$08                 ;if difference < 8 pixels, collision, thus branch
+            //> bcc ChgSDir              ;to process
         }
-        //> Chk2Ofs: lda $05                  ;if value of $02 was set earlier for whatever reason,
-        A = memory[0x5].toInt()
-        //> cmp #$02                 ;branch to increment OAM offset and leave, no collision
-        //> beq NoColFB
-        if (A != 0x02) {
+    }
+    //> Chk2Ofs: lda $05                  ;if value of $02 was set earlier for whatever reason,
+    A = memory[0x5].toInt()
+    //> cmp #$02                 ;branch to increment OAM offset and leave, no collision
+    //> beq NoColFB
+    if (A != 0x02) {
+        while (true) {
             //> ldy $05                  ;otherwise get temp here and use as offset
             Y = memory[0x5].toInt()
             //> lda Player_Y_Position
             A = playerYPosition
             //> clc
             //> adc FirebarYPos,y        ;add value loaded with offset to player's vertical coordinate
-            temp4 = A + firebarYPos[Y]
-            A = temp4 and 0xFF
+            temp5 = A + firebarYPos[Y]
+            A = temp5 and 0xFF
             //> inc $05                  ;then increment temp and jump back
             memory[0x5] = ((memory[0x5].toInt() + 1) and 0xFF).toUByte()
             //> jmp FBCLoop
-        } else {
-            //> NoColFB: pla                      ;get OAM data offset
-            A = pull()
-            //> clc                      ;add four to it and save
-            //> adc #$04
-            temp5 = A + 0x04
-            A = temp5 and 0xFF
-            //> sta $06
-            memory[0x6] = A.toUByte()
-            //> ldx ObjectOffset         ;get enemy object buffer offset and leave
-            X = objectOffset
-            //> rts
-            return
         }
+        //> ChgSDir: ldx #$01                 ;set movement direction by default
+        X = 0x01
+        //> lda $04                  ;if OAM X coordinate of player's sprite 1
+        A = memory[0x4].toInt()
+        //> cmp $06                  ;is greater than horizontal coordinate of firebar
+        //> bcs SetSDir              ;then do not alter movement direction
+        if (!(A >= memory[0x6].toInt())) {
+            //> inx                      ;otherwise increment it
+            X = (X + 1) and 0xFF
+        }
+        //> SetSDir: stx Enemy_MovingDir      ;store movement direction here
+        enemyMovingdir = X
+        //> ldx #$00
+        X = 0x00
+        //> lda $00                  ;save value written to $00 to stack
+        A = memory[0x0].toInt()
+        //> pha
+        push(A)
+        //> jsr InjurePlayer         ;perform sub to hurt or kill player
+        temp6 = injurePlayer()
+        X = temp6
+        //> pla
+        A = pull()
+        //> sta $00                  ;get value of $00 from stack
+        memory[0x0] = A.toUByte()
+        //  SKIPPED: Fall-through to firebarCollision would create mutual recursion cycle
+        return
+    } else {
+        //> NoColFB: pla                      ;get OAM data offset
+        A = pull()
+        //> clc                      ;add four to it and save
+        //> adc #$04
+        temp7 = A + 0x04
+        A = temp7 and 0xFF
+        //> sta $06
+        memory[0x6] = A.toUByte()
+        //> ldx ObjectOffset         ;get enemy object buffer offset and leave
+        X = objectOffset
+        //> rts
+        return
     }
-    //> ChgSDir: ldx #$01                 ;set movement direction by default
-    X = 0x01
-    //> lda $04                  ;if OAM X coordinate of player's sprite 1
-    A = memory[0x4].toInt()
-    //> cmp $06                  ;is greater than horizontal coordinate of firebar
-    //> bcs SetSDir              ;then do not alter movement direction
-    if (!(A >= memory[0x6].toInt())) {
-        //> inx                      ;otherwise increment it
-        X = (X + 1) and 0xFF
-    }
-    //> SetSDir: stx Enemy_MovingDir      ;store movement direction here
-    enemyMovingdir = X
-    //> ldx #$00
-    X = 0x00
-    //> lda $00                  ;save value written to $00 to stack
-    A = memory[0x0].toInt()
-    //> pha
-    push(A)
-    //> jsr InjurePlayer         ;perform sub to hurt or kill player
-    temp6 = injurePlayer()
-    X = temp6
-    //> pla
-    A = pull()
-    //> sta $00                  ;get value of $00 from stack
-    memory[0x0] = A.toUByte()
-    //  SKIPPED: Fall-through to firebarCollision would create mutual recursion cycle
-    return
     // SKIPPED: Fall-through to firebarCollision would create mutual recursion cycle
 }
 
@@ -20840,24 +20419,15 @@ fun movePiranhaPlant(X: Int) {
                     }
                 }
             }
-        } else {
-            //> PutinPipe:
-            //> lda #%00100000              ;set background priority bit in sprite
-            A = 0x20
-            //> sta Enemy_SprAttrib,x       ;attributes to give illusion of being inside pipe
-            enemySprattrib[X] = A
-            //> rts                         ;then leave
-            return
         }
-    } else {
-        //> PutinPipe:
-        //> lda #%00100000              ;set background priority bit in sprite
-        A = 0x20
-        //> sta Enemy_SprAttrib,x       ;attributes to give illusion of being inside pipe
-        enemySprattrib[X] = A
-        //> rts                         ;then leave
-        return
     }
+    //> PutinPipe:
+    //> lda #%00100000              ;set background priority bit in sprite
+    A = 0x20
+    //> sta Enemy_SprAttrib,x       ;attributes to give illusion of being inside pipe
+    enemySprattrib[X] = A
+    //> rts                         ;then leave
+    return
 }
 
 // Decompiled from FirebarSpin
@@ -20990,12 +20560,11 @@ fun balancePlatform(X: Int): Int {
                 //> jmp StopPlatforms           ;to make platforms stop
                 stopPlatforms(A, X, Y)
                 return X
-            } else {
-                //> MakePlatformFall:
-                //> jmp InitPlatformFall        ;make platforms fall
-                initPlatformFall(Y)
-                return X
             }
+            //> MakePlatformFall:
+            //> jmp InitPlatformFall        ;make platforms fall
+            initPlatformFall(Y)
+            return X
         }
     }
     //> ChkOtherForFall:
@@ -21178,20 +20747,11 @@ fun doOtherPlatform(X: Int): Int {
             //  Fall-through tail call to otherRope
             otherRope(X, Y)
             return X
-        } else {
-            //> ExitRp:  ldx ObjectOffset            ;get enemy object buffer offset and leave
-            X = objectOffset
-            //> rts
-            return X
         }
-    } else {
-        //> ExitRp:  ldx ObjectOffset            ;get enemy object buffer offset and leave
-        X = objectOffset
-        //> rts
-        return X
     }
-    // Fall-through tail call to otherRope
-    otherRope(X, Y)
+    //> ExitRp:  ldx ObjectOffset            ;get enemy object buffer offset and leave
+    X = objectOffset
+    //> rts
     return X
 }
 
@@ -22059,27 +21619,14 @@ fun fireballEnemyCollision(X: Int) {
                     X = (X - 1) and 0xFF
                     //> bpl FireballEnemyCDLoop     ;loop back until collision detection done on all enemies
                 } while ((X and 0x80) == 0)
-            } else {
-                //> ExitFBallEnemy:
-                //> ldx ObjectOffset                 ;get original fireball offset and leave
-                X = objectOffset
-                //> rts
-                return
             }
-        } else {
-            //> ExitFBallEnemy:
-            //> ldx ObjectOffset                 ;get original fireball offset and leave
-            X = objectOffset
-            //> rts
-            return
         }
-    } else {
-        //> ExitFBallEnemy:
-        //> ldx ObjectOffset                 ;get original fireball offset and leave
-        X = objectOffset
-        //> rts
-        return
     }
+    //> ExitFBallEnemy:
+    //> ldx ObjectOffset                 ;get original fireball offset and leave
+    X = objectOffset
+    //> rts
+    return
 }
 
 // Decompiled from HandleEnemyFBallCol
@@ -22175,9 +21722,6 @@ fun handleEnemyFBallCol(X: Int) {
                 //> bne EnemySmackScore        ;unconditional branch to award points
                 if (A == 0) {
                 }
-            } else {
-                //> ExHCF: rts                      ;and now let's leave
-                return
             }
         }
         //> ChkOtherEnemies:
@@ -22206,12 +21750,8 @@ fun handleEnemyFBallCol(X: Int) {
                 }
             }
         }
-    } else {
-        //> ExHCF: rts                      ;and now let's leave
-        return
     }
-    // Fall-through tail call to shellOrBlockDefeat
-    shellOrBlockDefeat(X)
+    //> ExHCF: rts                      ;and now let's leave
     return
 }
 
@@ -22354,27 +21894,17 @@ fun playerHammerCollision(X: Int) {
                         //> jmp InjurePlayer          ;otherwise jump to hurt player, do not return
                         injurePlayer()
                         return
-                    } else {
-                        //> ExPHC:  rts
-                        return
                     }
-                } else {
-                    //> ExPHC:  rts
-                    return
                 }
             }
             //> ClHCol: lda #$00                  ;clear collision flag
             A = 0x00
             //> sta Misc_Collision_Flag,x
             miscCollisionFlag[X] = A
-        } else {
-            //> ExPHC:  rts
-            return
         }
-    } else {
-        //> ExPHC:  rts
-        return
     }
+    //> ExPHC:  rts
+    return
 }
 
 // Decompiled from HandlePowerUpCollision
@@ -22828,216 +22358,115 @@ fun enemiesCollision(X: Int, Y: Int) {
                     //> bmi ExitECRoutine           ;branch to leave if there are no other enemies
                     A = temp0
                     if ((X and 0x80) == 0) {
-                        //> ECLoop: stx $01                     ;save enemy object buffer offset for second enemy here
-                        memory[0x1] = X.toUByte()
-                        //> tya                         ;save first enemy's bounding box offset to stack
-                        A = Y
-                        //> pha
-                        push(A)
-                        //> lda Enemy_Flag,x            ;check enemy object enable flag
-                        A = enemyFlag[X]
-                        //> beq ReadyNextEnemy          ;branch if flag not set
-                        if (A == 0) {
-                            //  goto ReadyNextEnemy -> readyNextEnemy
-                            readyNextEnemy()
-                            return
-                        }
-                        //> lda Enemy_ID,x
-                        A = enemyId[X]
-                        //> cmp #$15                    ;check for enemy object => $15
-                        //> bcs ReadyNextEnemy          ;branch if true
-                        if (A >= 0x15) {
-                            //  goto ReadyNextEnemy -> readyNextEnemy
-                            readyNextEnemy()
-                            return
-                        }
-                        //> cmp #Lakitu
-                        //> beq ReadyNextEnemy          ;branch if enemy object is lakitu
-                        if (A == Lakitu) {
-                            //  goto ReadyNextEnemy -> readyNextEnemy
-                            readyNextEnemy()
-                            return
-                        }
-                        //> cmp #PiranhaPlant
-                        //> beq ReadyNextEnemy          ;branch if enemy object is piranha plant
-                        if (A == PiranhaPlant) {
-                            //  goto ReadyNextEnemy -> readyNextEnemy
-                            readyNextEnemy()
-                            return
-                        }
-                        //> lda EnemyOffscrBitsMasked,x
-                        A = enemyOffscrBitsMasked[X]
-                        //> bne ReadyNextEnemy          ;branch if masked offscreen bits set
-                        if (!(A == 0)) {
-                            //  goto ReadyNextEnemy -> readyNextEnemy
-                            readyNextEnemy()
-                            return
-                        }
-                        //> txa                         ;get second enemy object's bounding box offset
-                        A = X
-                        //> asl                         ;multiply by four, then add four
-                        val orig1: Int = A
-                        A = (orig1 shl 1) and 0xFF
-                        //> asl
-                        val orig2: Int = A
-                        A = (orig2 shl 1) and 0xFF
-                        //> clc
-                        //> adc #$04
-                        temp1 = A + 0x04
-                        A = temp1 and 0xFF
-                        //> tax                         ;use as new contents of X
-                        X = A
-                        //> jsr SprObjectCollisionCore  ;do collision detection using the two enemies here
-                        val flag3: Boolean = sprObjectCollisionCore(X, Y)
-                        //> ldx ObjectOffset            ;use first enemy offset for X
-                        X = objectOffset
-                        //> ldy $01                     ;use second enemy offset for Y
-                        Y = memory[0x1].toInt()
-                        //> bcc NoEnemyCollision        ;if carry clear, no collision, branch ahead of this
-                        if (flag3) {
-                            //> lda Enemy_State,x
-                            A = enemyState[X]
-                            //> ora Enemy_State,y           ;check both enemy states for d7 set
-                            A = A or enemyState[Y]
-                            //> and #%10000000
-                            A = A and 0x80
-                            //> bne YesEC                   ;branch if at least one of them is set
-                            if (A == 0) {
-                                //> lda Enemy_CollisionBits,y   ;load first enemy's collision-related bits
-                                A = enemyCollisionbits[Y]
-                                //> and SetBitsMask,x           ;check to see if bit connected to second enemy is
-                                A = A and setBitsMask[X]
-                                //> bne ReadyNextEnemy          ;already set, and move onto next enemy slot if set
-                                if (!(A == 0)) {
-                                    //  goto ReadyNextEnemy -> readyNextEnemy
-                                    readyNextEnemy()
-                                    return
+                        loop0@ do {
+                            //> ECLoop: stx $01                     ;save enemy object buffer offset for second enemy here
+                            memory[0x1] = X.toUByte()
+                            //> tya                         ;save first enemy's bounding box offset to stack
+                            A = Y
+                            //> pha
+                            push(A)
+                            //> lda Enemy_Flag,x            ;check enemy object enable flag
+                            A = enemyFlag[X]
+                            //> beq ReadyNextEnemy          ;branch if flag not set
+                            if (A != 0) {
+                                //> lda Enemy_ID,x
+                                A = enemyId[X]
+                                //> cmp #$15                    ;check for enemy object => $15
+                                //> bcs ReadyNextEnemy          ;branch if true
+                                if (!(A >= 0x15)) {
+                                    //> cmp #Lakitu
+                                    //> beq ReadyNextEnemy          ;branch if enemy object is lakitu
+                                    if (A != Lakitu) {
+                                        //> cmp #PiranhaPlant
+                                        //> beq ReadyNextEnemy          ;branch if enemy object is piranha plant
+                                        if (A != PiranhaPlant) {
+                                            //> lda EnemyOffscrBitsMasked,x
+                                            A = enemyOffscrBitsMasked[X]
+                                            //> bne ReadyNextEnemy          ;branch if masked offscreen bits set
+                                            if (A == 0) {
+                                                //> txa                         ;get second enemy object's bounding box offset
+                                                A = X
+                                                //> asl                         ;multiply by four, then add four
+                                                val orig1: Int = A
+                                                A = (orig1 shl 1) and 0xFF
+                                                //> asl
+                                                val orig2: Int = A
+                                                A = (orig2 shl 1) and 0xFF
+                                                //> clc
+                                                //> adc #$04
+                                                temp1 = A + 0x04
+                                                A = temp1 and 0xFF
+                                                //> tax                         ;use as new contents of X
+                                                X = A
+                                                //> jsr SprObjectCollisionCore  ;do collision detection using the two enemies here
+                                                val flag3: Boolean = sprObjectCollisionCore(X, Y)
+                                                //> ldx ObjectOffset            ;use first enemy offset for X
+                                                X = objectOffset
+                                                //> ldy $01                     ;use second enemy offset for Y
+                                                Y = memory[0x1].toInt()
+                                                //> bcc NoEnemyCollision        ;if carry clear, no collision, branch ahead of this
+                                                if (flag3) {
+                                                    //> lda Enemy_State,x
+                                                    A = enemyState[X]
+                                                    //> ora Enemy_State,y           ;check both enemy states for d7 set
+                                                    A = A or enemyState[Y]
+                                                    //> and #%10000000
+                                                    A = A and 0x80
+                                                    //> bne YesEC                   ;branch if at least one of them is set
+                                                    if (A == 0) {
+                                                        //> lda Enemy_CollisionBits,y   ;load first enemy's collision-related bits
+                                                        A = enemyCollisionbits[Y]
+                                                        //> and SetBitsMask,x           ;check to see if bit connected to second enemy is
+                                                        A = A and setBitsMask[X]
+                                                        //> bne ReadyNextEnemy          ;already set, and move onto next enemy slot if set
+                                                        if (A == 0) {
+                                                            //> lda Enemy_CollisionBits,y
+                                                            A = enemyCollisionbits[Y]
+                                                            //> ora SetBitsMask,x           ;if the bit is not set, set it now
+                                                            A = A or setBitsMask[X]
+                                                            //> sta Enemy_CollisionBits,y
+                                                            enemyCollisionbits[Y] = A
+                                                        }
+                                                    }
+                                                    //> YesEC:  jsr ProcEnemyCollisions     ;react according to the nature of collision
+                                                    procEnemyCollisions(X, Y)
+                                                    //> jmp ReadyNextEnemy          ;move onto next enemy slot
+                                                    //> jmp ReadyNextEnemy (not a known function)
+                                                } else {
+                                                    //> NoEnemyCollision:
+                                                    //> lda Enemy_CollisionBits,y     ;load first enemy's collision-related bits
+                                                    A = enemyCollisionbits[Y]
+                                                    //> and ClearBitsMask,x           ;clear bit connected to second enemy
+                                                    A = A and clearBitsMask[X]
+                                                    //> sta Enemy_CollisionBits,y     ;then move onto next enemy slot
+                                                    enemyCollisionbits[Y] = A
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
-                                //> lda Enemy_CollisionBits,y
-                                A = enemyCollisionbits[Y]
-                                //> ora SetBitsMask,x           ;if the bit is not set, set it now
-                                A = A or setBitsMask[X]
-                                //> sta Enemy_CollisionBits,y
-                                enemyCollisionbits[Y] = A
                             }
-                            //> YesEC:  jsr ProcEnemyCollisions     ;react according to the nature of collision
-                            procEnemyCollisions(X, Y)
-                            //> jmp ReadyNextEnemy          ;move onto next enemy slot
-                            readyNextEnemy()
-                            return
-                        }
-                        //> NoEnemyCollision:
-                        //> lda Enemy_CollisionBits,y     ;load first enemy's collision-related bits
-                        A = enemyCollisionbits[Y]
-                        //> and ClearBitsMask,x           ;clear bit connected to second enemy
-                        A = A and clearBitsMask[X]
-                        //> sta Enemy_CollisionBits,y     ;then move onto next enemy slot
-                        enemyCollisionbits[Y] = A
-                        //  SKIPPED: Fall-through to readyNextEnemy would create mutual recursion cycle
-                        return
-                    } else {
-                        //> ExitECRoutine:
-                        //> ldx ObjectOffset ;get enemy object buffer offset
-                        X = objectOffset
-                        //> rts              ;leave
-                        return
+                            //> ReadyNextEnemy:
+                            //> pla              ;get first enemy's bounding box offset from the stack
+                            A = pull()
+                            //> tay              ;use as Y again
+                            Y = A
+                            //> ldx $01          ;get and decrement second enemy's object buffer offset
+                            X = memory[0x1].toInt()
+                            //> dex
+                            X = (X - 1) and 0xFF
+                            //> bpl ECLoop       ;loop until all enemy slots have been checked
+                        } while ((X and 0x80) == 0)
                     }
-                } else {
-                    //> ExitECRoutine:
-                    //> ldx ObjectOffset ;get enemy object buffer offset
-                    X = objectOffset
-                    //> rts              ;leave
-                    return
                 }
-            } else {
-                //> ExitECRoutine:
-                //> ldx ObjectOffset ;get enemy object buffer offset
-                X = objectOffset
-                //> rts              ;leave
-                return
             }
-        } else {
-            //> ExitECRoutine:
-            //> ldx ObjectOffset ;get enemy object buffer offset
-            X = objectOffset
-            //> rts              ;leave
-            return
         }
-    } else {
-        //> ExitECRoutine:
-        //> ldx ObjectOffset ;get enemy object buffer offset
-        X = objectOffset
-        //> rts              ;leave
-        return
     }
-    // SKIPPED: Fall-through to readyNextEnemy would create mutual recursion cycle
-}
-
-// Decompiled from ReadyNextEnemy
-fun readyNextEnemy() {
-    var A: Int = 0
-    var X: Int = 0
-    var Y: Int = 0
-    var temp0: Int = 0
-    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
-    val enemyId by MemoryByteIndexed(Enemy_ID)
-    //> ReadyNextEnemy:
-    //> pla              ;get first enemy's bounding box offset from the stack
-    temp0 = pull()
-    //> tay              ;use as Y again
-    Y = temp0
-    //> ldx $01          ;get and decrement second enemy's object buffer offset
-    X = memory[0x1].toInt()
-    //> dex
-    X = (X - 1) and 0xFF
-    //> bpl ECLoop       ;loop until all enemy slots have been checked
-    if (!((X and 0x80) != 0)) {
-        //  goto ECLoop
-        return
-    } else {
-        Y = Y
-        loop0@ do {
-            //> ECLoop: stx $01                     ;save enemy object buffer offset for second enemy here
-            memory[0x1] = X.toUByte()
-            //> tya                         ;save first enemy's bounding box offset to stack
-            A = Y
-            //> pha
-            push(A)
-            //> lda Enemy_Flag,x            ;check enemy object enable flag
-            A = enemyFlag[X]
-            //> beq ReadyNextEnemy          ;branch if flag not set
-            if (A == 0) {
-                //  goto ReadyNextEnemy -> readyNextEnemy
-                readyNextEnemy()
-                return
-            }
-            //  SKIPPED: Fall-through to enemiesCollision would create mutual recursion cycle
-            return
-        } while (A == 0)
-    }
-    loop1@ do {
-        //> lda Enemy_ID,x
-        A = enemyId[X]
-        //> cmp #$15                    ;check for enemy object => $15
-        //> bcs ReadyNextEnemy          ;branch if true
-        if (A >= 0x15) {
-            //  goto ReadyNextEnemy -> readyNextEnemy
-            readyNextEnemy()
-            return
-        }
-        //  SKIPPED: Fall-through to enemiesCollision would create mutual recursion cycle
-        return
-    } while (A >= 0x15)
-    //> cmp #Lakitu
-    //> beq ReadyNextEnemy          ;branch if enemy object is lakitu
-    if (A == Lakitu) {
-        //  goto ReadyNextEnemy -> readyNextEnemy
-        readyNextEnemy()
-        return
-    }
-    //  SKIPPED: Fall-through to enemiesCollision would create mutual recursion cycle
+    //> ExitECRoutine:
+    //> ldx ObjectOffset ;get enemy object buffer offset
+    X = objectOffset
+    //> rts              ;leave
     return
-    // SKIPPED: Fall-through to enemiesCollision would create mutual recursion cycle
 }
 
 // Decompiled from ProcEnemyCollisions
@@ -24127,9 +23556,6 @@ fun doFootCheck(X: Int) {
                 //> jmp StopPlayerMove         ;otherwise jump to impede player's movement
                 stopPlayerMove()
                 return
-            } else {
-                //> ExCSM: rts                       ;leave
-                return
             }
         }
         //> ChkPBtm:  ldy Player_State           ;get player's state
@@ -24211,10 +23637,9 @@ fun doFootCheck(X: Int) {
                 return
             }
         }
-    } else {
-        //> ExCSM: rts                       ;leave
-        return
     }
+    //> ExCSM: rts                       ;leave
+    return
 }
 
 // Decompiled from StopPlayerMove
@@ -24695,17 +24120,6 @@ fun impedePlayerMove() {
             //> jmp NXSpd                 ;and jump to affect movement
             nXSpd(A, X)
             return
-        } else {
-            //> ExIPM: txa                       ;invert contents of X
-            A = X
-            //> eor #$ff
-            A = A xor 0xFF
-            //> and Player_CollisionBits  ;mask out bit that was set here
-            A = A and playerCollisionbits
-            //> sta Player_CollisionBits  ;store to clear bit
-            playerCollisionbits = A
-            //> rts
-            return
         }
     }
     //> RImpd: ldx #$02                  ;return $02 to X
@@ -24718,10 +24132,18 @@ fun impedePlayerMove() {
         //  Fall-through tail call to nXSpd
         nXSpd(A, X)
         return
+    } else {
+        //> ExIPM: txa                       ;invert contents of X
+        A = X
+        //> eor #$ff
+        A = A xor 0xFF
+        //> and Player_CollisionBits  ;mask out bit that was set here
+        A = A and playerCollisionbits
+        //> sta Player_CollisionBits  ;store to clear bit
+        playerCollisionbits = A
+        //> rts
+        return
     }
-    // Fall-through tail call to nXSpd
-    nXSpd(A, X)
-    return
 }
 
 // Decompiled from NXSpd
@@ -24828,22 +24250,13 @@ fun checkForCoinMTiles(A: Int): Int {
             //> clc                   ;otherwise clear carry and leave
             //> rts
             return A
-        } else {
-            //> CoinSd:  lda #Sfx_CoinGrab
-            A = Sfx_CoinGrab
-            //> sta Square2SoundQueue ;load coin grab sound and leave
-            square2SoundQueue = A
-            //> rts
-            return A
         }
-    } else {
-        //> CoinSd:  lda #Sfx_CoinGrab
-        A = Sfx_CoinGrab
-        //> sta Square2SoundQueue ;load coin grab sound and leave
-        square2SoundQueue = A
-        //> rts
-        return A
     }
+    //> CoinSd:  lda #Sfx_CoinGrab
+    A = Sfx_CoinGrab
+    //> sta Square2SoundQueue ;load coin grab sound and leave
+    square2SoundQueue = A
+    //> rts
     return A
 }
 
@@ -25571,30 +24984,16 @@ fun hammerBroBGColl(A: Int, X: Int) {
             //> jmp DoEnemySideCheck  ;then check for horizontal blockage and leave
             doEnemySideCheck(X)
             return
-        } else {
-            //> NoUnderHammerBro:
-            //> lda Enemy_State,x  ;if hammer bro is not standing on anything, set d0
-            A = enemyState[X]
-            //> ora #$01           ;in the enemy state to indicate jumping or falling, then leave
-            A = A or 0x01
-            //> sta Enemy_State,x
-            enemyState[X] = A
-            //> rts
-            return
         }
-    } else {
-        //> NoUnderHammerBro:
-        //> lda Enemy_State,x  ;if hammer bro is not standing on anything, set d0
-        A = enemyState[X]
-        //> ora #$01           ;in the enemy state to indicate jumping or falling, then leave
-        A = A or 0x01
-        //> sta Enemy_State,x
-        enemyState[X] = A
-        //> rts
-        return
     }
-    // Fall-through tail call to killEnemyAboveBlock
-    killEnemyAboveBlock(X)
+    //> NoUnderHammerBro:
+    //> lda Enemy_State,x  ;if hammer bro is not standing on anything, set d0
+    A = enemyState[X]
+    //> ora #$01           ;in the enemy state to indicate jumping or falling, then leave
+    A = A or 0x01
+    //> sta Enemy_State,x
+    enemyState[X] = A
+    //> rts
     return
 }
 
@@ -25656,7 +25055,6 @@ fun chkForNonSolids(A: Int) {
 fun fireballBGCollision(X: Int) {
     var A: Int = 0
     var X: Int = X
-    var square1SoundQueue by MemoryByte(Square1SoundQueue)
     val fireballBouncingFlag by MemoryByteIndexed(FireballBouncingFlag)
     val fireballState by MemoryByteIndexed(Fireball_State)
     val fireballYPosition by MemoryByteIndexed(Fireball_Y_Position)
@@ -25700,92 +25098,18 @@ fun fireballBGCollision(X: Int) {
                         fireballYPosition[X] = A
                         //> rts                         ;leave
                         return
-                    } else {
-                        //> InitFireballExplode:
-                        //> lda #$80
-                        A = 0x80
-                        //> sta Fireball_State,x        ;set exploding flag in fireball's state
-                        fireballState[X] = A
-                        //> lda #Sfx_Bump
-                        A = Sfx_Bump
-                        //> sta Square1SoundQueue       ;load bump sound
-                        square1SoundQueue = A
-                        //> rts                         ;leave
-                        return
                     }
-                } else {
-                    //> InitFireballExplode:
-                    //> lda #$80
-                    A = 0x80
-                    //> sta Fireball_State,x        ;set exploding flag in fireball's state
-                    fireballState[X] = A
-                    //> lda #Sfx_Bump
-                    A = Sfx_Bump
-                    //> sta Square1SoundQueue       ;load bump sound
-                    square1SoundQueue = A
-                    //> rts                         ;leave
-                    return
                 }
-            } else {
-                //> ClearBounceFlag:
-                //> lda #$00
-                A = 0x00
-                //> sta FireballBouncingFlag,x  ;clear bouncing flag by default
-                fireballBouncingFlag[X] = A
-                //> rts                         ;leave
-                return
-                //> InitFireballExplode:
-                //> lda #$80
-                A = 0x80
-                //> sta Fireball_State,x        ;set exploding flag in fireball's state
-                fireballState[X] = A
-                //> lda #Sfx_Bump
-                A = Sfx_Bump
-                //> sta Square1SoundQueue       ;load bump sound
-                square1SoundQueue = A
-                //> rts                         ;leave
-                return
             }
-        } else {
-            //> ClearBounceFlag:
-            //> lda #$00
-            A = 0x00
-            //> sta FireballBouncingFlag,x  ;clear bouncing flag by default
-            fireballBouncingFlag[X] = A
-            //> rts                         ;leave
-            return
-            //> InitFireballExplode:
-            //> lda #$80
-            A = 0x80
-            //> sta Fireball_State,x        ;set exploding flag in fireball's state
-            fireballState[X] = A
-            //> lda #Sfx_Bump
-            A = Sfx_Bump
-            //> sta Square1SoundQueue       ;load bump sound
-            square1SoundQueue = A
-            //> rts                         ;leave
-            return
         }
-    } else {
-        //> ClearBounceFlag:
-        //> lda #$00
-        A = 0x00
-        //> sta FireballBouncingFlag,x  ;clear bouncing flag by default
-        fireballBouncingFlag[X] = A
-        //> rts                         ;leave
-        return
-        //> InitFireballExplode:
-        //> lda #$80
-        A = 0x80
-        //> sta Fireball_State,x        ;set exploding flag in fireball's state
-        fireballState[X] = A
-        //> lda #Sfx_Bump
-        A = Sfx_Bump
-        //> sta Square1SoundQueue       ;load bump sound
-        square1SoundQueue = A
-        //> rts                         ;leave
-        return
     }
+    //> ClearBounceFlag:
+    //> lda #$00
+    A = 0x00
+    //> sta FireballBouncingFlag,x  ;clear bouncing flag by default
+    fireballBouncingFlag[X] = A
+    //> rts                         ;leave
+    return
 }
 
 // Decompiled from GetFireballBoundBox
@@ -26238,92 +25562,98 @@ fun sprObjectCollisionCore(X: Int, Y: Int): Boolean {
     A = 0x01
     //> sta $07      ;save value 1 here as counter, compare horizontal coordinates first
     memory[0x7] = A.toUByte()
-    //> CollisionCoreLoop:
-    //> lda BoundingBox_UL_Corner,y  ;compare left/top coordinates
-    A = boundingboxUlCorner[Y]
-    //> cmp BoundingBox_UL_Corner,x  ;of first and second objects' bounding boxes
-    //> bcs FirstBoxGreater          ;if first left/top => second, branch
     X = X
     Y = Y
-    if (!(A >= boundingboxUlCorner[X])) {
-        //> cmp BoundingBox_LR_Corner,x  ;otherwise compare to right/bottom of second
-        //> bcc SecondBoxVerticalChk     ;if first left/top < second right/bottom, branch elsewhere
-        if (A >= boundingboxLrCorner[X]) {
-            //> beq CollisionFound           ;if somehow equal, collision, thus branch
-            if (A != boundingboxLrCorner[X]) {
-                //> lda BoundingBox_LR_Corner,y  ;if somehow greater, check to see if bottom of
-                A = boundingboxLrCorner[Y]
-                //> cmp BoundingBox_UL_Corner,y  ;first object's bounding box is greater than its top
-                //> bcc CollisionFound           ;if somehow less, vertical wrap collision, thus branch
-                if (A >= boundingboxUlCorner[Y]) {
-                    //> cmp BoundingBox_UL_Corner,x  ;otherwise compare bottom of first bounding box to the top
-                    //> bcs CollisionFound           ;of second box, and if equal or greater, collision, thus branch
-                    if (!(A >= boundingboxUlCorner[X])) {
-                        //> ldy $06                      ;otherwise return with carry clear and Y = $0006
-                        Y = memory[0x6].toInt()
-                        //> rts                          ;note horizontal wrapping never occurs
-                        return A >= boundingboxUlCorner[X]
-                    }
-                }
-            }
-        }
-        //> SecondBoxVerticalChk:
-        //> lda BoundingBox_LR_Corner,x  ;check to see if the vertical bottom of the box
-        A = boundingboxLrCorner[X]
-        //> cmp BoundingBox_UL_Corner,x  ;is greater than the vertical top
-        //> bcc CollisionFound           ;if somehow less, vertical wrap collision, thus branch
-        if (A >= boundingboxUlCorner[X]) {
-            //> lda BoundingBox_LR_Corner,y  ;otherwise compare horizontal right or vertical bottom
-            A = boundingboxLrCorner[Y]
-            //> cmp BoundingBox_UL_Corner,x  ;of first box with horizontal left or vertical top of second box
-            //> bcs CollisionFound           ;if equal or greater, collision, thus branch
-            if (!(A >= boundingboxUlCorner[X])) {
-                //> ldy $06                      ;otherwise return with carry clear and Y = $0006
-                Y = memory[0x6].toInt()
-                //> rts
-                return A >= boundingboxUlCorner[X]
-            }
-        }
-    }
-    //> FirstBoxGreater:
-    //> cmp BoundingBox_UL_Corner,x  ;compare first and second box horizontal left/vertical top again
-    //> beq CollisionFound           ;if first coordinate = second, collision, thus branch
-    if (A != boundingboxUlCorner[X]) {
-        //> cmp BoundingBox_LR_Corner,x  ;if not, compare with second object right or bottom edge
-        //> bcc CollisionFound           ;if left/top of first less than or equal to right/bottom of second
-        if (A >= boundingboxLrCorner[X]) {
-            //> beq CollisionFound           ;then collision, thus branch
-            if (A != boundingboxLrCorner[X]) {
-                //> cmp BoundingBox_LR_Corner,y  ;otherwise check to see if top of first box is greater than bottom
-                //> bcc NoCollisionFound         ;if less than or equal, no collision, branch to end
-                if (A >= boundingboxLrCorner[Y]) {
-                    //> beq NoCollisionFound
-                    if (A != boundingboxLrCorner[Y]) {
-                        //> lda BoundingBox_LR_Corner,y  ;otherwise compare bottom of first to top of second
-                        A = boundingboxLrCorner[Y]
-                        //> cmp BoundingBox_UL_Corner,x  ;if bottom of first is greater than top of second, vertical wrap
-                        //> bcs CollisionFound           ;collision, and branch, otherwise, proceed onwards here
+    loop0@ do {
+        //> CollisionCoreLoop:
+        //> lda BoundingBox_UL_Corner,y  ;compare left/top coordinates
+        A = boundingboxUlCorner[Y]
+        //> cmp BoundingBox_UL_Corner,x  ;of first and second objects' bounding boxes
+        //> bcs FirstBoxGreater          ;if first left/top => second, branch
+        if (!(A >= boundingboxUlCorner[X])) {
+            //> cmp BoundingBox_LR_Corner,x  ;otherwise compare to right/bottom of second
+            //> bcc SecondBoxVerticalChk     ;if first left/top < second right/bottom, branch elsewhere
+            if (A >= boundingboxLrCorner[X]) {
+                //> beq CollisionFound           ;if somehow equal, collision, thus branch
+                if (A != boundingboxLrCorner[X]) {
+                    //> lda BoundingBox_LR_Corner,y  ;if somehow greater, check to see if bottom of
+                    A = boundingboxLrCorner[Y]
+                    //> cmp BoundingBox_UL_Corner,y  ;first object's bounding box is greater than its top
+                    //> bcc CollisionFound           ;if somehow less, vertical wrap collision, thus branch
+                    if (A >= boundingboxUlCorner[Y]) {
+                        //> cmp BoundingBox_UL_Corner,x  ;otherwise compare bottom of first bounding box to the top
+                        //> bcs CollisionFound           ;of second box, and if equal or greater, collision, thus branch
                         if (!(A >= boundingboxUlCorner[X])) {
+                            //> ldy $06                      ;otherwise return with carry clear and Y = $0006
+                            Y = memory[0x6].toInt()
+                            //> rts                          ;note horizontal wrapping never occurs
+                            return A >= boundingboxUlCorner[X]
                         }
                     }
                 }
-                //> NoCollisionFound:
-                //> clc          ;clear carry, then load value set earlier, then leave
-                //> ldy $06      ;like previous ones, if horizontal coordinates do not collide, we do
-                Y = memory[0x6].toInt()
-                //> rts          ;not bother checking vertical ones, because what's the point?
-                return false
+            }
+            //> SecondBoxVerticalChk:
+            //> lda BoundingBox_LR_Corner,x  ;check to see if the vertical bottom of the box
+            A = boundingboxLrCorner[X]
+            //> cmp BoundingBox_UL_Corner,x  ;is greater than the vertical top
+            //> bcc CollisionFound           ;if somehow less, vertical wrap collision, thus branch
+            if (A >= boundingboxUlCorner[X]) {
+                //> lda BoundingBox_LR_Corner,y  ;otherwise compare horizontal right or vertical bottom
+                A = boundingboxLrCorner[Y]
+                //> cmp BoundingBox_UL_Corner,x  ;of first box with horizontal left or vertical top of second box
+                //> bcs CollisionFound           ;if equal or greater, collision, thus branch
+                if (!(A >= boundingboxUlCorner[X])) {
+                    //> ldy $06                      ;otherwise return with carry clear and Y = $0006
+                    Y = memory[0x6].toInt()
+                    //> rts
+                    return A >= boundingboxUlCorner[X]
+                }
             }
         }
-    }
-    //> CollisionFound:
-    //> inx                    ;increment offsets on both objects to check
-    X = (X + 1) and 0xFF
-    //> iny                    ;the vertical coordinates
-    Y = (Y + 1) and 0xFF
-    //> dec $07                ;decrement counter to reflect this
-    memory[0x7] = ((memory[0x7].toInt() - 1) and 0xFF).toUByte()
-    //> bpl CollisionCoreLoop  ;if counter not expired, branch to loop
+        //> FirstBoxGreater:
+        //> cmp BoundingBox_UL_Corner,x  ;compare first and second box horizontal left/vertical top again
+        //> beq CollisionFound           ;if first coordinate = second, collision, thus branch
+        if (A != boundingboxUlCorner[X]) {
+            //> cmp BoundingBox_LR_Corner,x  ;if not, compare with second object right or bottom edge
+            //> bcc CollisionFound           ;if left/top of first less than or equal to right/bottom of second
+            if (A >= boundingboxLrCorner[X]) {
+                //> beq CollisionFound           ;then collision, thus branch
+                if (A != boundingboxLrCorner[X]) {
+                    //> cmp BoundingBox_LR_Corner,y  ;otherwise check to see if top of first box is greater than bottom
+                    //> bcc NoCollisionFound         ;if less than or equal, no collision, branch to end
+                    if (A >= boundingboxLrCorner[Y]) {
+                        //> beq NoCollisionFound
+                        if (A != boundingboxLrCorner[Y]) {
+                            //> lda BoundingBox_LR_Corner,y  ;otherwise compare bottom of first to top of second
+                            A = boundingboxLrCorner[Y]
+                            //> cmp BoundingBox_UL_Corner,x  ;if bottom of first is greater than top of second, vertical wrap
+                            //> bcs CollisionFound           ;collision, and branch, otherwise, proceed onwards here
+                            if (!(A >= boundingboxUlCorner[X])) {
+                            }
+                        } else {
+                            break@loop0
+                        }
+                    } else {
+                        break@loop0
+                    }
+                    //> NoCollisionFound:
+                    //> clc          ;clear carry, then load value set earlier, then leave
+                    //> ldy $06      ;like previous ones, if horizontal coordinates do not collide, we do
+                    Y = memory[0x6].toInt()
+                    //> rts          ;not bother checking vertical ones, because what's the point?
+                    return false
+                }
+            }
+        }
+        //> CollisionFound:
+        //> inx                    ;increment offsets on both objects to check
+        X = (X + 1) and 0xFF
+        //> iny                    ;the vertical coordinates
+        Y = (Y + 1) and 0xFF
+        //> dec $07                ;decrement counter to reflect this
+        memory[0x7] = ((memory[0x7].toInt() - 1) and 0xFF).toUByte()
+        //> bpl CollisionCoreLoop  ;if counter not expired, branch to loop
+    } while ((memory[0x7].toInt() and 0x80) == 0)
     //> sec                    ;otherwise we already did both sets, therefore collision, so set carry
     //> ldy $06                ;load original value set here earlier, then leave
     Y = memory[0x6].toInt()
@@ -29592,8 +28922,6 @@ fun processPlayerAction() {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
-    var temp4: Int = 0
-    var temp5: Int = 0
     var crouchingFlag by MemoryByte(CrouchingFlag)
     var leftRightButtons by MemoryByte(Left_Right_Buttons)
     var playerAnimCtrl by MemoryByte(PlayerAnimCtrl)
@@ -29677,42 +29005,24 @@ fun processPlayerAction() {
                     //  Fall-through tail call to nonAnimatedActs
                     nonAnimatedActs(Y)
                     return
-                } else {
-                    //> ActionWalkRun:
-                    //> ldy #$04               ;load offset for walking/running
-                    Y = 0x04
-                    //> jsr GetGfxOffsetAdder  ;get offset to graphics table
-                    temp0 = getGfxOffsetAdder(Y)
-                    //> jmp FourFrameExtent    ;execute instructions for normal state
-                    fourFrameExtent(temp0)
-                    return
                 }
-            } else {
-                //> ActionWalkRun:
-                //> ldy #$04               ;load offset for walking/running
-                Y = 0x04
-                //> jsr GetGfxOffsetAdder  ;get offset to graphics table
-                temp1 = getGfxOffsetAdder(Y)
-                //> jmp FourFrameExtent    ;execute instructions for normal state
-                fourFrameExtent(temp1)
-                return
             }
         } else {
             //> ActionFalling:
             //> ldy #$04                  ;load offset for walking/running
             Y = 0x04
             //> jsr GetGfxOffsetAdder     ;get offset to graphics table
-            temp2 = getGfxOffsetAdder(Y)
+            temp0 = getGfxOffsetAdder(Y)
             //> jmp GetCurrentAnimOffset  ;execute instructions for falling state
-            getCurrentAnimOffset(temp2)
+            getCurrentAnimOffset(temp0)
             return
             //> ActionWalkRun:
             //> ldy #$04               ;load offset for walking/running
             Y = 0x04
             //> jsr GetGfxOffsetAdder  ;get offset to graphics table
-            temp3 = getGfxOffsetAdder(Y)
+            temp1 = getGfxOffsetAdder(Y)
             //> jmp FourFrameExtent    ;execute instructions for normal state
-            fourFrameExtent(temp3)
+            fourFrameExtent(temp1)
             return
         }
     }
@@ -29725,20 +29035,20 @@ fun processPlayerAction() {
     if (A == 0) {
         //> NonAnimatedActs:
         //> jsr GetGfxOffsetAdder      ;do a sub here to get offset adder for graphics table
-        temp4 = getGfxOffsetAdder(Y)
+        temp2 = getGfxOffsetAdder(Y)
         //> lda #$00
         A = 0x00
         //> sta PlayerAnimCtrl         ;initialize animation frame control
         playerAnimCtrl = A
         //> lda PlayerGfxTblOffsets,y  ;load offset to graphics table using size as offset
-        A = playerGfxTblOffsets[temp4]
+        A = playerGfxTblOffsets[temp2]
         //> rts
         return
     } else {
         //> jsr GetGfxOffsetAdder  ;otherwise get offset for graphics table
-        temp5 = getGfxOffsetAdder(Y)
+        temp3 = getGfxOffsetAdder(Y)
         //> jmp ThreeFrameExtent   ;then skip ahead to more code
-        threeFrameExtent(temp5)
+        threeFrameExtent(temp3)
         return
     }
 }
@@ -30980,85 +30290,293 @@ fun square1SfxHandler() {
     var Y: Int = 0
     var temp0: Int = 0
     var squ1Sfxlencounter by MemoryByte(Squ1_SfxLenCounter)
+    var square1SoundBuffer by MemoryByte(Square1SoundBuffer)
     var square1SoundQueue by MemoryByte(Square1SoundQueue)
     val sndSquare1Reg by MemoryByteIndexed(SND_SQUARE1_REG)
     val swimStompEnvelopeData by MemoryByteIndexed(SwimStompEnvelopeData)
-    //> Square1SfxHandler:
-    //> ldy Square1SoundQueue   ;check for sfx in queue
-    Y = square1SoundQueue
-    //> beq CheckSfx1Buffer
-    //> PlayFlagpoleSlide:
-    //> lda #$40               ;store length of flagpole sound
-    A = 0x40
-    //> sta Squ1_SfxLenCounter
-    squ1Sfxlencounter = A
-    //> lda #$62               ;load part of reg contents for flagpole sound
-    A = 0x62
-    //> jsr SetFreq_Squ1
-    temp0 = setfreqSqu1(A)
-    //> ldx #$99               ;now load the rest
-    X = 0x99
-    //> bne FPS2nd
-    //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
-    return
-    A = temp0
-    if (X == 0) {
+    loop0@ while (A != 0) {
+        //> PlayFlagpoleSlide:
+        //> lda #$40               ;store length of flagpole sound
+        A = 0x40
+        //> sta Squ1_SfxLenCounter
+        squ1Sfxlencounter = A
+        //> lda #$62               ;load part of reg contents for flagpole sound
+        A = 0x62
+        //> jsr SetFreq_Squ1
+        temp0 = setfreqSqu1(A)
+        //> ldx #$99               ;now load the rest
+        X = 0x99
+        //> bne FPS2nd
         //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
         return
-        //> PlaySmallJump:
-        //> lda #$26               ;branch here for small mario jumping sound
-        A = 0x26
-        //> bne JumpRegContents
+        A = temp0
+        if (X == 0) {
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
+            //> PlaySmallJump:
+            //> lda #$26               ;branch here for small mario jumping sound
+            A = 0x26
+            //> bne JumpRegContents
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
+            if (A == 0) {
+                //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+                return
+                //> PlayBigJump:
+                //> lda #$18               ;branch here for big mario jumping sound
+                A = 0x18
+                //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+                return
+            }
+            //> JumpRegContents:
+            //> ldx #$82               ;note that small and big jump borrow each others' reg contents
+            X = 0x82
+            //> ldy #$a7               ;anyway, this loads the first part of mario's jumping sound
+            Y = 0xA7
+            //> jsr PlaySqu1Sfx
+            playSqu1Sfx(A, X, Y)
+            //> lda #$28               ;store length of sfx for both jumping sounds
+            A = 0x28
+            //> sta Squ1_SfxLenCounter ;then continue on here
+            squ1Sfxlencounter = A
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
+            //> ContinueSndJump:
+            //> lda Squ1_SfxLenCounter ;jumping sounds seem to be composed of three parts
+            A = squ1Sfxlencounter
+            //> cmp #$25               ;check for time to play second part yet
+            //> bne N2Prt
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
+            if (A == 0x25) {
+                //> ldx #$5f               ;load second part
+                X = 0x5F
+                //> ldy #$f6
+                Y = 0xF6
+                //> bne DmpJpFPS           ;unconditional branch
+                //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+                return
+            }
+            //> N2Prt:    cmp #$20               ;check for third part
+            //> bne DecJpFPS
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
+            if (A == 0x20) {
+                //> ldx #$48               ;load third part
+                X = 0x48
+                //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+                return
+            }
+        }
+        //> FPS2nd:   ldy #$bc               ;the flagpole slide sound shares part of third part
+        Y = 0xBC
+        //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+        return
+        //> DmpJpFPS: jsr Dump_Squ1_Regs
+        dumpSqu1Regs(X, Y)
+        //> bne DecJpFPS           ;unconditional branch outta here
+        //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+        return
+        if (Y == 0) {
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
+            //> PlayFireballThrow:
+            //> lda #$05
+            A = 0x05
+            //> ldy #$99                 ;load reg contents for fireball throw sound
+            Y = 0x99
+            //> bne Fthrow               ;unconditional branch
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
+            if (Y == 0) {
+                //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+                return
+                //> PlayBump:
+                //> lda #$0a                ;load length of sfx and reg contents for bump sound
+                A = 0x0A
+                //> ldy #$93
+                Y = 0x93
+                //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+                return
+            }
+            //> Fthrow:   ldx #$9e                ;the fireball sound shares reg contents with the bump sound
+            X = 0x9E
+            //> sta Squ1_SfxLenCounter
+            squ1Sfxlencounter = A
+            //> lda #$0c                ;load offset for bump sound
+            A = 0x0C
+            //> jsr PlaySqu1Sfx
+            playSqu1Sfx(A, X, Y)
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
+            //> ContinueBumpThrow:
+            //> lda Squ1_SfxLenCounter  ;check for second part of bump sound
+            A = squ1Sfxlencounter
+            //> cmp #$06
+            //> bne DecJpFPS
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
+            if (A == 0x06) {
+                //> lda #$bb                ;load second part directly
+                A = 0xBB
+                //> sta SND_SQUARE1_REG+1
+                sndSquare1Reg[1] = A
+                //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+                return
+            }
+        }
+        //> DecJpFPS: bne BranchToDecLength1  ;unconditional branch
         //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
         return
         if (A == 0) {
-            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
-            return
-            //> PlayBigJump:
-            //> lda #$18               ;branch here for big mario jumping sound
-            A = 0x18
-            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
-            return
+            //> sty Square1SoundBuffer  ;if found, put in buffer
+            square1SoundBuffer = Y
+            //> bmi PlaySmallJump       ;small jump
+            if ((A and 0x80) != 0) {
+                //  goto PlaySmallJump
+                return
+            }
+            //> lsr Square1SoundQueue
+            val orig0: Int = square1SoundQueue
+            val carryFromLsr1: Boolean = (orig0 and 0x01) != 0
+            square1SoundQueue = orig0 shr 1
+            //> bcs PlayBigJump         ;big jump
+            if (carryFromLsr1) {
+                //  goto PlayBigJump
+                return
+            }
+            loop1@ do {
+                //> lsr Square1SoundQueue
+                val orig2: Int = square1SoundQueue
+                val carryFromLsr3: Boolean = (orig2 and 0x01) != 0
+                square1SoundQueue = orig2 shr 1
+                //> bcs PlayBump            ;bump
+                if (carryFromLsr3) {
+                    //  goto PlayBump
+                    return
+                }
+            } while (carryFromLsr3)
+            //> lsr Square1SoundQueue
+            val orig4: Int = square1SoundQueue
+            val carryFromLsr5: Boolean = (orig4 and 0x01) != 0
+            square1SoundQueue = orig4 shr 1
+            //> bcs PlaySwimStomp       ;swim/stomp
+            if (!carryFromLsr5) {
+                //> lsr Square1SoundQueue
+                val orig6: Int = square1SoundQueue
+                val carryFromLsr7: Boolean = (orig6 and 0x01) != 0
+                square1SoundQueue = orig6 shr 1
+                //> bcs PlaySmackEnemy      ;smack enemy
+                if (!carryFromLsr7) {
+                    //> lsr Square1SoundQueue
+                    val orig8: Int = square1SoundQueue
+                    val carryFromLsr9: Boolean = (orig8 and 0x01) != 0
+                    square1SoundQueue = orig8 shr 1
+                    //> bcs PlayPipeDownInj     ;pipedown/injury
+                    if (!carryFromLsr9) {
+                        //> lsr Square1SoundQueue
+                        val orig10: Int = square1SoundQueue
+                        val carryFromLsr11: Boolean = (orig10 and 0x01) != 0
+                        square1SoundQueue = orig10 shr 1
+                        //> bcs PlayFireballThrow   ;fireball throw
+                        if (carryFromLsr11) {
+                            //  goto PlayFireballThrow
+                            return
+                        }
+                        //> lsr Square1SoundQueue
+                        val orig12: Int = square1SoundQueue
+                        val carryFromLsr13: Boolean = (orig12 and 0x01) != 0
+                        square1SoundQueue = orig12 shr 1
+                        //> bcs PlayFlagpoleSlide   ;slide flagpole
+                        if (carryFromLsr13) {
+                            //  goto PlayFlagpoleSlide
+                            return
+                        }
+                        //> CheckSfx1Buffer:
+                        //> lda Square1SoundBuffer   ;check for sfx in buffer
+                        A = square1SoundBuffer
+                        //> beq ExS1H                ;if not found, exit sub
+                        if (A != 0) {
+                            //> bmi ContinueSndJump      ;small mario jump
+                            if ((A and 0x80) != 0) {
+                                //  goto ContinueSndJump
+                                return
+                            }
+                            //> lsr
+                            val orig14: Int = A
+                            A = orig14 shr 1
+                            //> bcs ContinueSndJump      ;big mario jump
+                            if ((orig14 and 0x01) != 0) {
+                                //  goto ContinueSndJump
+                                return
+                            }
+                            //> lsr
+                            val orig15: Int = A
+                            A = orig15 shr 1
+                            //> bcs ContinueBumpThrow    ;bump
+                            if ((orig15 and 0x01) != 0) {
+                                //  goto ContinueBumpThrow
+                                return
+                            }
+                            //> lsr
+                            val orig16: Int = A
+                            A = orig16 shr 1
+                            //> bcs ContinueSwimStomp    ;swim/stomp
+                            if ((orig16 and 0x01) == 0) {
+                                //> lsr
+                                val orig17: Int = A
+                                A = orig17 shr 1
+                                //> bcs ContinueSmackEnemy   ;smack enemy
+                                if ((orig17 and 0x01) == 0) {
+                                    //> lsr
+                                    val orig18: Int = A
+                                    A = orig18 shr 1
+                                    //> bcs ContinuePipeDownInj  ;pipedown/injury
+                                    if ((orig18 and 0x01) == 0) {
+                                        //> lsr
+                                        val orig19: Int = A
+                                        A = orig19 shr 1
+                                        //> bcs ContinueBumpThrow    ;fireball throw
+                                        if ((orig19 and 0x01) != 0) {
+                                            //  goto ContinueBumpThrow
+                                            return
+                                        }
+                                    } else {
+                                        break@loop0
+                                    }
+                                } else {
+                                    break@loop0
+                                }
+                            } else {
+                                break@loop0
+                            }
+                        } else {
+                            break@loop0
+                        }
+                    } else {
+                        break@loop0
+                    }
+                } else {
+                    break@loop0
+                }
+            } else {
+                break@loop0
+            }
+        } else {
+            break@loop0
         }
-        //> JumpRegContents:
-        //> ldx #$82               ;note that small and big jump borrow each others' reg contents
-        X = 0x82
-        //> ldy #$a7               ;anyway, this loads the first part of mario's jumping sound
-        Y = 0xA7
-        //> jsr PlaySqu1Sfx
-        playSqu1Sfx(A, X, Y)
-        //> lda #$28               ;store length of sfx for both jumping sounds
-        A = 0x28
-        //> sta Squ1_SfxLenCounter ;then continue on here
-        squ1Sfxlencounter = A
-        //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+    }
+    //> lsr
+    val orig20: Int = A
+    A = orig20 shr 1
+    //> bcs DecrementSfx1Length  ;slide flagpole
+    if ((orig20 and 0x01) != 0) {
+        //  goto DecrementSfx1Length -> decrementSfx1Length
+        decrementSfx1Length()
         return
-        //> ContinueSndJump:
-        //> lda Squ1_SfxLenCounter ;jumping sounds seem to be composed of three parts
-        A = squ1Sfxlencounter
-        //> cmp #$25               ;check for time to play second part yet
-        //> bne N2Prt
-        //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+    } else {
+        //> ExS1H: rts
         return
-        if (A == 0x25) {
-            //> ldx #$5f               ;load second part
-            X = 0x5F
-            //> ldy #$f6
-            Y = 0xF6
-            //> bne DmpJpFPS           ;unconditional branch
-            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
-            return
-        }
-        //> N2Prt:    cmp #$20               ;check for third part
-        //> bne DecJpFPS
-        //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
-        return
-        if (A == 0x20) {
-            //> ldx #$48               ;load third part
-            X = 0x48
-            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
-            return
-        }
     }
     // SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
 }
@@ -31448,8 +30966,6 @@ fun handleAreaMusicLoopB(A: Int) {
     var A: Int = A
     var Y: Int = 0
     var altRegContentFlag by MemoryByte(AltRegContentFlag)
-    var areaMusicBuffer by MemoryByte(AreaMusicBuffer)
-    var eventMusicBuffer by MemoryByte(EventMusicBuffer)
     var groundMusicHeaderOfs by MemoryByte(GroundMusicHeaderOfs)
     var musicDataHigh by MemoryByte(MusicDataHigh)
     var musicDataLow by MemoryByte(MusicDataLow)
@@ -31466,16 +30982,7 @@ fun handleAreaMusicLoopB(A: Int) {
     var triNotelencounter by MemoryByte(Tri_NoteLenCounter)
     val musicHeaderData by MemoryByteIndexed(MusicHeaderData)
     val musicHeaderOffsetData by MemoryByteIndexed(MusicHeaderOffsetData)
-    //> HandleAreaMusicLoopB:
-    //> ldy #$00                  ;clear event music buffer
-    Y = 0x00
-    //> sty EventMusicBuffer
-    eventMusicBuffer = Y
-    //> sta AreaMusicBuffer       ;copy area music queue contents to buffer
-    areaMusicBuffer = A
-    //> cmp #$01                  ;is it ground level music?
-    //> bne FindAreaMusicHeader
-    loop0@ while (A != 0x01) {
+    loop0@ while (!true /* unknown branch STY */) {
         //> GMLoopB: sty GroundMusicHeaderOfs
         groundMusicHeaderOfs = Y
         //> inc GroundMusicHeaderOfs  ;increment but only if playing ground level music
@@ -31484,84 +30991,92 @@ fun handleAreaMusicLoopB(A: Int) {
         Y = groundMusicHeaderOfs
         //> cpy #$32
         //> bne LoadHeader            ;branch ahead with alternate offset
-        //> ldy #$11
-        Y = 0x11
-        //> bne GMLoopB               ;unconditional branch
-        if (!(Y == 0)) {
-            //  goto GMLoopB
-            return
+        A = A
+        if (Y == 0x32) {
+            loop1@ do {
+                //> ldy #$11
+                Y = 0x11
+                //> bne GMLoopB               ;unconditional branch
+                if (!(Y == 0)) {
+                    //  goto GMLoopB
+                    return
+                }
+            } while (Y != 0)
+            //> FindAreaMusicHeader:
+            //> ldy #$08                   ;load Y for offset of area music
+            Y = 0x08
+            //> sty MusicOffset_Square2    ;residual instruction here
+            musicoffsetSquare2 = Y
+            loop2@ do {
+                //> FindEventMusicHeader:
+                //> iny                       ;increment Y pointer based on previously loaded queue contents
+                Y = (Y + 1) and 0xFF
+                //> lsr                       ;bit shift and increment until we find a set bit for music
+                val orig0: Int = A
+                A = orig0 shr 1
+                //> bcc FindEventMusicHeader
+            } while ((orig0 and 0x01) == 0)
         }
+        //> LoadHeader:
+        //> lda MusicHeaderOffsetData,y  ;load offset for header
+        A = musicHeaderOffsetData[Y]
+        //> tay
+        Y = A
+        //> lda MusicHeaderData,y        ;now load the header
+        A = musicHeaderData[Y]
+        //> sta NoteLenLookupTblOfs
+        noteLenLookupTblOfs = A
+        //> lda MusicHeaderData+1,y
+        A = musicHeaderData[1 + Y]
+        //> sta MusicDataLow
+        musicDataLow = A
+        //> lda MusicHeaderData+2,y
+        A = musicHeaderData[2 + Y]
+        //> sta MusicDataHigh
+        musicDataHigh = A
+        //> lda MusicHeaderData+3,y
+        A = musicHeaderData[3 + Y]
+        //> sta MusicOffset_Triangle
+        musicoffsetTriangle = A
+        //> lda MusicHeaderData+4,y
+        A = musicHeaderData[4 + Y]
+        //> sta MusicOffset_Square1
+        musicoffsetSquare1 = A
+        //> lda MusicHeaderData+5,y
+        A = musicHeaderData[5 + Y]
+        //> sta MusicOffset_Noise
+        musicoffsetNoise = A
+        //> sta NoiseDataLoopbackOfs
+        noiseDataLoopbackOfs = A
+        //> lda #$01                     ;initialize music note counters
+        A = 0x01
+        //> sta Squ2_NoteLenCounter
+        squ2Notelencounter = A
+        //> sta Squ1_NoteLenCounter
+        squ1Notelencounter = A
+        //> sta Tri_NoteLenCounter
+        triNotelencounter = A
+        //> sta Noise_BeatLenCounter
+        noiseBeatlencounter = A
+        //> lda #$00                     ;initialize music data offset for square 2
+        A = 0x00
+        //> sta MusicOffset_Square2
+        musicoffsetSquare2 = A
+        //> sta AltRegContentFlag        ;initialize alternate control reg data used by square 1
+        altRegContentFlag = A
+        //> lda #$0b                     ;disable triangle channel and reenable it
+        A = 0x0B
+        //> sta SND_MASTERCTRL_REG
+        sndMasterctrlReg = A
+        //> lda #$0f
+        A = 0x0F
+        //> sta SND_MASTERCTRL_REG
+        sndMasterctrlReg = A
+        //  Fall-through tail call to handleSquare2Music
+        handleSquare2Music()
+        return
     }
-    //> FindAreaMusicHeader:
-    //> ldy #$08                   ;load Y for offset of area music
-    Y = 0x08
-    //> sty MusicOffset_Square2    ;residual instruction here
-    musicoffsetSquare2 = Y
-    loop1@ do {
-        //> FindEventMusicHeader:
-        //> iny                       ;increment Y pointer based on previously loaded queue contents
-        Y = (Y + 1) and 0xFF
-        //> lsr                       ;bit shift and increment until we find a set bit for music
-        val orig0: Int = A
-        A = orig0 shr 1
-        //> bcc FindEventMusicHeader
-    } while ((orig0 and 0x01) == 0)
-    //> LoadHeader:
-    //> lda MusicHeaderOffsetData,y  ;load offset for header
-    A = musicHeaderOffsetData[Y]
-    //> tay
-    Y = A
-    //> lda MusicHeaderData,y        ;now load the header
-    A = musicHeaderData[Y]
-    //> sta NoteLenLookupTblOfs
-    noteLenLookupTblOfs = A
-    //> lda MusicHeaderData+1,y
-    A = musicHeaderData[1 + Y]
-    //> sta MusicDataLow
-    musicDataLow = A
-    //> lda MusicHeaderData+2,y
-    A = musicHeaderData[2 + Y]
-    //> sta MusicDataHigh
-    musicDataHigh = A
-    //> lda MusicHeaderData+3,y
-    A = musicHeaderData[3 + Y]
-    //> sta MusicOffset_Triangle
-    musicoffsetTriangle = A
-    //> lda MusicHeaderData+4,y
-    A = musicHeaderData[4 + Y]
-    //> sta MusicOffset_Square1
-    musicoffsetSquare1 = A
-    //> lda MusicHeaderData+5,y
-    A = musicHeaderData[5 + Y]
-    //> sta MusicOffset_Noise
-    musicoffsetNoise = A
-    //> sta NoiseDataLoopbackOfs
-    noiseDataLoopbackOfs = A
-    //> lda #$01                     ;initialize music note counters
-    A = 0x01
-    //> sta Squ2_NoteLenCounter
-    squ2Notelencounter = A
-    //> sta Squ1_NoteLenCounter
-    squ1Notelencounter = A
-    //> sta Tri_NoteLenCounter
-    triNotelencounter = A
-    //> sta Noise_BeatLenCounter
-    noiseBeatlencounter = A
-    //> lda #$00                     ;initialize music data offset for square 2
-    A = 0x00
-    //> sta MusicOffset_Square2
-    musicoffsetSquare2 = A
-    //> sta AltRegContentFlag        ;initialize alternate control reg data used by square 1
-    altRegContentFlag = A
-    //> lda #$0b                     ;disable triangle channel and reenable it
-    A = 0x0B
-    //> sta SND_MASTERCTRL_REG
-    sndMasterctrlReg = A
-    //> lda #$0f
-    A = 0x0F
-    //> sta SND_MASTERCTRL_REG
-    sndMasterctrlReg = A
-    //  Fall-through tail call to handleSquare2Music
+    // Fall-through tail call to handleSquare2Music
     handleSquare2Music()
     return
 }
@@ -31662,16 +31177,11 @@ fun handleSquare2Music() {
                 sndSquare2Reg[0] = A
                 //> rts
                 return
-            } else {
-                //> MusicLoopBack:
-                //> jmp HandleAreaMusicLoopB
-                handleAreaMusicLoopB(A)
-                return
-                //> VictoryMLoopBack:
-                //> jmp LoadEventMusic
-                loadEventMusic(A)
-                return
             }
+            //> MusicLoopBack:
+            //> jmp HandleAreaMusicLoopB
+            handleAreaMusicLoopB(A)
+            return
         } else {
             //> VictoryMLoopBack:
             //> jmp LoadEventMusic
@@ -31993,16 +31503,11 @@ fun handleSquare2Music() {
             sndNoiseReg[2] = X
             //> sty SND_NOISE_REG+3
             sndNoiseReg[3] = Y
-        } else {
-            //> ExitMusicHandler:
-            //> rts
-            return
         }
-    } else {
-        //> ExitMusicHandler:
-        //> rts
-        return
     }
+    //> ExitMusicHandler:
+    //> rts
+    return
 }
 
 // Decompiled from AlternateLengthHandler
