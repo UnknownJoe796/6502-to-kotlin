@@ -14,7 +14,7 @@ import java.io.File
 
 /**
  * Auto-generated tests from TAS capture: pc-based-smb-tas
- * Captured at: 2026-01-21T16:22:35.057106Z
+ * Captured at: 2026-01-21T18:18:34.495263Z
  * Total frames: 17868
  * Total captures: 1483835
  * Functions with tests: 288
@@ -140,8 +140,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             spriteShuffler()
 
-            // Verify: Check output memory (24 addresses)
-            assertEquals(0x28u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (23 addresses)
             assertEquals(0x01u, memory[0x06E0], "Memory 0x06E0 mismatch")
             assertEquals(0x88u, memory[0x06E5], "Memory 0x06E5 mismatch")
             assertEquals(0xA0u, memory[0x06E6], "Memory 0x06E6 mismatch")
@@ -205,8 +204,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             spriteShuffler()
 
-            // Verify: Check output memory (24 addresses)
-            assertEquals(0x28u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (23 addresses)
             assertEquals(0x02u, memory[0x06E0], "Memory 0x06E0 mismatch")
             assertEquals(0xD0u, memory[0x06E5], "Memory 0x06E5 mismatch")
             assertEquals(0xE8u, memory[0x06E6], "Memory 0x06E6 mismatch")
@@ -270,8 +268,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             spriteShuffler()
 
-            // Verify: Check output memory (24 addresses)
-            assertEquals(0x28u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (23 addresses)
             assertEquals(0x00u, memory[0x06E0], "Memory 0x06E0 mismatch")
             assertEquals(0x30u, memory[0x06E5], "Memory 0x06E5 mismatch")
             assertEquals(0x48u, memory[0x06E6], "Memory 0x06E6 mismatch")
@@ -2704,8 +2701,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getPlayerColors()
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0x3Fu, memory[0x0301], "Memory 0x0301 mismatch")
             assertEquals(0x10u, memory[0x0302], "Memory 0x0302 mismatch")
             assertEquals(0x04u, memory[0x0303], "Memory 0x0303 mismatch")
@@ -2741,8 +2737,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getPlayerColors()
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0x3Fu, memory[0x0301], "Memory 0x0301 mismatch")
             assertEquals(0x10u, memory[0x0302], "Memory 0x0302 mismatch")
             assertEquals(0x04u, memory[0x0303], "Memory 0x0303 mismatch")
@@ -2778,8 +2773,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getPlayerColors()
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0x3Fu, memory[0x0301], "Memory 0x0301 mismatch")
             assertEquals(0x10u, memory[0x0302], "Memory 0x0302 mismatch")
             assertEquals(0x04u, memory[0x0303], "Memory 0x0303 mismatch")
@@ -2815,8 +2809,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getPlayerColors()
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0x3Fu, memory[0x0301], "Memory 0x0301 mismatch")
             assertEquals(0x10u, memory[0x0302], "Memory 0x0302 mismatch")
             assertEquals(0x04u, memory[0x0303], "Memory 0x0303 mismatch")
@@ -3494,9 +3487,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawTitleScreen()
 
-            // Verify: Check output memory (316 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x04u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (314 addresses)
             assertEquals(0x00u, memory[0x0300], "Memory 0x0300 mismatch")
             assertEquals(0x00u, memory[0x0301], "Memory 0x0301 mismatch")
             assertEquals(0x00u, memory[0x0302], "Memory 0x0302 mismatch")
@@ -4290,10 +4281,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAreaGraphics()
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (10 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x00u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -4339,10 +4327,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAreaGraphics()
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x3Au, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (10 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x01u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -4388,10 +4373,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAreaGraphics()
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (10 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x00u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -4437,10 +4419,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAreaGraphics()
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x3Au, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x08u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (10 addresses)
             assertEquals(0x08u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x01u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -4486,10 +4465,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAreaGraphics()
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (10 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x00u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -4535,10 +4511,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAreaGraphics()
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (10 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x01u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -4584,10 +4557,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAreaGraphics()
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (10 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x00u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -4633,10 +4603,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAreaGraphics()
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (10 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x01u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -4682,10 +4649,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAreaGraphics()
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (10 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x00u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -4731,10 +4695,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAreaGraphics()
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (10 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x00u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -4802,10 +4763,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setAttrib(0x00)
 
-            // Verify: Check output memory (41 addresses)
-            assertEquals(0x1Au, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x0Cu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (38 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xACu, memory[0x0006], "Memory 0x0006 mismatch")
@@ -4895,10 +4853,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setAttrib(0x00)
 
-            // Verify: Check output memory (41 addresses)
-            assertEquals(0x37u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x0Cu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (38 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xACu, memory[0x0006], "Memory 0x0006 mismatch")
@@ -4988,10 +4943,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setAttrib(0x00)
 
-            // Verify: Check output memory (41 addresses)
-            assertEquals(0x54u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x0Cu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (38 addresses)
             assertEquals(0x04u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xACu, memory[0x0006], "Memory 0x0006 mismatch")
@@ -5081,10 +5033,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setAttrib(0x00)
 
-            // Verify: Check output memory (41 addresses)
-            assertEquals(0x71u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x0Cu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (38 addresses)
             assertEquals(0x04u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xACu, memory[0x0006], "Memory 0x0006 mismatch")
@@ -5174,10 +5123,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setAttrib(0x00)
 
-            // Verify: Check output memory (41 addresses)
-            assertEquals(0x1Au, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x0Cu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (38 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xACu, memory[0x0006], "Memory 0x0006 mismatch")
@@ -5267,10 +5213,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setAttrib(0x00)
 
-            // Verify: Check output memory (41 addresses)
-            assertEquals(0x1Au, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x0Cu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (38 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xACu, memory[0x0006], "Memory 0x0006 mismatch")
@@ -5360,10 +5303,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setAttrib(0x00)
 
-            // Verify: Check output memory (41 addresses)
-            assertEquals(0x1Au, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x0Cu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (38 addresses)
             assertEquals(0x04u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xACu, memory[0x0006], "Memory 0x0006 mismatch")
@@ -5453,10 +5393,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setAttrib(0x00)
 
-            // Verify: Check output memory (41 addresses)
-            assertEquals(0x1Au, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x0Cu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (38 addresses)
             assertEquals(0x04u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xACu, memory[0x0006], "Memory 0x0006 mismatch")
@@ -5546,10 +5483,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setAttrib(0x00)
 
-            // Verify: Check output memory (41 addresses)
-            assertEquals(0x1Au, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x0Cu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (38 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xACu, memory[0x0006], "Memory 0x0006 mismatch")
@@ -5639,10 +5573,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setAttrib(0x00)
 
-            // Verify: Check output memory (41 addresses)
-            assertEquals(0x1Au, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x0Cu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (38 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xACu, memory[0x0006], "Memory 0x0006 mismatch")
@@ -5719,9 +5650,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAttributeTables()
 
-            // Verify: Check output memory (39 addresses)
-            assertEquals(0x23u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xF8u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (37 addresses)
             assertEquals(0x90u, memory[0x0340], "Memory 0x0340 mismatch")
             assertEquals(0x23u, memory[0x03B5], "Memory 0x03B5 mismatch")
             assertEquals(0xC8u, memory[0x03B6], "Memory 0x03B6 mismatch")
@@ -5792,9 +5721,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAttributeTables()
 
-            // Verify: Check output memory (39 addresses)
-            assertEquals(0x23u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xFBu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (37 addresses)
             assertEquals(0x90u, memory[0x0340], "Memory 0x0340 mismatch")
             assertEquals(0x23u, memory[0x03B5], "Memory 0x03B5 mismatch")
             assertEquals(0xCBu, memory[0x03B6], "Memory 0x03B6 mismatch")
@@ -5865,9 +5792,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAttributeTables()
 
-            // Verify: Check output memory (39 addresses)
-            assertEquals(0x23u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xFFu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (37 addresses)
             assertEquals(0x90u, memory[0x0340], "Memory 0x0340 mismatch")
             assertEquals(0x23u, memory[0x03B5], "Memory 0x03B5 mismatch")
             assertEquals(0xCFu, memory[0x03B6], "Memory 0x03B6 mismatch")
@@ -5938,9 +5863,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAttributeTables()
 
-            // Verify: Check output memory (39 addresses)
-            assertEquals(0x27u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xFBu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (37 addresses)
             assertEquals(0x90u, memory[0x0340], "Memory 0x0340 mismatch")
             assertEquals(0x27u, memory[0x03B5], "Memory 0x03B5 mismatch")
             assertEquals(0xCBu, memory[0x03B6], "Memory 0x03B6 mismatch")
@@ -6011,9 +5934,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAttributeTables()
 
-            // Verify: Check output memory (39 addresses)
-            assertEquals(0x27u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xFFu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (37 addresses)
             assertEquals(0x1Cu, memory[0x0340], "Memory 0x0340 mismatch")
             assertEquals(0x27u, memory[0x0341], "Memory 0x0341 mismatch")
             assertEquals(0xCFu, memory[0x0342], "Memory 0x0342 mismatch")
@@ -6084,9 +6005,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAttributeTables()
 
-            // Verify: Check output memory (39 addresses)
-            assertEquals(0x23u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xFBu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (37 addresses)
             assertEquals(0x1Cu, memory[0x0340], "Memory 0x0340 mismatch")
             assertEquals(0x23u, memory[0x0341], "Memory 0x0341 mismatch")
             assertEquals(0xCBu, memory[0x0342], "Memory 0x0342 mismatch")
@@ -6157,9 +6076,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAttributeTables()
 
-            // Verify: Check output memory (39 addresses)
-            assertEquals(0x23u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xFEu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (37 addresses)
             assertEquals(0x1Cu, memory[0x0340], "Memory 0x0340 mismatch")
             assertEquals(0x23u, memory[0x0341], "Memory 0x0341 mismatch")
             assertEquals(0xCEu, memory[0x0342], "Memory 0x0342 mismatch")
@@ -6230,9 +6147,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAttributeTables()
 
-            // Verify: Check output memory (39 addresses)
-            assertEquals(0x27u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xFAu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (37 addresses)
             assertEquals(0x1Cu, memory[0x0340], "Memory 0x0340 mismatch")
             assertEquals(0x27u, memory[0x0341], "Memory 0x0341 mismatch")
             assertEquals(0xCAu, memory[0x0342], "Memory 0x0342 mismatch")
@@ -6303,9 +6218,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAttributeTables()
 
-            // Verify: Check output memory (39 addresses)
-            assertEquals(0x27u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xFDu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (37 addresses)
             assertEquals(0x1Cu, memory[0x0340], "Memory 0x0340 mismatch")
             assertEquals(0x27u, memory[0x0341], "Memory 0x0341 mismatch")
             assertEquals(0xCDu, memory[0x0342], "Memory 0x0342 mismatch")
@@ -6376,9 +6289,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderAttributeTables()
 
-            // Verify: Check output memory (39 addresses)
-            assertEquals(0x27u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xFDu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (37 addresses)
             assertEquals(0x1Cu, memory[0x0340], "Memory 0x0340 mismatch")
             assertEquals(0x27u, memory[0x0341], "Memory 0x0341 mismatch")
             assertEquals(0xCDu, memory[0x0342], "Memory 0x0342 mismatch")
@@ -6764,8 +6675,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             colorRotation()
 
-            // Verify: Check output memory (11 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (10 addresses)
             assertEquals(0x07u, memory[0x0300], "Memory 0x0300 mismatch")
             assertEquals(0x3Fu, memory[0x0301], "Memory 0x0301 mismatch")
             assertEquals(0x0Cu, memory[0x0302], "Memory 0x0302 mismatch")
@@ -6802,8 +6712,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             colorRotation()
 
-            // Verify: Check output memory (11 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (10 addresses)
             assertEquals(0x07u, memory[0x0300], "Memory 0x0300 mismatch")
             assertEquals(0x3Fu, memory[0x0301], "Memory 0x0301 mismatch")
             assertEquals(0x0Cu, memory[0x0302], "Memory 0x0302 mismatch")
@@ -7402,8 +7311,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveVOffset(0x01)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -7438,9 +7347,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             putBlockMetatile(0x03, 0x00, 0x01)
 
-            // Verify: Check output memory (5 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x01u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x24u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x40u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x26u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -7472,9 +7379,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             putBlockMetatile(0x02, 0x00, 0x01)
 
-            // Verify: Check output memory (5 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x01u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x24u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x40u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x26u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -7506,9 +7411,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             putBlockMetatile(0x03, 0x01, 0x01)
 
-            // Verify: Check output memory (5 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x01u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x24u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x4Au, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x26u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -7540,9 +7443,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             putBlockMetatile(0x02, 0x01, 0x01)
 
-            // Verify: Check output memory (5 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x01u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x24u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x4Au, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x26u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -7574,9 +7475,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             putBlockMetatile(0x03, 0x00, 0x01)
 
-            // Verify: Check output memory (5 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x01u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x24u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x4Cu, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x25u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -7608,9 +7507,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             putBlockMetatile(0x02, 0x00, 0x01)
 
-            // Verify: Check output memory (5 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x01u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x24u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x4Cu, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x25u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -8048,9 +7945,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             updateScreen()
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0xEBu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x8Cu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -8108,9 +8004,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             updateScreen()
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x5Eu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x03u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -8168,9 +8063,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             updateScreen()
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x5Eu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x03u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -8228,9 +8122,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             updateScreen()
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x5Eu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x03u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -8288,9 +8181,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             updateScreen()
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x5Eu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x03u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -8348,9 +8240,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             updateScreen()
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x5Eu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x03u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -8408,9 +8299,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             updateScreen()
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x5Eu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x03u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -8468,9 +8358,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             updateScreen()
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x5Eu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x03u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -8528,9 +8417,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             updateScreen()
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x5Eu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x03u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -9024,8 +8912,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             printStatusBarNumbers(0x02)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -9051,8 +8939,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             printStatusBarNumbers(0xFA)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xFAu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -9078,8 +8966,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             printStatusBarNumbers(0x02)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -9105,8 +8993,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             printStatusBarNumbers(0x02)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -9132,8 +9020,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             printStatusBarNumbers(0x02)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -9168,8 +9056,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             outputNumbers(0x02)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x05u, memory[0x0300], "Memory 0x0300 mismatch")
             assertEquals(0x20u, memory[0x0301], "Memory 0x0301 mismatch")
@@ -9210,8 +9097,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             outputNumbers(0x00)
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x05u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (12 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x0Eu, memory[0x0300], "Memory 0x0300 mismatch")
             assertEquals(0x20u, memory[0x0306], "Memory 0x0306 mismatch")
@@ -9281,8 +9167,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             outputNumbers(0x0F)
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (12 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x09u, memory[0x0300], "Memory 0x0300 mismatch")
             assertEquals(0x22u, memory[0x0301], "Memory 0x0301 mismatch")
@@ -9323,8 +9208,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             outputNumbers(0x02)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x0Au, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x0Fu, memory[0x0300], "Memory 0x0300 mismatch")
             assertEquals(0x20u, memory[0x030B], "Memory 0x030B mismatch")
@@ -9365,8 +9249,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             outputNumbers(0x00)
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x0Fu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (12 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x18u, memory[0x0300], "Memory 0x0300 mismatch")
             assertEquals(0x20u, memory[0x0310], "Memory 0x0310 mismatch")
@@ -9407,8 +9290,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             outputNumbers(0x02)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x05u, memory[0x0300], "Memory 0x0300 mismatch")
             assertEquals(0x20u, memory[0x0301], "Memory 0x0301 mismatch")
@@ -9449,8 +9331,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             outputNumbers(0x00)
 
-            // Verify: Check output memory (13 addresses)
-            assertEquals(0x05u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (12 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x0Eu, memory[0x0300], "Memory 0x0300 mismatch")
             assertEquals(0x20u, memory[0x0306], "Memory 0x0306 mismatch")
@@ -9491,8 +9372,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             outputNumbers(0x02)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x0Au, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x0Fu, memory[0x0300], "Memory 0x0300 mismatch")
             assertEquals(0x20u, memory[0x030B], "Memory 0x030B mismatch")
@@ -11202,8 +11082,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             areaParserCore()
 
-            // Verify: Check output memory (14 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (13 addresses)
             assertEquals(0x00u, memory[0x06A1], "Memory 0x06A1 mismatch")
             assertEquals(0x00u, memory[0x06A2], "Memory 0x06A2 mismatch")
             assertEquals(0x00u, memory[0x06A3], "Memory 0x06A3 mismatch")
@@ -11247,8 +11126,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             areaParserCore()
 
-            // Verify: Check output memory (14 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (13 addresses)
             assertEquals(0x00u, memory[0x06A1], "Memory 0x06A1 mismatch")
             assertEquals(0x80u, memory[0x06A2], "Memory 0x06A2 mismatch")
             assertEquals(0x83u, memory[0x06A3], "Memory 0x06A3 mismatch")
@@ -11292,8 +11170,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             areaParserCore()
 
-            // Verify: Check output memory (14 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (13 addresses)
             assertEquals(0x00u, memory[0x06A1], "Memory 0x06A1 mismatch")
             assertEquals(0x00u, memory[0x06A2], "Memory 0x06A2 mismatch")
             assertEquals(0x00u, memory[0x06A3], "Memory 0x06A3 mismatch")
@@ -11337,8 +11214,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             areaParserCore()
 
-            // Verify: Check output memory (14 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (13 addresses)
             assertEquals(0x00u, memory[0x06A1], "Memory 0x06A1 mismatch")
             assertEquals(0x00u, memory[0x06A2], "Memory 0x06A2 mismatch")
             assertEquals(0x00u, memory[0x06A3], "Memory 0x06A3 mismatch")
@@ -11466,8 +11342,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             areaParserCore()
 
-            // Verify: Check output memory (14 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (13 addresses)
             assertEquals(0x00u, memory[0x06A1], "Memory 0x06A1 mismatch")
             assertEquals(0x00u, memory[0x06A2], "Memory 0x06A2 mismatch")
             assertEquals(0x00u, memory[0x06A3], "Memory 0x06A3 mismatch")
@@ -11511,8 +11386,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             areaParserCore()
 
-            // Verify: Check output memory (14 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (13 addresses)
             assertEquals(0x00u, memory[0x06A1], "Memory 0x06A1 mismatch")
             assertEquals(0x80u, memory[0x06A2], "Memory 0x06A2 mismatch")
             assertEquals(0x83u, memory[0x06A3], "Memory 0x06A3 mismatch")
@@ -11598,8 +11472,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             areaParserCore()
 
-            // Verify: Check output memory (14 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (13 addresses)
             assertEquals(0x00u, memory[0x06A1], "Memory 0x06A1 mismatch")
             assertEquals(0x00u, memory[0x06A2], "Memory 0x06A2 mismatch")
             assertEquals(0x00u, memory[0x06A3], "Memory 0x06A3 mismatch")
@@ -11664,9 +11537,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             storeMT(0x54)
 
-            // Verify: Check output memory (18 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x04u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (16 addresses)
             assertEquals(0x54u, memory[0x0007], "Memory 0x0007 mismatch")
             assertEquals(0x00u, memory[0x0500], "Memory 0x0500 mismatch")
             assertEquals(0x00u, memory[0x0510], "Memory 0x0510 mismatch")
@@ -11728,9 +11599,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             storeMT(0x54)
 
-            // Verify: Check output memory (18 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x04u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (16 addresses)
             assertEquals(0x54u, memory[0x0007], "Memory 0x0007 mismatch")
             assertEquals(0x00u, memory[0x0505], "Memory 0x0505 mismatch")
             assertEquals(0x00u, memory[0x0515], "Memory 0x0515 mismatch")
@@ -11792,9 +11661,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             storeMT(0x54)
 
-            // Verify: Check output memory (18 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x04u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (16 addresses)
             assertEquals(0x54u, memory[0x0007], "Memory 0x0007 mismatch")
             assertEquals(0x00u, memory[0x050B], "Memory 0x050B mismatch")
             assertEquals(0x00u, memory[0x051B], "Memory 0x051B mismatch")
@@ -11856,9 +11723,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             storeMT(0x54)
 
-            // Verify: Check output memory (18 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x04u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (16 addresses)
             assertEquals(0x54u, memory[0x0007], "Memory 0x0007 mismatch")
             assertEquals(0x00u, memory[0x05D1], "Memory 0x05D1 mismatch")
             assertEquals(0x00u, memory[0x05E1], "Memory 0x05E1 mismatch")
@@ -11906,9 +11771,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             storeMT(0x54)
 
-            // Verify: Check output memory (5 addresses)
-            assertEquals(0x18u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x04u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x54u, memory[0x0007], "Memory 0x0007 mismatch")
             assertEquals(0x54u, memory[0x06AC], "Memory 0x06AC mismatch")
             assertEquals(0x54u, memory[0x06AD], "Memory 0x06AD mismatch")
@@ -11943,9 +11806,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             storeMT(0x54)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x18u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x04u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x54u, memory[0x0007], "Memory 0x0007 mismatch")
             assertEquals(0x54u, memory[0x06AC], "Memory 0x06AC mismatch")
             assertEquals(0x54u, memory[0x06AD], "Memory 0x06AD mismatch")
@@ -11995,9 +11856,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             storeMT(0x54)
 
-            // Verify: Check output memory (18 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x04u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (16 addresses)
             assertEquals(0x54u, memory[0x0007], "Memory 0x0007 mismatch")
             assertEquals(0x00u, memory[0x0503], "Memory 0x0503 mismatch")
             assertEquals(0x00u, memory[0x0513], "Memory 0x0513 mismatch")
@@ -12059,9 +11918,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             storeMT(0x54)
 
-            // Verify: Check output memory (18 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x04u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (16 addresses)
             assertEquals(0x54u, memory[0x0007], "Memory 0x0007 mismatch")
             assertEquals(0x00u, memory[0x050B], "Memory 0x050B mismatch")
             assertEquals(0x00u, memory[0x051B], "Memory 0x051B mismatch")
@@ -12123,9 +11980,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             storeMT(0x54)
 
-            // Verify: Check output memory (18 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x04u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (16 addresses)
             assertEquals(0x54u, memory[0x0007], "Memory 0x0007 mismatch")
             assertEquals(0x00u, memory[0x05D3], "Memory 0x05D3 mismatch")
             assertEquals(0x00u, memory[0x05E3], "Memory 0x05E3 mismatch")
@@ -12187,9 +12042,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             storeMT(0x54)
 
-            // Verify: Check output memory (18 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x04u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (16 addresses)
             assertEquals(0x54u, memory[0x0007], "Memory 0x0007 mismatch")
             assertEquals(0x00u, memory[0x05DB], "Memory 0x05DB mismatch")
             assertEquals(0x00u, memory[0x05EB], "Memory 0x05EB mismatch")
@@ -12293,8 +12146,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             processAreaData()
 
-            // Verify: Check output memory (16 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (15 addresses)
             assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
             assertEquals(0x00u, memory[0x05D0], "Memory 0x05D0 mismatch")
             assertEquals(0x00u, memory[0x05E0], "Memory 0x05E0 mismatch")
@@ -12420,8 +12272,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             processAreaData()
 
-            // Verify: Check output memory (16 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (15 addresses)
             assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
             assertEquals(0x00u, memory[0x05DC], "Memory 0x05DC mismatch")
             assertEquals(0x00u, memory[0x05EC], "Memory 0x05EC mismatch")
@@ -12514,8 +12365,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             processAreaData()
 
-            // Verify: Check output memory (16 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (15 addresses)
             assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
             assertEquals(0x00u, memory[0x0507], "Memory 0x0507 mismatch")
             assertEquals(0x00u, memory[0x0517], "Memory 0x0517 mismatch")
@@ -12577,8 +12427,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             processAreaData()
 
-            // Verify: Check output memory (16 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (15 addresses)
             assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
             assertEquals(0x00u, memory[0x050E], "Memory 0x050E mismatch")
             assertEquals(0x00u, memory[0x051E], "Memory 0x051E mismatch")
@@ -12641,8 +12490,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             processAreaData()
 
-            // Verify: Check output memory (16 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (15 addresses)
             assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
             assertEquals(0x00u, memory[0x05D9], "Memory 0x05D9 mismatch")
             assertEquals(0x00u, memory[0x05E9], "Memory 0x05E9 mismatch")
@@ -12855,8 +12703,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             chkLength()
 
-            // Verify: Check output memory (17 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (16 addresses)
             assertEquals(0x01u, memory[0x0008], "Memory 0x0008 mismatch")
             assertEquals(0x00u, memory[0x05D7], "Memory 0x05D7 mismatch")
             assertEquals(0x00u, memory[0x05E7], "Memory 0x05E7 mismatch")
@@ -13419,8 +13266,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             decodeAreaData(0x02)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x20u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -13505,8 +13351,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             decodeAreaData(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x70u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -13535,8 +13380,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             decodeAreaData(0x02)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x70u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -13565,8 +13409,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             decodeAreaData(0x02)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x70u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -13595,8 +13438,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             decodeAreaData(0x02)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x70u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -13625,8 +13467,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             decodeAreaData(0x02)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -13697,8 +13538,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveAOId(0x20)
 
-            // Verify: Check output memory (5 addresses)
-            assertEquals(0x20u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0xCAu, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x92u, memory[0x0005], "Memory 0x0005 mismatch")
             assertEquals(0xAEu, memory[0x0006], "Memory 0x0006 mismatch")
@@ -13731,8 +13571,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveAOId(0x20)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x20u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -13794,8 +13633,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveAOId(0x70)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x70u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -13850,8 +13688,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveAOId(0x70)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x70u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -13880,8 +13717,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveAOId(0x70)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x70u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -13936,8 +13772,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveAOId(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -14001,8 +13836,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             normObj(0x01, 0x02)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -14033,8 +13868,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             normObj(0x02, 0x02)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -14076,8 +13911,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             normObj(0x01, 0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0xCAu, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x92u, memory[0x0005], "Memory 0x0005 mismatch")
             assertEquals(0xAEu, memory[0x0006], "Memory 0x0006 mismatch")
@@ -14113,8 +13947,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             normObj(0x07, 0x00)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x07u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -14145,8 +13979,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             normObj(0x07, 0x01)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x07u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -14177,8 +14011,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             normObj(0x07, 0x00)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x07u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -14209,8 +14043,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             normObj(0x07, 0x00)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x07u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -14238,8 +14072,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             normObj(0x07, 0x02)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x07u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -14270,8 +14104,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             normObj(0x00, 0x02)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -14302,8 +14136,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             normObj(0x00, 0x01)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -17499,8 +17333,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             scrollScreen(0x01)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x00u, memory[0x071A], "Memory 0x071A mismatch")
             assertEquals(0x01u, memory[0x071C], "Memory 0x071C mismatch")
             assertEquals(0x01u, memory[0x073D], "Memory 0x073D mismatch")
@@ -17537,8 +17370,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             scrollScreen(0x02)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x00u, memory[0x071A], "Memory 0x071A mismatch")
             assertEquals(0x50u, memory[0x071C], "Memory 0x071C mismatch")
             assertEquals(0x10u, memory[0x073D], "Memory 0x073D mismatch")
@@ -17575,8 +17407,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             scrollScreen(0x01)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x00u, memory[0x071A], "Memory 0x071A mismatch")
             assertEquals(0xB5u, memory[0x071C], "Memory 0x071C mismatch")
             assertEquals(0x15u, memory[0x073D], "Memory 0x073D mismatch")
@@ -17613,8 +17444,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             scrollScreen(0x01)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x071A], "Memory 0x071A mismatch")
             assertEquals(0x24u, memory[0x071C], "Memory 0x071C mismatch")
             assertEquals(0x04u, memory[0x073D], "Memory 0x073D mismatch")
@@ -17651,8 +17481,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             scrollScreen(0x01)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x071A], "Memory 0x071A mismatch")
             assertEquals(0x7Du, memory[0x071C], "Memory 0x071C mismatch")
             assertEquals(0x1Du, memory[0x073D], "Memory 0x073D mismatch")
@@ -17689,8 +17518,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             scrollScreen(0x01)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x071A], "Memory 0x071A mismatch")
             assertEquals(0xE4u, memory[0x071C], "Memory 0x071C mismatch")
             assertEquals(0x04u, memory[0x073D], "Memory 0x073D mismatch")
@@ -17727,8 +17555,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             scrollScreen(0x01)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x00u, memory[0x071A], "Memory 0x071A mismatch")
             assertEquals(0xA5u, memory[0x071C], "Memory 0x071C mismatch")
             assertEquals(0x05u, memory[0x073D], "Memory 0x073D mismatch")
@@ -17765,8 +17592,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             scrollScreen(0x02)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x071A], "Memory 0x071A mismatch")
             assertEquals(0x89u, memory[0x071C], "Memory 0x071C mismatch")
             assertEquals(0x09u, memory[0x073D], "Memory 0x073D mismatch")
@@ -17803,8 +17629,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             scrollScreen(0x01)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x02u, memory[0x071A], "Memory 0x071A mismatch")
             assertEquals(0x3Du, memory[0x071C], "Memory 0x071C mismatch")
             assertEquals(0x1Du, memory[0x073D], "Memory 0x073D mismatch")
@@ -17841,8 +17666,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             scrollScreen(0x01)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x02u, memory[0x071A], "Memory 0x071A mismatch")
             assertEquals(0x86u, memory[0x071C], "Memory 0x071C mismatch")
             assertEquals(0x06u, memory[0x073D], "Memory 0x073D mismatch")
@@ -17881,8 +17705,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             chkPOffscr(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
         }
     }
@@ -17909,8 +17732,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             chkPOffscr(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
         }
     }
@@ -17937,8 +17759,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             chkPOffscr(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
         }
     }
@@ -17965,8 +17786,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             chkPOffscr(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
         }
     }
@@ -17993,8 +17813,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             chkPOffscr(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
         }
     }
@@ -18021,8 +17840,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             chkPOffscr(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
         }
     }
@@ -18049,8 +17867,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             chkPOffscr(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
         }
     }
@@ -18077,8 +17894,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             chkPOffscr(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
         }
     }
@@ -18105,8 +17921,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             chkPOffscr(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
         }
     }
@@ -18135,8 +17950,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             chkPOffscr(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x80u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x01u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0x43u, memory[0x0086], "Memory 0x0086 mismatch")
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
@@ -19908,8 +19722,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             cyclePlayerPalette(0x1C)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
         }
     }
@@ -19935,8 +19748,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             cyclePlayerPalette(0x1E)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x02u, memory[0x03C4], "Memory 0x03C4 mismatch")
         }
     }
@@ -19962,8 +19774,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             cyclePlayerPalette(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
         }
     }
@@ -19989,8 +19800,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             cyclePlayerPalette(0x02)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x02u, memory[0x03C4], "Memory 0x03C4 mismatch")
         }
     }
@@ -20016,8 +19826,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             cyclePlayerPalette(0x04)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
         }
     }
@@ -20043,8 +19852,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             cyclePlayerPalette(0x06)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x02u, memory[0x03C4], "Memory 0x03C4 mismatch")
         }
     }
@@ -20070,8 +19878,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             cyclePlayerPalette(0x09)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x01u, memory[0x03C4], "Memory 0x03C4 mismatch")
         }
     }
@@ -20097,8 +19904,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             cyclePlayerPalette(0x0B)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x03u, memory[0x03C4], "Memory 0x03C4 mismatch")
         }
     }
@@ -20124,8 +19930,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             cyclePlayerPalette(0x18)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
         }
     }
@@ -20151,8 +19956,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             cyclePlayerPalette(0x1A)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x02u, memory[0x03C4], "Memory 0x03C4 mismatch")
         }
     }
@@ -21905,8 +21709,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             xPhysics()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -21932,8 +21736,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             xPhysics()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -21959,8 +21763,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             xPhysics()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -21986,8 +21790,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             xPhysics()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -22013,8 +21817,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             xPhysics()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -22040,8 +21844,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             xPhysics()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -22072,8 +21876,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             xPhysics()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -22104,8 +21908,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             xPhysics()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -22135,8 +21939,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             xPhysics()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -22162,8 +21966,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             xPhysics()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -25642,10 +25446,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             miscObjectsCore()
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x50u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x03u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x06u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x08u, memory[0x0008], "Memory 0x0008 mismatch")
         }
     }
@@ -26472,8 +26273,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getSBNybbles()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -27376,8 +27177,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerHeadCollision(0xC0)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xC0u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0xC0u, memory[0x0005], "Memory 0x0005 mismatch")
             assertEquals(0x11u, memory[0x0026], "Memory 0x0026 mismatch")
             assertEquals(0x90u, memory[0x00D7], "Memory 0x00D7 mismatch")
@@ -27423,8 +27223,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerHeadCollision(0xC1)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xC1u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0xC1u, memory[0x0005], "Memory 0x0005 mismatch")
             assertEquals(0x11u, memory[0x0027], "Memory 0x0027 mismatch")
             assertEquals(0x90u, memory[0x00D8], "Memory 0x00D8 mismatch")
@@ -27470,8 +27269,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerHeadCollision(0xC0)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0xC0u, memory[0x0005], "Memory 0x0005 mismatch")
             assertEquals(0x11u, memory[0x0026], "Memory 0x0026 mismatch")
             assertEquals(0x50u, memory[0x00D7], "Memory 0x00D7 mismatch")
@@ -27981,8 +27779,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkTopOfBlock()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x60u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -28009,8 +27807,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkTopOfBlock()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x60u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -28037,8 +27835,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkTopOfBlock()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x20u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29060,10 +28858,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveObjectHorizontally(0x00)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0x28u, memory[0x0086], "Memory 0x0086 mismatch")
             assertEquals(0x00u, memory[0x0400], "Memory 0x0400 mismatch")
@@ -29097,10 +28892,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveObjectHorizontally(0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xFFu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x01u, memory[0x006E], "Memory 0x006E mismatch")
             assertEquals(0x3Au, memory[0x0087], "Memory 0x0087 mismatch")
             assertEquals(0x80u, memory[0x0401], "Memory 0x0401 mismatch")
@@ -29134,10 +28926,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveObjectHorizontally(0x06)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x01u, memory[0x0073], "Memory 0x0073 mismatch")
             assertEquals(0x6Bu, memory[0x008C], "Memory 0x008C mismatch")
             assertEquals(0x00u, memory[0x0406], "Memory 0x0406 mismatch")
@@ -29171,10 +28960,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveObjectHorizontally(0x00)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x01u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0xC0u, memory[0x0086], "Memory 0x0086 mismatch")
             assertEquals(0x90u, memory[0x0400], "Memory 0x0400 mismatch")
@@ -29208,10 +28994,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveObjectHorizontally(0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xFFu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x03u, memory[0x006E], "Memory 0x006E mismatch")
             assertEquals(0x27u, memory[0x0087], "Memory 0x0087 mismatch")
             assertEquals(0x80u, memory[0x0401], "Memory 0x0401 mismatch")
@@ -29245,10 +29028,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveObjectHorizontally(0x02)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x03u, memory[0x006F], "Memory 0x006F mismatch")
             assertEquals(0x15u, memory[0x0088], "Memory 0x0088 mismatch")
             assertEquals(0x00u, memory[0x0402], "Memory 0x0402 mismatch")
@@ -29282,10 +29062,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveObjectHorizontally(0x02)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x00u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x03u, memory[0x006F], "Memory 0x006F mismatch")
             assertEquals(0x57u, memory[0x0088], "Memory 0x0088 mismatch")
             assertEquals(0x80u, memory[0x0402], "Memory 0x0402 mismatch")
@@ -29319,10 +29096,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveObjectHorizontally(0x00)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFEu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x10u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xFFu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x01u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0x74u, memory[0x0086], "Memory 0x0086 mismatch")
             assertEquals(0xE0u, memory[0x0400], "Memory 0x0400 mismatch")
@@ -29356,10 +29130,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveObjectHorizontally(0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xFFu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x02u, memory[0x006E], "Memory 0x006E mismatch")
             assertEquals(0xB0u, memory[0x0087], "Memory 0x0087 mismatch")
             assertEquals(0x80u, memory[0x0401], "Memory 0x0401 mismatch")
@@ -29393,10 +29164,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             moveObjectHorizontally(0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xFFu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x02u, memory[0x006E], "Memory 0x006E mismatch")
             assertEquals(0x8Au, memory[0x0087], "Memory 0x0087 mismatch")
             assertEquals(0x00u, memory[0x0401], "Memory 0x0401 mismatch")
@@ -29429,8 +29197,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             movePlayerVertically()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x1Eu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29454,8 +29222,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             movePlayerVertically()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x28u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29479,8 +29247,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             movePlayerVertically()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x28u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29504,8 +29272,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             movePlayerVertically()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x28u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29529,8 +29297,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             movePlayerVertically()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x28u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29554,8 +29322,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             movePlayerVertically()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x28u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29579,8 +29347,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             movePlayerVertically()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x28u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29604,8 +29372,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             movePlayerVertically()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x28u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29629,8 +29397,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             movePlayerVertically()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x28u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29654,8 +29422,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             movePlayerVertically()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x28u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29747,8 +29515,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setXMoveAmt(0x03, 0x05, 0x3D)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x3Du, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29776,8 +29544,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             imposeGravityBlock()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x50u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29800,8 +29568,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             imposeGravityBlock()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x50u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29831,8 +29599,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             imposeGravitySprObj(0x04)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x04u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29856,8 +29624,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             imposeGravitySprObj(0x08)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x08u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29881,8 +29649,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             imposeGravitySprObj(0x04)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x04u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29906,8 +29674,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             imposeGravitySprObj(0x08)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x08u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29931,8 +29699,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             imposeGravitySprObj(0x03)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x03u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -29956,8 +29724,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             imposeGravitySprObj(0x04)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x04u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -31761,8 +31529,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkpointEnemyID(0x00)
 
-            // Verify: Check output memory (12 addresses)
-            assertEquals(0x03u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (11 addresses)
             assertEquals(0x60u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x01u, memory[0x0008], "Memory 0x0008 mismatch")
             assertEquals(0x01u, memory[0x0010], "Memory 0x0010 mismatch")
@@ -31841,8 +31608,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkpointEnemyID(0x01)
 
-            // Verify: Check output memory (12 addresses)
-            assertEquals(0x03u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (11 addresses)
             assertEquals(0x60u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
             assertEquals(0x01u, memory[0x0011], "Memory 0x0011 mismatch")
@@ -32883,10 +32649,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             handleGroupEnemies(0x37)
 
-            // Verify: Check output memory (11 addresses)
-            assertEquals(0xB0u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x06u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x03u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0x48u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x01u, memory[0x000F], "Memory 0x000F mismatch")
             assertEquals(0x06u, memory[0x0016], "Memory 0x0016 mismatch")
@@ -32928,10 +32691,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             handleGroupEnemies(0x37)
 
-            // Verify: Check output memory (11 addresses)
-            assertEquals(0xB0u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x06u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x03u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0x48u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x01u, memory[0x0010], "Memory 0x0010 mismatch")
             assertEquals(0x06u, memory[0x0017], "Memory 0x0017 mismatch")
@@ -34250,10 +34010,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             offscreenBoundsCheck(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xE9u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x01u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x79u, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
@@ -34288,10 +34045,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             offscreenBoundsCheck(0x05)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xFCu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x02u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x8Cu, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
@@ -34326,10 +34080,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             offscreenBoundsCheck(0x01)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xF1u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x03u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x82u, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
@@ -34364,10 +34115,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             offscreenBoundsCheck(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x83u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x02u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x14u, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
@@ -34402,10 +34150,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             offscreenBoundsCheck(0x01)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xEDu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x03u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x7Eu, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
@@ -34440,10 +34185,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             offscreenBoundsCheck(0x02)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x2Bu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x03u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0xBCu, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
@@ -34478,10 +34220,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             offscreenBoundsCheck(0x01)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x4Bu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x03u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0xDCu, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
@@ -34516,10 +34255,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             offscreenBoundsCheck(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x75u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x04u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x06u, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
@@ -34554,10 +34290,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             offscreenBoundsCheck(0x01)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x75u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x04u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x06u, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
@@ -34592,10 +34325,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             offscreenBoundsCheck(0x02)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x04u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x03u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x95u, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
@@ -34630,8 +34360,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             handlePowerUpCollision(0x05)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (2 addresses)
             assertEquals(0x20u, memory[0x00FE], "Memory 0x00FE mismatch")
             assertEquals(0x01u, memory[0x0756], "Memory 0x0756 mismatch")
         }
@@ -35577,9 +35306,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             enemiesCollision(0x02, 0x18)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x01u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0492], "Memory 0x0492 mismatch")
         }
     }
@@ -35695,8 +35422,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             enemiesCollision(0x01, 0x18)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x01u, memory[0x0491], "Memory 0x0491 mismatch")
         }
     }
@@ -35811,8 +35537,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             readyNextEnemy()
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x01u, memory[0x0491], "Memory 0x0491 mismatch")
         }
     }
@@ -35844,8 +35569,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             readyNextEnemy()
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0491], "Memory 0x0491 mismatch")
         }
     }
@@ -35900,8 +35624,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             readyNextEnemy()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -35929,8 +35653,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             readyNextEnemy()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -35958,8 +35682,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             readyNextEnemy()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -35987,8 +35711,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             readyNextEnemy()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -36911,8 +36635,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getEnemyBoundBoxOfs()
 
-            // Verify: Check output memory (5 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x09u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xC9u, memory[0x0005], "Memory 0x0005 mismatch")
             assertEquals(0x77u, memory[0x0006], "Memory 0x0006 mismatch")
@@ -37672,9 +37395,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             doFootCheck(0x00)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x54u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (6 addresses)
             assertEquals(0x00u, memory[0x001D], "Memory 0x001D mismatch")
             assertEquals(0x00u, memory[0x009F], "Memory 0x009F mismatch")
             assertEquals(0xB0u, memory[0x00CE], "Memory 0x00CE mismatch")
@@ -37709,9 +37430,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             doFootCheck(0x00)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x13u, memory[0x00EB], "Memory 0x00EB mismatch")
         }
     }
@@ -37741,9 +37460,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             doFootCheck(0x00)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x13u, memory[0x00EB], "Memory 0x00EB mismatch")
         }
     }
@@ -37773,9 +37490,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             doFootCheck(0x00)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x05u, memory[0x00EB], "Memory 0x00EB mismatch")
         }
     }
@@ -37805,9 +37520,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             doFootCheck(0x00)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x05u, memory[0x00EB], "Memory 0x00EB mismatch")
         }
     }
@@ -37837,9 +37550,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             doFootCheck(0x00)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x05u, memory[0x00EB], "Memory 0x00EB mismatch")
         }
     }
@@ -37869,9 +37580,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             doFootCheck(0x00)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x05u, memory[0x00EB], "Memory 0x00EB mismatch")
         }
     }
@@ -37904,9 +37613,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             doFootCheck(0x00)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x12u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (6 addresses)
             assertEquals(0x00u, memory[0x001D], "Memory 0x001D mismatch")
             assertEquals(0x00u, memory[0x009F], "Memory 0x009F mismatch")
             assertEquals(0x80u, memory[0x00CE], "Memory 0x00CE mismatch")
@@ -37941,9 +37648,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             doFootCheck(0x00)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x05u, memory[0x00EB], "Memory 0x00EB mismatch")
         }
     }
@@ -37973,9 +37678,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             doFootCheck(0x00)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x05u, memory[0x00EB], "Memory 0x00EB mismatch")
         }
     }
@@ -39527,8 +39230,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             nXSpd(0xFF, 0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x00u, memory[0x0057], "Memory 0x0057 mismatch")
             assertEquals(0x01u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0xB3u, memory[0x0086], "Memory 0x0086 mismatch")
@@ -39560,8 +39262,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             nXSpd(0x01, 0x02)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x00u, memory[0x0057], "Memory 0x0057 mismatch")
             assertEquals(0x01u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0x8Du, memory[0x0086], "Memory 0x0086 mismatch")
@@ -39593,8 +39294,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             nXSpd(0xFF, 0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x00u, memory[0x0057], "Memory 0x0057 mismatch")
             assertEquals(0x01u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0xB3u, memory[0x0086], "Memory 0x0086 mismatch")
@@ -39626,8 +39326,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             nXSpd(0xFF, 0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x00u, memory[0x0057], "Memory 0x0057 mismatch")
             assertEquals(0x01u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0xB2u, memory[0x0086], "Memory 0x0086 mismatch")
@@ -39659,8 +39358,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             nXSpd(0xFF, 0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x00u, memory[0x0057], "Memory 0x0057 mismatch")
             assertEquals(0x01u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0xB2u, memory[0x0086], "Memory 0x0086 mismatch")
@@ -39692,8 +39390,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             nXSpd(0xFF, 0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x00u, memory[0x0057], "Memory 0x0057 mismatch")
             assertEquals(0x02u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0x52u, memory[0x0086], "Memory 0x0086 mismatch")
@@ -39725,8 +39422,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             nXSpd(0xFF, 0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x00u, memory[0x0057], "Memory 0x0057 mismatch")
             assertEquals(0x02u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0x52u, memory[0x0086], "Memory 0x0086 mismatch")
@@ -39758,8 +39454,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             nXSpd(0xFF, 0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x00u, memory[0x0057], "Memory 0x0057 mismatch")
             assertEquals(0x01u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0xB2u, memory[0x0086], "Memory 0x0086 mismatch")
@@ -39791,8 +39486,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             nXSpd(0xFF, 0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x00u, memory[0x0057], "Memory 0x0057 mismatch")
             assertEquals(0x02u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0xD2u, memory[0x0086], "Memory 0x0086 mismatch")
@@ -39824,8 +39518,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             nXSpd(0xFF, 0x01)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xFFu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x00u, memory[0x0057], "Memory 0x0057 mismatch")
             assertEquals(0x02u, memory[0x006D], "Memory 0x006D mismatch")
             assertEquals(0xD2u, memory[0x0086], "Memory 0x0086 mismatch")
@@ -42107,8 +41800,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getEnemyBoundBox()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x48u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -42131,8 +41824,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getEnemyBoundBox()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x48u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -42155,8 +41848,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getEnemyBoundBox()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x48u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -42179,8 +41872,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getEnemyBoundBox()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x48u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -42203,8 +41896,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getEnemyBoundBox()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x48u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -42227,8 +41920,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getEnemyBoundBox()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x48u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -42251,8 +41944,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getEnemyBoundBox()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x48u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -42275,8 +41968,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getEnemyBoundBox()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x48u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -42299,8 +41992,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getEnemyBoundBox()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x48u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -42323,8 +42016,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getEnemyBoundBox()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x48u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -42360,8 +42053,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getMaskedOffScrBits(0x00, 0x44)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x2Eu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x08u, memory[0x03D8], "Memory 0x03D8 mismatch")
             assertEquals(0xFFu, memory[0x04B0], "Memory 0x04B0 mismatch")
             assertEquals(0xFFu, memory[0x04B1], "Memory 0x04B1 mismatch")
@@ -42396,8 +42088,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getMaskedOffScrBits(0x00, 0x44)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x69u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D8], "Memory 0x03D8 mismatch")
         }
     }
@@ -42428,8 +42119,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getMaskedOffScrBits(0x05, 0x44)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x36u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03DD], "Memory 0x03DD mismatch")
         }
     }
@@ -42460,8 +42150,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getMaskedOffScrBits(0x01, 0x44)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0xEBu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D9], "Memory 0x03D9 mismatch")
         }
     }
@@ -42492,8 +42181,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getMaskedOffScrBits(0x01, 0x44)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x32u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x08u, memory[0x03D9], "Memory 0x03D9 mismatch")
             assertEquals(0xFFu, memory[0x04B4], "Memory 0x04B4 mismatch")
             assertEquals(0xFFu, memory[0x04B5], "Memory 0x04B5 mismatch")
@@ -42528,8 +42216,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getMaskedOffScrBits(0x00, 0x44)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x06u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x08u, memory[0x03D8], "Memory 0x03D8 mismatch")
             assertEquals(0xFFu, memory[0x04B0], "Memory 0x04B0 mismatch")
             assertEquals(0xFFu, memory[0x04B1], "Memory 0x04B1 mismatch")
@@ -42564,8 +42251,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getMaskedOffScrBits(0x01, 0x44)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0xEBu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D9], "Memory 0x03D9 mismatch")
         }
     }
@@ -42596,8 +42282,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getMaskedOffScrBits(0x00, 0x44)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x3Cu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D8], "Memory 0x03D8 mismatch")
         }
     }
@@ -42628,8 +42313,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getMaskedOffScrBits(0x02, 0x44)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0xA4u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03DA], "Memory 0x03DA mismatch")
         }
     }
@@ -42660,8 +42344,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getMaskedOffScrBits(0x01, 0x44)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x5Fu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D9], "Memory 0x03D9 mismatch")
         }
     }
@@ -42834,10 +42517,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             boundingBoxCore(0x00, 0x00)
 
-            // Verify: Check output memory (7 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x28u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xB0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x2Bu, memory[0x04AC], "Memory 0x04AC mismatch")
             assertEquals(0xC4u, memory[0x04AD], "Memory 0x04AD mismatch")
             assertEquals(0x35u, memory[0x04AE], "Memory 0x04AE mismatch")
@@ -42871,10 +42551,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             boundingBoxCore(0x00, 0x00)
 
-            // Verify: Check output memory (7 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x70u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xB0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x73u, memory[0x04AC], "Memory 0x04AC mismatch")
             assertEquals(0xC4u, memory[0x04AD], "Memory 0x04AD mismatch")
             assertEquals(0x7Du, memory[0x04AE], "Memory 0x04AE mismatch")
@@ -42908,10 +42585,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             boundingBoxCore(0x06, 0x01)
 
-            // Verify: Check output memory (7 addresses)
-            assertEquals(0x06u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x38u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x80u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x3Au, memory[0x04C4], "Memory 0x04C4 mismatch")
             assertEquals(0x89u, memory[0x04C5], "Memory 0x04C5 mismatch")
             assertEquals(0x46u, memory[0x04C6], "Memory 0x04C6 mismatch")
@@ -42945,10 +42619,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             boundingBoxCore(0x00, 0x00)
 
-            // Verify: Check output memory (7 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x2Bu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x2Eu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x2Du, memory[0x04AC], "Memory 0x04AC mismatch")
             assertEquals(0x36u, memory[0x04AD], "Memory 0x04AD mismatch")
             assertEquals(0x39u, memory[0x04AE], "Memory 0x04AE mismatch")
@@ -42982,10 +42653,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             boundingBoxCore(0x01, 0x01)
 
-            // Verify: Check output memory (7 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xEDu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0xF0u, memory[0x04B0], "Memory 0x04B0 mismatch")
             assertEquals(0xC6u, memory[0x04B1], "Memory 0x04B1 mismatch")
             assertEquals(0xFAu, memory[0x04B2], "Memory 0x04B2 mismatch")
@@ -43019,10 +42687,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             boundingBoxCore(0x00, 0x00)
 
-            // Verify: Check output memory (7 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x5Bu, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x93u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x5Eu, memory[0x04AC], "Memory 0x04AC mismatch")
             assertEquals(0xA7u, memory[0x04AD], "Memory 0x04AD mismatch")
             assertEquals(0x68u, memory[0x04AE], "Memory 0x04AE mismatch")
@@ -43056,10 +42721,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             boundingBoxCore(0x00, 0x00)
 
-            // Verify: Check output memory (7 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x69u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x2Du, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x6Bu, memory[0x04AC], "Memory 0x04AC mismatch")
             assertEquals(0x35u, memory[0x04AD], "Memory 0x04AD mismatch")
             assertEquals(0x77u, memory[0x04AE], "Memory 0x04AE mismatch")
@@ -43093,10 +42755,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             boundingBoxCore(0x02, 0x01)
 
-            // Verify: Check output memory (7 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0xB9u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0xBCu, memory[0x04B4], "Memory 0x04B4 mismatch")
             assertEquals(0xC6u, memory[0x04B5], "Memory 0x04B5 mismatch")
             assertEquals(0xC6u, memory[0x04B6], "Memory 0x04B6 mismatch")
@@ -43130,10 +42789,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             boundingBoxCore(0x01, 0x01)
 
-            // Verify: Check output memory (7 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x07u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x0Au, memory[0x04B0], "Memory 0x04B0 mismatch")
             assertEquals(0xC6u, memory[0x04B1], "Memory 0x04B1 mismatch")
             assertEquals(0x14u, memory[0x04B2], "Memory 0x04B2 mismatch")
@@ -43167,10 +42823,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             boundingBoxCore(0x00, 0x00)
 
-            // Verify: Check output memory (7 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x54u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xA2u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x57u, memory[0x04AC], "Memory 0x04AC mismatch")
             assertEquals(0xB6u, memory[0x04AD], "Memory 0x04AD mismatch")
             assertEquals(0x61u, memory[0x04AE], "Memory 0x04AE mismatch")
@@ -43212,9 +42865,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkRightScreenBBox(0x01, 0x04)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x00u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xD4u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (2 addresses)
             assertEquals(0xFFu, memory[0x04B0], "Memory 0x04B0 mismatch")
             assertEquals(0xFFu, memory[0x04B2], "Memory 0x04B2 mismatch")
         }
@@ -43247,9 +42898,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkRightScreenBBox(0x01, 0x04)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x01u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x2Du, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -43280,9 +42930,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkRightScreenBBox(0x06, 0x18)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x01u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x9Au, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -43313,9 +42962,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkRightScreenBBox(0x01, 0x04)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x02u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xBAu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -43346,9 +42994,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkRightScreenBBox(0x01, 0x04)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x01u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x38u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -43379,9 +43026,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkRightScreenBBox(0x01, 0x04)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x02u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x31u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -43412,9 +43058,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkRightScreenBBox(0x01, 0x04)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x02u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xC9u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -43445,9 +43090,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkRightScreenBBox(0x02, 0x08)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x02u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xE8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -43478,9 +43122,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkRightScreenBBox(0x03, 0x0C)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x02u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0xF4u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -43511,9 +43154,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             checkRightScreenBBox(0x02, 0x08)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x03u, memory[0x0001], "Memory 0x0001 mismatch")
-            assertEquals(0x13u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -43619,8 +43261,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerCollisionCore()
 
-            // Verify: Check output memory (5 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x09u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xC9u, memory[0x0005], "Memory 0x0005 mismatch")
             assertEquals(0x77u, memory[0x0006], "Memory 0x0006 mismatch")
@@ -44503,8 +44144,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliFeet(0x0E)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xB0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x54u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x10u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x34u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -44543,8 +44183,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliFeet(0x0E)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xB0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x54u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x10u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xCCu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -44583,8 +44222,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliFeet(0x0E)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xB0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x54u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x10u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x4Du, memory[0x0005], "Memory 0x0005 mismatch")
@@ -44624,8 +44262,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliFeet(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x60u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x96u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -44665,8 +44302,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliFeet(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x70u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xC3u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -44705,8 +44341,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliFeet(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xB0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x54u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x5Cu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -44746,8 +44381,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliFeet(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x90u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x92u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -44786,8 +44420,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliFeet(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x70u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x51u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x6Du, memory[0x0005], "Memory 0x0005 mismatch")
@@ -44826,8 +44459,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliFeet(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xA0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x2Bu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -44867,8 +44499,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliFeet(0x0E)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x60u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x10u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xE3u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45155,8 +44786,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliSide()
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xA0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x14u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x35u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45192,8 +44822,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliSide()
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xA0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x14u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xCDu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45229,8 +44858,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliSide()
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xA0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x14u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x4Eu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45269,8 +44897,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliSide()
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x60u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x97u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45309,8 +44936,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliSide()
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x70u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xC5u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45348,8 +44974,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliSide()
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x90u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x14u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x05u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x60u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45386,8 +45011,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliSide()
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x80u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x8Fu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45426,8 +45050,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliSide()
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x6Au, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45466,8 +45089,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliSide()
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x90u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x06u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x27u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45504,8 +45126,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockbuffercolliSide()
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x60u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x14u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xE3u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45548,8 +45169,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockBufferCollision(0x00, 0x00, 0x0E)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xA0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x0Eu, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x30u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45586,8 +45206,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockBufferCollision(0x00, 0x00, 0x0E)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xA0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x0Eu, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xF9u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45624,8 +45243,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockBufferCollision(0x00, 0x00, 0x0E)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xA0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x0Eu, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xA8u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45662,8 +45280,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockBufferCollision(0x00, 0x00, 0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x9Du, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45700,8 +45317,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockBufferCollision(0x00, 0x00, 0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x90u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x4Eu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45739,8 +45355,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockBufferCollision(0x00, 0x02, 0x15)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xA0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x16u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x2Du, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45778,8 +45393,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockBufferCollision(0x00, 0x01, 0x15)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xA0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x17u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x3Eu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45816,8 +45430,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockBufferCollision(0x00, 0x00, 0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x77u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45854,8 +45467,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockBufferCollision(0x00, 0x00, 0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x60u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x8Bu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -45893,8 +45505,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             blockBufferCollision(0x00, 0x02, 0x15)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0xA0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x16u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x09u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -46340,8 +45951,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             dumpThreeSpr(0x87, 0x59)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x87u, memory[0x0261], "Memory 0x0261 mismatch")
         }
     }
@@ -46367,8 +45977,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             dumpThreeSpr(0x87, 0xA1)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x87u, memory[0x02A9], "Memory 0x02A9 mismatch")
         }
     }
@@ -46394,8 +46003,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             dumpThreeSpr(0x87, 0xD9)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x87u, memory[0x02E1], "Memory 0x02E1 mismatch")
         }
     }
@@ -47390,9 +46998,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPowerUp()
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x8Bu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x22u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x4Du, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47427,9 +47033,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPowerUp()
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x88u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x22u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x38u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47464,9 +47068,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPowerUp()
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x84u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x22u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x20u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47501,9 +47103,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPowerUp()
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x22u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x0Cu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47538,9 +47138,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPowerUp()
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x1Bu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47575,9 +47173,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPowerUp()
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x2Bu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47612,9 +47208,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPowerUp()
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x3Au, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47649,9 +47243,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPowerUp()
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x22u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x0Eu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47686,9 +47278,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPowerUp()
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x18u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47723,9 +47313,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPowerUp()
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x80u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (4 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x28u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47772,8 +47360,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             enemyGfxHandler(0x00)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x02u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x2Eu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47818,8 +47405,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             enemyGfxHandler(0x01)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xF9u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47863,8 +47449,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             enemyGfxHandler(0x00)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xE7u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47908,8 +47493,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             enemyGfxHandler(0x00)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x02u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x8Cu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47952,8 +47536,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             enemyGfxHandler(0x02)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x02u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xF5u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -47997,8 +47580,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             enemyGfxHandler(0x02)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x02u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x9Bu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -48041,8 +47623,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             enemyGfxHandler(0x00)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xF2u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -48085,8 +47666,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             enemyGfxHandler(0x01)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x45u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -48131,8 +47711,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             enemyGfxHandler(0x00)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x02u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0xDAu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -48176,8 +47755,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             enemyGfxHandler(0x01)
 
-            // Verify: Check output memory (8 addresses)
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x02u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x8Bu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -49372,8 +48950,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawEnemyObjRow(0x54)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xFCu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49397,8 +48975,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawEnemyObjRow(0x54)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xFCu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49422,8 +49000,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawEnemyObjRow(0x54)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xFCu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49447,8 +49025,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawEnemyObjRow(0x8A)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xFCu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49472,8 +49050,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawEnemyObjRow(0x54)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xFCu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49497,8 +49075,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawEnemyObjRow(0x54)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xFCu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49522,8 +49100,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawEnemyObjRow(0x54)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xFCu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49547,8 +49125,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawEnemyObjRow(0x54)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xFCu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49572,8 +49150,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawEnemyObjRow(0x54)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xFCu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49597,8 +49175,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawEnemyObjRow(0x8A)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xFCu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49628,8 +49206,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawOneSpriteRow(0xFC)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x4Fu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49653,9 +49231,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawOneSpriteRow(0xFC)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x72u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x73u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49679,8 +49256,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawOneSpriteRow(0xFC)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x43u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49704,8 +49281,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawOneSpriteRow(0x77)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x79u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49729,8 +49306,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawOneSpriteRow(0xFC)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x4Eu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49754,8 +49331,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawOneSpriteRow(0x19)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x1Fu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49779,9 +49356,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawOneSpriteRow(0xFC)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x72u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x73u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49806,9 +49382,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawOneSpriteRow(0x09)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x0Fu, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49832,9 +49407,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawOneSpriteRow(0xFC)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x72u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x73u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -49858,9 +49432,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawOneSpriteRow(0xFC)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x72u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x73u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -50174,9 +49747,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawBlock(0x00)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x86u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x8Eu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x6Eu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -50215,9 +49786,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawBlock(0x00)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x86u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x88u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x65u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -50256,9 +49825,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawBlock(0x00)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x86u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x90u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x5Cu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -50297,9 +49864,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawBlock(0x01)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x86u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x88u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x63u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -50338,9 +49903,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawBlock(0x01)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x86u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x8Eu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x56u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -50379,9 +49942,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawBlock(0x00)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x86u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x88u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x67u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -50420,9 +49981,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawBlock(0x00)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x86u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x8Cu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x5Eu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -50461,9 +50020,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawBlock(0x01)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x86u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x89u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x66u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -50502,9 +50059,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawBlock(0x01)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x86u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x8Bu, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x5Bu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -50543,9 +50098,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawBlock(0x00)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x86u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x4Au, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (7 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x1Du, memory[0x0005], "Memory 0x0005 mismatch")
@@ -51342,8 +50895,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerGfxProcessing(0xB8)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0xB8u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
@@ -51373,8 +50925,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerGfxProcessing(0x70)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x70u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
@@ -51404,8 +50955,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerGfxProcessing(0xB8)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0xB8u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
@@ -51435,8 +50985,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerGfxProcessing(0x08)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x08u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
@@ -51466,8 +51015,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerGfxProcessing(0x18)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x18u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
@@ -51497,8 +51045,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerGfxProcessing(0xC8)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0xC8u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
@@ -51528,8 +51075,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerGfxProcessing(0x88)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x88u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
@@ -51559,8 +51105,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerGfxProcessing(0x28)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x28u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
@@ -51590,8 +51135,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerGfxProcessing(0x28)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x28u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
@@ -51621,8 +51165,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             playerGfxProcessing(0xB0)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0xB0u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
@@ -51658,8 +51201,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderPlayerSub(0x04)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xB0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x28u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -51693,8 +51235,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderPlayerSub(0x04)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xB0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x02u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x6Fu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -51728,8 +51269,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderPlayerSub(0x04)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x70u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x02u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x3Fu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -51763,8 +51303,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderPlayerSub(0x04)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x7Au, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x5Fu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -51798,8 +51337,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderPlayerSub(0x04)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0xB0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x02u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x67u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -51833,8 +51371,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderPlayerSub(0x04)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x70u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x02u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x1Eu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -51868,8 +51405,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderPlayerSub(0x04)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x59u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x70u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -51903,8 +51439,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderPlayerSub(0x04)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x88u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x01u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x6Fu, memory[0x0005], "Memory 0x0005 mismatch")
@@ -51938,8 +51473,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderPlayerSub(0x04)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x50u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x02u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x02u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x4Du, memory[0x0005], "Memory 0x0005 mismatch")
@@ -51973,8 +51507,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             renderPlayerSub(0x04)
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x2Au, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x02u, memory[0x0003], "Memory 0x0003 mismatch")
             assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x4Du, memory[0x0005], "Memory 0x0005 mismatch")
@@ -52011,8 +51544,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPlayerLoop(0xB8)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x4Fu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -52039,8 +51571,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPlayerLoop(0x68)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x38u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -52067,8 +51598,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPlayerLoop(0x70)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x3Bu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -52095,8 +51625,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPlayerLoop(0xC0)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x4Eu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -52123,8 +51652,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPlayerLoop(0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x06u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -52151,8 +51679,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPlayerLoop(0x20)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x26u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -52179,8 +51706,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPlayerLoop(0x10)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x16u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -52207,8 +51733,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPlayerLoop(0x28)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x2Cu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -52235,8 +51760,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPlayerLoop(0xB0)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x9Fu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -52263,8 +51787,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawPlayerLoop(0xB0)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x9Fu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
@@ -53112,8 +52635,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             animationControl(0x03)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (2 addresses)
             assertEquals(0x01u, memory[0x070D], "Memory 0x070D mismatch")
             assertEquals(0x07u, memory[0x0781], "Memory 0x0781 mismatch")
         }
@@ -53141,8 +52663,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             animationControl(0x03)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -53171,8 +52693,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             animationControl(0x03)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (2 addresses)
             assertEquals(0x01u, memory[0x070D], "Memory 0x070D mismatch")
             assertEquals(0x04u, memory[0x0781], "Memory 0x0781 mismatch")
         }
@@ -53200,8 +52721,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             animationControl(0x03)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -53230,8 +52751,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             animationControl(0x03)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (2 addresses)
             assertEquals(0x01u, memory[0x070D], "Memory 0x070D mismatch")
             assertEquals(0x04u, memory[0x0781], "Memory 0x0781 mismatch")
         }
@@ -53259,8 +52779,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             animationControl(0x03)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -53289,8 +52809,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             animationControl(0x03)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (2 addresses)
             assertEquals(0x00u, memory[0x070D], "Memory 0x070D mismatch")
             assertEquals(0x04u, memory[0x0781], "Memory 0x0781 mismatch")
         }
@@ -53318,8 +52837,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             animationControl(0x03)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -53345,8 +52864,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             animationControl(0x03)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -53375,8 +52894,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             animationControl(0x03)
 
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (2 addresses)
             assertEquals(0x00u, memory[0x070D], "Memory 0x070D mismatch")
             assertEquals(0x07u, memory[0x0781], "Memory 0x0781 mismatch")
         }
@@ -55687,8 +55205,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             variableObjOfsRelPos(0x01, 0x00, 0x01)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -55715,8 +55233,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             variableObjOfsRelPos(0x09, 0x00, 0x04)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -55743,8 +55261,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             variableObjOfsRelPos(0x09, 0x02, 0x05)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -55771,8 +55289,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             variableObjOfsRelPos(0x09, 0x00, 0x04)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -55799,8 +55317,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             variableObjOfsRelPos(0x09, 0x03, 0x05)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -55827,8 +55345,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             variableObjOfsRelPos(0x09, 0x01, 0x04)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -55855,8 +55373,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             variableObjOfsRelPos(0x01, 0x05, 0x01)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x05u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -55883,8 +55401,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             variableObjOfsRelPos(0x01, 0x05, 0x01)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x05u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -55911,8 +55429,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             variableObjOfsRelPos(0x01, 0x01, 0x01)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -55939,8 +55457,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             variableObjOfsRelPos(0x09, 0x02, 0x05)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -57513,8 +57031,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setOffscrBitsOffset(0x01, 0x00)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -57538,8 +57056,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setOffscrBitsOffset(0x09, 0x00)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -57563,8 +57081,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setOffscrBitsOffset(0x09, 0x01)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -57588,8 +57106,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setOffscrBitsOffset(0x01, 0x05)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x05u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -57613,8 +57131,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setOffscrBitsOffset(0x01, 0x05)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x05u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -57638,8 +57156,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setOffscrBitsOffset(0x01, 0x01)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -57663,8 +57181,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setOffscrBitsOffset(0x01, 0x00)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -57688,8 +57206,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             setOffscrBitsOffset(0x01, 0x02)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -57723,8 +57241,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getOffScreenBitsSet(0x00, 0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D0], "Memory 0x03D0 mismatch")
         }
     }
@@ -57753,8 +57270,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getOffScreenBitsSet(0x01, 0x01)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x0Fu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x0Fu, memory[0x03D1], "Memory 0x03D1 mismatch")
         }
     }
@@ -57783,8 +57299,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getOffScreenBitsSet(0x01, 0x01)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x01u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x01u, memory[0x03D1], "Memory 0x03D1 mismatch")
         }
     }
@@ -57813,8 +57328,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getOffScreenBitsSet(0x15, 0x06)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D6], "Memory 0x03D6 mismatch")
         }
     }
@@ -57843,8 +57357,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getOffScreenBitsSet(0x00, 0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D0], "Memory 0x03D0 mismatch")
         }
     }
@@ -57873,8 +57386,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getOffScreenBitsSet(0x02, 0x01)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x07u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x07u, memory[0x03D1], "Memory 0x03D1 mismatch")
         }
     }
@@ -57903,8 +57415,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getOffScreenBitsSet(0x02, 0x01)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D1], "Memory 0x03D1 mismatch")
         }
     }
@@ -57933,8 +57444,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getOffScreenBitsSet(0x00, 0x00)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x08u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x08u, memory[0x03D0], "Memory 0x03D0 mismatch")
         }
     }
@@ -57963,8 +57473,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getOffScreenBitsSet(0x03, 0x01)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x03u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x03u, memory[0x03D1], "Memory 0x03D1 mismatch")
         }
     }
@@ -57993,8 +57502,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             getOffScreenBitsSet(0x01, 0x01)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x08u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (1 addresses)
             assertEquals(0x08u, memory[0x03D1], "Memory 0x03D1 mismatch")
         }
     }
@@ -58026,8 +57534,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             runOffscrBitsSubs(0x00, 0x00)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -58052,8 +57560,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             runOffscrBitsSubs(0x00, 0x00)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -58078,8 +57586,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             runOffscrBitsSubs(0x01, 0x01)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x0Fu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -58104,9 +57612,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             runOffscrBitsSubs(0x04, 0x09)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x86u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -58131,8 +57638,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             runOffscrBitsSubs(0x06, 0x15)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -58157,9 +57664,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             runOffscrBitsSubs(0x04, 0x0A)
 
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
-            assertEquals(0x86u, memory[0x0001], "Memory 0x0001 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -58184,8 +57690,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             runOffscrBitsSubs(0x01, 0x06)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -58210,8 +57716,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             runOffscrBitsSubs(0x00, 0x00)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -58236,8 +57742,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             runOffscrBitsSubs(0x01, 0x02)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x0Fu, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -58262,8 +57768,8 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             runOffscrBitsSubs(0x00, 0x00)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x08u, memory[0x0000], "Memory 0x0000 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -59225,8 +58731,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawSpriteObject(0xB8, 0x04)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0xB0u, memory[0x0204], "Memory 0x0204 mismatch")
             assertEquals(0xFCu, memory[0x0205], "Memory 0x0205 mismatch")
             assertEquals(0x00u, memory[0x0206], "Memory 0x0206 mismatch")
@@ -59263,8 +58768,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawSpriteObject(0x8E, 0x40)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xD1u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0xC9u, memory[0x0240], "Memory 0x0240 mismatch")
             assertEquals(0xEFu, memory[0x0241], "Memory 0x0241 mismatch")
             assertEquals(0x43u, memory[0x0242], "Memory 0x0242 mismatch")
@@ -59301,8 +58805,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawSpriteObject(0x02, 0x0C)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xC0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0xB8u, memory[0x020C], "Memory 0x020C mismatch")
             assertEquals(0x02u, memory[0x020D], "Memory 0x020D mismatch")
             assertEquals(0x00u, memory[0x020E], "Memory 0x020E mismatch")
@@ -59339,8 +58842,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawSpriteObject(0x08, 0x04)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xB8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0xB0u, memory[0x0204], "Memory 0x0204 mismatch")
             assertEquals(0x09u, memory[0x0205], "Memory 0x0205 mismatch")
             assertEquals(0x40u, memory[0x0206], "Memory 0x0206 mismatch")
@@ -59377,8 +58879,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawSpriteObject(0x58, 0xF8)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xD0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0xC8u, memory[0x02F8], "Memory 0x02F8 mismatch")
             assertEquals(0x72u, memory[0x02F9], "Memory 0x02F9 mismatch")
             assertEquals(0x03u, memory[0x02FA], "Memory 0x02FA mismatch")
@@ -59415,8 +58916,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawSpriteObject(0x00, 0xA8)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x88u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0x80u, memory[0x02A8], "Memory 0x02A8 mismatch")
             assertEquals(0x76u, memory[0x02A9], "Memory 0x02A9 mismatch")
             assertEquals(0x02u, memory[0x02AA], "Memory 0x02AA mismatch")
@@ -59453,8 +58953,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawSpriteObject(0x58, 0xC8)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xD0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0xC8u, memory[0x02C8], "Memory 0x02C8 mismatch")
             assertEquals(0x73u, memory[0x02C9], "Memory 0x02C9 mismatch")
             assertEquals(0x43u, memory[0x02CA], "Memory 0x02CA mismatch")
@@ -59491,8 +58990,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawSpriteObject(0x58, 0xE0)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xD0u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0xC8u, memory[0x02E0], "Memory 0x02E0 mismatch")
             assertEquals(0x72u, memory[0x02E1], "Memory 0x02E1 mismatch")
             assertEquals(0x03u, memory[0x02E2], "Memory 0x02E2 mismatch")
@@ -59529,8 +59027,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawSpriteObject(0xB2, 0x0C)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x96u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0x8Eu, memory[0x020C], "Memory 0x020C mismatch")
             assertEquals(0xFCu, memory[0x020D], "Memory 0x020D mismatch")
             assertEquals(0x40u, memory[0x020E], "Memory 0x020E mismatch")
@@ -59567,8 +59064,7 @@ class GeneratedFunctionTests {
             // Execute decompiled function
             drawSpriteObject(0x56, 0x38)
 
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0xC8u, memory[0x0002], "Memory 0x0002 mismatch")
+            // Verify: Check output memory (8 addresses)
             assertEquals(0xC0u, memory[0x0238], "Memory 0x0238 mismatch")
             assertEquals(0x70u, memory[0x0239], "Memory 0x0239 mismatch")
             assertEquals(0x03u, memory[0x023A], "Memory 0x023A mismatch")

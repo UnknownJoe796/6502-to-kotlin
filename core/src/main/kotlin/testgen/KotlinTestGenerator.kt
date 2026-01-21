@@ -373,7 +373,12 @@ class KotlinTestGenerator(
         sb.appendLine()
 
         // Filter out stack writes (0x0100-0x01FF) since decompiled code uses native Kotlin calls
-        val nonStackWrites = testCase.memoryWrites.filter { (addr, _) -> addr !in 0x0100..0x01FF }
+        // Also filter out zero-page scratch addresses (0x00-0x02) which are temporary variables
+        // that get overwritten by nested function calls - not meaningful outputs to verify
+        // by Claude
+        val nonStackWrites = testCase.memoryWrites.filter { (addr, _) ->
+            addr !in 0x0100..0x01FF && addr !in 0x00..0x02
+        }
         sb.appendLine("${indent}// Verify: Check output memory (${nonStackWrites.size} addresses)")
         if (nonStackWrites.isEmpty()) {
             sb.appendLine("${indent}// No memory outputs to verify (or only stack writes)")
