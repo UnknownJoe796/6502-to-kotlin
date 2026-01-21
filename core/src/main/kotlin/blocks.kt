@@ -658,11 +658,81 @@ fun List<AssemblyBlock>.functionify(
                         .forEach { state ->
                             trackUse(state, killed)
                         }
+
+                    // by Claude - CRITICAL FIX: Also track indexed addressing mode register uses
+                    // When LDA addr,X is used, X is read but not included in op.reads()
+                    when (instruction.address) {
+                        is AssemblyAddressing.DirectX,
+                        is AssemblyAddressing.IndirectX -> {
+                            trackUse(TrackedAsIo.X, killed)
+                        }
+                        is AssemblyAddressing.DirectY,
+                        is AssemblyAddressing.IndirectY -> {
+                            trackUse(TrackedAsIo.Y, killed)
+                        }
+                        else -> {}
+                    }
+
                     op.modifies(instruction.address?.let {it::class })
                         .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
                         .forEach { state ->
                             killed.add(state)
                         }
+                }
+
+                // by Claude - CRITICAL FIX: Also scan fall-through blocks after the JSR
+                // When a block ends with a JSR and the next block starts with a label,
+                // the fall-through block may use registers that were set by the called function.
+                // Example: jsr DividePDiff / YLdBData: lda YOffscreenBitsData,x
+                // The X register is used in YLdBData but is in a different block.
+                var currentBlock: AssemblyBlock? = block.fallThroughExit
+                val maxFallThroughBlocks = 5  // Limit to avoid infinite loops
+                var fallThroughCount = 0
+
+                while (currentBlock != null && fallThroughCount < maxFallThroughBlocks) {
+                    fallThroughCount++
+                    var foundTerminator = false
+
+                    for (line in currentBlock.lines) {
+                        val instruction = line.instruction ?: continue
+                        val op = instruction.op
+
+                        // Track uses before checking for terminator
+                        op.reads(instruction.address?.let { it::class })
+                            .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
+                            .forEach { state ->
+                                trackUse(state, killed)
+                            }
+
+                        // by Claude - Also track indexed addressing mode register uses in fall-through
+                        when (instruction.address) {
+                            is AssemblyAddressing.DirectX,
+                            is AssemblyAddressing.IndirectX -> {
+                                trackUse(TrackedAsIo.X, killed)
+                            }
+                            is AssemblyAddressing.DirectY,
+                            is AssemblyAddressing.IndirectY -> {
+                                trackUse(TrackedAsIo.Y, killed)
+                            }
+                            else -> {}
+                        }
+
+                        op.modifies(instruction.address?.let { it::class })
+                            .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
+                            .forEach { state ->
+                                killed.add(state)
+                            }
+
+                        // Stop at branch, jump, or return instructions
+                        if (op.isBranch || op == AssemblyOp.JMP || op == AssemblyOp.RTS || op == AssemblyOp.RTI) {
+                            foundTerminator = true
+                            break
+                        }
+                    }
+
+                    // Stop if we found a terminator or no fall-through
+                    if (foundTerminator) break
+                    currentBlock = currentBlock.fallThroughExit
                 }
             }
 
