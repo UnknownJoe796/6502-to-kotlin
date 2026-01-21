@@ -942,15 +942,26 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
             val returnValue = when {
                 outputRegisterCount >= 2 -> {
                     // Return Pair for functions that output multiple registers
-                    // Determine which registers to return
-                    val firstValue = when {
-                        hasAOutput -> ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
-                        hasXOutput -> ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X")
+                    // Determine which registers to return based on priority: A > X > Y
+                    // by Claude - Fixed: secondValue now correctly picks X when firstValue is A and X is an output
+                    val firstReg = when {
+                        hasAOutput -> "A"
+                        hasXOutput -> "X"
+                        else -> "Y"
+                    }
+                    val secondReg = when {
+                        hasYOutput -> "Y"
+                        hasXOutput && firstReg != "X" -> "X"  // X is output and wasn't used as first
+                        else -> "Y" // fallback (shouldn't happen with correct outputs)
+                    }
+                    val firstValue = when (firstReg) {
+                        "A" -> ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
+                        "X" -> ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X")
                         else -> ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y")
                     }
-                    val secondValue = when {
-                        hasYOutput -> ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y")
-                        hasXOutput && !hasAOutput -> ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X")
+                    val secondValue = when (secondReg) {
+                        "A" -> ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
+                        "X" -> ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X")
                         else -> ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y")
                     }
                     KCall("Pair", listOf(firstValue, secondValue))
