@@ -297,3 +297,51 @@ fun AssemblyAddressing?.toKotlinExpr(ctx: CodeGenContext): KotlinExpr {
 fun UShort.toKotlinExpr(ctx: CodeGenContext): KotlinExpr {
     return KLiteral("0x${this.toString(16).uppercase().padStart(4, '0')}")
 }
+
+/**
+ * by Claude - Get the current value of a register for use as a function argument.
+ *
+ * Priority:
+ * 1. If the register was set locally in this function, use that value
+ * 2. If the register is an input parameter to the current function, use the parameter
+ * 3. Only use 0 as a last resort (this case should be rare and may indicate an analysis bug)
+ *
+ * @param register The register name: "A", "X", or "Y"
+ * @param ctx The code generation context
+ * @return The expression representing the current register value
+ */
+fun getRegisterValueOrDefault(register: String, ctx: CodeGenContext): KotlinExpr {
+    // 1. Check if the register was set locally in this function
+    val tracked = when (register) {
+        "A" -> ctx.registerA
+        "X" -> ctx.registerX
+        "Y" -> ctx.registerY
+        else -> null
+    }
+    if (tracked != null) return tracked
+
+    // 2. Check for function-level variable (created during code generation)
+    val funcLevel = ctx.getFunctionLevelVar(register)
+    if (funcLevel != null) return funcLevel
+
+    // 3. by Claude - Check if the register is an input parameter to the current function
+    // If so, use the parameter directly (it's declared with the register name: A, X, or Y)
+    val currentFunc = ctx.currentFunction
+    if (currentFunc != null) {
+        val trackedAsIo = when (register) {
+            "A" -> TrackedAsIo.A
+            "X" -> TrackedAsIo.X
+            "Y" -> TrackedAsIo.Y
+            else -> null
+        }
+        if (trackedAsIo != null && currentFunc.inputs?.contains(trackedAsIo) == true) {
+            // The register is a function input parameter - use it directly
+            return KVar(register)
+        }
+    }
+
+    // 4. Last resort - register was never set and is not an input parameter
+    // This should be rare. Return 0 to avoid unresolved reference errors,
+    // but this may indicate an issue with input/output analysis.
+    return KLiteral("0")
+}

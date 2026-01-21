@@ -679,15 +679,16 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                 // This happens when SetAttrib is both an internal label AND a registered function
                 if (targetFunction != null && targetName != currentFunctionName) {
                     // Generate tail call to the target function
+                    // by Claude - Use getRegisterValueOrDefault to avoid unresolved reference errors
                     val args = mutableListOf<KotlinExpr>()
                     if (targetFunction.inputs?.contains(TrackedAsIo.A) == true) {
-                        args.add(ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A"))
+                        args.add(getRegisterValueOrDefault("A", ctx))
                     }
                     if (targetFunction.inputs?.contains(TrackedAsIo.X) == true) {
-                        args.add(ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X"))
+                        args.add(getRegisterValueOrDefault("X", ctx))
                     }
                     if (targetFunction.inputs?.contains(TrackedAsIo.Y) == true) {
-                        args.add(ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y"))
+                        args.add(getRegisterValueOrDefault("Y", ctx))
                     }
 
                     stmts.add(KExprStmt(KCall(targetName, args)))
@@ -718,6 +719,7 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                 // Generate a when() statement that dispatches based on A register
                 val indexExpr = ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A")
 
+                // by Claude - Use getRegisterValueOrDefault to avoid unresolved reference errors
                 val branches = jumpTable.targets.mapIndexed { index, targetLabel ->
                     val targetFunctionName = assemblyLabelToKotlinName(targetLabel)
                     val targetFunction = ctx.functionRegistry[targetFunctionName]
@@ -731,10 +733,10 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                             args.add(KLiteral("$index"))
                         }
                         if (TrackedAsIo.X in targetFunction.inputs!!) {
-                            args.add(ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X"))
+                            args.add(getRegisterValueOrDefault("X", ctx))
                         }
                         if (TrackedAsIo.Y in targetFunction.inputs!!) {
-                            args.add(ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y"))
+                            args.add(getRegisterValueOrDefault("Y", ctx))
                         }
                     }
 
@@ -757,16 +759,17 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                 val targetFunction = ctx.functionRegistry[functionName]
 
                 // Build argument list based on target function's inputs
+                // by Claude - Use getRegisterValueOrDefault to avoid unresolved reference errors
                 val args = mutableListOf<KotlinExpr>()
                 if (targetFunction?.inputs != null) {
                     if (TrackedAsIo.A in targetFunction.inputs!!) {
-                        args.add(ctx.registerA ?: ctx.getFunctionLevelVar("A") ?: KVar("A"))
+                        args.add(getRegisterValueOrDefault("A", ctx))
                     }
                     if (TrackedAsIo.X in targetFunction.inputs!!) {
-                        args.add(ctx.registerX ?: ctx.getFunctionLevelVar("X") ?: KVar("X"))
+                        args.add(getRegisterValueOrDefault("X", ctx))
                     }
                     if (TrackedAsIo.Y in targetFunction.inputs!!) {
-                        args.add(ctx.registerY ?: ctx.getFunctionLevelVar("Y") ?: KVar("Y"))
+                        args.add(getRegisterValueOrDefault("Y", ctx))
                     }
                 }
 
@@ -802,10 +805,13 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                         ctx.registerY = KVar(resultVar)
                     }
                     // by Claude - Bug #2 fix: capture carry flag boolean return
+                    // by Claude - Bug fix: Capture the result in a variable to avoid calling the function multiple times
                     hasCarryOutput -> {
-                        // Function returns Boolean (carry flag) - capture it
-                        // The carry flag expression is set so subsequent BCS/BCC use the result
-                        ctx.carryFlag = KCall(functionName, args)
+                        // Function returns Boolean (carry flag) - capture it in a variable
+                        // The carry flag variable is then used by subsequent BCS/BCC conditions
+                        val flagVar = "flag${ctx.nextFlagVar()}"
+                        stmts.add(KVarDecl(flagVar, "Boolean", KCall(functionName, args), mutable = false))
+                        ctx.carryFlag = KVar(flagVar)
                     }
                     else -> {
                         // Void function - just call it
