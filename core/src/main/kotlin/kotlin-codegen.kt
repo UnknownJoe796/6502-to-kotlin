@@ -995,6 +995,12 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
             if (condition != null) {
                 val targetLabel = branchTarget.label ?: "exit"
 
+                // by Claude - Bug #2 fix: Check if branchTarget IS the entry point of another function
+                // If so, generate a call to that function directly
+                val targetFunc = branchTarget.function
+                val targetIsFunctionEntry = targetIsExit && targetFunc != null &&
+                    branchTarget == targetFunc.startingBlock
+
                 // by Claude - Bug #1 fix: Check if branchTarget contains JMP to another function
                 // If so, generate a tail call to that function instead of just returning
                 val jmpInstr = branchTarget.lines.find { it.instruction?.op == AssemblyOp.JMP }?.instruction
@@ -1009,6 +1015,24 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                     listOf(
                         KComment("goto $targetLabel", commentTypeIndicator = " "),
                         KLabeledBreak(breakLabel)
+                    )
+                } else if (targetIsFunctionEntry) {
+                    // by Claude - Branch to another function's entry point - generate call
+                    val funcName = assemblyLabelToKotlinName(branchTarget.label!!)
+                    val args = mutableListOf<KotlinExpr>()
+                    if (targetFunc!!.inputs?.contains(TrackedAsIo.A) == true) {
+                        args.add(getRegisterValueOrDefault("A", ctx))
+                    }
+                    if (targetFunc.inputs?.contains(TrackedAsIo.X) == true) {
+                        args.add(getRegisterValueOrDefault("X", ctx))
+                    }
+                    if (targetFunc.inputs?.contains(TrackedAsIo.Y) == true) {
+                        args.add(getRegisterValueOrDefault("Y", ctx))
+                    }
+                    listOf(
+                        KComment("goto $targetLabel -> $funcName", commentTypeIndicator = " "),
+                        KExprStmt(KCall(funcName, args)),
+                        KReturn()
                     )
                 } else if (jmpTargetFunction != null && jmpTarget != null) {
                     // Generate tail call to the JMP target function
