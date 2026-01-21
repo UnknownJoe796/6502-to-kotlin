@@ -829,6 +829,55 @@ fun List<AssemblyBlock>.functionify(
         func.outputs = detectedOutputs
     }
 
+    // by Claude - Step 7: Propagate outputs through JMP chains
+    // If function A outputs X and JMPs to function B, then B should also output X.
+    // This is because when B returns via RTS, it returns to A's caller, which expects X.
+    // Example: RunOffscrBitsSubs outputs A and JMPs to GetYOffscreenBits,
+    // so GetYOffscreenBits should also output A.
+    changed = true
+    iterations = 0
+
+    while (changed && iterations < maxIterations) {
+        changed = false
+        iterations++
+
+        for (func in functions) {
+            val funcBlocks = func.blocks ?: continue
+
+            // Find all JMP targets within this function
+            for (block in funcBlocks) {
+                for (line in block.lines) {
+                    val instr = line.instruction ?: continue
+                    if (instr.op == AssemblyOp.JMP) {
+                        val targetLabel = (instr.address as? AssemblyAddressing.Direct)?.label
+                        val targetFunction = if (targetLabel != null) labelToFunction[targetLabel] else null
+
+                        if (targetFunction != null && targetFunction != func) {
+                            // This function JMPs to targetFunction
+                            // targetFunction should inherit this function's outputs
+                            val currentOutputs = func.outputs ?: emptySet()
+                            val targetOutputs = targetFunction.outputs?.toMutableSet() ?: mutableSetOf()
+                            val originalSize = targetOutputs.size
+
+                            for (output in currentOutputs) {
+                                // Only propagate if the target function clobbers this register
+                                // (i.e., it could set this value)
+                                if (output in (targetFunction.clobbers ?: emptySet())) {
+                                    targetOutputs.add(output)
+                                }
+                            }
+
+                            if (targetOutputs.size != originalSize) {
+                                targetFunction.outputs = targetOutputs
+                                changed = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     return functions
 }
 

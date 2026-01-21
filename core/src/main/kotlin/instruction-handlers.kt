@@ -743,8 +743,22 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                         args.add(getRegisterValueOrDefault("Y", ctx))
                     }
 
-                    stmts.add(KExprStmt(KCall(targetName, args)))
-                    stmts.add(KReturn())
+                    // by Claude - CRITICAL FIX: Propagate return value from JMP target
+                    // If the current function outputs A and the target function also outputs A,
+                    // we should use `return targetFunction(args)` instead of calling and returning separately.
+                    // This ensures the tail call properly returns the target's result.
+                    val currentFunc = ctx.currentFunction
+                    val currentOutputsA = currentFunc?.outputs?.contains(TrackedAsIo.A) == true
+                    val targetOutputsA = targetFunction.outputs?.contains(TrackedAsIo.A) == true
+
+                    if (currentOutputsA && targetOutputsA) {
+                        // Both functions output A - use return with call
+                        stmts.add(KReturn(value = KCall(targetName, args)))
+                    } else {
+                        // No return value to propagate
+                        stmts.add(KExprStmt(KCall(targetName, args)))
+                        stmts.add(KReturn())
+                    }
                 } else if (targetFunction == null) {
                     // Target is not a known function - add comment for debugging
                     stmts.add(KComment("jmp $targetLabel (not a known function)", commentTypeIndicator = ">"))
