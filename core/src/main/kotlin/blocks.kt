@@ -439,13 +439,32 @@ fun List<AssemblyBlock>.functionify(
 
     // by Claude - Collect JMP targets as candidates, but don't immediately mark them as functions
     // We'll filter them after determining which are already reachable from JSR-based functions
+    // Also track which block each JMP comes from so we can check if both are in the same loop
     val jmpTargetCandidates = mutableSetOf<AssemblyBlock>()
+    val jmpSources = mutableMapOf<AssemblyBlock, MutableSet<AssemblyBlock>>() // target -> set of source blocks
+
+    // by Claude - Track loop regions defined by backward BRANCHES (conditional)
+    // A loop region spans from the backward branch target (loop header) to the source block (loop tail)
+    // We use (headerLineIndex, tailLineIndex) pairs to define loop regions
+    data class LoopRegion(val headerIdx: Int, val tailIdx: Int)
+    val loopRegions = mutableListOf<LoopRegion>()
 
     for (block in this) {
+        // by Claude - Check for backward branches (conditional branches that jump backward)
+        val lastInstr = block.lines.lastOrNull { it.instruction != null }?.instruction
+        if (lastInstr != null && lastInstr.op.isBranch) {
+            val targetLabel = (lastInstr.address as? AssemblyAddressing.Direct)?.label
+            val targetBlock = targetLabel?.let { labelToBlock[it] }
+            if (targetBlock != null && block.originalLineIndex > targetBlock.originalLineIndex) {
+                // This is a backward branch: block branches back to targetBlock
+                // The loop region is from targetBlock (header) to block (tail)
+                loopRegions.add(LoopRegion(targetBlock.originalLineIndex, block.originalLineIndex))
+            }
+        }
+
         for ((index, line) in block.lines.withIndex()) {
             // by Claude - Collect JMP targets as candidates for later filtering
-            // We include backward jumps here - they might be tail calls to earlier functions
-            // The filtering step will determine if they're internal control flow or real functions
+            // Track which block the JMP comes from so we can check loop membership
             if (line.instruction?.op == AssemblyOp.JMP) {
                 val addr = line.instruction.address
                 if (addr is AssemblyAddressing.Direct) {
@@ -454,6 +473,7 @@ fun List<AssemblyBlock>.functionify(
                     // Only consider as candidate if not already in the current block's fall-through path
                     if (targetBlock != null && targetBlock != block.fallThroughExit) {
                         jmpTargetCandidates.add(targetBlock)
+                        jmpSources.getOrPut(targetBlock) { mutableSetOf() }.add(block)
                     }
                 }
             }
@@ -512,12 +532,43 @@ fun List<AssemblyBlock>.functionify(
         }
     }
 
-    // by Claude - Promote ALL JMP targets to functions
+    // by Claude - Selectively promote JMP targets to functions
     // This handles shared utility routines like IncSubtask that are reached via JMP from multiple functions.
-    // The code generator will handle fallthrough-to-function-entry by inserting a tail call.
+    // However, we DON'T promote JMP targets where ALL JMP sources are in the same loop region as the target.
+    // This preserves loop structures like ProcessCannons where internal labels (Chk_BB, Next3Slt)
+    // are jumped to from within the same loop.
+
+    // by Claude - Helper function to find which loop region a block is in (if any)
+    fun getLoopRegion(block: AssemblyBlock): LoopRegion? {
+        val blockIdx = block.originalLineIndex
+        return loopRegions.find { region ->
+            blockIdx in region.headerIdx..region.tailIdx
+        }
+    }
+
     for (candidate in jmpTargetCandidates) {
         // Skip if already a function entry (via JSR)
         if (candidate in functionEntryBlocks) continue
+
+        // by Claude - Check if ALL JMP sources to this target are in the same loop as the target
+        // If so, this is internal loop control flow and should NOT become a function
+        val targetLoop = getLoopRegion(candidate)
+        val sources = jmpSources[candidate] ?: emptySet()
+
+        val allSourcesInSameLoop = if (targetLoop != null && sources.isNotEmpty()) {
+            sources.all { source ->
+                val sourceLoop = getLoopRegion(source)
+                // Source is in the same loop if it's in the exact same loop region
+                sourceLoop != null && sourceLoop.headerIdx == targetLoop.headerIdx && sourceLoop.tailIdx == targetLoop.tailIdx
+            }
+        } else {
+            false
+        }
+
+        if (allSourcesInSameLoop) {
+            continue // Don't promote internal loop blocks to functions
+        }
+
         functionEntryBlocks.getOrPut(candidate) { ArrayList() }
     }
 
