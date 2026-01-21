@@ -4403,14 +4403,16 @@ fun secondaryGameSetup() {
     //> lda ScreenLeft_PageLoc    ;get left side page location
     A = screenleftPageloc
     //> lsr Mirror_PPU_CTRL_REG1  ;shift LSB of ppu register #1 mirror out
-    mirrorPpuCtrlReg1 = mirrorPpuCtrlReg1 shr 1
+    val orig0: Int = mirrorPpuCtrlReg1
+    val carryFromLsr1: Boolean = (orig0 and 0x01) != 0
+    mirrorPpuCtrlReg1 = orig0 shr 1
     //> and #$01                  ;mask out all but LSB of page location
     A = A and 0x01
     //> ror                       ;rotate LSB of page location into carry then onto mirror
-    val orig0: Int = A
-    A = orig0 shr 1 or if ((mirrorPpuCtrlReg1 and 0x01) != 0) 0x80 else 0
+    val orig2: Int = A
+    A = orig2 shr 1 or if (carryFromLsr1) 0x80 else 0
     //> rol Mirror_PPU_CTRL_REG1  ;this is to set the proper PPU name table
-    mirrorPpuCtrlReg1 = (mirrorPpuCtrlReg1 shl 1) and 0xFE or if ((orig0 and 0x01) != 0) 1 else 0
+    mirrorPpuCtrlReg1 = (mirrorPpuCtrlReg1 shl 1) and 0xFE or if ((orig2 and 0x01) != 0) 1 else 0
     //> jsr GetAreaMusic          ;load proper music into queue
     getAreaMusic()
     //> lda #$38                  ;load sprite shuffle amounts to be used later
@@ -5200,7 +5202,7 @@ fun areaParserCore() {
     if (Y != 0) {
         //> lda CurrentPageLoc         ;otherwise check for every third page
         A = currentPageLoc
-        loop1@ while ((temp0 and 0xFF and 0x80) == 0) {
+        loop1@ while ((A and 0x80) == 0) {
             //> sec
             //> sbc #$03                   ;if 3 or more, subtract 3 and
             temp0 = A - 0x03
@@ -5269,7 +5271,7 @@ fun areaParserCore() {
             A = 0x03
             //> sta $00
             memory[0x0] = A.toUByte()
-            loop2@ while (memory[0x0].toInt() != 0) {
+            loop2@ while (A != 0) {
                 //> dec $00                    ;decrement until counter expires, barring exception
                 memory[0x0] = ((memory[0x0].toInt() - 1) and 0xFF).toUByte()
                 //> bne SceLoop1
@@ -6226,7 +6228,7 @@ fun areaFrenzy() {
     A = frenzyIDData[-8 + X]
     //> ldy #$05
     Y = 0x05
-    loop0@ while (((A - enemyId[Y]) and 0xFF and 0x80) == 0) {
+    loop0@ while ((Y and 0x80) == 0) {
         //> cmp Enemy_ID,y    ;check for enemy object in buffer versus frenzy object
         //> bne FreCompLoop
     }
@@ -6913,7 +6915,7 @@ fun findEmptyEnemySlot(): Int {
     //> FindEmptyEnemySlot:
     //> ldx #$00          ;start at first enemy slot
     X = 0x00
-    loop0@ while (X != 0x05) {
+    loop0@ while (X != 0) {
         //> inx
         X = (X + 1) and 0xFF
         //> cpx #$05          ;if nonzero, check next value
@@ -10491,9 +10493,11 @@ fun getXPhy(Y: Int) {
     //> beq ExitPhy                ;if the same, branch to leave
     if (A != playerMovingdir) {
         //> asl FrictionAdderLow       ;otherwise shift d7 of friction adder low into carry
-        frictionAdderLow = (frictionAdderLow shl 1) and 0xFF
+        val orig0: Int = frictionAdderLow
+        val carryFromAsl1: Boolean = (orig0 and 0x80) != 0
+        frictionAdderLow = (orig0 shl 1) and 0xFF
         //> rol FrictionAdderHigh      ;then rotate carry onto d0 of friction adder high
-        frictionAdderHigh = (frictionAdderHigh shl 1) and 0xFE or if ((frictionAdderLow and 0x80) != 0) 1 else 0
+        frictionAdderHigh = (frictionAdderHigh shl 1) and 0xFE or if (carryFromAsl1) 1 else 0
     }
     //> ExitPhy:   rts                        ;and then leave
     return
@@ -12561,7 +12565,7 @@ fun findEmptyMiscSlot(): Boolean {
     //> FindEmptyMiscSlot:
     //> ldy #$08                ;start at end of misc objects buffer
     Y = 0x08
-    loop0@ while (Y != 0x05) {
+    loop0@ while (Y != 0) {
         //> dey                     ;decrement offset
         Y = (Y - 1) and 0xFF
         //> cpy #$05                ;do this for three slots
@@ -12572,7 +12576,7 @@ fun findEmptyMiscSlot(): Boolean {
     //> UseMiscS:  sty JumpCoinMiscOffset  ;store offset of misc object buffer here (residual)
     jumpCoinMiscOffset = Y
     //> rts
-    return Y >= 0x05
+    return false
 }
 
 // Decompiled from MiscObjectsCore
@@ -14592,7 +14596,7 @@ fun procLoopCommand(X: Int) {
         if (A == 0) {
             //> ldy #$0b                  ;start at the end of each set of loop data
             Y = 0x0B
-            loop0@ while (((A - loopCmdPageNumber[Y]) and 0xFF and 0x80) == 0) {
+            loop0@ while ((Y and 0x80) == 0) {
                 //> lda WorldNumber           ;check to see if one of the world numbers
                 A = worldNumber
                 //> cmp LoopCmdWorldNumber,y  ;matches our current world number
@@ -16474,7 +16478,7 @@ fun bulletBillCheepCheep(X: Int) {
         //> DoBulletBills:
         //> ldy #$ff                   ;start at beginning of enemy slots
         Y = 0xFF
-        loop0@ while (!(A >= BulletBill_FrenzyVar)) {
+        loop0@ while (!(Y >= 0x05)) {
             //> lda Enemy_Flag,y           ;if enemy buffer flag not set,
             A = enemyFlag[Y]
             //> beq BB_SLoop               ;loop back and check another slot
@@ -22974,7 +22978,7 @@ fun smallPlatformCollision(X: Int, Y: Int) {
             A = 0x02
             //> sta $00                      ;load counter here for 2 bounding boxes
             memory[0x0] = A.toUByte()
-            loop0@ while (memory[0x0].toInt() == 0) {
+            loop0@ while (A == 0) {
                 //> lda BoundingBox_UL_YPos,y  ;check top of platform's bounding box for being
                 A = boundingboxUlYpos[Y]
                 //> cmp #$20                   ;above a specific point
@@ -30833,7 +30837,7 @@ fun noiseSfxHandler() {
     //> ldy NoiseSoundQueue   ;check for sfx in queue
     Y = noiseSoundQueue
     //> beq CheckNoiseBuffer
-    loop0@ while ((noiseSoundQueue and 0x01) != 0) {
+    loop0@ while (flagC) {
         //> PlayBrickShatter:
         //> lda #$20                 ;load length of brick shatter sound
         A = 0x20
@@ -30878,25 +30882,29 @@ fun noiseSfxHandler() {
         //> sty NoiseSoundBuffer  ;if found, put in buffer
         noiseSoundBuffer = Y
         //> lsr NoiseSoundQueue
-        noiseSoundQueue = noiseSoundQueue shr 1
+        val orig1: Int = noiseSoundQueue
+        val carryFromLsr2: Boolean = (orig1 and 0x01) != 0
+        noiseSoundQueue = orig1 shr 1
         //> bcs PlayBrickShatter  ;brick shatter
     }
     //> lsr NoiseSoundQueue
-    noiseSoundQueue = noiseSoundQueue shr 1
+    val orig3: Int = noiseSoundQueue
+    val carryFromLsr4: Boolean = (orig3 and 0x01) != 0
+    noiseSoundQueue = orig3 shr 1
     //> bcs PlayBowserFlame   ;bowser flame
-    if ((noiseSoundQueue and 0x01) == 0) {
+    if (!carryFromLsr4) {
         //> CheckNoiseBuffer:
         //> lda NoiseSoundBuffer      ;check for sfx in buffer
         A = noiseSoundBuffer
         //> beq ExNH                  ;if not found, exit sub
         if (A != 0) {
             //> lsr
-            val orig1: Int = A
-            A = orig1 shr 1
+            val orig5: Int = A
+            A = orig5 shr 1
             //> bcs ContinueBrickShatter  ;brick shatter
             //> lsr
-            val orig2: Int = A
-            A = orig2 shr 1
+            val orig6: Int = A
+            A = orig6 shr 1
             //> bcs ContinueBowserFlame   ;bowser flame
             //> PlayBowserFlame:
             //> lda #$40                    ;load length of bowser flame sound
@@ -30907,8 +30915,8 @@ fun noiseSfxHandler() {
             //> lda Noise_SfxLenCounter
             A = noiseSfxlencounter
             //> lsr
-            val orig3: Int = A
-            A = orig3 shr 1
+            val orig7: Int = A
+            A = orig7 shr 1
             //> tay
             Y = A
             //> ldx #$0f                    ;load reg contents of bowser flame sound
@@ -31064,7 +31072,7 @@ fun handleAreaMusicLoopB(A: Int) {
     areaMusicBuffer = A
     //> cmp #$01                  ;is it ground level music?
     //> bne FindAreaMusicHeader
-    loop0@ while (Y != 0) {
+    loop0@ while (A != 0x01) {
         //> GMLoopB: sty GroundMusicHeaderOfs
         groundMusicHeaderOfs = Y
         //> inc GroundMusicHeaderOfs  ;increment but only if playing ground level music
@@ -31331,7 +31339,7 @@ fun handleSquare2Music() {
         squ1Notelencounter = (squ1Notelencounter - 1) and 0xFF
         //> bne MiscSqu1MusicTasks     ;is it time for more data?
         if (squ1Notelencounter == 0) {
-            loop0@ while (A == 0) {
+            loop0@ while (squ1Notelencounter == 0) {
                 //> lda #$83
                 A = 0x83
                 //> sta SND_SQUARE1_REG        ;store some data into control regs for square 1
@@ -31496,7 +31504,7 @@ fun handleSquare2Music() {
         noiseBeatlencounter = (noiseBeatlencounter - 1) and 0xFF
         //> bne ExitMusicHandler      ;is it time for more data?
         if (noiseBeatlencounter == 0) {
-            loop1@ while (A == 0) {
+            loop1@ while (noiseBeatlencounter == 0) {
                 //> lda NoiseDataLoopbackOfs    ;if data is zero, reload original noise beat offset
                 A = noiseDataLoopbackOfs
                 //> sta MusicOffset_Noise       ;and loopback next time around

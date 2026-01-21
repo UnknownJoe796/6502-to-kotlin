@@ -595,6 +595,13 @@ fun ControlNode.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
             val loopLabel = ctx.pushLoop(this.breakTargets)
             val needsLabel = this.breakTargets.isNotEmpty()
 
+            // by Claude - CRITICAL FIX: For PreTest loops (while loops), save the context state
+            // BEFORE processing the body. This is because the loop condition should be evaluated
+            // using the pre-loop state, not the state after the body has been processed.
+            // This fixes issues where temp variables (like carryFromLsr2) are referenced in the
+            // loop condition but declared inside the loop body.
+            val preBodyState = if (this.kind == LoopKind.PreTest) ctx.saveState() else null
+
             val bodyStmts = this.body.flatMap { it.toKotlin(ctx) }
 
             // by Claude - Pop loop from stack after body is processed
@@ -602,6 +609,9 @@ fun ControlNode.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
 
             val loop = when (this.kind) {
                 LoopKind.PreTest -> {
+                    // by Claude - Restore pre-body state for condition evaluation
+                    // This ensures the condition uses variables that exist BEFORE the loop body
+                    preBodyState?.let { ctx.restoreState(it) }
                     val condition = this.condition?.toKotlinExpr(ctx) ?: KLiteral("true")
                     if (needsLabel) KLabeledWhile(loopLabel, condition, bodyStmts)
                     else KWhile(condition, bodyStmts)

@@ -473,11 +473,42 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                 ctx.zeroFlag = KBinaryOp(result, "==", KLiteral("0"))
                 ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(result, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
             } else {
+                // by Claude - Memory mode ASL
                 val target = this.address.toKotlinExpr(ctx)
                 val readValue = wrapPropertyRead(target)
-                // Carry flag = bit 7 of original value (shifted out)
-                ctx.carryFlag = KBinaryOp(KParen(KBinaryOp(readValue, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
-                val shifted = KBinaryOp(KParen(KBinaryOp(readValue, "shl", KLiteral("1"))), "and", KLiteral("0xFF"))
+
+                // by Claude - CRITICAL FIX: Capture original value BEFORE the shift
+                // The carry flag must test bit 7 of the ORIGINAL value, not the shifted result.
+                //
+                // We use TWO temp variables:
+                // 1. origN: captures the original Int value (for use in shift calculation)
+                // 2. carryFromAslN: captures the carry decision as a boolean
+                //
+                // The carry flag expression uses the carryFromAslN variable, which ensures:
+                // - For ASL/ROL sequences: The carry boolean is pre-computed BEFORE the memory
+                //   is modified, so ROL gets the correct carry value.
+                // - For control flow: The carry boolean variable name can be referenced in loop
+                //   conditions. If control flow creates a loop where this variable is out of
+                //   scope, it's a control flow analysis issue, not an instruction handler issue.
+                val originalValue: KotlinExpr
+                if (readValue is KVar) {
+                    // Capture the original value into a temp variable
+                    val origVarName = "orig${ctx.nextFlagVar()}"
+                    stmts.add(KVarDecl(origVarName, "Int", readValue, mutable = false))
+                    originalValue = KVar(origVarName)
+
+                    // Capture the carry decision as a boolean variable
+                    val carryVarName = "carryFromAsl${ctx.nextFlagVar()}"
+                    val carryExpr = KBinaryOp(KParen(KBinaryOp(originalValue, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+                    stmts.add(KVarDecl(carryVarName, "Boolean", carryExpr, mutable = false))
+                    ctx.carryFlag = KVar(carryVarName)
+                } else {
+                    // Expression is immutable, safe to reference directly
+                    originalValue = readValue
+                    ctx.carryFlag = KBinaryOp(KParen(KBinaryOp(originalValue, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+                }
+
+                val shifted = KBinaryOp(KParen(KBinaryOp(originalValue, "shl", KLiteral("1"))), "and", KLiteral("0xFF"))
                 val wrappedShifted = wrapPropertyWrite(target, shifted)
                 stmts.add(KAssignment(target, wrappedShifted))
                 ctx.zeroFlag = KBinaryOp(shifted, "==", KLiteral("0"))
@@ -514,11 +545,32 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                 ctx.zeroFlag = KBinaryOp(result, "==", KLiteral("0"))
                 ctx.negativeFlag = KLiteral("false")  // LSR always clears N (bit 7 becomes 0)
             } else {
+                // by Claude - Memory mode LSR
                 val target = this.address.toKotlinExpr(ctx)
                 val readValue = wrapPropertyRead(target)
-                // Carry flag = bit 0 of original value (shifted out)
-                ctx.carryFlag = KBinaryOp(KParen(KBinaryOp(readValue, "and", KLiteral("0x01"))), "!=", KLiteral("0"))
-                val shifted = KBinaryOp(readValue, "shr", KLiteral("1"))
+
+                // by Claude - CRITICAL FIX: Capture original value BEFORE the shift
+                // The carry flag must test bit 0 of the ORIGINAL value, not the shifted result.
+                // See ASL memory mode handler for detailed explanation.
+                val originalValue: KotlinExpr
+                if (readValue is KVar) {
+                    // Capture the original value into a temp variable
+                    val origVarName = "orig${ctx.nextFlagVar()}"
+                    stmts.add(KVarDecl(origVarName, "Int", readValue, mutable = false))
+                    originalValue = KVar(origVarName)
+
+                    // Capture the carry decision as a boolean variable
+                    val carryVarName = "carryFromLsr${ctx.nextFlagVar()}"
+                    val carryExpr = KBinaryOp(KParen(KBinaryOp(originalValue, "and", KLiteral("0x01"))), "!=", KLiteral("0"))
+                    stmts.add(KVarDecl(carryVarName, "Boolean", carryExpr, mutable = false))
+                    ctx.carryFlag = KVar(carryVarName)
+                } else {
+                    // Expression is immutable, safe to reference directly
+                    originalValue = readValue
+                    ctx.carryFlag = KBinaryOp(KParen(KBinaryOp(originalValue, "and", KLiteral("0x01"))), "!=", KLiteral("0"))
+                }
+
+                val shifted = KBinaryOp(originalValue, "shr", KLiteral("1"))
                 val wrappedShifted = wrapPropertyWrite(target, shifted)
                 stmts.add(KAssignment(target, wrappedShifted))
                 ctx.zeroFlag = KBinaryOp(shifted, "==", KLiteral("0"))
