@@ -1092,10 +1092,13 @@ fun gameMenuRoutine() {
         Y = (Y + 1) and 0xFF
         //> sty VRAM_Buffer1+3          ;null terminator
         vramBuffer1[3] = Y
-        //  SKIPPED: Fall-through to nullJoypad would create mutual recursion cycle
+        //  Fall-through tail call to nullJoypad
+        nullJoypad()
         return
     }
-    // SKIPPED: Fall-through to nullJoypad would create mutual recursion cycle
+    // Fall-through tail call to nullJoypad
+    nullJoypad()
+    return
 }
 
 // Decompiled from NullJoypad
@@ -1106,9 +1109,9 @@ fun nullJoypad() {
     A = 0x00
     //> sta SavedJoypad1Bits
     savedJoypad1Bits = A
-    //  SKIPPED: Fall-through to runDemo would create mutual recursion cycle
+    //  Fall-through tail call to runDemo
+    runDemo()
     return
-    // SKIPPED: Fall-through to runDemo would create mutual recursion cycle
 }
 
 // Decompiled from RunDemo
@@ -1125,7 +1128,8 @@ fun runDemo() {
     A = gameEngineSubroutine
     //> cmp #$06
     //> bne ExitMenu                ;if not, do not do all the resetting below
-    //  SKIPPED: Fall-through to gameMenuRoutine would create mutual recursion cycle
+    //  Fall-through tail call to chkContinue
+    chkContinue(A)
     return
     if (A == 0x06) {
         //> ResetTitle:   lda #$00                    ;reset game modes, disable
@@ -1144,7 +1148,6 @@ fun runDemo() {
         //> ExitMenu:     rts
         return
     }
-    // SKIPPED: Fall-through to gameMenuRoutine would create mutual recursion cycle
 }
 
 // Decompiled from ChkContinue
@@ -1671,9 +1674,6 @@ fun playerEndWorld() {
             A = GameModeValue
             //> sta OperMode               ;set mode of operation to game mode
             operMode = A
-            //  Fall-through tail call to floateyNumbersRoutine
-            floateyNumbersRoutine(0)
-            return
         }
     }
     //> EndExitOne:    rts                        ;and leave
@@ -2017,8 +2017,8 @@ fun setvramaddrA(X: Int) {
     var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
     //> SetVRAMAddr_A: stx VRAM_Buffer_AddrCtrl ;store offset into buffer control
     vramBufferAddrctrl = X
-    //  Fall-through tail call to initScreen
-    initScreen()
+    //> NextSubtask:   jmp IncSubtask           ;move onto next task
+    incSubtask()
     return
 }
 
@@ -2159,14 +2159,14 @@ fun getAlternatePalette1() {
     if (A == 0x01) {
         //> lda #$0b                 ;if found, load appropriate palette
         A = 0x0B
-        //  SKIPPED: Fall-through to setvramaddrB would create mutual recursion cycle
+        //  Fall-through tail call to setvramaddrB
+        setvramaddrB(A)
         return
     } else {
         //> NoAltPal:      jmp IncSubtask           ;now onto the next task
         incSubtask()
         return
     }
-    // SKIPPED: Fall-through to setvramaddrB would create mutual recursion cycle
 }
 
 // Decompiled from SetVRAMAddr_B
@@ -2174,9 +2174,9 @@ fun setvramaddrB(A: Int) {
     var vramBufferAddrctrl by MemoryByte(VRAM_Buffer_AddrCtrl)
     //> SetVRAMAddr_B: sta VRAM_Buffer_AddrCtrl
     vramBufferAddrctrl = A
-    //  SKIPPED: Fall-through to getAlternatePalette1 would create mutual recursion cycle
+    //> NoAltPal:      jmp IncSubtask           ;now onto the next task
+    incSubtask()
     return
-    // SKIPPED: Fall-through to getAlternatePalette1 would create mutual recursion cycle
 }
 
 // Decompiled from WriteTopStatusLine
@@ -2735,13 +2735,13 @@ fun resetSpritesAndScreenTimer() {
     if (A == 0) {
         //> jsr MoveAllSpritesOffscreen ;otherwise reset sprites now
         moveAllSpritesOffscreen()
-        //  Fall-through tail call to resetScreenTimer
-        resetScreenTimer()
+        //  SKIPPED: Fall-through to resetScreenTimer would create mutual recursion cycle
         return
     } else {
         //> NoReset: rts
         return
     }
+    // SKIPPED: Fall-through to resetScreenTimer would create mutual recursion cycle
 }
 
 // Decompiled from ResetScreenTimer
@@ -2756,8 +2756,9 @@ fun resetScreenTimer() {
     screenTimer = A
     //> inc ScreenRoutineTask       ;move onto next task
     screenRoutineTask = (screenRoutineTask + 1) and 0xFF
-    //> NoReset: rts
+    //  SKIPPED: Fall-through to resetSpritesAndScreenTimer would create mutual recursion cycle
     return
+    // SKIPPED: Fall-through to resetSpritesAndScreenTimer would create mutual recursion cycle
 }
 
 // Decompiled from RenderAreaGraphics
@@ -2765,10 +2766,15 @@ fun renderAreaGraphics() {
     var A: Int = 0
     var X: Int = 0
     var Y: Int = 0
+    var temp0: Int = 0
+    var areaParserTaskNum by MemoryByte(AreaParserTaskNum)
     var currentColumnPos by MemoryByte(CurrentColumnPos)
     var currentntaddrHigh by MemoryByte(CurrentNTAddr_High)
     var currentntaddrLow by MemoryByte(CurrentNTAddr_Low)
     var vramBuffer2Offset by MemoryByte(VRAM_Buffer2_Offset)
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    val metatilegraphicsHigh by MemoryByteIndexed(MetatileGraphics_High)
+    val metatilegraphicsLow by MemoryByteIndexed(MetatileGraphics_Low)
     val vramBuffer2 by MemoryByteIndexed(VRAM_Buffer2)
     //> RenderAreaGraphics:
     //> lda CurrentColumnPos         ;store LSB of where we're at
@@ -2799,42 +2805,6 @@ fun renderAreaGraphics() {
     memory[0x4] = A.toUByte()
     //> tax
     X = A
-    //  Fall-through tail call to setAttrib
-    setAttrib(Y)
-    return
-}
-
-// Decompiled from SetAttrib
-fun setAttrib(Y: Int) {
-    var A: Int = 0
-    var X: Int = 0
-    var Y: Int = Y
-    var temp0: Int = 0
-    var areaParserTaskNum by MemoryByte(AreaParserTaskNum)
-    var currentntaddrHigh by MemoryByte(CurrentNTAddr_High)
-    var currentntaddrLow by MemoryByte(CurrentNTAddr_Low)
-    var vramBuffer2Offset by MemoryByte(VRAM_Buffer2_Offset)
-    val attributeBuffer by MemoryByteIndexed(AttributeBuffer)
-    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
-    val metatilegraphicsHigh by MemoryByteIndexed(MetatileGraphics_High)
-    val metatilegraphicsLow by MemoryByteIndexed(MetatileGraphics_Low)
-    val vramBuffer2 by MemoryByteIndexed(VRAM_Buffer2)
-    //> SetAttrib:  lda AttributeBuffer,y        ;get previously saved bits from before
-    A = attributeBuffer[Y]
-    //> ora $03                      ;if any, and put new bits, if any, onto
-    A = A or memory[0x3].toInt()
-    //> sta AttributeBuffer,y        ;the old, and store
-    attributeBuffer[Y] = A
-    //> inc $00                      ;increment vram buffer offset by 2
-    memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
-    //> inc $00
-    memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
-    //> ldx $01                      ;get current gfx buffer row, and check for
-    X = memory[0x1].toInt()
-    //> inx                          ;the bottom of the screen
-    X = (X + 1) and 0xFF
-    //> cpx #$0d
-    //> bcc DrawMTLoop               ;if not there yet, loop back
     //> DrawMTLoop: stx $01                      ;store init value of 0 or incremented offset for buffer
     memory[0x1] = X.toUByte()
     //> lda MetatileBuffer,x         ;get first metatile number, and mask out all but 2 MSB
@@ -2911,14 +2881,171 @@ fun setAttrib(Y: Int) {
         A = orig6 shr 1
         //> bcs LLeft
         if ((orig6 and 0x01) == 0) {
-            while (true) {
-                //> rol $03                      ;rotate attribute bits 3 to the left
-                memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((orig6 and 0x01) != 0) 1 else 0) and 0xFF).toUByte()
-                //> rol $03                      ;thus in d1-d0, for upper left square
-                memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
-                //> rol $03
-                memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
-                //> jmp SetAttrib
+            //> rol $03                      ;rotate attribute bits 3 to the left
+            memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((orig6 and 0x01) != 0) 1 else 0) and 0xFF).toUByte()
+            //> rol $03                      ;thus in d1-d0, for upper left square
+            memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
+            //> rol $03
+            memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
+            //> jmp SetAttrib
+            setAttrib(Y)
+            return
+        }
+    }
+    //> RightCheck: lda $01                      ;get LSB of current row we're rendering
+    A = memory[0x1].toInt()
+    //> lsr                          ;branch if set (clear = top right, set = bottom right)
+    val orig7: Int = A
+    A = orig7 shr 1
+    //> bcs NextMTRow
+    if ((orig7 and 0x01) == 0) {
+        //> lsr $03                      ;shift attribute bits 4 to the right
+        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+        //> lsr $03                      ;thus in d3-d2, for upper right square
+        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+        //> lsr $03
+        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+        //> lsr $03
+        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+        //> jmp SetAttrib
+        setAttrib(Y)
+        return
+        //> LLeft:      lsr $03                      ;shift attribute bits 2 to the right
+        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+        //> lsr $03                      ;thus in d5-d4 for lower left square
+        memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+    }
+    //> NextMTRow:  inc $04                      ;move onto next attribute row
+    memory[0x4] = ((memory[0x4].toInt() + 1) and 0xFF).toUByte()
+    //  Fall-through tail call to setAttrib
+    setAttrib(Y)
+    return
+}
+
+// Decompiled from SetAttrib
+fun setAttrib(Y: Int) {
+    var A: Int = 0
+    var X: Int = 0
+    var Y: Int = Y
+    var temp0: Int = 0
+    var areaParserTaskNum by MemoryByte(AreaParserTaskNum)
+    var currentntaddrHigh by MemoryByte(CurrentNTAddr_High)
+    var currentntaddrLow by MemoryByte(CurrentNTAddr_Low)
+    var vramBuffer2Offset by MemoryByte(VRAM_Buffer2_Offset)
+    val attributeBuffer by MemoryByteIndexed(AttributeBuffer)
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
+    val metatilegraphicsHigh by MemoryByteIndexed(MetatileGraphics_High)
+    val metatilegraphicsLow by MemoryByteIndexed(MetatileGraphics_Low)
+    val vramBuffer2 by MemoryByteIndexed(VRAM_Buffer2)
+    //> SetAttrib:  lda AttributeBuffer,y        ;get previously saved bits from before
+    A = attributeBuffer[Y]
+    //> ora $03                      ;if any, and put new bits, if any, onto
+    A = A or memory[0x3].toInt()
+    //> sta AttributeBuffer,y        ;the old, and store
+    attributeBuffer[Y] = A
+    //> inc $00                      ;increment vram buffer offset by 2
+    memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
+    //> inc $00
+    memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
+    //> ldx $01                      ;get current gfx buffer row, and check for
+    X = memory[0x1].toInt()
+    //> inx                          ;the bottom of the screen
+    X = (X + 1) and 0xFF
+    //> cpx #$0d
+    //> bcc DrawMTLoop               ;if not there yet, loop back
+    if (!(X >= 0x0D)) {
+        //  goto DrawMTLoop
+        return
+    } else {
+        //> DrawMTLoop: stx $01                      ;store init value of 0 or incremented offset for buffer
+        memory[0x1] = X.toUByte()
+        //> lda MetatileBuffer,x         ;get first metatile number, and mask out all but 2 MSB
+        A = metatileBuffer[X]
+        //> and #%11000000
+        A = A and 0xC0
+        //> sta $03                      ;store attribute table bits here
+        memory[0x3] = A.toUByte()
+        //> asl                          ;note that metatile format is:
+        val orig0: Int = A
+        A = (orig0 shl 1) and 0xFF
+        //> rol                          ;%xx000000 - attribute table bits,
+        val orig1: Int = A
+        A = (orig1 shl 1) and 0xFE or if ((orig0 and 0x80) != 0) 1 else 0
+        //> rol                          ;%00xxxxxx - metatile number
+        val orig2: Int = A
+        A = (orig2 shl 1) and 0xFE or if ((orig1 and 0x80) != 0) 1 else 0
+        //> tay                          ;rotate bits to d1-d0 and use as offset here
+        Y = A
+        //> lda MetatileGraphics_Low,y   ;get address to graphics table from here
+        A = metatilegraphicsLow[Y]
+        //> sta $06
+        memory[0x6] = A.toUByte()
+        //> lda MetatileGraphics_High,y
+        A = metatilegraphicsHigh[Y]
+        //> sta $07
+        memory[0x7] = A.toUByte()
+        //> lda MetatileBuffer,x         ;get metatile number again
+        A = metatileBuffer[X]
+        //> asl                          ;multiply by 4 and use as tile offset
+        val orig3: Int = A
+        A = (orig3 shl 1) and 0xFF
+        //> asl
+        val orig4: Int = A
+        A = (orig4 shl 1) and 0xFF
+        //> sta $02
+        memory[0x2] = A.toUByte()
+        //> lda AreaParserTaskNum        ;get current task number for level processing and
+        A = areaParserTaskNum
+        //> and #%00000001               ;mask out all but LSB, then invert LSB, multiply by 2
+        A = A and 0x01
+        //> eor #%00000001               ;to get the correct column position in the metatile,
+        A = A xor 0x01
+        //> asl                          ;then add to the tile offset so we can draw either side
+        val orig5: Int = A
+        A = (orig5 shl 1) and 0xFF
+        //> adc $02                      ;of the metatiles
+        temp0 = A + memory[0x2].toInt() + if ((orig5 and 0x80) != 0) 1 else 0
+        A = temp0 and 0xFF
+        //> tay
+        Y = A
+        //> ldx $00                      ;use vram buffer offset from before as X
+        X = memory[0x0].toInt()
+        //> lda ($06),y
+        A = memory[readWord(0x6) + Y].toInt()
+        //> sta VRAM_Buffer2+3,x         ;get first tile number (top left or top right) and store
+        vramBuffer2[3 + X] = A
+        //> iny
+        Y = (Y + 1) and 0xFF
+        //> lda ($06),y                  ;now get the second (bottom left or bottom right) and store
+        A = memory[readWord(0x6) + Y].toInt()
+        //> sta VRAM_Buffer2+4,x
+        vramBuffer2[4 + X] = A
+        //> ldy $04                      ;get current attribute row
+        Y = memory[0x4].toInt()
+        //> lda $05                      ;get LSB of current column where we're at, and
+        A = memory[0x5].toInt()
+        //> bne RightCheck               ;branch if set (clear = left attrib, set = right)
+        //  SKIPPED: Fall-through to renderAreaGraphics would create mutual recursion cycle
+        return
+        if (A == 0) {
+            //> lda $01                      ;get current row we're rendering
+            A = memory[0x1].toInt()
+            //> lsr                          ;branch if LSB set (clear = top left, set = bottom left)
+            val orig6: Int = A
+            A = orig6 shr 1
+            //> bcs LLeft
+            //  SKIPPED: Fall-through to renderAreaGraphics would create mutual recursion cycle
+            return
+            if ((orig6 and 0x01) == 0) {
+                while (true) {
+                    //> rol $03                      ;rotate attribute bits 3 to the left
+                    memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((orig6 and 0x01) != 0) 1 else 0) and 0xFF).toUByte()
+                    //> rol $03                      ;thus in d1-d0, for upper left square
+                    memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
+                    //> rol $03
+                    memory[0x3] = (((memory[0x3].toInt() shl 1) and 0xFE or if ((memory[0x3].toInt() and 0x80) != 0) 1 else 0) and 0xFF).toUByte()
+                    //> jmp SetAttrib
+                }
             }
         }
     }
@@ -2928,6 +3055,8 @@ fun setAttrib(Y: Int) {
     val orig7: Int = A
     A = orig7 shr 1
     //> bcs NextMTRow
+    //  SKIPPED: Fall-through to renderAreaGraphics would create mutual recursion cycle
+    return
     if ((orig7 and 0x01) == 0) {
         while (true) {
             //> lsr $03                      ;shift attribute bits 4 to the right
@@ -2944,9 +3073,12 @@ fun setAttrib(Y: Int) {
         memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
         //> lsr $03                      ;thus in d5-d4 for lower left square
         memory[0x3] = ((memory[0x3].toInt() shr 1) and 0xFF).toUByte()
+        //  SKIPPED: Fall-through to renderAreaGraphics would create mutual recursion cycle
+        return
+    } else {
+        //> NextMTRow:  inc $04                      ;move onto next attribute row
+        memory[0x4] = ((memory[0x4].toInt() + 1) and 0xFF).toUByte()
     }
-    //> NextMTRow:  inc $04                      ;move onto next attribute row
-    memory[0x4] = ((memory[0x4].toInt() + 1) and 0xFF).toUByte()
     //> ldy $00                      ;get current vram buffer offset, increment by 3
     Y = memory[0x0].toInt()
     //> iny                          ;(for name table address and length bytes)
@@ -3872,6 +4004,9 @@ fun digitsMathRoutine(Y: Int) {
     if (A != TitleScreenModeValue) {
         //> ldx #$05
         X = 0x05
+        //  Fall-through tail call to storeNewD
+        storeNewD(A, X, Y)
+        return
         //> AddModLoop: lda DigitModifier,x       ;load digit amount to increment
         A = digitModifier[X]
         //> clc
@@ -3879,10 +4014,14 @@ fun digitsMathRoutine(Y: Int) {
         temp0 = A + displayDigits[Y]
         A = temp0 and 0xFF
         //> bmi BorrowOne             ;if result is a negative number, branch to subtract
+        //  Fall-through tail call to storeNewD
+        storeNewD(A, X, Y)
+        return
         if ((temp0 and 0xFF and 0x80) == 0) {
             //> cmp #10
             //> bcs CarryOne              ;if digit greater than $09, branch to add
-            //  SKIPPED: Fall-through to storeNewD would create mutual recursion cycle
+            //  Fall-through tail call to storeNewD
+            storeNewD(A, X, Y)
             return
         }
     }
@@ -3890,22 +4029,19 @@ fun digitsMathRoutine(Y: Int) {
     A = 0x00
     //> ldx #$06                  ;start with the last digit
     X = 0x06
-    loop0@ do {
-        //> EraseMLoop: sta DigitModifier-1,x     ;initialize the digit amounts to increment
-        digitModifier[-1 + X] = A
-        //> dex
-        X = (X - 1) and 0xFF
-        //> bpl EraseMLoop            ;do this until they're all reset, then leave
-    } while ((X and 0x80) == 0)
-    //> rts
+    //  Fall-through tail call to storeNewD
+    storeNewD(A, X, Y)
     return
-    // SKIPPED: Fall-through to storeNewD would create mutual recursion cycle
 }
 
 // Decompiled from StoreNewD
 fun storeNewD(A: Int, X: Int, Y: Int) {
+    var A: Int = A
     var X: Int = X
     var Y: Int = Y
+    var temp0: Int = 0
+    var temp1: Int = 0
+    val digitModifier by MemoryByteIndexed(DigitModifier)
     val displayDigits by MemoryByteIndexed(DisplayDigits)
     //> StoreNewD:  sta DisplayDigits,y       ;store as new score or game timer digit
     displayDigits[Y] = A
@@ -3914,13 +4050,53 @@ fun storeNewD(A: Int, X: Int, Y: Int) {
     //> dex                       ;and digit amounts to increment
     X = (X - 1) and 0xFF
     //> bpl AddModLoop            ;loop back if we're not done yet
-    if (!((X and 0x80) != 0)) {
-        //  goto AddModLoop
+    //> AddModLoop: lda DigitModifier,x       ;load digit amount to increment
+    A = digitModifier[X]
+    //> clc
+    //> adc DisplayDigits,y       ;add to current digit
+    temp0 = A + displayDigits[Y]
+    A = temp0 and 0xFF
+    //> bmi BorrowOne             ;if result is a negative number, branch to subtract
+    X = X
+    Y = Y
+    if ((temp0 and 0xFF and 0x80) == 0) {
+        loop0@ do {
+            //> cmp #10
+            //> bcs CarryOne              ;if digit greater than $09, branch to add
+            if (A >= 0x0A) {
+                //  goto CarryOne
+                break@loop0
+            }
+        } while (!(A >= 0x0A))
+        //> EraseDMods: lda #$00                  ;store zero here
+        A = 0x00
+        //> ldx #$06                  ;start with the last digit
+        X = 0x06
+        loop1@ do {
+            //> EraseMLoop: sta DigitModifier-1,x     ;initialize the digit amounts to increment
+            digitModifier[-1 + X] = A
+            //> dex
+            X = (X - 1) and 0xFF
+            //> bpl EraseMLoop            ;do this until they're all reset, then leave
+        } while ((X and 0x80) == 0)
+        //> rts
         return
+    } else {
+        //> BorrowOne:  dec DigitModifier-1,x     ;decrement the previous digit, then put $09 in
+        digitModifier[-1 + X] = (digitModifier[-1 + X] - 1) and 0xFF
+        //> lda #$09                  ;the game timer digit we're currently on to "borrow
+        A = 0x09
+        //> bne StoreNewD             ;the one", then do an unconditional branch back
     }
-    //  SKIPPED: Fall-through to digitsMathRoutine would create mutual recursion cycle
-    return
-    // SKIPPED: Fall-through to digitsMathRoutine would create mutual recursion cycle
+    while (true) {
+        //> CarryOne:   sec                       ;subtract ten from our digit to make it a
+        //> sbc #10                   ;proper BCD number, then increment the digit
+        temp1 = A - 0x0A
+        A = temp1 and 0xFF
+        //> inc DigitModifier-1,x     ;preceding current digit to "carry the one" properly
+        digitModifier[-1 + X] = (digitModifier[-1 + X] + 1) and 0xFF
+        //> jmp StoreNewD             ;go back to just after we branched here
+    }
 }
 
 // Decompiled from UpdateTopScore
@@ -5318,26 +5494,6 @@ fun storeMT(A: Int) {
 
 // Decompiled from ProcessAreaData
 fun processAreaData() {
-    var X: Int = 0
-    //> ProcessAreaData:
-    //> ldx #$02                 ;start at the end of area object buffer
-    X = 0x02
-    //  Fall-through tail call to chkLength
-    chkLength()
-    return
-}
-
-// Decompiled from NextAObj
-fun nextAObj() {
-    //> NextAObj:   jsr IncAreaObjOffset     ;increment buffer offset and move on
-    incAreaObjOffset()
-    //  SKIPPED: Fall-through to chkLength would create mutual recursion cycle
-    return
-    // SKIPPED: Fall-through to chkLength would create mutual recursion cycle
-}
-
-// Decompiled from ChkLength
-fun chkLength() {
     var A: Int = 0
     var X: Int = 0
     var Y: Int = 0
@@ -5349,11 +5505,9 @@ fun chkLength() {
     var currentPageLoc by MemoryByte(CurrentPageLoc)
     var objectOffset by MemoryByte(ObjectOffset)
     val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
-    //> ChkLength:  ldx ObjectOffset         ;get buffer offset
-    X = objectOffset
-    //> lda AreaObjectLength,x   ;check object length for anything stored here
-    A = areaObjectLength[X]
-    //> bmi ProcLoopb            ;if not, branch to handle loopback
+    //> ProcessAreaData:
+    //> ldx #$02                 ;start at the end of area object buffer
+    X = 0x02
     //> ProcADLoop: stx ObjectOffset
     objectOffset = X
     //> lda #$00                 ;reset flag
@@ -5440,17 +5594,164 @@ fun chkLength() {
             A = areaObjectPageLoc
             //> cmp CurrentPageLoc       ;behind current page of renderer
             //> bcc SetBehind            ;if so branch
+        } else {
+            //> RdyDecode:  jsr DecodeAreaData       ;do sub and do not turn on flag
+            decodeAreaData(X)
+            //> jmp ChkLength
+            chkLength()
+            return
         }
-    }
-    while (true) {
+    } else {
         //> RdyDecode:  jsr DecodeAreaData       ;do sub and do not turn on flag
         decodeAreaData(X)
         //> jmp ChkLength
+        chkLength()
+        return
     }
     //> SetBehind:  inc BehindAreaParserFlag ;turn on flag if object is behind renderer
     behindAreaParserFlag = (behindAreaParserFlag + 1) and 0xFF
-    //  SKIPPED: Fall-through to nextAObj would create mutual recursion cycle
+    //  Fall-through tail call to nextAObj
+    nextAObj()
     return
+}
+
+// Decompiled from NextAObj
+fun nextAObj() {
+    //> NextAObj:   jsr IncAreaObjOffset     ;increment buffer offset and move on
+    incAreaObjOffset()
+    //  Fall-through tail call to chkLength
+    chkLength()
+    return
+}
+
+// Decompiled from ChkLength
+fun chkLength() {
+    var A: Int = 0
+    var X: Int = 0
+    var Y: Int = 0
+    var areaDataOffset by MemoryByte(AreaDataOffset)
+    var areaObjectPageLoc by MemoryByte(AreaObjectPageLoc)
+    var areaObjectPageSel by MemoryByte(AreaObjectPageSel)
+    var backloadingFlag by MemoryByte(BackloadingFlag)
+    var behindAreaParserFlag by MemoryByte(BehindAreaParserFlag)
+    var currentPageLoc by MemoryByte(CurrentPageLoc)
+    var objectOffset by MemoryByte(ObjectOffset)
+    val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
+    //> ChkLength:  ldx ObjectOffset         ;get buffer offset
+    X = objectOffset
+    //> lda AreaObjectLength,x   ;check object length for anything stored here
+    A = areaObjectLength[X]
+    //> bmi ProcLoopb            ;if not, branch to handle loopback
+    //> ProcADLoop: stx ObjectOffset
+    objectOffset = X
+    //> lda #$00                 ;reset flag
+    A = 0x00
+    //> sta BehindAreaParserFlag
+    behindAreaParserFlag = A
+    //> ldy AreaDataOffset       ;get offset of area data pointer
+    Y = areaDataOffset
+    //> lda (AreaData),y         ;get first byte of area object
+    A = memory[readWord(AreaData) + Y].toInt()
+    //> cmp #$fd                 ;if end-of-area, skip all this crap
+    //> beq RdyDecode
+    //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
+    return
+    if (A != 0xFD) {
+        //> lda AreaObjectLength,x   ;check area object buffer flag
+        A = areaObjectLength[X]
+        //> bpl RdyDecode            ;if buffer not negative, branch, otherwise
+        //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
+        return
+        if ((A and 0x80) != 0) {
+            //> iny
+            Y = (Y + 1) and 0xFF
+            //> lda (AreaData),y         ;get second byte of area object
+            A = memory[readWord(AreaData) + Y].toInt()
+            //> asl                      ;check for page select bit (d7), branch if not set
+            val orig0: Int = A
+            A = (orig0 shl 1) and 0xFF
+            //> bcc Chk1Row13
+            //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
+            return
+            if ((orig0 and 0x80) != 0) {
+                //> lda AreaObjectPageSel    ;check page select
+                A = areaObjectPageSel
+                //> bne Chk1Row13
+                //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
+                return
+                if (A == 0) {
+                    //> inc AreaObjectPageSel    ;if not already set, set it now
+                    areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
+                    //> inc AreaObjectPageLoc    ;and increment page location
+                    areaObjectPageLoc = (areaObjectPageLoc + 1) and 0xFF
+                    //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
+                    return
+                }
+            }
+            //> Chk1Row13:  dey
+            Y = (Y - 1) and 0xFF
+            //> lda (AreaData),y         ;reread first byte of level object
+            A = memory[readWord(AreaData) + Y].toInt()
+            //> and #$0f                 ;mask out high nybble
+            A = A and 0x0F
+            //> cmp #$0d                 ;row 13?
+            //> bne Chk1Row14
+            //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
+            return
+            if (A == 0x0D) {
+                //> iny                      ;if so, reread second byte of level object
+                Y = (Y + 1) and 0xFF
+                //> lda (AreaData),y
+                A = memory[readWord(AreaData) + Y].toInt()
+                //> dey                      ;decrement to get ready to read first byte
+                Y = (Y - 1) and 0xFF
+                //> and #%01000000           ;check for d6 set (if not, object is page control)
+                A = A and 0x40
+                //> bne CheckRear
+                //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
+                return
+                if (A == 0) {
+                    //> lda AreaObjectPageSel    ;if page select is set, do not reread
+                    A = areaObjectPageSel
+                    //> bne CheckRear
+                    //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
+                    return
+                    if (A == 0) {
+                        //> iny                      ;if d6 not set, reread second byte
+                        Y = (Y + 1) and 0xFF
+                        //> lda (AreaData),y
+                        A = memory[readWord(AreaData) + Y].toInt()
+                        //> and #%00011111           ;mask out all but 5 LSB and store in page control
+                        A = A and 0x1F
+                        //> sta AreaObjectPageLoc
+                        areaObjectPageLoc = A
+                        //> inc AreaObjectPageSel    ;increment page select
+                        areaObjectPageSel = (areaObjectPageSel + 1) and 0xFF
+                        //> jmp NextAObj
+                        nextAObj()
+                        return
+                    }
+                }
+            }
+            //> Chk1Row14:  cmp #$0e                 ;row 14?
+            //> bne CheckRear
+            //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
+            return
+            if (A == 0x0E) {
+                //> lda BackloadingFlag      ;check flag for saved page number and branch if set
+                A = backloadingFlag
+                //> bne RdyDecode            ;to render the object (otherwise bg might not look right)
+                //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
+                return
+            }
+            //> CheckRear:  lda AreaObjectPageLoc    ;check to see if current page of level object is
+            A = areaObjectPageLoc
+            //> cmp CurrentPageLoc       ;behind current page of renderer
+            //> bcc SetBehind            ;if so branch
+            //  SKIPPED: Fall-through to processAreaData would create mutual recursion cycle
+            return
+        }
+    }
 }
 
 // Decompiled from IncAreaObjOffset
@@ -5482,7 +5783,6 @@ fun decodeAreaData(X: Int) {
     //> bmi Chk1stB
     //> EndAParse:  rts
     return
-    // SKIPPED: Fall-through to moveAOId would create mutual recursion cycle
 }
 
 // Decompiled from MoveAOId
@@ -5500,9 +5800,9 @@ fun moveAOId(A: Int, X: Int) {
     //> lsr
     val orig3: Int = A
     A = orig3 shr 1
-    //  SKIPPED: Fall-through to normObj would create mutual recursion cycle
+    //  Fall-through tail call to normObj
+    normObj(A, X)
     return
-    // SKIPPED: Fall-through to normObj would create mutual recursion cycle
 }
 
 // Decompiled from NormObj
@@ -5544,8 +5844,6 @@ fun normObj(A: Int, X: Int) {
                 //> lda BackloadingFlag        ;if so, check backloading flag
                 A = backloadingFlag
                 //> bne StrAObj                ;if set, branch to render object, else leave
-                //  SKIPPED: Fall-through to decodeAreaData would create mutual recursion cycle
-                return
                 //> InitRear: lda BackloadingFlag        ;check backloading flag to see if it's been initialized
                 A = backloadingFlag
                 //> beq BackColC               ;branch to column-wise check
@@ -7475,8 +7773,7 @@ fun getAreaObjectID(): Int {
     A = temp0 and 0xFF
     //> tay        ;save to Y
     Y = A
-    //  Fall-through tail call to hidden1UpBlock
-    hidden1UpBlock(0, Y)
+    //> ExitDecBlock: rts
     return Y
 }
 
@@ -9099,13 +9396,13 @@ fun chgAreaPipe(Y: Int) {
     if (changeAreaTimer == 0) {
         //> sty AltEntranceControl    ;when timer expires set mode of alternate entry
         altEntranceControl = Y
-        //  Fall-through tail call to chgAreaMode
-        chgAreaMode()
+        //  SKIPPED: Fall-through to chgAreaMode would create mutual recursion cycle
         return
     } else {
         //> ExitCAPipe:  rts                       ;leave
         return
     }
+    // SKIPPED: Fall-through to chgAreaMode would create mutual recursion cycle
 }
 
 // Decompiled from ChgAreaMode
@@ -9122,7 +9419,9 @@ fun chgAreaMode(): Int {
     opermodeTask = A
     //> sta Sprite0HitDetectFlag  ;disable sprite 0 check
     sprite0HitDetectFlag = A
-    //> ExitCAPipe:  rts                       ;leave
+    //  SKIPPED: Fall-through to chgAreaPipe would create mutual recursion cycle
+    return A
+    // SKIPPED: Fall-through to chgAreaPipe would create mutual recursion cycle
     return A
 }
 
@@ -9478,13 +9777,13 @@ fun playerEndLevel() {
         }
         //> inc Hidden1UpFlag         ;otherwise set hidden 1-up box control flag
         hidden1UpFlag = (hidden1UpFlag + 1) and 0xFF
-        //  SKIPPED: Fall-through to nextArea would create mutual recursion cycle
+        //  Fall-through tail call to nextArea
+        nextArea(A)
         return
     } else {
         //> ExitNA:   rts
         return
     }
-    // SKIPPED: Fall-through to nextArea would create mutual recursion cycle
 }
 
 // Decompiled from NextArea
@@ -9510,9 +9809,8 @@ fun nextArea(A: Int) {
     A = Silence
     //> sta EventMusicQueue       ;silence music and leave
     eventMusicQueue = A
-    //  SKIPPED: Fall-through to playerEndLevel would create mutual recursion cycle
+    //> ExitNA:   rts
     return
-    // SKIPPED: Fall-through to playerEndLevel would create mutual recursion cycle
 }
 
 // Decompiled from PlayerMovementSubs
@@ -10733,8 +11031,7 @@ fun bubbleCheck(X: Int) {
         A = airBubbleTimer
         //> bne ExitBubl                ;branch to leave, otherwise create new air bubble
         if (A == 0) {
-            //  Fall-through tail call to setupBubble
-            setupBubble(X)
+            //  SKIPPED: Fall-through to setupBubble would create mutual recursion cycle
             return
         }
     }
@@ -10755,22 +11052,15 @@ fun bubbleCheck(X: Int) {
     A = temp1 and 0xFF
     //> cmp #$20                 ;if below the status bar,
     //> bcs Y_Bubl               ;branch to go ahead and use to move air bubble upwards
-    //  Fall-through tail call to setupBubble
-    setupBubble(X)
-    return
     if (!(A >= 0x20)) {
         //> lda #$f8                 ;otherwise set offscreen coordinate
         A = 0xF8
-        //  Fall-through tail call to setupBubble
-        setupBubble(X)
-        return
-    } else {
-        //> Y_Bubl:   sta Bubble_Y_Position,x  ;store as new vertical coordinate for air bubble
-        bubbleYPosition[X] = A
-        //  Fall-through tail call to setupBubble
-        setupBubble(X)
-        return
     }
+    //> Y_Bubl:   sta Bubble_Y_Position,x  ;store as new vertical coordinate for air bubble
+    bubbleYPosition[X] = A
+    //> ExitBubl: rts                      ;leave
+    return
+    // SKIPPED: Fall-through to setupBubble would create mutual recursion cycle
 }
 
 // Decompiled from SetupBubble
@@ -10781,18 +11071,14 @@ fun setupBubble(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
-    var temp3: Int = 0
-    var temp4: Int = 0
     var airBubbleTimer by MemoryByte(AirBubbleTimer)
     var playerFacingDir by MemoryByte(PlayerFacingDir)
     var playerPageloc by MemoryByte(Player_PageLoc)
     var playerXPosition by MemoryByte(Player_X_Position)
     var playerYPosition by MemoryByte(Player_Y_Position)
     val bubbleTimerData by MemoryByteIndexed(BubbleTimerData)
-    val bubbleMforcedata by MemoryByteIndexed(Bubble_MForceData)
     val bubblePageloc by MemoryByteIndexed(Bubble_PageLoc)
     val bubbleXPosition by MemoryByteIndexed(Bubble_X_Position)
-    val bubbleYmfDummy by MemoryByteIndexed(Bubble_YMF_Dummy)
     val bubbleYHighpos by MemoryByteIndexed(Bubble_Y_HighPos)
     val bubbleYPosition by MemoryByteIndexed(Bubble_Y_Position)
     //> SetupBubble:
@@ -10841,31 +11127,9 @@ fun setupBubble(X: Int) {
     A = bubbleTimerData[Y]
     //> sta AirBubbleTimer       ;set air bubble timer
     airBubbleTimer = A
-    //> MoveBubl: ldy $07                  ;get pseudorandom bit again, use as offset
-    Y = memory[0x7].toInt()
-    //> lda Bubble_YMF_Dummy,x
-    A = bubbleYmfDummy[X]
-    //> sec                      ;subtract pseudorandom amount from dummy variable
-    //> sbc Bubble_MForceData,y
-    temp3 = A - bubbleMforcedata[Y]
-    A = temp3 and 0xFF
-    //> sta Bubble_YMF_Dummy,x   ;save dummy variable
-    bubbleYmfDummy[X] = A
-    //> lda Bubble_Y_Position,x
-    A = bubbleYPosition[X]
-    //> sbc #$00                 ;subtract borrow from airbubble's vertical coordinate
-    temp4 = A - if (temp3 >= 0) 0 else 1
-    A = temp4 and 0xFF
-    //> cmp #$20                 ;if below the status bar,
-    //> bcs Y_Bubl               ;branch to go ahead and use to move air bubble upwards
-    if (!(A >= 0x20)) {
-        //> lda #$f8                 ;otherwise set offscreen coordinate
-        A = 0xF8
-    }
-    //> Y_Bubl:   sta Bubble_Y_Position,x  ;store as new vertical coordinate for air bubble
-    bubbleYPosition[X] = A
-    //> ExitBubl: rts                      ;leave
+    //  SKIPPED: Fall-through to bubbleCheck would create mutual recursion cycle
     return
+    // SKIPPED: Fall-through to bubbleCheck would create mutual recursion cycle
 }
 
 // Decompiled from RunGameTimer
@@ -11133,11 +11397,6 @@ fun processWhirlpools() {
             val orig1: Int = A
             A = orig1 shr 1
             //> bcc WhPull                  ;if d0 not set, branch to last part of code
-            if (!((orig1 and 0x01) != 0)) {
-                //  goto WhPull -> imposeGravity
-                imposeGravity(A, 0)
-                return
-            }
         } else {
             //> ExitWh: rts                         ;leave
             return
@@ -11176,11 +11435,6 @@ fun processWhirlpools() {
         val orig2: Int = A
         A = orig2 shr 1
         //> bcc WhPull                  ;if d0 not set, branch
-        if (!((orig2 and 0x01) != 0)) {
-            //  goto WhPull -> imposeGravity
-            imposeGravity(A, 0)
-            return
-        }
         //> lda Player_X_Position       ;otherwise slowly pull player right, towards the center
         A = playerXPosition
         //> clc
@@ -11194,8 +11448,7 @@ fun processWhirlpools() {
         //> adc #$00                    ;add carry
         temp13 = A + if (temp12 > 0xFF) 1 else 0
         A = temp13 and 0xFF
-        //  Fall-through tail call to setPWh
-        setPWh(A)
+        //  SKIPPED: Fall-through to setPWh would create mutual recursion cycle
         return
         //> WhPull: lda #$10
         A = 0x10
@@ -11219,34 +11472,17 @@ fun processWhirlpools() {
         //> ExitWh: rts                         ;leave
         return
     }
+    // SKIPPED: Fall-through to setPWh would create mutual recursion cycle
 }
 
 // Decompiled from SetPWh
 fun setPWh(A: Int) {
-    var A: Int = A
-    var X: Int = 0
     var playerPageloc by MemoryByte(Player_PageLoc)
-    var whirlpoolFlag by MemoryByte(Whirlpool_Flag)
     //> SetPWh: sta Player_PageLoc          ;set player's new page location
     playerPageloc = A
-    //> WhPull: lda #$10
-    A = 0x10
-    //> sta $00                     ;set vertical movement force
-    memory[0x0] = A.toUByte()
-    //> lda #$01
-    A = 0x01
-    //> sta Whirlpool_Flag          ;set whirlpool flag to be used later
-    whirlpoolFlag = A
-    //> sta $02                     ;also set maximum vertical speed
-    memory[0x2] = A.toUByte()
-    //> lsr
-    val orig0: Int = A
-    A = orig0 shr 1
-    //> tax                         ;set X for player offset
-    X = A
-    //> jmp ImposeGravity           ;jump to put whirlpool effect on player vertically, do not return
-    imposeGravity(A, X)
+    //  SKIPPED: Fall-through to processWhirlpools would create mutual recursion cycle
     return
+    // SKIPPED: Fall-through to processWhirlpools would create mutual recursion cycle
 }
 
 // Decompiled from FlagpoleRoutine
@@ -11433,8 +11669,7 @@ fun jumpspringHandler(X: Int) {
             playerYPosition = (playerYPosition - 1) and 0xFF
             //> dec Player_Y_Position
             playerYPosition = (playerYPosition - 1) and 0xFF
-            //  Fall-through tail call to posJSpr
-            posJSpr(X, Y)
+            //  SKIPPED: Fall-through to posJSpr would create mutual recursion cycle
             return
         }
     }
@@ -11449,17 +11684,11 @@ fun jumpspringHandler(X: Int) {
     //> lda JumpspringAnimCtrl      ;if frame control at zero, don't bother
     A = jumpspringAnimCtrl
     //> beq ExJSpring               ;trying to animate it, just leave
-    //  Fall-through tail call to posJSpr
-    posJSpr(temp3, Y)
-    return
     X = temp3
     if (A != 0) {
         //> lda JumpspringTimer
         A = jumpspringTimer
         //> bne ExJSpring               ;if jumpspring timer not expired yet, leave
-        //  Fall-through tail call to posJSpr
-        posJSpr(X, Y)
-        return
         if (A == 0) {
             //> lda #$04
             A = 0x04
@@ -11467,14 +11696,11 @@ fun jumpspringHandler(X: Int) {
             jumpspringTimer = A
             //> inc JumpspringAnimCtrl      ;increment frame control to animate jumpspring
             jumpspringAnimCtrl = (jumpspringAnimCtrl + 1) and 0xFF
-            //  Fall-through tail call to posJSpr
-            posJSpr(X, Y)
-            return
         }
     }
-    // Fall-through tail call to posJSpr
-    posJSpr(X, Y)
+    //> ExJSpring: rts                         ;leave
     return
+    // SKIPPED: Fall-through to posJSpr would create mutual recursion cycle
 }
 
 // Decompiled from PosJSpr
@@ -11535,34 +11761,44 @@ fun posJSpr(X: Int, Y: Int) {
         A = 0x00
         //> sta JumpspringAnimCtrl      ;initialize jumpspring frame control
         jumpspringAnimCtrl = A
-    }
-    //> DrawJSpr:  jsr RelativeEnemyPosition   ;get jumpspring's relative coordinates
-    temp1 = relativeEnemyPosition(X)
-    X = temp1
-    //> jsr EnemyGfxHandler         ;draw jumpspring
-    temp2 = enemyGfxHandler(temp1)
-    X = temp2
-    //> jsr OffscreenBoundsCheck    ;check to see if we need to kill it
-    offscreenBoundsCheck(temp2)
-    //> lda JumpspringAnimCtrl      ;if frame control at zero, don't bother
-    A = jumpspringAnimCtrl
-    //> beq ExJSpring               ;trying to animate it, just leave
-    X = temp2
-    if (A != 0) {
-        //> lda JumpspringTimer
-        A = jumpspringTimer
-        //> bne ExJSpring               ;if jumpspring timer not expired yet, leave
-        if (A == 0) {
-            //> lda #$04
-            A = 0x04
-            //> sta JumpspringTimer         ;otherwise initialize jumpspring timer
-            jumpspringTimer = A
-            //> inc JumpspringAnimCtrl      ;increment frame control to animate jumpspring
-            jumpspringAnimCtrl = (jumpspringAnimCtrl + 1) and 0xFF
+        //  SKIPPED: Fall-through to jumpspringHandler would create mutual recursion cycle
+        return
+    } else {
+        //> DrawJSpr:  jsr RelativeEnemyPosition   ;get jumpspring's relative coordinates
+        temp1 = relativeEnemyPosition(X)
+        X = temp1
+        //> jsr EnemyGfxHandler         ;draw jumpspring
+        temp2 = enemyGfxHandler(temp1)
+        X = temp2
+        //> jsr OffscreenBoundsCheck    ;check to see if we need to kill it
+        offscreenBoundsCheck(temp2)
+        //> lda JumpspringAnimCtrl      ;if frame control at zero, don't bother
+        A = jumpspringAnimCtrl
+        //> beq ExJSpring               ;trying to animate it, just leave
+        //  SKIPPED: Fall-through to jumpspringHandler would create mutual recursion cycle
+        return
+        X = temp2
+        if (A != 0) {
+            //> lda JumpspringTimer
+            A = jumpspringTimer
+            //> bne ExJSpring               ;if jumpspring timer not expired yet, leave
+            //  SKIPPED: Fall-through to jumpspringHandler would create mutual recursion cycle
+            return
+            if (A == 0) {
+                //> lda #$04
+                A = 0x04
+                //> sta JumpspringTimer         ;otherwise initialize jumpspring timer
+                jumpspringTimer = A
+                //> inc JumpspringAnimCtrl      ;increment frame control to animate jumpspring
+                jumpspringAnimCtrl = (jumpspringAnimCtrl + 1) and 0xFF
+                //  SKIPPED: Fall-through to jumpspringHandler would create mutual recursion cycle
+                return
+            }
         }
     }
     //> ExJSpring: rts                         ;leave
     return
+    // SKIPPED: Fall-through to jumpspringHandler would create mutual recursion cycle
 }
 
 // Decompiled from Setup_Vine
@@ -11798,9 +12034,6 @@ fun processCannons() {
     if (A != 0) {
         //> ldx #$02
         X = 0x02
-        //  Fall-through tail call to next3Slt
-        next3Slt(X)
-        return
         //> ThreeSChk: stx ObjectOffset            ;start at third enemy slot
         objectOffset = X
         //> lda Enemy_Flag,x            ;check enemy buffer flag
@@ -11810,9 +12043,6 @@ fun processCannons() {
             //  goto Chk_BB
             return
         }
-        //  Fall-through tail call to next3Slt
-        next3Slt(X)
-        return
         //> lda PseudoRandomBitReg+1,x  ;otherwise get part of LSFR
         A = pseudoRandomBitReg[1 + X]
         //> ldy SecondaryHardMode       ;get secondary hard mode flag, use as offset
@@ -11825,9 +12055,6 @@ fun processCannons() {
             //  goto Chk_BB
             return
         }
-        //  Fall-through tail call to next3Slt
-        next3Slt(X)
-        return
         //> tay                         ;transfer masked contents of LSFR to Y as pseudorandom offset
         Y = A
         //> lda Cannon_PageLoc,y        ;get page location
@@ -11837,15 +12064,9 @@ fun processCannons() {
             //  goto Chk_BB
             return
         }
-        //  Fall-through tail call to next3Slt
-        next3Slt(X)
-        return
         //> lda Cannon_Timer,y          ;get cannon timer
         A = cannonTimer[Y]
         //> beq FireCannon              ;if expired, branch to fire cannon
-        //  Fall-through tail call to next3Slt
-        next3Slt(X)
-        return
         if (A != 0) {
             //> sbc #$00                    ;otherwise subtract borrow (note carry will always be clear here)
             temp0 = A - if (A >= 0x06) 0 else 1
@@ -11864,9 +12085,6 @@ fun processCannons() {
             //  goto Chk_BB
             return
         }
-        //  Fall-through tail call to next3Slt
-        next3Slt(X)
-        return
         //> lda #$0e                   ;otherwise we start creating one
         A = 0x0E
         //> sta Cannon_Timer,y         ;first, reset cannon timer
@@ -11957,129 +12175,16 @@ fun chkBb(X: Int, Y: Int) {
 
 // Decompiled from Next3Slt
 fun next3Slt(X: Int) {
-    var A: Int = 0
     var X: Int = X
-    var Y: Int = 0
-    var temp0: Int = 0
-    var temp1: Int = 0
-    var objectOffset by MemoryByte(ObjectOffset)
-    var secondaryHardMode by MemoryByte(SecondaryHardMode)
-    var timerControl by MemoryByte(TimerControl)
-    val cannonBitmasks by MemoryByteIndexed(CannonBitmasks)
-    val cannonPageloc by MemoryByteIndexed(Cannon_PageLoc)
-    val cannonTimer by MemoryByteIndexed(Cannon_Timer)
-    val cannonXPosition by MemoryByteIndexed(Cannon_X_Position)
-    val cannonYPosition by MemoryByteIndexed(Cannon_Y_Position)
-    val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
-    val enemyFlag by MemoryByteIndexed(Enemy_Flag)
-    val enemyId by MemoryByteIndexed(Enemy_ID)
-    val enemyPageloc by MemoryByteIndexed(Enemy_PageLoc)
-    val enemyState by MemoryByteIndexed(Enemy_State)
-    val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
-    val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
-    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
-    val pseudoRandomBitReg by MemoryByteIndexed(PseudoRandomBitReg)
     //> Next3Slt: dex                        ;move onto next slot
     X = (X - 1) and 0xFF
     //> bpl ThreeSChk              ;do this until first three slots are checked
-    //> ThreeSChk: stx ObjectOffset            ;start at third enemy slot
-    objectOffset = X
-    //> lda Enemy_Flag,x            ;check enemy buffer flag
-    A = enemyFlag[X]
-    //> bne Chk_BB                  ;if set, branch to check enemy
-    if (!(A == 0)) {
-        //  goto Chk_BB
+    if (!((X and 0x80) != 0)) {
+        //  goto ThreeSChk
         return
-    } else {
-        //> lda PseudoRandomBitReg+1,x  ;otherwise get part of LSFR
-        A = pseudoRandomBitReg[1 + X]
-        //> ldy SecondaryHardMode       ;get secondary hard mode flag, use as offset
-        Y = secondaryHardMode
-        //> and CannonBitmasks,y        ;mask out bits of LSFR as decided by flag
-        A = A and cannonBitmasks[Y]
-        //> cmp #$06                    ;check to see if lower nybble is above certain value
-        //> bcs Chk_BB                  ;if so, branch to check enemy
-        if (A >= 0x06) {
-            //  goto Chk_BB
-            return
-        }
     }
-    //> tay                         ;transfer masked contents of LSFR to Y as pseudorandom offset
-    Y = A
-    //> lda Cannon_PageLoc,y        ;get page location
-    A = cannonPageloc[Y]
-    //> beq Chk_BB                  ;if not set or on page 0, branch to check enemy
-    if (A == 0) {
-        //  goto Chk_BB
-        return
-    } else {
-        //> lda Cannon_Timer,y          ;get cannon timer
-        A = cannonTimer[Y]
-        //> beq FireCannon              ;if expired, branch to fire cannon
-        X = X
-        if (A != 0) {
-            //> sbc #$00                    ;otherwise subtract borrow (note carry will always be clear here)
-            temp0 = A - if (A >= 0x06) 0 else 1
-            A = temp0 and 0xFF
-            //> sta Cannon_Timer,y          ;to count timer down
-            cannonTimer[Y] = A
-            //> jmp Chk_BB                  ;then jump ahead to check enemy
-            chkBb(X, Y)
-            return
-        }
-    }
-    //> FireCannon:
-    //> lda TimerControl           ;if master timer control set,
-    A = timerControl
-    //> bne Chk_BB                 ;branch to check enemy
-    if (!(A == 0)) {
-        //  goto Chk_BB
-        return
-    } else {
-        while (true) {
-            //> lda #$0e                   ;otherwise we start creating one
-            A = 0x0E
-            //> sta Cannon_Timer,y         ;first, reset cannon timer
-            cannonTimer[Y] = A
-            //> lda Cannon_PageLoc,y       ;get page location of cannon
-            A = cannonPageloc[Y]
-            //> sta Enemy_PageLoc,x        ;save as page location of bullet bill
-            enemyPageloc[X] = A
-            //> lda Cannon_X_Position,y    ;get horizontal coordinate of cannon
-            A = cannonXPosition[Y]
-            //> sta Enemy_X_Position,x     ;save as horizontal coordinate of bullet bill
-            enemyXPosition[X] = A
-            //> lda Cannon_Y_Position,y    ;get vertical coordinate of cannon
-            A = cannonYPosition[Y]
-            //> sec
-            //> sbc #$08                   ;subtract eight pixels (because enemies are 24 pixels tall)
-            temp1 = A - 0x08
-            A = temp1 and 0xFF
-            //> sta Enemy_Y_Position,x     ;save as vertical coordinate of bullet bill
-            enemyYPosition[X] = A
-            //> lda #$01
-            A = 0x01
-            //> sta Enemy_Y_HighPos,x      ;set vertical high byte of bullet bill
-            enemyYHighpos[X] = A
-            //> sta Enemy_Flag,x           ;set buffer flag
-            enemyFlag[X] = A
-            //> lsr                        ;shift right once to init A
-            val orig0: Int = A
-            A = orig0 shr 1
-            //> sta Enemy_State,x          ;then initialize enemy's state
-            enemyState[X] = A
-            //> lda #$09
-            A = 0x09
-            //> sta Enemy_BoundBoxCtrl,x   ;set bounding box size control for bullet bill
-            enemyBoundboxctrl[X] = A
-            //> lda #BulletBill_CannonVar
-            A = BulletBill_CannonVar
-            //> sta Enemy_ID,x             ;load identifier for bullet bill (cannon variant)
-            enemyId[X] = A
-            //> jmp Next3Slt               ;move onto next slot
-        }
-    }
-    //> ExCannon: rts                        ;then leave
+    //  Fall-through tail call to processCannons
+    processCannons()
     return
 }
 
@@ -12183,7 +12288,7 @@ fun bulletBillHandler(X: Int, Y: Int): Int {
             movedEnemyvertically(X)
         }
         //> BBFly:     jsr MoveEnemyHorizontally ;do sub to move bullet bill horizontally
-        val pair0 = moveEnemyHorizontally(X)
+        val pair0 = moveEnemyHorizontally(A, X)
         temp3 = pair0.first
         temp4 = pair0.second
         X = temp4
@@ -12405,12 +12510,7 @@ fun procHammerObj(X: Int) {
         //> sta Misc_Y_HighPos,x       ;set hammer's vertical high byte
         miscYHighpos[X] = A
         //> bne RunHSubs               ;unconditional branch to skip first routine
-        if (!(A == 0)) {
-            //  goto RunHSubs
-            return
-        }
-        //  Fall-through tail call to runAllH
-        runAllH(X)
+        //  SKIPPED: Fall-through to runAllH would create mutual recursion cycle
         return
     } else {
         //> RunHSubs: jsr GetMiscOffscreenBits   ;get offscreen information
@@ -12427,29 +12527,16 @@ fun procHammerObj(X: Int) {
         //> rts                        ;and we are done here
         return
     }
+    // SKIPPED: Fall-through to runAllH would create mutual recursion cycle
 }
 
 // Decompiled from RunAllH
 fun runAllH(X: Int) {
-    var X: Int = X
-    var temp0: Int = 0
-    var temp1: Int = 0
-    var temp2: Int = 0
     //> RunAllH:  jsr PlayerHammerCollision  ;handle collisions
     playerHammerCollision(X)
-    //> RunHSubs: jsr GetMiscOffscreenBits   ;get offscreen information
-    temp0 = getMiscOffscreenBits(X)
-    X = temp0
-    //> jsr RelativeMiscPosition   ;get relative coordinates
-    temp1 = relativeMiscPosition(temp0)
-    X = temp1
-    //> jsr GetMiscBoundBox        ;get bounding box coordinates
-    temp2 = getMiscBoundBox(temp1)
-    X = temp2
-    //> jsr DrawHammer             ;draw the hammer
-    drawHammer(temp2)
-    //> rts                        ;and we are done here
+    //  SKIPPED: Fall-through to procHammerObj would create mutual recursion cycle
     return
+    // SKIPPED: Fall-through to procHammerObj would create mutual recursion cycle
 }
 
 // Decompiled from CoinBlock
@@ -13081,13 +13168,17 @@ fun powerUpObjHandler(Y: Int) {
         A = enemyState[5]
         //> cmp #$06                   ;for if power-up has risen enough
         //> bcc ExitPUp                ;if not, don't even bother running these routines
-        //  SKIPPED: Fall-through to runPUSubs would create mutual recursion cycle
+        if (!(A >= 0x06)) {
+            //  goto ExitPUp
+            return
+        }
+        //  Fall-through tail call to runPUSubs
+        runPUSubs(X, Y)
         return
     } else {
         //> ExitPUp:   rts                        ;and we're done
         return
     }
-    // SKIPPED: Fall-through to runPUSubs would create mutual recursion cycle
 }
 
 // Decompiled from RunPUSubs
@@ -13114,9 +13205,8 @@ fun runPUSubs(X: Int, Y: Int) {
     X = temp3
     //> jsr OffscreenBoundsCheck   ;check to see if it went offscreen
     offscreenBoundsCheck(temp3)
-    //  SKIPPED: Fall-through to powerUpObjHandler would create mutual recursion cycle
+    //> ExitPUp:   rts                        ;and we're done
     return
-    // SKIPPED: Fall-through to powerUpObjHandler would create mutual recursion cycle
 }
 
 // Decompiled from PlayerHeadCollision
@@ -13851,8 +13941,7 @@ fun blockobjmtUpdater() {
 }
 
 // Decompiled from MoveEnemyHorizontally
-fun moveEnemyHorizontally(X: Int): Pair<Int, Int> {
-    var A: Int = 0
+fun moveEnemyHorizontally(A: Int, X: Int): Pair<Int, Int> {
     var X: Int = X
     var objectOffset by MemoryByte(ObjectOffset)
     //> MoveEnemyHorizontally:
@@ -14022,14 +14111,14 @@ fun movedEnemyvertically(X: Int) {
     //> bne ContVMove      ;and use, otherwise set different movement amount, continue on
     X = X
     if (A == 0x05) {
-        //  SKIPPED: Fall-through to moveFallingPlatform would create mutual recursion cycle
+        //  Fall-through tail call to moveFallingPlatform
+        moveFallingPlatform(X)
         return
     } else {
         //> ContVMove: jmp SetHiMax   ;jump to skip the rest of this
         setHiMax(X, Y)
         return
     }
-    // SKIPPED: Fall-through to moveFallingPlatform would create mutual recursion cycle
 }
 
 // Decompiled from MoveFallingPlatform
@@ -14038,9 +14127,9 @@ fun moveFallingPlatform(X: Int) {
     //> MoveFallingPlatform:
     //> ldy #$20       ;set movement amount
     Y = 0x20
-    //  SKIPPED: Fall-through to movedEnemyvertically would create mutual recursion cycle
+    //> ContVMove: jmp SetHiMax   ;jump to skip the rest of this
+    setHiMax(X, Y)
     return
-    // SKIPPED: Fall-through to movedEnemyvertically would create mutual recursion cycle
 }
 
 // Decompiled from MoveRedPTroopaDown
@@ -14102,7 +14191,8 @@ fun moveDropPlatform(X: Int) {
     //> bne SetMdMax  ;skip ahead of other value set here
     X = X
     if (Y == 0) {
-        //  SKIPPED: Fall-through to moveEnemySlowVert would create mutual recursion cycle
+        //  Fall-through tail call to moveEnemySlowVert
+        moveEnemySlowVert(X)
         return
     } else {
         //> SetMdMax: lda #$02         ;set maximum speed in A
@@ -14112,23 +14202,31 @@ fun moveDropPlatform(X: Int) {
             //  goto SetXMoveAmt
             return
         }
+        //  Fall-through tail call to moveEnemySlowVert
+        moveEnemySlowVert(X)
+        return
     }
-    //> ;--------------------------------
-    //  Fall-through tail call to movejEnemyvertically
-    movejEnemyvertically(X)
-    return
-    // SKIPPED: Fall-through to moveEnemySlowVert would create mutual recursion cycle
 }
 
 // Decompiled from MoveEnemySlowVert
 fun moveEnemySlowVert(X: Int) {
+    var A: Int = 0
     var Y: Int = 0
     //> MoveEnemySlowVert:
     //> ldy #$0f         ;set movement amount for bowser/other objects
     Y = 0x0F
-    //  SKIPPED: Fall-through to moveDropPlatform would create mutual recursion cycle
-    return
-    // SKIPPED: Fall-through to moveDropPlatform would create mutual recursion cycle
+    //> SetMdMax: lda #$02         ;set maximum speed in A
+    A = 0x02
+    //> bne SetXMoveAmt  ;unconditional branch
+    if (!(A == 0)) {
+        //  goto SetXMoveAmt
+        return
+    } else {
+        //> ;--------------------------------
+        //  Fall-through tail call to movejEnemyvertically
+        movejEnemyvertically(X)
+        return
+    }
 }
 
 // Decompiled from MoveJ_EnemyVertically
@@ -14203,24 +14301,16 @@ fun imposeGravitySprObj(A: Int, X: Int) {
 // Decompiled from MovePlatformDown
 fun movePlatformDown(X: Int): Int {
     var A: Int = 0
+    var X: Int = X
+    var Y: Int = 0
+    val enemyId by MemoryByteIndexed(Enemy_ID)
     //> MovePlatformDown:
     //> lda #$00    ;save value to stack (if branching here, execute next
     A = 0x00
     //> .db $2c     ;part as BIT instruction)
-    //  Fall-through tail call to movePlatformUp
-    movePlatformUp(X)
-    return X
-}
-
-// Decompiled from MovePlatformUp
-fun movePlatformUp(X: Int) {
-    var A: Int = 0
-    var X: Int = X
-    var Y: Int = 0
-    val enemyId by MemoryByteIndexed(Enemy_ID)
     //> MovePlatformUp:
     //> lda #$01        ;save value to stack
-    A = 0x01
+    //  (skipped by BIT $2C)
     //> pha
     push(A)
     //> ldy Enemy_ID,x  ;get enemy object identifier
@@ -14252,7 +14342,57 @@ fun movePlatformUp(X: Int) {
     Y = A
     //  Fall-through tail call to redPTroopaGrav
     redPTroopaGrav(A, X)
+    return X
+}
+
+// Decompiled from MovePlatformUp
+fun movePlatformUp(X: Int) {
+    var A: Int = 0
+    var X: Int = X
+    var Y: Int = 0
+    val enemyId by MemoryByteIndexed(Enemy_ID)
+    //> MovePlatformUp:
+    //> lda #$01        ;save value to stack
+    A = 0x01
+    //> pha
+    push(A)
+    //> ldy Enemy_ID,x  ;get enemy object identifier
+    Y = enemyId[X]
+    //> inx             ;increment offset for enemy object
+    X = (X + 1) and 0xFF
+    //> lda #$05        ;load default value here
+    A = 0x05
+    //> cpy #$29        ;residual comparison, object #29 never executes
+    //> bne SetDplSpd   ;this code, thus unconditional branch here
+    //  Fall-through tail call to movePlatformDown
+    movePlatformDown(X)
     return
+    X = X
+    if (Y == 0x29) {
+        //> lda #$09        ;residual code
+        A = 0x09
+        //  Fall-through tail call to movePlatformDown
+        movePlatformDown(X)
+        return
+    } else {
+        //> SetDplSpd: sta $00         ;save downward movement amount here
+        memory[0x0] = A.toUByte()
+        //> lda #$0a        ;save upward movement amount here
+        A = 0x0A
+        //> sta $01
+        memory[0x1] = A.toUByte()
+        //> lda #$03        ;save maximum vertical speed here
+        A = 0x03
+        //> sta $02
+        memory[0x2] = A.toUByte()
+        //> pla             ;get value from stack
+        A = pull()
+        //> tay             ;use as Y, then move onto code shared by red koopa
+        Y = A
+        //  Fall-through tail call to redPTroopaGrav
+        redPTroopaGrav(A, X)
+        return
+    }
 }
 
 // Decompiled from RedPTroopaGrav
@@ -16090,8 +16230,7 @@ fun duplicateEnemyObj(X: Int) {
     A = enemyYPosition[X]
     //> sta Enemy_Y_Position,y  ;copy vertical coordinate from original to new
     enemyYPosition[Y] = A
-    //  Fall-through tail call to initBowserFlame
-    initBowserFlame(X)
+    //> FlmEx:  rts                     ;and then leave
     return
 }
 
@@ -17936,7 +18075,7 @@ fun moveNormalEnemy(X: Int) {
             //> bne MoveDefeatedEnemy      ;if set, branch to move defeated enemy object
             if (!(A == 0)) {
                 //  goto MoveDefeatedEnemy -> moveEnemyHorizontally
-                moveEnemyHorizontally(X)
+                moveEnemyHorizontally(A, X)
                 return
             }
             //> lda Enemy_State,x
@@ -17979,7 +18118,7 @@ fun moveNormalEnemy(X: Int) {
         Y = 0x01
     } else {
         //> MEHor: jmp MoveEnemyHorizontally  ;jump here to move enemy horizontally for <> $2e and d6 set
-        moveEnemyHorizontally(X)
+        moveEnemyHorizontally(A, X)
         return
     }
     //> SteadM: lda Enemy_X_Speed,x       ;get current horizontal speed
@@ -18000,7 +18139,7 @@ fun moveNormalEnemy(X: Int) {
     //> sta Enemy_X_Speed,x       ;save as horizontal speed temporarily
     enemyXSpeed[X] = A
     //> jsr MoveEnemyHorizontally ;then do a sub to move horizontally
-    val pair0 = moveEnemyHorizontally(X)
+    val pair0 = moveEnemyHorizontally(A, X)
     temp1 = pair0.first
     temp2 = pair0.second
     X = temp2
@@ -18018,7 +18157,7 @@ fun moveDefeatedEnemy(X: Int) {
     //> jsr MoveD_EnemyVertically      ;execute sub to move defeated enemy downwards
     movedEnemyvertically(X)
     //> jmp MoveEnemyHorizontally      ;now move defeated enemy horizontally
-    moveEnemyHorizontally(X)
+    moveEnemyHorizontally(0, X)
     return
 }
 
@@ -18028,7 +18167,7 @@ fun moveJumpingEnemy(X: Int) {
     //> jsr MoveJ_EnemyVertically  ;do a sub to impose gravity on green paratroopa
     movejEnemyvertically(X)
     //> jmp MoveEnemyHorizontally  ;jump to move enemy horizontally
-    moveEnemyHorizontally(X)
+    moveEnemyHorizontally(0, X)
     return
 }
 
@@ -18231,7 +18370,7 @@ fun moveWithXMCntrs(X: Int): Int {
     //> XMRight: sty Enemy_MovingDir,x        ;store as moving direction
     enemyMovingdir[X] = Y
     //> jsr MoveEnemyHorizontally
-    val pair0 = moveEnemyHorizontally(X)
+    val pair0 = moveEnemyHorizontally(A, X)
     temp1 = pair0.first
     temp2 = pair0.second
     X = temp2
@@ -18523,7 +18662,7 @@ fun moveBulletBill(X: Int) {
         //> sta Enemy_X_Speed,x        ;and move it accordingly (note: this bullet bill
         enemyXSpeed[X] = A
         //> jmp MoveEnemyHorizontally  ;object occurs in frenzy object $17, not from cannons)
-        moveEnemyHorizontally(X)
+        moveEnemyHorizontally(A, X)
         return
     }
 }
@@ -18659,17 +18798,14 @@ fun moveSwimmingCheepCheep(X: Int) {
             //> sbc #$00                  ;subtract borrow from page location
             temp9 = A - if (temp8 >= 0) 0 else 1
             A = temp9 and 0xFF
-            //  Fall-through tail call to chkSwimYPos
-            chkSwimYPos(A, X)
+            //  SKIPPED: Fall-through to chkSwimYPos would create mutual recursion cycle
             return
         } else {
             //> ExSwCC: rts                       ;leave
             return
         }
     }
-    // Fall-through tail call to chkSwimYPos
-    chkSwimYPos(A, X)
-    return
+    // SKIPPED: Fall-through to chkSwimYPos would create mutual recursion cycle
 }
 
 // Decompiled from ChkSwimYPos
@@ -18713,9 +18849,13 @@ fun chkSwimYPos(A: Int, X: Int) {
         A = Y
         //> sta CheepCheepMoveMFlag,x ;otherwise change movement speed
         cheepCheepMoveMFlag[X] = A
+        //  SKIPPED: Fall-through to moveSwimmingCheepCheep would create mutual recursion cycle
+        return
+    } else {
+        //> ExSwCC: rts                       ;leave
+        return
     }
-    //> ExSwCC: rts                       ;leave
-    return
+    // SKIPPED: Fall-through to moveSwimmingCheepCheep would create mutual recursion cycle
 }
 
 // Decompiled from ProcFirebar
@@ -18813,7 +18953,7 @@ fun procFirebar(X: Int) {
         //> sta $00                     ;set $01 value here (not necessary)
         memory[0x0] = A.toUByte()
         //> jsr FirebarCollision        ;draw fireball part and do collision detection
-        temp5 = firebarCollision(Y)
+        temp5 = firebarCollision(temp4, Y)
         X = temp5
         //> ldy #$05                    ;load value for short firebars by default
         Y = 0x05
@@ -18968,14 +19108,14 @@ fun chkFOfs(A: Int, Y: Int) {
     //> sta $07                  ;also store here for now
     memory[0x7] = A.toUByte()
     //  Fall-through tail call to firebarCollision
-    firebarCollision(Y)
+    firebarCollision(0, Y)
     return
 }
 
 // Decompiled from FirebarCollision
-fun firebarCollision(Y: Int): Int {
+fun firebarCollision(X: Int, Y: Int): Int {
     var A: Int = 0
-    var X: Int = 0
+    var X: Int = X
     var Y: Int = Y
     var temp0: Int = 0
     var temp1: Int = 0
@@ -18999,6 +19139,7 @@ fun firebarCollision(Y: Int): Int {
     //> ora TimerControl         ;or master timer controls set
     A = A or timerControl
     //> bne NoColFB              ;then skip all of this
+    X = X
     Y = Y
     if (A == 0) {
         //> sta $05                  ;otherwise initialize counter
@@ -19324,7 +19465,7 @@ fun moveFlyingCheepCheep(X: Int) {
         return
     } else {
         //> FlyCC:  jsr MoveEnemyHorizontally  ;move cheep-cheep horizontally based on speed and force
-        val pair0 = moveEnemyHorizontally(X)
+        val pair0 = moveEnemyHorizontally(A, X)
         temp0 = pair0.first
         temp1 = pair0.second
         X = temp1
@@ -19485,7 +19626,7 @@ fun moveLakitu(X: Int) {
     //> SetLMov: sty Enemy_MovingDir,x      ;store moving direction
     enemyMovingdir[X] = Y
     //> jmp MoveEnemyHorizontally  ;move lakitu horizontally
-    moveEnemyHorizontally(X)
+    moveEnemyHorizontally(A, X)
     return
 }
 
@@ -19674,6 +19815,11 @@ fun bridgeCollapse() {
                 A = enemyYPosition[X]
                 //> cmp #$e0                  ;if bowser not yet low enough, skip this part ahead
                 //> bcc MoveD_Bowser
+                if (!(A >= 0xE0)) {
+                    //  goto MoveD_Bowser -> bowserGfxHandler
+                    bowserGfxHandler(X, 0)
+                    return
+                }
                 //> MoveD_Bowser:
                 //> jsr MoveEnemySlowVert     ;do a sub to move bowser downwards
                 moveEnemySlowVert(X)
@@ -20060,7 +20206,8 @@ fun bowserGfxHandler(X: Int, Y: Int) {
     A = 0x00
     //> sta BowserGfxFlag
     bowserGfxFlag = A
-    //> ExBGfxH:  rts                      ;leave!
+    //  Fall-through tail call to processBowserHalf
+    processBowserHalf(X, Y)
     return
 }
 
@@ -20119,7 +20266,8 @@ fun setFlameTimer(): Int {
     bowserFlameTimerCtrl = A
     //> lda FlameTimerData,y      ;load value to be used then leave
     A = flameTimerData[Y]
-    //> ExFl: rts
+    //  Fall-through tail call to procBowserFlame
+    procBowserFlame(0)
     return A
 }
 
@@ -20268,6 +20416,7 @@ fun gameTimerFireworks(X: Int) {
     var X: Int = X
     var Y: Int = 0
     var fireworksCounter by MemoryByte(FireworksCounter)
+    var starFlagTaskControl by MemoryByte(StarFlagTaskControl)
     val enemyState by MemoryByteIndexed(Enemy_State)
     val gameTimerDisplay by MemoryByteIndexed(GameTimerDisplay)
     //> GameTimerFireworks:
@@ -20298,8 +20447,11 @@ fun gameTimerFireworks(X: Int) {
     fireworksCounter = A
     //> sty Enemy_State,x      ;set whatever state we have in star flag object
     enemyState[X] = Y
-    //  Fall-through tail call to awardGameTimerPoints
-    awardGameTimerPoints()
+    //> IncrementSFTask1:
+    //> inc StarFlagTaskControl  ;increment star flag object task number
+    starFlagTaskControl = (starFlagTaskControl + 1) and 0xFF
+    //  Fall-through tail call to starFlagExit
+    starFlagExit()
     return
 }
 
@@ -20324,12 +20476,17 @@ fun awardGameTimerPoints() {
     //> ora GameTimerDisplay+2
     A = A or gameTimerDisplay[2]
     //> beq IncrementSFTask1   ;if no time left on game timer at all, branch to next task
-    //> IncrementSFTask1:
-    //> inc StarFlagTaskControl  ;increment star flag object task number
-    starFlagTaskControl = (starFlagTaskControl + 1) and 0xFF
-    //  Fall-through tail call to starFlagExit
-    starFlagExit()
-    return
+    if (A == 0) {
+        //  goto IncrementSFTask1
+        return
+    } else {
+        //> IncrementSFTask1:
+        //> inc StarFlagTaskControl  ;increment star flag object task number
+        starFlagTaskControl = (starFlagTaskControl + 1) and 0xFF
+        //  Fall-through tail call to starFlagExit
+        starFlagExit()
+        return
+    }
 }
 
 // Decompiled from EndAreaPoints
@@ -20969,7 +21126,8 @@ fun doOtherPlatform(X: Int): Int {
             vramBuffer1[3 + X] = A
             //> sta VRAM_Buffer1+4,x
             vramBuffer1[4 + X] = A
-            //  SKIPPED: Fall-through to otherRope would create mutual recursion cycle
+            //  Fall-through tail call to otherRope
+            otherRope(X, Y)
             return X
         } else {
             //> ExitRp:  ldx ObjectOffset            ;get enemy object buffer offset and leave
@@ -20983,7 +21141,8 @@ fun doOtherPlatform(X: Int): Int {
         //> rts
         return X
     }
-    // SKIPPED: Fall-through to otherRope would create mutual recursion cycle
+    // Fall-through tail call to otherRope
+    otherRope(X, Y)
     return X
 }
 
@@ -21043,17 +21202,18 @@ fun otherRope(X: Int, Y: Int): Int {
         vramBuffer1[8 + X] = A
         //> sta VRAM_Buffer1+9,x
         vramBuffer1[9 + X] = A
-        //  SKIPPED: Fall-through to endRp would create mutual recursion cycle
+        //  Fall-through tail call to endRp
+        endRp(X)
         return X
     }
-    // SKIPPED: Fall-through to endRp would create mutual recursion cycle
-    return X
 }
 
 // Decompiled from EndRp
 fun endRp(X: Int): Int {
     var A: Int = 0
+    var X: Int = X
     var temp0: Int = 0
+    var objectOffset by MemoryByte(ObjectOffset)
     var vramBuffer1Offset by MemoryByte(VRAM_Buffer1_Offset)
     val vramBuffer1 by MemoryByteIndexed(VRAM_Buffer1)
     //> EndRp:   lda #$00                    ;put null terminator at the end
@@ -21068,9 +21228,9 @@ fun endRp(X: Int): Int {
     A = temp0 and 0xFF
     //> sta VRAM_Buffer1_Offset
     vramBuffer1Offset = A
-    //  SKIPPED: Fall-through to doOtherPlatform would create mutual recursion cycle
-    return X
-    // SKIPPED: Fall-through to doOtherPlatform would create mutual recursion cycle
+    //> ExitRp:  ldx ObjectOffset            ;get enemy object buffer offset and leave
+    X = objectOffset
+    //> rts
     return X
 }
 
@@ -21405,14 +21565,13 @@ fun xMovingPlatform(X: Int): Int {
     //> bmi ExXMP                    ;branch ahead to leave
     X = temp0
     if ((A and 0x80) == 0) {
-        //  SKIPPED: Fall-through to positionPlayerOnHPlat would create mutual recursion cycle
+        //  Fall-through tail call to positionPlayerOnHPlat
+        positionPlayerOnHPlat(X)
         return X
     } else {
         //> ExXMP:   rts                       ;and we are done here
         return X
     }
-    // SKIPPED: Fall-through to positionPlayerOnHPlat would create mutual recursion cycle
-    return X
 }
 
 // Decompiled from PositionPlayerOnHPlat
@@ -21451,10 +21610,10 @@ fun positionPlayerOnHPlat(X: Int) {
         //> PPHSubt: sbc #$00                  ;subtract borrow from page location
         temp2 = A - if (temp0 > 0xFF) 0 else 1
         A = temp2 and 0xFF
-        //  SKIPPED: Fall-through to setPVar would create mutual recursion cycle
+        //  Fall-through tail call to setPVar
+        setPVar(A, X, Y)
         return
     }
-    // SKIPPED: Fall-through to setPVar would create mutual recursion cycle
 }
 
 // Decompiled from SetPVar
@@ -21467,9 +21626,8 @@ fun setPVar(A: Int, X: Int, Y: Int) {
     platformXScroll = Y
     //> jsr PositionPlayerOnVPlat ;position player vertically and appropriately
     positionPlayerOnVPlat(X)
-    //  SKIPPED: Fall-through to xMovingPlatform would create mutual recursion cycle
+    //> ExXMP:   rts                       ;and we are done here
     return
-    // SKIPPED: Fall-through to xMovingPlatform would create mutual recursion cycle
 }
 
 // Decompiled from DropPlatform
@@ -21503,7 +21661,7 @@ fun rightPlatform(A: Int, X: Int): Int {
     val platformCollisionFlag by MemoryByteIndexed(PlatformCollisionFlag)
     //> RightPlatform:
     //> jsr MoveEnemyHorizontally     ;move platform with current horizontal speed, if any
-    val pair0 = moveEnemyHorizontally(X)
+    val pair0 = moveEnemyHorizontally(A, X)
     temp0 = pair0.first
     temp1 = pair0.second
     X = temp1
@@ -21598,9 +21756,13 @@ fun chkSmallPlatCollision(X: Int) {
     if (A != 0) {
         //> jsr PositionPlayerOnS_Plat  ;use to position player correctly
         positionplayeronsPlat(A, X)
+        //  Fall-through tail call to moveLiftPlatforms
+        moveLiftPlatforms(X)
+        return
+    } else {
+        //> ExLiftP: rts                         ;then leave
+        return
     }
-    //> ExLiftP: rts                         ;then leave
-    return
 }
 
 // Decompiled from OffscreenBoundsCheck
@@ -22439,8 +22601,10 @@ fun forceInjury(A: Int) {
 
 // Decompiled from SetPRout
 fun setPRout(A: Int, Y: Int) {
+    var X: Int = 0
     var Y: Int = Y
     var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
+    var objectOffset by MemoryByte(ObjectOffset)
     var playerState by MemoryByte(Player_State)
     var scrollAmount by MemoryByte(ScrollAmount)
     var timerControl by MemoryByte(TimerControl)
@@ -22456,8 +22620,10 @@ fun setPRout(A: Int, Y: Int) {
     Y = (Y + 1) and 0xFF
     //> sty ScrollAmount          ;initialize scroll speed
     scrollAmount = Y
-    //  Fall-through tail call to playerEnemyCollision
-    playerEnemyCollision(0, Y)
+    //> ExInjColRoutines:
+    //> ldx ObjectOffset              ;get enemy offset and leave
+    X = objectOffset
+    //> rts
     return
 }
 
@@ -22550,7 +22716,8 @@ fun setupFloateyNumber(A: Int, X: Int): Int {
     A = enemyRelXpos
     //> sta FloateyNum_X_Pos,x   ;set horizontal coordinate and leave
     floateynumXPos[X] = A
-    //> ExSFN: rts
+    //  Fall-through tail call to enemiesCollision
+    enemiesCollision(X, 0)
     return A
 }
 
@@ -22927,18 +23094,14 @@ fun enemyTurnAround(X: Int) {
                 }
                 //> cmp #$07
                 //> bcs ExTA                 ;if any OTHER enemy object => $07, leave
-                if (A >= 0x07) {
-                    //  goto ExTA
-                    return
-                }
-                //  Fall-through tail call to rXSpd
-                rXSpd(X)
+                //  SKIPPED: Fall-through to rXSpd would create mutual recursion cycle
                 return
             }
         }
     }
     //> ExTA:  rts                      ;leave!!!
     return
+    // SKIPPED: Fall-through to rXSpd would create mutual recursion cycle
 }
 
 // Decompiled from RXSpd
@@ -22963,8 +23126,9 @@ fun rXSpd(X: Int) {
     A = A xor 0x03
     //> sta Enemy_MovingDir,x    ;thus effectively turning the enemy around
     enemyMovingdir[X] = A
-    //> ExTA:  rts                      ;leave!!!
+    //  SKIPPED: Fall-through to enemyTurnAround would create mutual recursion cycle
     return
+    // SKIPPED: Fall-through to enemyTurnAround would create mutual recursion cycle
 }
 
 // Decompiled from LargePlatformCollision
@@ -23624,7 +23788,8 @@ fun playerBGCollision() {
             A = 0x01
             //> sta Player_Y_Speed     ;jump or swim
             playerYSpeed = A
-            //  SKIPPED: Fall-through to doFootCheck would create mutual recursion cycle
+            //  Fall-through tail call to doFootCheck
+            doFootCheck(X)
             return
         } else {
             //> AwardTouchedCoin:
@@ -23633,7 +23798,9 @@ fun playerBGCollision() {
             return
         }
     }
-    // SKIPPED: Fall-through to doFootCheck would create mutual recursion cycle
+    // Fall-through tail call to doFootCheck
+    doFootCheck(X)
+    return
 }
 
 // Decompiled from DoFootCheck
@@ -23698,8 +23865,6 @@ fun doFootCheck(X: Int) {
                     //> bcc ChkFootMTile           ;if not, skip unconditional jump and continue code
                     A = temp1
                     if (A >= 0xCF) {
-                        //  SKIPPED: Fall-through to playerBGCollision would create mutual recursion cycle
-                        return
                     }
                 }
             }
@@ -23850,10 +24015,6 @@ fun doFootCheck(X: Int) {
                 //> jsr ChkInvisibleMTiles     ;check for hidden or coin 1-up blocks
                 val flag3: Boolean = chkInvisibleMTiles(temp3)
                 //> beq ExCSM                  ;branch to leave if either found
-                if (memory[0x0].toInt() == 0) {
-                    //  goto ExCSM
-                    return
-                }
             } else {
                 //> ExSCH: rts                       ;leave
                 return
@@ -23986,7 +24147,6 @@ fun doFootCheck(X: Int) {
         //> ExCSM: rts                       ;leave
         return
     }
-    // SKIPPED: Fall-through to playerBGCollision would create mutual recursion cycle
 }
 
 // Decompiled from StopPlayerMove
@@ -23994,7 +24154,8 @@ fun stopPlayerMove() {
     //> StopPlayerMove:
     //> jsr ImpedePlayerMove      ;stop player's movement
     impedePlayerMove()
-    //> ExCSM: rts                       ;leave
+    //  Fall-through tail call to doFootCheck
+    doFootCheck(0)
     return
 }
 
@@ -24638,7 +24799,8 @@ fun getMTileAttrib(A: Int): Pair<Int, Int> {
     X = A
     //> tya            ;get original metatile value back
     A = Y
-    //> ExEBG: rts            ;leave
+    //  Fall-through tail call to enemyToBGCollisionDet
+    enemyToBGCollisionDet(X)
     return Pair(A, X)
 }
 
@@ -26725,14 +26887,14 @@ fun flagpoleGfxHandler(X: Int) {
     //> beq ExitDumpSpr                ;if none of these bits set, branch to leave
     if (A != 0) {
         //> ;-------------------------------------------------------------------------------------
-        //  Fall-through tail call to moveSixSpritesOffscreen
-        moveSixSpritesOffscreen(Y)
+        //  SKIPPED: Fall-through to moveSixSpritesOffscreen would create mutual recursion cycle
         return
     } else {
         //> ExitDumpSpr:
         //> rts
         return
     }
+    // SKIPPED: Fall-through to moveSixSpritesOffscreen would create mutual recursion cycle
 }
 
 // Decompiled from MoveSixSpritesOffscreen
@@ -26741,9 +26903,9 @@ fun moveSixSpritesOffscreen(Y: Int) {
     //> MoveSixSpritesOffscreen:
     //> lda #$f8                  ;set offscreen coordinate if jumping here
     A = 0xF8
-    //  Fall-through tail call to dumpSixSpr
-    dumpSixSpr(A, Y)
+    //  SKIPPED: Fall-through to dumpSixSpr would create mutual recursion cycle
     return
+    // SKIPPED: Fall-through to dumpSixSpr would create mutual recursion cycle
 }
 
 // Decompiled from DumpSixSpr
@@ -26754,9 +26916,9 @@ fun dumpSixSpr(A: Int, Y: Int) {
     spriteData[20 + Y] = A
     //> sta Sprite_Data+16,y      ;into third row sprites
     spriteData[16 + Y] = A
-    //  Fall-through tail call to dumpFourSpr
-    dumpFourSpr(A, Y)
+    //  SKIPPED: Fall-through to dumpFourSpr would create mutual recursion cycle
     return
+    // SKIPPED: Fall-through to dumpFourSpr would create mutual recursion cycle
 }
 
 // Decompiled from DumpFourSpr
@@ -26765,9 +26927,9 @@ fun dumpFourSpr(A: Int, Y: Int) {
     //> DumpFourSpr:
     //> sta Sprite_Data+12,y      ;into second row sprites
     spriteData[12 + Y] = A
-    //  Fall-through tail call to dumpThreeSpr
-    dumpThreeSpr(A, Y)
+    //  SKIPPED: Fall-through to dumpThreeSpr would create mutual recursion cycle
     return
+    // SKIPPED: Fall-through to dumpThreeSpr would create mutual recursion cycle
 }
 
 // Decompiled from DumpThreeSpr
@@ -26776,9 +26938,9 @@ fun dumpThreeSpr(A: Int, Y: Int) {
     //> DumpThreeSpr:
     //> sta Sprite_Data+8,y
     spriteData[8 + Y] = A
-    //  Fall-through tail call to dumpTwoSpr
-    dumpTwoSpr(A, Y)
+    //  SKIPPED: Fall-through to dumpTwoSpr would create mutual recursion cycle
     return
+    // SKIPPED: Fall-through to dumpTwoSpr would create mutual recursion cycle
 }
 
 // Decompiled from DumpTwoSpr
@@ -26789,9 +26951,9 @@ fun dumpTwoSpr(A: Int, Y: Int) {
     spriteData[4 + Y] = A
     //> sta Sprite_Data,y
     spriteData[Y] = A
-    //> ExitDumpSpr:
-    //> rts
+    //  SKIPPED: Fall-through to flagpoleGfxHandler would create mutual recursion cycle
     return
+    // SKIPPED: Fall-through to flagpoleGfxHandler would create mutual recursion cycle
 }
 
 // Decompiled from DrawLargePlatform
@@ -28398,13 +28560,13 @@ fun chkLeftCo(A: Int, Y: Int) {
     A = A
     Y = Y
     if (A != 0) {
-        //  Fall-through tail call to moveColOffscreen
-        moveColOffscreen(Y)
+        //  SKIPPED: Fall-through to moveColOffscreen would create mutual recursion cycle
         return
     } else {
         //> ExDBlk: rts
         return
     }
+    // SKIPPED: Fall-through to moveColOffscreen would create mutual recursion cycle
 }
 
 // Decompiled from MoveColOffscreen
@@ -28418,7 +28580,9 @@ fun moveColOffscreen(Y: Int): Int {
     spriteYPosition[Y] = A
     //> sta Sprite_Y_Position+8,y  ;if branched here from enemy graphics handler)
     spriteYPosition[8 + Y] = A
-    //> ExDBlk: rts
+    //  SKIPPED: Fall-through to chkLeftCo would create mutual recursion cycle
+    return A
+    // SKIPPED: Fall-through to chkLeftCo would create mutual recursion cycle
     return A
 }
 
@@ -30168,7 +30332,7 @@ fun getXOffscreenBits(X: Int): Pair<Int, Int> {
                 //> lda #$08                    ;load some other value and execute subroutine
                 A = 0x08
                 //> jsr DividePDiff
-                temp2 = dividePDiff(A, Y)
+                temp2 = dividePDiff(A, X, Y)
                 X = temp2
             }
         }
@@ -30240,7 +30404,7 @@ fun getYOffscreenBits(X: Int): Int {
                 //> lda #$04                     ;load some other value and execute subroutine
                 A = 0x04
                 //> jsr DividePDiff
-                temp2 = dividePDiff(A, Y)
+                temp2 = dividePDiff(A, X, Y)
                 X = temp2
             }
         }
@@ -30263,9 +30427,9 @@ fun getYOffscreenBits(X: Int): Int {
 }
 
 // Decompiled from DividePDiff
-fun dividePDiff(A: Int, Y: Int): Int {
+fun dividePDiff(A: Int, X: Int, Y: Int): Int {
     var A: Int = A
-    var X: Int = 0
+    var X: Int = X
     var Y: Int = Y
     var temp0: Int = 0
     //> DividePDiff:
@@ -30275,6 +30439,7 @@ fun dividePDiff(A: Int, Y: Int): Int {
     A = memory[0x7].toInt()
     //> cmp $06       ;compare to preset value
     //> bcs ExDivPD   ;if pixel difference >= preset value, branch
+    X = X
     Y = Y
     if (!(A >= memory[0x6].toInt())) {
         //> lsr           ;divide by eight
@@ -30682,6 +30847,7 @@ fun setfreqTri(A: Int) {
     var Y: Int = 0
     val freqRegLookupTbl by MemoryByteIndexed(FreqRegLookupTbl)
     val sndRegister by MemoryByteIndexed(SND_REGISTER)
+    val sndSquare1Reg by MemoryByteIndexed(SND_SQUARE1_REG)
     //> SetFreq_Tri:
     //> ldx #$08               ;set frequency reg offset for triangle sound channel
     X = 0x08
@@ -30705,6 +30871,7 @@ fun setfreqTri(A: Int) {
     }
     //> NoTone: rts
     return
+    // SKIPPED: Fall-through to square1SfxHandler would create mutual recursion cycle
 }
 
 // Decompiled from Square1SfxHandler
@@ -30714,7 +30881,6 @@ fun square1SfxHandler() {
     var Y: Int = 0
     var temp0: Int = 0
     var squ1Sfxlencounter by MemoryByte(Squ1_SfxLenCounter)
-    var square1SoundBuffer by MemoryByte(Square1SoundBuffer)
     var square1SoundQueue by MemoryByte(Square1SoundQueue)
     val sndSquare1Reg by MemoryByteIndexed(SND_SQUARE1_REG)
     val swimStompEnvelopeData by MemoryByteIndexed(SwimStompEnvelopeData)
@@ -30734,16 +30900,26 @@ fun square1SfxHandler() {
     //> ldx #$99               ;now load the rest
     X = 0x99
     //> bne FPS2nd
+    //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+    return
     A = temp0
     if (X == 0) {
+        //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+        return
         //> PlaySmallJump:
         //> lda #$26               ;branch here for small mario jumping sound
         A = 0x26
         //> bne JumpRegContents
+        //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+        return
         if (A == 0) {
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
             //> PlayBigJump:
             //> lda #$18               ;branch here for big mario jumping sound
             A = 0x18
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
         }
         //> JumpRegContents:
         //> ldx #$82               ;note that small and big jump borrow each others' reg contents
@@ -30756,233 +30932,36 @@ fun square1SfxHandler() {
         A = 0x28
         //> sta Squ1_SfxLenCounter ;then continue on here
         squ1Sfxlencounter = A
+        //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+        return
         //> ContinueSndJump:
         //> lda Squ1_SfxLenCounter ;jumping sounds seem to be composed of three parts
         A = squ1Sfxlencounter
         //> cmp #$25               ;check for time to play second part yet
         //> bne N2Prt
+        //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+        return
         if (A == 0x25) {
             //> ldx #$5f               ;load second part
             X = 0x5F
             //> ldy #$f6
             Y = 0xF6
             //> bne DmpJpFPS           ;unconditional branch
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
         }
         //> N2Prt:    cmp #$20               ;check for third part
         //> bne DecJpFPS
+        //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+        return
         if (A == 0x20) {
             //> ldx #$48               ;load third part
             X = 0x48
+            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
+            return
         }
     }
-    //> FPS2nd:   ldy #$bc               ;the flagpole slide sound shares part of third part
-    Y = 0xBC
-    //> DmpJpFPS: jsr Dump_Squ1_Regs
-    dumpSqu1Regs(X, Y)
-    //> bne DecJpFPS           ;unconditional branch outta here
-    if (Y == 0) {
-        //> PlayFireballThrow:
-        //> lda #$05
-        A = 0x05
-        //> ldy #$99                 ;load reg contents for fireball throw sound
-        Y = 0x99
-        //> bne Fthrow               ;unconditional branch
-        if (Y == 0) {
-            //> PlayBump:
-            //> lda #$0a                ;load length of sfx and reg contents for bump sound
-            A = 0x0A
-            //> ldy #$93
-            Y = 0x93
-        }
-        //> Fthrow:   ldx #$9e                ;the fireball sound shares reg contents with the bump sound
-        X = 0x9E
-        //> sta Squ1_SfxLenCounter
-        squ1Sfxlencounter = A
-        //> lda #$0c                ;load offset for bump sound
-        A = 0x0C
-        //> jsr PlaySqu1Sfx
-        playSqu1Sfx(A, X, Y)
-        //> ContinueBumpThrow:
-        //> lda Squ1_SfxLenCounter  ;check for second part of bump sound
-        A = squ1Sfxlencounter
-        //> cmp #$06
-        //> bne DecJpFPS
-        if (A == 0x06) {
-            //> lda #$bb                ;load second part directly
-            A = 0xBB
-            //> sta SND_SQUARE1_REG+1
-            sndSquare1Reg[1] = A
-        }
-    }
-    //> DecJpFPS: bne BranchToDecLength1  ;unconditional branch
-    if (A == 0) {
-        //> sty Square1SoundBuffer  ;if found, put in buffer
-        square1SoundBuffer = Y
-        //> bmi PlaySmallJump       ;small jump
-        //> lsr Square1SoundQueue
-        val orig0: Int = square1SoundQueue
-        val carryFromLsr1: Boolean = (orig0 and 0x01) != 0
-        square1SoundQueue = orig0 shr 1
-        //> bcs PlayBigJump         ;big jump
-        loop0@ do {
-            //> lsr Square1SoundQueue
-            val orig2: Int = square1SoundQueue
-            val carryFromLsr3: Boolean = (orig2 and 0x01) != 0
-            square1SoundQueue = orig2 shr 1
-            //> bcs PlayBump            ;bump
-        } while (carryFromLsr3)
-        //> lsr Square1SoundQueue
-        val orig4: Int = square1SoundQueue
-        val carryFromLsr5: Boolean = (orig4 and 0x01) != 0
-        square1SoundQueue = orig4 shr 1
-        //> bcs PlaySwimStomp       ;swim/stomp
-        if (!carryFromLsr5) {
-            //> lsr Square1SoundQueue
-            val orig6: Int = square1SoundQueue
-            val carryFromLsr7: Boolean = (orig6 and 0x01) != 0
-            square1SoundQueue = orig6 shr 1
-            //> bcs PlaySmackEnemy      ;smack enemy
-            if (!carryFromLsr7) {
-                //> lsr Square1SoundQueue
-                val orig8: Int = square1SoundQueue
-                val carryFromLsr9: Boolean = (orig8 and 0x01) != 0
-                square1SoundQueue = orig8 shr 1
-                //> bcs PlayPipeDownInj     ;pipedown/injury
-                if (!carryFromLsr9) {
-                    //> lsr Square1SoundQueue
-                    val orig10: Int = square1SoundQueue
-                    val carryFromLsr11: Boolean = (orig10 and 0x01) != 0
-                    square1SoundQueue = orig10 shr 1
-                    //> bcs PlayFireballThrow   ;fireball throw
-                    //> lsr Square1SoundQueue
-                    val orig12: Int = square1SoundQueue
-                    val carryFromLsr13: Boolean = (orig12 and 0x01) != 0
-                    square1SoundQueue = orig12 shr 1
-                    //> bcs PlayFlagpoleSlide   ;slide flagpole
-                    //> CheckSfx1Buffer:
-                    //> lda Square1SoundBuffer   ;check for sfx in buffer
-                    A = square1SoundBuffer
-                    //> beq ExS1H                ;if not found, exit sub
-                    if (A != 0) {
-                        //> bmi ContinueSndJump      ;small mario jump
-                        //> lsr
-                        val orig14: Int = A
-                        A = orig14 shr 1
-                        //> bcs ContinueSndJump      ;big mario jump
-                        //> lsr
-                        val orig15: Int = A
-                        A = orig15 shr 1
-                        //> bcs ContinueBumpThrow    ;bump
-                        //> lsr
-                        val orig16: Int = A
-                        A = orig16 shr 1
-                        //> bcs ContinueSwimStomp    ;swim/stomp
-                        if ((orig16 and 0x01) == 0) {
-                            //> lsr
-                            val orig17: Int = A
-                            A = orig17 shr 1
-                            //> bcs ContinueSmackEnemy   ;smack enemy
-                            if ((orig17 and 0x01) == 0) {
-                                //> lsr
-                                val orig18: Int = A
-                                A = orig18 shr 1
-                                //> bcs ContinuePipeDownInj  ;pipedown/injury
-                                if ((orig18 and 0x01) == 0) {
-                                    //> lsr
-                                    val orig19: Int = A
-                                    A = orig19 shr 1
-                                    //> bcs ContinueBumpThrow    ;fireball throw
-                                    //> lsr
-                                    val orig20: Int = A
-                                    A = orig20 shr 1
-                                    //> bcs DecrementSfx1Length  ;slide flagpole
-                                    if ((orig20 and 0x01) != 0) {
-                                        //  goto DecrementSfx1Length
-                                        return
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    //> ExS1H: rts
-                    return
-                }
-            }
-        }
-        //> PlaySwimStomp:
-        //> lda #$0e               ;store length of swim/stomp sound
-        A = 0x0E
-        //> sta Squ1_SfxLenCounter
-        squ1Sfxlencounter = A
-        //> ldy #$9c               ;store reg contents for swim/stomp sound
-        Y = 0x9C
-        //> ldx #$9e
-        X = 0x9E
-        //> lda #$26
-        A = 0x26
-        //> jsr PlaySqu1Sfx
-        playSqu1Sfx(A, X, Y)
-        //> ContinueSwimStomp:
-        //> ldy Squ1_SfxLenCounter        ;look up reg contents in data section based on
-        Y = squ1Sfxlencounter
-        //> lda SwimStompEnvelopeData-1,y ;length of sound left, used to control sound's
-        A = swimStompEnvelopeData[-1 + Y]
-        //> sta SND_SQUARE1_REG           ;envelope
-        sndSquare1Reg[0] = A
-        //> cpy #$06
-        //> bne BranchToDecLength1
-        if (Y == 0x06) {
-            //> lda #$9e                      ;when the length counts down to a certain point, put this
-            A = 0x9E
-            //> sta SND_SQUARE1_REG+2         ;directly into the LSB of square 1's frequency divider
-            sndSquare1Reg[2] = A
-        }
-    }
-    //> BranchToDecLength1:
-    //> bne DecrementSfx1Length  ;unconditional branch (regardless of how we got here)
-    if (!(A == 0)) {
-        //  goto DecrementSfx1Length
-        return
-    }
-    //> PlaySmackEnemy:
-    //> lda #$0e                 ;store length of smack enemy sound
-    A = 0x0E
-    //> ldy #$cb
-    Y = 0xCB
-    //> ldx #$9f
-    X = 0x9F
-    //> sta Squ1_SfxLenCounter
-    squ1Sfxlencounter = A
-    //> lda #$28                 ;store reg contents for smack enemy sound
-    A = 0x28
-    //> jsr PlaySqu1Sfx
-    playSqu1Sfx(A, X, Y)
-    //> bne DecrementSfx1Length  ;unconditional branch
-    if (!(A == 0)) {
-        //  goto DecrementSfx1Length
-        return
-    }
-    //> ContinueSmackEnemy:
-    //> ldy Squ1_SfxLenCounter  ;check about halfway through
-    Y = squ1Sfxlencounter
-    //> cpy #$08
-    //> bne SmSpc
-    if (Y == 0x08) {
-        //> lda #$a0                ;if we're at the about-halfway point, make the second tone
-        A = 0xA0
-        //> sta SND_SQUARE1_REG+2   ;in the smack enemy sound
-        sndSquare1Reg[2] = A
-        //> lda #$9f
-        A = 0x9F
-        //> bne SmTick
-    }
-    //> SmSpc:  lda #$90                ;this creates spaces in the sound, giving it its distinct noise
-    A = 0x90
-    //> SmTick: sta SND_SQUARE1_REG
-    sndSquare1Reg[0] = A
-    //  Fall-through tail call to decrementSfx1Length
-    decrementSfx1Length()
-    return
+    // SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
 }
 
 // Decompiled from DecrementSfx1Length
@@ -30993,13 +30972,13 @@ fun decrementSfx1Length() {
     squ1Sfxlencounter = (squ1Sfxlencounter - 1) and 0xFF
     //> bne ExSfx1
     if (squ1Sfxlencounter == 0) {
-        //  Fall-through tail call to stopSquare1Sfx
-        stopSquare1Sfx()
+        //  SKIPPED: Fall-through to stopSquare1Sfx would create mutual recursion cycle
         return
     } else {
         //> ExSfx1: rts
         return
     }
+    // SKIPPED: Fall-through to stopSquare1Sfx would create mutual recursion cycle
 }
 
 // Decompiled from StopSquare1Sfx
@@ -31019,8 +30998,9 @@ fun stopSquare1Sfx() {
     X = 0x0F
     //> stx SND_MASTERCTRL_REG
     sndMasterctrlReg = X
-    //> ExSfx1: rts
+    //  SKIPPED: Fall-through to decrementSfx1Length would create mutual recursion cycle
     return
+    // SKIPPED: Fall-through to decrementSfx1Length would create mutual recursion cycle
 }
 
 // Decompiled from ContinueCGrabTTick
@@ -31252,9 +31232,8 @@ fun noiseSfxHandler() {
         }
     }
     //> ;--------------------------------
-    //> ContinueMusic:
-    //> jmp HandleSquare2Music  ;if we have music, start with square 2 channel
-    handleSquare2Music()
+    //  Fall-through tail call to musicHandler
+    musicHandler()
     return
 }
 
@@ -31318,17 +31297,26 @@ fun loadEventMusic(A: Int) {
         noteLengthTblAdder = X
         //> bne FindEventMusicHeader  ;unconditional branch
         if (X == 0) {
+            //  Fall-through tail call to musicHandler
+            musicHandler()
+            return
             //> LoadAreaMusic:
             //> cmp #$04                  ;is it underground music?
             //> bne NoStop1               ;no, do not stop square 1 sfx
+            //  Fall-through tail call to musicHandler
+            musicHandler()
+            return
             if (A == 0x04) {
                 //> jsr StopSquare1Sfx
                 stopSquare1Sfx()
+                //  Fall-through tail call to musicHandler
+                musicHandler()
+                return
             }
             //> NoStop1: ldy #$10                  ;start counter used only by ground level music
             Y = 0x10
-            //  Fall-through tail call to handleAreaMusicLoopB
-            handleAreaMusicLoopB(A)
+            //  Fall-through tail call to musicHandler
+            musicHandler()
             return
             //> GMLoopB: sty GroundMusicHeaderOfs
             groundMusicHeaderOfs = Y
@@ -31398,6 +31386,10 @@ fun handleAreaMusicLoopB(A: Int) {
         //> ldy #$11
         Y = 0x11
         //> bne GMLoopB               ;unconditional branch
+        if (!(Y == 0)) {
+            //  goto GMLoopB
+            return
+        }
     }
     //> FindAreaMusicHeader:
     //> ldy #$08                   ;load Y for offset of area music

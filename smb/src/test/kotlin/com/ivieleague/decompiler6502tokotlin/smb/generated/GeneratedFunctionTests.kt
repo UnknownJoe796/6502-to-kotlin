@@ -14,7 +14,7 @@ import java.io.File
 
 /**
  * Auto-generated tests from TAS capture: smb-tas
- * Captured at: 2026-01-21T19:35:02.633499Z
+ * Captured at: 2026-01-21T21:34:36.937077Z
  * Total frames: 17868
  * Total captures: 1019846
  * Functions with tests: 157
@@ -12649,14 +12649,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0xBF02: moveEnemyHorizontally
-    // Parameters: X
+    // Parameters: A, X
     // 4150 calls, 7 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 1181
      * Function: moveEnemyHorizontally (0xBF02)
-     * Parameters: X
+     * Parameters: A, X
      * Call depth: 10
      * Memory reads: 3, writes: 2
      */
@@ -12673,7 +12673,7 @@ class GeneratedFunctionTests {
             memory[0x01F0] = 0xBFu
 
             // Execute decompiled function
-            moveEnemyHorizontally(0x00)
+            moveEnemyHorizontally(0xF8, 0x00)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -12683,7 +12683,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 1 from frame 1623
      * Function: moveEnemyHorizontally (0xBF02)
-     * Parameters: X
+     * Parameters: A, X
      * Call depth: 9
      * Memory reads: 3, writes: 2
      */
@@ -12700,7 +12700,7 @@ class GeneratedFunctionTests {
             memory[0x01F0] = 0xBFu
 
             // Execute decompiled function
-            moveEnemyHorizontally(0x05)
+            moveEnemyHorizontally(0x10, 0x05)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -12710,7 +12710,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 2 from frame 2021
      * Function: moveEnemyHorizontally (0xBF02)
-     * Parameters: X
+     * Parameters: A, X
      * Call depth: 10
      * Memory reads: 3, writes: 2
      */
@@ -12727,7 +12727,7 @@ class GeneratedFunctionTests {
             memory[0x01F0] = 0xBFu
 
             // Execute decompiled function
-            moveEnemyHorizontally(0x00)
+            moveEnemyHorizontally(0x08, 0x00)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -12737,7 +12737,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 3 from frame 2621
      * Function: moveEnemyHorizontally (0xBF02)
-     * Parameters: X
+     * Parameters: A, X
      * Call depth: 12
      * Memory reads: 3, writes: 2
      */
@@ -12754,7 +12754,7 @@ class GeneratedFunctionTests {
             memory[0x01F0] = 0xBFu
 
             // Execute decompiled function
-            moveEnemyHorizontally(0x01)
+            moveEnemyHorizontally(0xF8, 0x01)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -12764,7 +12764,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 4 from frame 2843
      * Function: moveEnemyHorizontally (0xBF02)
-     * Parameters: X
+     * Parameters: A, X
      * Call depth: 12
      * Memory reads: 3, writes: 2
      */
@@ -12781,7 +12781,7 @@ class GeneratedFunctionTests {
             memory[0x01F0] = 0xBFu
 
             // Execute decompiled function
-            moveEnemyHorizontally(0x01)
+            moveEnemyHorizontally(0x08, 0x01)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -12791,7 +12791,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 5 from frame 6047
      * Function: moveEnemyHorizontally (0xBF02)
-     * Parameters: X
+     * Parameters: A, X
      * Call depth: 14
      * Memory reads: 3, writes: 2
      */
@@ -12808,7 +12808,7 @@ class GeneratedFunctionTests {
             memory[0x01F0] = 0xBFu
 
             // Execute decompiled function
-            moveEnemyHorizontally(0x02)
+            moveEnemyHorizontally(0xF8, 0x02)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -12818,7 +12818,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 6 from frame 6379
      * Function: moveEnemyHorizontally (0xBF02)
-     * Parameters: X
+     * Parameters: A, X
      * Call depth: 14
      * Memory reads: 3, writes: 2
      */
@@ -12835,7 +12835,7 @@ class GeneratedFunctionTests {
             memory[0x01F0] = 0xBFu
 
             // Execute decompiled function
-            moveEnemyHorizontally(0x02)
+            moveEnemyHorizontally(0x08, 0x02)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -31950,14 +31950,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0xF26D: dividePDiff
-    // Parameters: A, Y
+    // Parameters: A, X, Y
     // 57403 calls, 872 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 32
      * Function: dividePDiff (0xF26D)
-     * Parameters: A, Y
+     * Parameters: A, X, Y
      * Call depth: 8
      * Memory reads: 2, writes: 1
      */
@@ -31973,7 +31973,7 @@ class GeneratedFunctionTests {
             memory[0x0007] = 0xD7u
 
             // Execute decompiled function
-            dividePDiff(0x08, 0x01)
+            dividePDiff(0x08, 0x07, 0x01)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x08u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -31983,7 +31983,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 1 from frame 1068
      * Function: dividePDiff (0xF26D)
-     * Parameters: A, Y
+     * Parameters: A, X, Y
      * Call depth: 10
      * Memory reads: 2, writes: 1
      */
@@ -31999,7 +31999,7 @@ class GeneratedFunctionTests {
             memory[0x0007] = 0xB7u
 
             // Execute decompiled function
-            dividePDiff(0x08, 0x01)
+            dividePDiff(0x08, 0x07, 0x01)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x08u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -32009,7 +32009,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 2 from frame 1172
      * Function: dividePDiff (0xF26D)
-     * Parameters: A, Y
+     * Parameters: A, X, Y
      * Call depth: 10
      * Memory reads: 2, writes: 1
      */
@@ -32025,7 +32025,7 @@ class GeneratedFunctionTests {
             memory[0x0007] = 0x97u
 
             // Execute decompiled function
-            dividePDiff(0x08, 0x01)
+            dividePDiff(0x08, 0x07, 0x01)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x08u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -32035,7 +32035,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 3 from frame 1317
      * Function: dividePDiff (0xF26D)
-     * Parameters: A, Y
+     * Parameters: A, X, Y
      * Call depth: 12
      * Memory reads: 2, writes: 1
      */
@@ -32051,7 +32051,7 @@ class GeneratedFunctionTests {
             memory[0x0007] = 0x53u
 
             // Execute decompiled function
-            dividePDiff(0x08, 0x01)
+            dividePDiff(0x08, 0x07, 0x01)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x08u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -32061,7 +32061,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 4 from frame 1395
      * Function: dividePDiff (0xF26D)
-     * Parameters: A, Y
+     * Parameters: A, X, Y
      * Call depth: 11
      * Memory reads: 2, writes: 1
      */
@@ -32077,7 +32077,7 @@ class GeneratedFunctionTests {
             memory[0x0007] = 0x89u
 
             // Execute decompiled function
-            dividePDiff(0x04, 0x00)
+            dividePDiff(0x04, 0x00, 0x00)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x04u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -32087,7 +32087,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 5 from frame 1595
      * Function: dividePDiff (0xF26D)
-     * Parameters: A, Y
+     * Parameters: A, X, Y
      * Call depth: 11
      * Memory reads: 2, writes: 1
      */
@@ -32103,7 +32103,7 @@ class GeneratedFunctionTests {
             memory[0x0007] = 0xE5u
 
             // Execute decompiled function
-            dividePDiff(0x08, 0x01)
+            dividePDiff(0x08, 0x07, 0x01)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x08u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -32113,7 +32113,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 6 from frame 1902
      * Function: dividePDiff (0xF26D)
-     * Parameters: A, Y
+     * Parameters: A, X, Y
      * Call depth: 9
      * Memory reads: 2, writes: 1
      */
@@ -32129,7 +32129,7 @@ class GeneratedFunctionTests {
             memory[0x0007] = 0xC7u
 
             // Execute decompiled function
-            dividePDiff(0x04, 0x00)
+            dividePDiff(0x04, 0x00, 0x00)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x04u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -32139,7 +32139,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 7 from frame 2711
      * Function: dividePDiff (0xF26D)
-     * Parameters: A, Y
+     * Parameters: A, X, Y
      * Call depth: 13
      * Memory reads: 2, writes: 1
      */
@@ -32155,7 +32155,7 @@ class GeneratedFunctionTests {
             memory[0x0007] = 0x08u
 
             // Execute decompiled function
-            dividePDiff(0x08, 0x01)
+            dividePDiff(0x08, 0x07, 0x01)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x08u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -32165,7 +32165,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 8 from frame 5685
      * Function: dividePDiff (0xF26D)
-     * Parameters: A, Y
+     * Parameters: A, X, Y
      * Call depth: 9
      * Memory reads: 2, writes: 1
      */
@@ -32181,7 +32181,7 @@ class GeneratedFunctionTests {
             memory[0x0007] = 0xE4u
 
             // Execute decompiled function
-            dividePDiff(0x04, 0x00)
+            dividePDiff(0x04, 0x00, 0x00)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x04u, memory[0x0005], "Memory 0x0005 mismatch")
@@ -32191,7 +32191,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 9 from frame 6211
      * Function: dividePDiff (0xF26D)
-     * Parameters: A, Y
+     * Parameters: A, X, Y
      * Call depth: 13
      * Memory reads: 2, writes: 1
      */
@@ -32207,7 +32207,7 @@ class GeneratedFunctionTests {
             memory[0x0007] = 0x4Cu
 
             // Execute decompiled function
-            dividePDiff(0x08, 0x01)
+            dividePDiff(0x08, 0x07, 0x01)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x08u, memory[0x0005], "Memory 0x0005 mismatch")

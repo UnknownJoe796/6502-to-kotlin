@@ -964,6 +964,110 @@ fun List<AssemblyBlock>.functionify(
         func.outputs = detectedOutputs
     }
 
+    // by Claude - Step 6.5: Detect pass-through inputs
+    // When a register is an output but is NOT written on all paths to RTS,
+    // that register must ALSO be an input (to preserve the value on early exit).
+    // Example: DividePDiff outputs X (via TAX on main path) but early exit (BCS ExDivPD)
+    // doesn't write X, so X must also be an input to preserve its value.
+    for (func in functions) {
+        val funcBlocks = func.blocks ?: continue
+        val funcOutputs = func.outputs ?: continue
+        if (funcOutputs.isEmpty()) continue
+
+        val currentInputs = func.inputs?.toMutableSet() ?: mutableSetOf()
+        val outputRegisters = funcOutputs.filterIsInstance<TrackedAsIo>()
+            .filter { it == TrackedAsIo.X || it == TrackedAsIo.Y || it == TrackedAsIo.A }
+
+        for (outputReg in outputRegisters) {
+            // Check if this output is written on ALL paths to RTS
+            // Use a worklist algorithm to track which paths write to the register
+
+            // State: for each block, track whether the register has been written when entering that block
+            // We need to check if there's any path from entry to RTS where register is NOT written
+
+            // Track: (block, writtenSoFar) pairs - writtenSoFar is true if register was written on this path
+            val visited = mutableMapOf<AssemblyBlock, MutableSet<Boolean>>() // block -> set of (written) states seen
+            val worklist = ArrayDeque<Pair<AssemblyBlock, Boolean>>()
+            worklist.add(func.startingBlock to false)
+
+            var foundUnwrittenPath = false
+
+            while (worklist.isNotEmpty() && !foundUnwrittenPath) {
+                val (block, writtenBefore) = worklist.removeFirst()
+
+                // Check if we've seen this state before
+                val seenStates = visited.getOrPut(block) { mutableSetOf() }
+                if (writtenBefore in seenStates) continue
+                seenStates.add(writtenBefore)
+
+                // Process this block - check if it writes to the register
+                var writtenInBlock = writtenBefore
+                var foundRts = false
+
+                for (line in block.lines) {
+                    val instr = line.instruction ?: continue
+
+                    // Check if this instruction writes to our output register
+                    val modifies = instr.op.modifies(instr.address?.let { it::class })
+                        .mapNotNull { it.toTrackedAsIo(instr.address, labelIsVirtualRegister) }
+
+                    if (outputReg in modifies) {
+                        writtenInBlock = true
+                    }
+
+                    // Check for RTS/RTI
+                    if (instr.op == AssemblyOp.RTS || instr.op == AssemblyOp.RTI) {
+                        foundRts = true
+                        if (!writtenInBlock) {
+                            // Found a path to RTS that doesn't write the register!
+                            foundUnwrittenPath = true
+                        }
+                        break
+                    }
+
+                    // Check for JMP to another function (tail call) - treat as RTS
+                    if (instr.op == AssemblyOp.JMP) {
+                        val targetLabel = (instr.address as? AssemblyAddressing.Direct)?.label
+                        val targetFunction = if (targetLabel != null) labelToFunction[targetLabel] else null
+                        if (targetFunction != null && targetFunction != func) {
+                            // Tail call to another function - treat as exit point
+                            if (!writtenInBlock) {
+                                foundUnwrittenPath = true
+                            }
+                            break
+                        }
+                    }
+                }
+
+                if (foundRts || foundUnwrittenPath) continue
+
+                // Add successors to worklist (only blocks within this function)
+                block.fallThroughExit?.let { target ->
+                    if (target in funcBlocks || target == func.startingBlock) {
+                        worklist.add(target to writtenInBlock)
+                    } else {
+                        // Fall-through to another function's block - treat as exit
+                        if (!writtenInBlock) {
+                            foundUnwrittenPath = true
+                        }
+                    }
+                }
+                block.branchExit?.let { target ->
+                    if (target in funcBlocks || target == func.startingBlock) {
+                        worklist.add(target to writtenInBlock)
+                    }
+                }
+            }
+
+            // If any path to RTS doesn't write the register, it must be an input
+            if (foundUnwrittenPath && outputReg !in currentInputs) {
+                currentInputs.add(outputReg)
+            }
+        }
+
+        func.inputs = currentInputs
+    }
+
     // by Claude - Step 7: Propagate outputs through JMP chains
     // If function A outputs X and JMPs to function B, then B should also output X.
     // This is because when B returns via RTS, it returns to A's caller, which expects X.
