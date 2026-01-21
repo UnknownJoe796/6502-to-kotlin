@@ -941,7 +941,7 @@ MoveAllSpritesOffscreen:                                                        
 LDY #$00                      ; this routine moves all sprites off the screen                       ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-MoveSpritesOffscreen:                                                                               ;  B
+MoveSpritesOffscreen:                                                                               ; fun():  B
 LDY #$04                      ; this routine moves all but sprite 0                                 ; 
 LDA #$f8                      ; off the screen                                                      ; 
 SprInitLoop:  STA Sprite_Y_Position,Y; write 248 into OAM data's Y coordinate                       ;  B
@@ -3925,7 +3925,7 @@ QuestionBlockRow_High:                                                          
 LDA #$03                      ; start on the fourth row                                             ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-QuestionBlockRow_Low:                                                                               ; fun(X):  B
+QuestionBlockRow_Low:                                                                               ;  B
 LDA #$07                      ; start on the eighth row                                             ; 
 PHA                           ; save whatever row to the stack for now                              ; 
 JSR ChkLrgObjLength           ; get low nybble and save as length                                   ; 
@@ -3941,7 +3941,7 @@ Bridge_High:                                                                    
 LDA #$06                      ; start on the seventh row from top of screen                         ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-Bridge_Middle:                                                                                      ;  B
+Bridge_Middle:                                                                                      ; fun(X):  B
 LDA #$07                      ; start on the eighth row                                             ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
@@ -7344,7 +7344,7 @@ MushFlowerBlock:                                                                
 LDA #$00                      ; load mushroom/fire flower into power-up type                        ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-StarBlock:                                                                                          ; fun():  B
+StarBlock:                                                                                          ;  B
 LDA #$02                      ; load star into power-up type                                        ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
@@ -7679,7 +7679,7 @@ MovePlatformDown:                                                               
 LDA #$00                      ; save value to stack (if branching here, execute next                ; 
 DATA: ByteValue(value=44)     ; part as BIT instruction)                                            ; 
                                                                                                     ; 
-MovePlatformUp:                                                                                     ;  B
+MovePlatformUp:                                                                                     ; fun(X):  B
 LDA #$01                      ; save value to stack                                                 ; 
 PHA                                                                                                 ; 
 LDY Enemy_ID,X                ; get enemy object identifier                                         ; 
@@ -11848,7 +11848,7 @@ CLC                           ; add positioning data using offset to the vertica
 ADC PlayerPosSPlatData-1,Y    ; coordinate                                                          ; 
 DATA: ByteValue(value=44)     ; BIT instruction opcode                                              ; 
                                                                                                     ; 
-PositionPlayerOnVPlat:                                                                              ; fun(X):  B
+PositionPlayerOnVPlat:                                                                              ;  B
 LDA Enemy_Y_Position,X        ; get vertical coordinate                                             ; 
 LDY GameEngineSubroutine                                                                            ; 
 CPY #$0b                      ; if certain routine being executed on this frame,                    ; 

@@ -129,6 +129,44 @@ class CodeGenContext(
     /** Track which blocks have been converted to avoid duplicates */
     val convertedBlocks = mutableSetOf<AssemblyBlock>()
 
+    // by Claude - Track whether we're converting a block that's part of a structured control flow
+    // (e.g., the branch block of an IfNode). When true, skip the orphaned branch handler because
+    // the branch is already handled by the control structure (IfNode/LoopNode).
+    var isInsideStructuredBranch: Boolean = false
+
+    // by Claude - Stack of enclosing loops for labeled break support
+    // Each entry is (loopLabel, breakTargets) where breakTargets are blocks that exit the loop
+    private var loopLabelCounter = 0
+    val loopStack = mutableListOf<Pair<String, Set<AssemblyBlock>>>()
+
+    /** Push a new loop onto the stack and return its label */
+    fun pushLoop(breakTargets: Set<AssemblyBlock>): String {
+        val label = "loop${loopLabelCounter++}"
+        loopStack.add(label to breakTargets)
+        return label
+    }
+
+    /** Pop the current loop from the stack */
+    fun popLoop() {
+        if (loopStack.isNotEmpty()) loopStack.removeLast()
+    }
+
+    /** Find the label for a break target block. Returns null if not a break target. */
+    // by Claude - IMPORTANT: We need to find the OUTERMOST loop that has this target as a break target.
+    // This handles nested loops where an inner branch exits BOTH loops (like beq RendBBuf).
+    // If we returned the innermost loop, break@innerLoop wouldn't exit the outer loop.
+    fun findBreakLabel(target: AssemblyBlock): String? {
+        // Search from OUTERMOST to innermost loop - return the first (outermost) match
+        for (i in loopStack.indices) {
+            val (label, breakTargets) = loopStack[i]
+            if (target in breakTargets) return label
+        }
+        return null
+    }
+
+    /** Check if a block is a break target for ANY enclosing loop */
+    fun isBreakTarget(target: AssemblyBlock): Boolean = findBreakLabel(target) != null
+
     // ===== DELEGATE MEMORY ACCESS TRACKING =====
 
     /** Track direct memory accesses: constant -> property name */
@@ -460,8 +498,13 @@ fun ControlNode.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
 
             // Include the statements from the block containing the branch
             // (the instructions before the branch instruction)
+            // by Claude - Set flag to indicate branch is handled by this IfNode structure
+            // This prevents the orphaned branch handler from generating duplicate if-return logic
             val branchBlock = this.condition.branchBlock
+            val wasInsideStructuredBranch = ctx.isInsideStructuredBranch
+            ctx.isInsideStructuredBranch = true
             result.addAll(branchBlock.toKotlin(ctx))
+            ctx.isInsideStructuredBranch = wasInsideStructuredBranch
 
             // Materialize any complex register expressions before branching
             // This ensures we capture values into named variables before they can be lost
@@ -494,9 +537,26 @@ fun ControlNode.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
             ctx.restoreState(stateBeforeBranch)
             ctx.convertedBlocks.clear()
             ctx.convertedBlocks.addAll(convertedBlocksBeforeBranch)
-            val elseStmts = this.elseBranch.flatMap { it.toKotlin(ctx) }
+            var elseStmts = this.elseBranch.flatMap { it.toKotlin(ctx) }.toMutableList()
             val elseState = ctx.saveState()
             val elseConvertedBlocks = ctx.convertedBlocks.toSet()
+
+            // by Claude - Check if branch target is a break target for an enclosing loop
+            // This handles nested loop breaks like: beq RendBBuf (where RendBBuf is outside both loops)
+            // When elseBranch is empty and the branch would go to a loop's break target,
+            // we need to generate a labeled break instead of just skipping the then-branch.
+            if (elseStmts.isEmpty() && !this.condition.sense) {
+                // sense=false means branch-taken skips the then-branch
+                // Check if branch target is a break target
+                val branchTarget = branchBlock.branchExit
+                if (branchTarget != null) {
+                    val breakLabel = ctx.findBreakLabel(branchTarget)
+                    if (breakLabel != null) {
+                        // Add labeled break to else branch
+                        elseStmts.add(KLabeledBreak(breakLabel))
+                    }
+                }
+            }
 
             // by Claude - Merge convertedBlocks: blocks converted in EITHER branch should
             // be marked as converted for the code AFTER the if-else (the join point code).
@@ -530,19 +590,30 @@ fun ControlNode.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
             result.addAll(ctx.materializeRegister("X", mutable = true))
             result.addAll(ctx.materializeRegister("Y", mutable = true))
 
+            // by Claude - Push loop onto stack for labeled break support
+            // If this loop has break targets, we may need labeled breaks from inner code
+            val loopLabel = ctx.pushLoop(this.breakTargets)
+            val needsLabel = this.breakTargets.isNotEmpty()
+
             val bodyStmts = this.body.flatMap { it.toKotlin(ctx) }
+
+            // by Claude - Pop loop from stack after body is processed
+            ctx.popLoop()
 
             val loop = when (this.kind) {
                 LoopKind.PreTest -> {
                     val condition = this.condition?.toKotlinExpr(ctx) ?: KLiteral("true")
-                    KWhile(condition, bodyStmts)
+                    if (needsLabel) KLabeledWhile(loopLabel, condition, bodyStmts)
+                    else KWhile(condition, bodyStmts)
                 }
                 LoopKind.PostTest -> {
                     val condition = this.condition?.toKotlinExpr(ctx) ?: KLiteral("true")
-                    KDoWhile(bodyStmts, condition)
+                    if (needsLabel) KLabeledDoWhile(loopLabel, bodyStmts, condition)
+                    else KDoWhile(bodyStmts, condition)
                 }
                 LoopKind.Infinite -> {
-                    KLoop(bodyStmts)
+                    if (needsLabel) KLabeledLoop(loopLabel, bodyStmts)
+                    else KLoop(bodyStmts)
                 }
             }
 
@@ -882,8 +953,10 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
 
     // Handle orphaned conditional branches - branches that weren't picked up by control flow analysis
     // This happens when the branch target is outside the function or leads to an immediate exit (like JMP to another function)
+    // by Claude - Skip if this block's branch is already handled by a structured control flow (IfNode/LoopNode)
+    // The isInsideStructuredBranch flag is set when converting the branchBlock of an IfNode
     val lastInstr = this.lines.lastOrNull { it.instruction != null }?.instruction
-    if (lastInstr?.op?.isBranch == true) {
+    if (lastInstr?.op?.isBranch == true && !ctx.isInsideStructuredBranch) {
         val branchTarget = this.branchExit
         val fallthrough = this.fallThroughExit
 
@@ -896,7 +969,16 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
         val isInternalForwardBranch = !targetIsExit && branchTarget != null &&
             branchTarget.originalLineIndex > this.originalLineIndex
 
-        if ((targetIsExit || isInternalForwardBranch) && branchTarget != null) {
+        // by Claude - Check if branch target is a break target for an enclosing loop
+        // If so, we need to generate a labeled break. If NOT a break target, the branch
+        // just skips some code within the loop and we shouldn't generate return.
+        val targetIsBreakTarget = branchTarget != null && ctx.isBreakTarget(branchTarget)
+
+        // Only generate orphaned branch handling if:
+        // 1. Target is outside the function (exit), or
+        // 2. Target is a break target for an enclosing loop
+        // Skip handling for internal forward branches that just skip code within a loop
+        if ((targetIsExit || targetIsBreakTarget) && branchTarget != null) {
             // Generate an if-statement for this orphaned branch
             // The condition is based on the branch type
             val condition = buildOrphanedBranchCondition(lastInstr, ctx)
@@ -911,7 +993,14 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                     ctx.functionRegistry[assemblyLabelToKotlinName(label)]
                 }
 
-                val thenBody = if (jmpTargetFunction != null && jmpTarget != null) {
+                val thenBody = if (targetIsBreakTarget) {
+                    // by Claude - Branch to a break target - generate labeled break
+                    val breakLabel = ctx.findBreakLabel(branchTarget)!!
+                    listOf(
+                        KComment("goto $targetLabel", commentTypeIndicator = " "),
+                        KLabeledBreak(breakLabel)
+                    )
+                } else if (jmpTargetFunction != null && jmpTarget != null) {
                     // Generate tail call to the JMP target function
                     // by Claude - Use getRegisterValueOrDefault to handle registers properly
                     val targetName = assemblyLabelToKotlinName(jmpTarget)
@@ -1038,6 +1127,10 @@ fun List<KotlinStmt>.isRegisterAssigned(register: String): Boolean {
             is KWhile -> stmt.body.any { checkStmt(it) }
             is KDoWhile -> stmt.body.any { checkStmt(it) }
             is KLoop -> stmt.body.any { checkStmt(it) }
+            // by Claude - Handle labeled loop variants
+            is KLabeledWhile -> stmt.body.any { checkStmt(it) }
+            is KLabeledDoWhile -> stmt.body.any { checkStmt(it) }
+            is KLabeledLoop -> stmt.body.any { checkStmt(it) }
             is KWhen -> stmt.branches.any { it.body.any { s -> checkStmt(s) } } || stmt.elseBranch.any { checkStmt(it) }
             else -> false
         }
@@ -1104,6 +1197,16 @@ fun collectTempVars(stmts: List<KotlinStmt>): Set<String> {
                 collectFromExpr(stmt.condition)
             }
             is KLoop -> stmt.body.forEach { collectFromStmt(it) }
+            // by Claude - Handle labeled loop variants
+            is KLabeledWhile -> {
+                collectFromExpr(stmt.condition)
+                stmt.body.forEach { collectFromStmt(it) }
+            }
+            is KLabeledDoWhile -> {
+                stmt.body.forEach { collectFromStmt(it) }
+                collectFromExpr(stmt.condition)
+            }
+            is KLabeledLoop -> stmt.body.forEach { collectFromStmt(it) }
             is KReturn -> stmt.value?.let { collectFromExpr(it) }
             is KWhen -> {
                 collectFromExpr(stmt.subject)
@@ -1144,6 +1247,10 @@ fun convertTempDeclsToAssignments(stmts: List<KotlinStmt>, tempVars: Set<String>
             is KWhile -> KWhile(stmt.condition, stmt.body.map { convertStmt(it) })
             is KDoWhile -> KDoWhile(stmt.body.map { convertStmt(it) }, stmt.condition)
             is KLoop -> KLoop(stmt.body.map { convertStmt(it) })
+            // by Claude - Handle labeled loop variants
+            is KLabeledWhile -> KLabeledWhile(stmt.label, stmt.condition, stmt.body.map { convertStmt(it) })
+            is KLabeledDoWhile -> KLabeledDoWhile(stmt.label, stmt.body.map { convertStmt(it) }, stmt.condition)
+            is KLabeledLoop -> KLabeledLoop(stmt.label, stmt.body.map { convertStmt(it) })
             is KWhen -> KWhen(
                 subject = stmt.subject,
                 branches = stmt.branches.map { branch ->
@@ -1726,6 +1833,10 @@ fun KotlinStmt.usesRegister(registerName: String): Boolean {
         is KWhile -> condition.usesRegister(registerName) || body.any { it.usesRegister(registerName) }
         is KDoWhile -> condition.usesRegister(registerName) || body.any { it.usesRegister(registerName) }
         is KLoop -> body.any { it.usesRegister(registerName) }
+        // by Claude - Handle labeled loop variants
+        is KLabeledWhile -> condition.usesRegister(registerName) || body.any { it.usesRegister(registerName) }
+        is KLabeledDoWhile -> condition.usesRegister(registerName) || body.any { it.usesRegister(registerName) }
+        is KLabeledLoop -> body.any { it.usesRegister(registerName) }
         is KReturn -> value?.usesRegister(registerName) ?: false
         is KVarDecl -> value?.usesRegister(registerName) ?: false
         is KDestructuringDecl -> value.usesRegister(registerName)  // by Claude
@@ -1757,6 +1868,9 @@ fun KotlinExpr.usesRegister(registerName: String): Boolean {
 fun KotlinStmt.isTerminating(): Boolean {
     return when (this) {
         is KReturn -> true
+        // by Claude - Labeled breaks terminate the current code path (exit the loop)
+        is KLabeledBreak -> true
+        is KBreak -> true
         // For if statements, terminating only if BOTH branches terminate
         is KIf -> thenBranch.lastOrNull()?.isTerminating() == true &&
                   elseBranch.lastOrNull()?.isTerminating() == true

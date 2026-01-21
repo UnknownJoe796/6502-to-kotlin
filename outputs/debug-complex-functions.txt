@@ -212,7 +212,7 @@ Inputs:
 Outputs: 
 Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, X, OverflowFlag
 
---- Control Flow Nodes (6 nodes) ---
+--- Control Flow Nodes (5 nodes) ---
 
 [0] BlockNode
   Block: MusicHandler
@@ -225,27 +225,22 @@ Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, X, OverflowFlag
   Lines: 2
     JMP HandleSquare2Music
 
-[2] IfNode
-  Condition block: @15617
-  Sense: false
-  Then branch: 2 nodes
-  Else branch: 0 nodes
+[2] BlockNode
+  Block: @15617
+  Lines: 2
+    LDA AreaMusicQueue
+    BNE LoadAreaMusic
 
 [3] IfNode
-  Condition block: LoadAreaMusic
-  Sense: false
+  Condition block: @15619
+  Sense: true
   Then branch: 1 nodes
   Else branch: 0 nodes
 
 [4] BlockNode
-  Block: NoStop1
+  Block: @15622
   Lines: 1
-    LDY #$10
-
-[5] BlockNode
-  Block: GMLoopB
-  Lines: 2
-    STY GroundMusicHeaderOfs
+    RTS 
 
 --- Blocks Graph ---
 

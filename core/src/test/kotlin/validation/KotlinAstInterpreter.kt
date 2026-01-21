@@ -78,6 +78,11 @@ class KotlinAstInterpreter(
             is KComment, is KBlockComment -> { /* Skip comments */ }
             is KBreak -> { /* TODO: Handle break in loops */ }
             is KContinue -> { /* TODO: Handle continue in loops */ }
+            // by Claude - Handle labeled loops and breaks (for nested loop breaks)
+            is KLabeledBreak -> { /* TODO: Handle labeled break */ }
+            is KLabeledWhile -> executeWhile(KWhile(stmt.condition, stmt.body)) // Delegate to unlabeled
+            is KLabeledDoWhile -> executeDoWhile(KDoWhile(stmt.body, stmt.condition)) // Delegate to unlabeled
+            is KLabeledLoop -> executeLoop(KLoop(stmt.body)) // Delegate to unlabeled
             // by Claude - Handle destructuring declarations for Pair returns
             is KDestructuringDecl -> executeDestructuringDecl(stmt)
         }

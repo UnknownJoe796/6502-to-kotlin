@@ -94,7 +94,23 @@ Inputs:
 Outputs: 
 Clobbers: Y, NegativeFlag, ZeroFlag, A
 
---- Control Flow Nodes (0 nodes) ---
+--- Control Flow Nodes (3 nodes) ---
+
+[0] BlockNode
+  Block: MoveSpritesOffscreen
+  Lines: 3
+    LDY #$04
+    LDA #$f8
+
+[1] LoopNode
+  Type: LoopNode
+  Body nodes: 1
+  Entry: SprInitLoop
+
+[2] BlockNode
+  Block: @952
+  Lines: 1
+    RTS 
 
 --- Blocks Graph ---
 

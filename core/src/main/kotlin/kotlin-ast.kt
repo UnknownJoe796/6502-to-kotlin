@@ -217,6 +217,41 @@ data class KLoop(val body: List<KotlinStmt>) : KotlinStmt {
     }
 }
 
+// by Claude - Labeled loop variants for nested loop break support
+
+/** Labeled do-while loop: label@ do { ... } while (cond) */
+data class KLabeledDoWhile(val label: String, val body: List<KotlinStmt>, val condition: KotlinExpr) : KotlinStmt {
+    override fun toKotlin(indent: String): String {
+        val sb = StringBuilder()
+        sb.append("$indent$label@ do {\n")
+        body.forEach { sb.append(it.toKotlin("$indent    ")).append("\n") }
+        sb.append("$indent} while (${condition.toKotlin()})")
+        return sb.toString()
+    }
+}
+
+/** Labeled while loop: label@ while (cond) { ... } */
+data class KLabeledWhile(val label: String, val condition: KotlinExpr, val body: List<KotlinStmt>) : KotlinStmt {
+    override fun toKotlin(indent: String): String {
+        val sb = StringBuilder()
+        sb.append("$indent$label@ while (${condition.toKotlin()}) {\n")
+        body.forEach { sb.append(it.toKotlin("$indent    ")).append("\n") }
+        sb.append("$indent}")
+        return sb.toString()
+    }
+}
+
+/** Labeled infinite loop: label@ while (true) { ... } */
+data class KLabeledLoop(val label: String, val body: List<KotlinStmt>) : KotlinStmt {
+    override fun toKotlin(indent: String): String {
+        val sb = StringBuilder()
+        sb.append("$indent$label@ while (true) {\n")
+        body.forEach { sb.append(it.toKotlin("$indent    ")).append("\n") }
+        sb.append("$indent}")
+        return sb.toString()
+    }
+}
+
 /** Return statement: return, return value */
 data class KReturn(val value: KotlinExpr? = null) : KotlinStmt {
     override fun toKotlin(indent: String) = if (value != null) {
@@ -260,6 +295,12 @@ data class KWhenBranch(val values: List<KotlinExpr>, val body: List<KotlinStmt>)
 /** Break statement: break */
 object KBreak : KotlinStmt {
     override fun toKotlin(indent: String) = "${indent}break"
+}
+
+/** Labeled break statement: break@label */
+// by Claude - Used for breaking out of nested loops
+data class KLabeledBreak(val label: String) : KotlinStmt {
+    override fun toKotlin(indent: String) = "${indent}break@$label"
 }
 
 /** Continue statement: continue */
