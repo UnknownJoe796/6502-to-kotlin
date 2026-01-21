@@ -369,6 +369,9 @@ class KotlinCodeGenTest {
         // Detect JumpEngine dispatch tables
         val jumpEngineTables = com.ivieleague.decompiler6502tokotlin.hand.detectJumpEngineTables(code.lines)
 
+        // by Claude - Build fall-through graph for cycle detection (prevents mutual recursion in tail calls)
+        val fallThroughGraph = com.ivieleague.decompiler6502tokotlin.hand.buildFallThroughGraph(functions)
+
         outFile.bufferedWriter().use { out ->
             out.appendLine("@file:OptIn(ExperimentalUnsignedTypes::class)")
             out.appendLine()
@@ -383,7 +386,7 @@ class KotlinCodeGenTest {
             // Convert all functions
             for (func in functions.sortedBy { it.startingBlock.originalLineIndex }) {
                 try {
-                    val kFunc = func.toKotlinFunction(functionRegistry, jumpEngineTables)
+                    val kFunc = func.toKotlinFunction(functionRegistry, jumpEngineTables, fallThroughGraph)
                     out.appendLine(kFunc.toKotlin())
                     out.appendLine()
                 } catch (e: Exception) {

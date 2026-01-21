@@ -212,7 +212,7 @@ Inputs:
 Outputs: 
 Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, X, OverflowFlag
 
---- Control Flow Nodes (4 nodes) ---
+--- Control Flow Nodes (6 nodes) ---
 
 [0] BlockNode
   Block: MusicHandler
@@ -221,21 +221,31 @@ Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, Y, X, OverflowFlag
     BNE LoadEventMusic
 
 [1] BlockNode
-  Block: @15617
+  Block: ContinueMusic
   Lines: 2
-    LDA AreaMusicQueue
-    BNE LoadAreaMusic
+    JMP HandleSquare2Music
 
 [2] IfNode
-  Condition block: @15619
-  Sense: true
+  Condition block: @15617
+  Sense: false
+  Then branch: 2 nodes
+  Else branch: 0 nodes
+
+[3] IfNode
+  Condition block: LoadAreaMusic
+  Sense: false
   Then branch: 1 nodes
   Else branch: 0 nodes
 
-[3] BlockNode
-  Block: @15622
+[4] BlockNode
+  Block: NoStop1
   Lines: 1
-    RTS 
+    LDY #$10
+
+[5] BlockNode
+  Block: GMLoopB
+  Lines: 2
+    STY GroundMusicHeaderOfs
 
 --- Blocks Graph ---
 
@@ -919,22 +929,20 @@ Clobbers: A, NegativeFlag, ZeroFlag, Y, X, CarryFlag, $00, OverflowFlag
 [0] IfNode
   Condition block: ImpedePlayerMove
   Sense: false
-  Then branch: 1 nodes
+  Then branch: 2 nodes
   Else branch: 0 nodes
 
-[1] IfNode
-  Condition block: RImpd
-  Sense: false
-  Then branch: 1 nodes
-  Else branch: 0 nodes
+[1] BlockNode
+  Block: RImpd
+  Lines: 3
+    LDX #$02
+    CPY #$01
+    BPL ExIPM
 
 [2] BlockNode
-  Block: ExIPM
-  Lines: 5
-    TXA 
-    EOR #$ff
-    AND Player_CollisionBits
-    ... (2 more)
+  Block: @12336
+  Lines: 1
+    LDA #$01
 
 --- Blocks Graph ---
 
