@@ -699,8 +699,12 @@ fun List<AssemblyBlock>.functionify(
                 for (line in block.lines) {
                     val instr = line.instruction ?: continue
 
-                    // Track what's been defined before each JSR
-                    if (instr.op == AssemblyOp.JSR) {
+                    // Track what's been defined before each JSR or JMP to a function
+                    // by Claude - CRITICAL FIX: Also handle JMP (tail calls) for input propagation
+                    // When function A tail-calls function B via JMP, A needs B's inputs because
+                    // B will use the register values that A had when it jumped.
+                    // Example: imposeGravitySprObj JMPs to imposeGravity which uses X for indexing
+                    if (instr.op == AssemblyOp.JSR || instr.op == AssemblyOp.JMP) {
                         // Get the called function
                         val targetLabel = (instr.address as? AssemblyAddressing.Direct)?.label
                         val calledFunction = if (targetLabel != null) labelToFunction[targetLabel] else null
@@ -722,6 +726,23 @@ fun List<AssemblyBlock>.functionify(
                     instr.op.modifies(addrClass)
                         .mapNotNull { aff -> aff.toTrackedAsIo(instr.address, labelIsVirtualRegister) }
                         .forEach { state -> definedBeforeCall.add(state) }
+                }
+
+                // by Claude - Also check for fall-through to another function at the end of this block
+                // If this block falls through to another function's entry, we need that function's inputs
+                val fallThrough = block.fallThroughExit
+                if (fallThrough != null) {
+                    val fallThroughFunction = labelToFunction[fallThrough.label]
+                    if (fallThroughFunction != null && fallThroughFunction != func) {
+                        // This block falls through to another function - inherit its inputs
+                        val calleeInputs = fallThroughFunction.inputs ?: emptySet()
+                        for (input in calleeInputs) {
+                            if (input !in definedBeforeCall && input !in currentInputs) {
+                                currentInputs.add(input)
+                                changed = true
+                            }
+                        }
+                    }
                 }
             }
 
