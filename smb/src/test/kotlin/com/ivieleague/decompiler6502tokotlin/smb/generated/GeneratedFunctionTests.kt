@@ -14,7 +14,7 @@ import java.io.File
 
 /**
  * Auto-generated tests from TAS capture: smb-tas
- * Captured at: 2026-01-21T21:34:36.937077Z
+ * Captured at: 2026-01-21T21:47:53.046432Z
  * Total frames: 17868
  * Total captures: 1019846
  * Functions with tests: 157
@@ -25,7 +25,7 @@ import java.io.File
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 // Note: 8 functions skipped (not in validFunctions)
 // Note: 9 functions skipped (unreliable capture data)
-// Generated 1005 tests for 140 functions
+// Generated 1043 tests for 140 functions
 // Exact matches: 140, Fuzzy matches: 0
 // Parameterless: 53, With parameters: 87
 
@@ -2602,7 +2602,7 @@ class GeneratedFunctionTests {
      * Function: replaceBlockMetatile (0x8A61)
      * Parameters: A, X
      * Call depth: 9
-     * Memory reads: 4, writes: 4
+     * Memory reads: 14, writes: 4
      */
     @Test
     fun `replaceBlockMetatile_frame1345_test0`() {
@@ -2611,9 +2611,19 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (14 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x70u
+            memory[0x0003] = 0x24u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x00u
+            memory[0x0006] = 0xD0u
+            memory[0x01F0] = 0x8Eu
+            memory[0x01F1] = 0x8Au
             memory[0x01F2] = 0x63u
             memory[0x01F3] = 0x8Au
+            memory[0x0300] = 0x00u
             memory[0x03EC] = 0x01u
             memory[0x03F0] = 0x00u
 
@@ -2631,7 +2641,7 @@ class GeneratedFunctionTests {
      * Function: replaceBlockMetatile (0x8A61)
      * Parameters: A, X
      * Call depth: 8
-     * Memory reads: 4, writes: 4
+     * Memory reads: 14, writes: 4
      */
     @Test
     fun `replaceBlockMetatile_frame1519_test1`() {
@@ -2640,9 +2650,19 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (14 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x70u
+            memory[0x0003] = 0x24u
+            memory[0x0004] = 0x0Au
+            memory[0x0005] = 0x00u
+            memory[0x0006] = 0xD5u
+            memory[0x01F0] = 0x8Eu
+            memory[0x01F1] = 0x8Au
             memory[0x01F2] = 0x63u
             memory[0x01F3] = 0x8Au
+            memory[0x0300] = 0x00u
             memory[0x03ED] = 0x01u
             memory[0x03F0] = 0x01u
 
@@ -2660,7 +2680,7 @@ class GeneratedFunctionTests {
      * Function: replaceBlockMetatile (0x8A61)
      * Parameters: A, X
      * Call depth: 7
-     * Memory reads: 4, writes: 4
+     * Memory reads: 14, writes: 4
      */
     @Test
     fun `replaceBlockMetatile_frame5695_test2`() {
@@ -2669,9 +2689,19 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (14 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x30u
+            memory[0x0003] = 0x24u
+            memory[0x0004] = 0x0Cu
+            memory[0x0005] = 0x00u
+            memory[0x0006] = 0xD6u
+            memory[0x01F0] = 0x8Eu
+            memory[0x01F1] = 0x8Au
             memory[0x01F2] = 0x63u
             memory[0x01F3] = 0x8Au
+            memory[0x0300] = 0x00u
             memory[0x03EC] = 0x01u
             memory[0x03F0] = 0x02u
 
@@ -2695,7 +2725,7 @@ class GeneratedFunctionTests {
      * Function: destroyBlockMetatile (0x8A6B)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 3, writes: 3
+     * Memory reads: 10, writes: 3
      */
     @Test
     fun `destroyBlockMetatile_frame1316_test0`() {
@@ -2704,7 +2734,14 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (10 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x70u
+            memory[0x0003] = 0x24u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x00u
+            memory[0x0006] = 0xD0u
             memory[0x01ED] = 0x8Eu
             memory[0x01EE] = 0x8Au
             memory[0x0300] = 0x00u
@@ -2722,7 +2759,7 @@ class GeneratedFunctionTests {
      * Function: destroyBlockMetatile (0x8A6B)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 3, writes: 3
+     * Memory reads: 10, writes: 3
      */
     @Test
     fun `destroyBlockMetatile_frame1490_test1`() {
@@ -2731,7 +2768,14 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (10 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x70u
+            memory[0x0003] = 0x24u
+            memory[0x0004] = 0x0Au
+            memory[0x0005] = 0x00u
+            memory[0x0006] = 0xD5u
             memory[0x01ED] = 0x8Eu
             memory[0x01EE] = 0x8Au
             memory[0x0300] = 0x00u
@@ -2749,7 +2793,7 @@ class GeneratedFunctionTests {
      * Function: destroyBlockMetatile (0x8A6B)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 3, writes: 3
+     * Memory reads: 10, writes: 3
      */
     @Test
     fun `destroyBlockMetatile_frame5666_test2`() {
@@ -2758,7 +2802,14 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (10 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x30u
+            memory[0x0003] = 0x24u
+            memory[0x0004] = 0x0Cu
+            memory[0x0005] = 0x00u
+            memory[0x0006] = 0xD6u
             memory[0x01ED] = 0x8Eu
             memory[0x01EE] = 0x8Au
             memory[0x0300] = 0x00u
@@ -2782,7 +2833,7 @@ class GeneratedFunctionTests {
      * Function: writeBlockMetatile (0x8A6D)
      * Parameters: A, X
      * Call depth: 10
-     * Memory reads: 3, writes: 3
+     * Memory reads: 10, writes: 3
      */
     @Test
     fun `writeBlockMetatile_frame1345_test0`() {
@@ -2791,7 +2842,14 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (10 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x70u
+            memory[0x0003] = 0x24u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x00u
+            memory[0x0006] = 0xD0u
             memory[0x01F0] = 0x8Eu
             memory[0x01F1] = 0x8Au
             memory[0x0300] = 0x00u
@@ -2809,7 +2867,7 @@ class GeneratedFunctionTests {
      * Function: writeBlockMetatile (0x8A6D)
      * Parameters: A, X
      * Call depth: 9
-     * Memory reads: 3, writes: 3
+     * Memory reads: 10, writes: 3
      */
     @Test
     fun `writeBlockMetatile_frame1519_test1`() {
@@ -2818,7 +2876,14 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (10 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x70u
+            memory[0x0003] = 0x24u
+            memory[0x0004] = 0x0Au
+            memory[0x0005] = 0x00u
+            memory[0x0006] = 0xD5u
             memory[0x01F0] = 0x8Eu
             memory[0x01F1] = 0x8Au
             memory[0x0300] = 0x00u
@@ -2836,7 +2901,7 @@ class GeneratedFunctionTests {
      * Function: writeBlockMetatile (0x8A6D)
      * Parameters: A, X
      * Call depth: 8
-     * Memory reads: 3, writes: 3
+     * Memory reads: 10, writes: 3
      */
     @Test
     fun `writeBlockMetatile_frame5695_test2`() {
@@ -2845,7 +2910,14 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (10 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x30u
+            memory[0x0003] = 0x24u
+            memory[0x0004] = 0x0Cu
+            memory[0x0005] = 0x00u
+            memory[0x0006] = 0xD6u
             memory[0x01F0] = 0x8Eu
             memory[0x01F1] = 0x8Au
             memory[0x0300] = 0x00u
@@ -3255,14 +3327,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0x8E5C: readJoypads
-    // 9005 calls, 2 unique inputs
+    // 9005 calls, 37 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 3
      * Function: readJoypads (0x8E5C)
      * Call depth: 0
-     * Memory reads: 4, writes: 5
+     * Memory reads: 6, writes: 5
      */
     @Test
     fun `readJoypads_frame3_test0`() {
@@ -3271,10 +3343,12 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x00u
+            memory[0x01F8] = 0x00u
             memory[0x01F9] = 0x68u
             memory[0x01FA] = 0x8Eu
+            memory[0x074A] = 0x00u
             memory[0x074B] = 0x00u
 
             // Execute decompiled function
@@ -3287,22 +3361,264 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 14
+     * Test case 1 from frame 197
      * Function: readJoypads (0x8E5C)
      * Call depth: 0
-     * Memory reads: 4, writes: 5
+     * Memory reads: 6, writes: 5
      */
     @Test
-    fun `readJoypads_frame14_test1`() {
+    fun `readJoypads_frame197_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x00u
+            // Setup: Set input memory (6 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x01F8] = 0x00u
             memory[0x01F9] = 0x68u
             memory[0x01FA] = 0x8Eu
+            memory[0x074A] = 0x00u
+            memory[0x074B] = 0x00u
+
+            // Execute decompiled function
+            readJoypads()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x00u, memory[0x06FD], "Memory 0x06FD mismatch")
+            assertEquals(0x00u, memory[0x074B], "Memory 0x074B mismatch")
+        }
+    }
+
+    /**
+     * Test case 2 from frame 221
+     * Function: readJoypads (0x8E5C)
+     * Call depth: 0
+     * Memory reads: 6, writes: 5
+     */
+    @Test
+    fun `readJoypads_frame221_test2`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x01F8] = 0x00u
+            memory[0x01F9] = 0x68u
+            memory[0x01FA] = 0x8Eu
+            memory[0x074A] = 0x40u
+            memory[0x074B] = 0x00u
+
+            // Execute decompiled function
+            readJoypads()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x00u, memory[0x06FD], "Memory 0x06FD mismatch")
+            assertEquals(0x00u, memory[0x074B], "Memory 0x074B mismatch")
+        }
+    }
+
+    /**
+     * Test case 3 from frame 659
+     * Function: readJoypads (0x8E5C)
+     * Call depth: 0
+     * Memory reads: 6, writes: 5
+     */
+    @Test
+    fun `readJoypads_frame659_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x01F8] = 0x00u
+            memory[0x01F9] = 0x68u
+            memory[0x01FA] = 0x8Eu
+            memory[0x074A] = 0x40u
+            memory[0x074B] = 0x00u
+
+            // Execute decompiled function
+            readJoypads()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x00u, memory[0x06FD], "Memory 0x06FD mismatch")
+            assertEquals(0x00u, memory[0x074B], "Memory 0x074B mismatch")
+        }
+    }
+
+    /**
+     * Test case 4 from frame 1073
+     * Function: readJoypads (0x8E5C)
+     * Call depth: 0
+     * Memory reads: 6, writes: 5
+     */
+    @Test
+    fun `readJoypads_frame1073_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x01F8] = 0x00u
+            memory[0x01F9] = 0x68u
+            memory[0x01FA] = 0x8Eu
+            memory[0x074A] = 0x82u
+            memory[0x074B] = 0x00u
+
+            // Execute decompiled function
+            readJoypads()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x00u, memory[0x06FD], "Memory 0x06FD mismatch")
+            assertEquals(0x00u, memory[0x074B], "Memory 0x074B mismatch")
+        }
+    }
+
+    /**
+     * Test case 5 from frame 2525
+     * Function: readJoypads (0x8E5C)
+     * Call depth: 0
+     * Memory reads: 6, writes: 5
+     */
+    @Test
+    fun `readJoypads_frame2525_test5`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x01F8] = 0x00u
+            memory[0x01F9] = 0x68u
+            memory[0x01FA] = 0x8Eu
+            memory[0x074A] = 0xC0u
+            memory[0x074B] = 0x00u
+
+            // Execute decompiled function
+            readJoypads()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x00u, memory[0x06FD], "Memory 0x06FD mismatch")
+            assertEquals(0x00u, memory[0x074B], "Memory 0x074B mismatch")
+        }
+    }
+
+    /**
+     * Test case 6 from frame 3601
+     * Function: readJoypads (0x8E5C)
+     * Call depth: 0
+     * Memory reads: 6, writes: 5
+     */
+    @Test
+    fun `readJoypads_frame3601_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x01F8] = 0x00u
+            memory[0x01F9] = 0x68u
+            memory[0x01FA] = 0x8Eu
+            memory[0x074A] = 0xC2u
+            memory[0x074B] = 0x00u
+
+            // Execute decompiled function
+            readJoypads()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x00u, memory[0x06FD], "Memory 0x06FD mismatch")
+            assertEquals(0x00u, memory[0x074B], "Memory 0x074B mismatch")
+        }
+    }
+
+    /**
+     * Test case 7 from frame 5423
+     * Function: readJoypads (0x8E5C)
+     * Call depth: 0
+     * Memory reads: 6, writes: 5
+     */
+    @Test
+    fun `readJoypads_frame5423_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x01F8] = 0x00u
+            memory[0x01F9] = 0x68u
+            memory[0x01FA] = 0x8Eu
+            memory[0x074A] = 0xC1u
+            memory[0x074B] = 0x00u
+
+            // Execute decompiled function
+            readJoypads()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x00u, memory[0x06FD], "Memory 0x06FD mismatch")
+            assertEquals(0x00u, memory[0x074B], "Memory 0x074B mismatch")
+        }
+    }
+
+    /**
+     * Test case 8 from frame 8269
+     * Function: readJoypads (0x8E5C)
+     * Call depth: 0
+     * Memory reads: 6, writes: 5
+     */
+    @Test
+    fun `readJoypads_frame8269_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x01F8] = 0x00u
+            memory[0x01F9] = 0x68u
+            memory[0x01FA] = 0x8Eu
+            memory[0x074A] = 0x80u
+            memory[0x074B] = 0x00u
+
+            // Execute decompiled function
+            readJoypads()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x00u, memory[0x06FD], "Memory 0x06FD mismatch")
+            assertEquals(0x00u, memory[0x074B], "Memory 0x074B mismatch")
+        }
+    }
+
+    /**
+     * Test case 9 from frame 12299
+     * Function: readJoypads (0x8E5C)
+     * Call depth: 0
+     * Memory reads: 6, writes: 5
+     */
+    @Test
+    fun `readJoypads_frame12299_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x01F8] = 0x00u
+            memory[0x01F9] = 0x68u
+            memory[0x01FA] = 0x8Eu
+            memory[0x074A] = 0x40u
             memory[0x074B] = 0x00u
 
             // Execute decompiled function
@@ -4319,7 +4635,7 @@ class GeneratedFunctionTests {
      * Function: printStatusBarNumbers (0x8F06)
      * Parameters: A
      * Call depth: 5
-     * Memory reads: 12, writes: 16
+     * Memory reads: 15, writes: 16
      */
     @Test
     fun `printStatusBarNumbers_frame10_test0`() {
@@ -4328,19 +4644,22 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x02u
-            memory[0x0002] = 0x05u
-            memory[0x0003] = 0x06u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x02u
+            memory[0x01F3] = 0x03u
             memory[0x01F4] = 0x0Au
             memory[0x01F5] = 0x8Fu
-            memory[0x0300] = 0x05u
+            memory[0x0300] = 0x00u
             memory[0x07DD] = 0x00u
             memory[0x07DE] = 0x00u
             memory[0x07DF] = 0x00u
             memory[0x07E0] = 0x00u
             memory[0x07E1] = 0x00u
             memory[0x07E2] = 0x00u
+            memory[0x07ED] = 0x00u
+            memory[0x07EE] = 0x00u
 
             // Execute decompiled function
             printStatusBarNumbers(0x02)
@@ -4413,7 +4732,7 @@ class GeneratedFunctionTests {
      * Function: printStatusBarNumbers (0x8F06)
      * Parameters: A
      * Call depth: 12
-     * Memory reads: 12, writes: 16
+     * Memory reads: 15, writes: 16
      */
     @Test
     fun `printStatusBarNumbers_frame1317_test2`() {
@@ -4422,19 +4741,22 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x02u
-            memory[0x0002] = 0x0Fu
-            memory[0x0003] = 0x06u
+            memory[0x0002] = 0x0Au
+            memory[0x0003] = 0x02u
+            memory[0x01E9] = 0x03u
             memory[0x01EA] = 0x0Au
             memory[0x01EB] = 0x8Fu
-            memory[0x0300] = 0x0Fu
+            memory[0x0300] = 0x0Au
             memory[0x07DD] = 0x00u
             memory[0x07DE] = 0x00u
             memory[0x07DF] = 0x00u
             memory[0x07E0] = 0x00u
             memory[0x07E1] = 0x00u
             memory[0x07E2] = 0x00u
+            memory[0x07ED] = 0x00u
+            memory[0x07EE] = 0x00u
 
             // Execute decompiled function
             printStatusBarNumbers(0x02)
@@ -4460,7 +4782,7 @@ class GeneratedFunctionTests {
      * Function: printStatusBarNumbers (0x8F06)
      * Parameters: A
      * Call depth: 10
-     * Memory reads: 12, writes: 16
+     * Memory reads: 15, writes: 16
      */
     @Test
     fun `printStatusBarNumbers_frame1435_test3`() {
@@ -4469,19 +4791,22 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x02u
-            memory[0x0002] = 0x05u
-            memory[0x0003] = 0x06u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x02u
+            memory[0x01EF] = 0x03u
             memory[0x01F0] = 0x0Au
             memory[0x01F1] = 0x8Fu
-            memory[0x0300] = 0x05u
+            memory[0x0300] = 0x00u
             memory[0x07DD] = 0x00u
             memory[0x07DE] = 0x00u
             memory[0x07DF] = 0x00u
             memory[0x07E0] = 0x00u
             memory[0x07E1] = 0x00u
             memory[0x07E2] = 0x00u
+            memory[0x07ED] = 0x00u
+            memory[0x07EE] = 0x00u
 
             // Execute decompiled function
             printStatusBarNumbers(0x02)
@@ -4507,7 +4832,7 @@ class GeneratedFunctionTests {
      * Function: printStatusBarNumbers (0x8F06)
      * Parameters: A
      * Call depth: 12
-     * Memory reads: 12, writes: 16
+     * Memory reads: 15, writes: 16
      */
     @Test
     fun `printStatusBarNumbers_frame5667_test4`() {
@@ -4516,19 +4841,22 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x02u
-            memory[0x0002] = 0x0Fu
-            memory[0x0003] = 0x06u
+            memory[0x0002] = 0x0Au
+            memory[0x0003] = 0x02u
+            memory[0x01E9] = 0x03u
             memory[0x01EA] = 0x0Au
             memory[0x01EB] = 0x8Fu
-            memory[0x0300] = 0x0Fu
+            memory[0x0300] = 0x0Au
             memory[0x07DD] = 0x00u
             memory[0x07DE] = 0x00u
             memory[0x07DF] = 0x00u
             memory[0x07E0] = 0x00u
             memory[0x07E1] = 0x00u
             memory[0x07E2] = 0x00u
+            memory[0x07ED] = 0x00u
+            memory[0x07EE] = 0x00u
 
             // Execute decompiled function
             printStatusBarNumbers(0x02)
@@ -4737,7 +5065,7 @@ class GeneratedFunctionTests {
      * Test case 0 from frame 3
      * Function: updateTopScore (0x8F97)
      * Call depth: 0
-     * Memory reads: 14, writes: 8
+     * Memory reads: 20, writes: 8
      */
     @Test
     fun `updateTopScore_frame3_test0`() {
@@ -4746,7 +5074,7 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (14 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x01F9] = 0x9Bu
             memory[0x01FA] = 0x8Fu
             memory[0x07D7] = 0x00u
@@ -4755,6 +5083,12 @@ class GeneratedFunctionTests {
             memory[0x07DA] = 0x00u
             memory[0x07DB] = 0x00u
             memory[0x07DC] = 0x00u
+            memory[0x07DD] = 0x00u
+            memory[0x07DE] = 0x00u
+            memory[0x07DF] = 0x00u
+            memory[0x07E0] = 0x00u
+            memory[0x07E1] = 0x00u
+            memory[0x07E2] = 0x00u
             memory[0x07E3] = 0x00u
             memory[0x07E4] = 0x00u
             memory[0x07E5] = 0x00u
@@ -4882,14 +5216,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0x92B0: areaParserTaskHandler
-    // 1464 calls, 131 unique inputs
+    // 1464 calls, 503 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 12
      * Function: areaParserTaskHandler (0x92B0)
      * Call depth: 4
-     * Memory reads: 3, writes: 5
+     * Memory reads: 47, writes: 5
      */
     @Test
     fun `areaParserTaskHandler_frame12_test0`() {
@@ -4898,10 +5232,54 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (47 addresses)
+            memory[0x0000] = 0x06u
+            memory[0x0001] = 0x03u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xFCu
+            memory[0x0007] = 0x93u
+            memory[0x0008] = 0x02u
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x01F2] = 0x67u
+            memory[0x01F3] = 0x95u
+            memory[0x01F4] = 0xCAu
+            memory[0x01F5] = 0x92u
+            memory[0x01F6] = 0xBEu
+            memory[0x01F7] = 0x92u
             memory[0x01F8] = 0xEBu
             memory[0x01F9] = 0x86u
+            memory[0x06A0] = 0x00u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x05u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
             memory[0x071F] = 0x00u
+            memory[0x0725] = 0x00u
+            memory[0x0726] = 0x00u
+            memory[0x0727] = 0x01u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x00u
+            memory[0x072B] = 0x00u
+            memory[0x072C] = 0x00u
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0xFFu
+            memory[0x0741] = 0x00u
+            memory[0x0742] = 0x02u
+            memory[0x0743] = 0x00u
+            memory[0x074E] = 0x01u
 
             // Execute decompiled function
             areaParserTaskHandler()
@@ -4914,8 +5292,8 @@ class GeneratedFunctionTests {
     /**
      * Test case 1 from frame 19
      * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 11
-     * Memory reads: 4, writes: 4
+     * Call depth: 6
+     * Memory reads: 39, writes: 4
      */
     @Test
     fun `areaParserTaskHandler_frame19_test1`() {
@@ -4924,38 +5302,94 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (39 addresses)
+            memory[0x0000] = 0x1Du
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xAEu
+            memory[0x0007] = 0x88u
+            memory[0x01F4] = 0xCAu
+            memory[0x01F5] = 0x92u
+            memory[0x01F6] = 0xBEu
+            memory[0x01F7] = 0x92u
             memory[0x01F8] = 0xEBu
             memory[0x01F9] = 0x86u
-            memory[0x071E] = 0x05u
+            memory[0x0340] = 0x1Du
+            memory[0x03F9] = 0x00u
+            memory[0x03FA] = 0x00u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x10u
+            memory[0x03FF] = 0x01u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x03u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x06u
+            memory[0x0720] = 0x20u
+            memory[0x0721] = 0x99u
+            memory[0x0726] = 0x0Cu
+
+            // Execute decompiled function
+            areaParserTaskHandler()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 2 from frame 1159
+     * Function: areaParserTaskHandler (0x92B0)
+     * Call depth: 6
+     * Memory reads: 25, writes: 2
+     */
+    @Test
+    fun `areaParserTaskHandler_frame1159_test2`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (25 addresses)
+            memory[0x0000] = 0x27u
+            memory[0x0001] = 0x10u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xDBu
+            memory[0x0007] = 0x92u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
+            memory[0x01F4] = 0xBEu
+            memory[0x01F5] = 0x92u
+            memory[0x01F6] = 0x91u
+            memory[0x01F7] = 0xAFu
+            memory[0x0340] = 0x00u
+            memory[0x03F9] = 0x00u
+            memory[0x03FA] = 0x00u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x10u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x50u
+            memory[0x03FF] = 0x05u
+            memory[0x06A0] = 0x19u
             memory[0x071F] = 0x01u
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x04u, memory[0x071E], "Memory 0x071E mismatch")
-            assertEquals(0x06u, memory[0x0773], "Memory 0x0773 mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 1155
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 6
-     * Memory reads: 3, writes: 2
-     */
-    @Test
-    fun `areaParserTaskHandler_frame1155_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (3 addresses)
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-            memory[0x071F] = 0x03u
+            memory[0x0720] = 0x24u
+            memory[0x0721] = 0x94u
+            memory[0x0726] = 0x09u
 
             // Execute decompiled function
             areaParserTaskHandler()
@@ -4966,100 +5400,58 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1263
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 8
-     * Memory reads: 3, writes: 2
-     */
-    @Test
-    fun `areaParserTaskHandler_frame1263_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (3 addresses)
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-            memory[0x071F] = 0x02u
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 4 from frame 1565
+     * Test case 3 from frame 1525
      * Function: areaParserTaskHandler (0x92B0)
      * Call depth: 7
-     * Memory reads: 3, writes: 3
+     * Memory reads: 39, writes: 2
      */
     @Test
-    fun `areaParserTaskHandler_frame1565_test4`() {
+    fun `areaParserTaskHandler_frame1525_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (39 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x04u
+            memory[0x0003] = 0x80u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xAEu
+            memory[0x0007] = 0x88u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
+            memory[0x01F4] = 0xBEu
+            memory[0x01F5] = 0x92u
             memory[0x01F6] = 0x91u
             memory[0x01F7] = 0xAFu
-            memory[0x071F] = 0x00u
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x08u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    /**
-     * Test case 5 from frame 2343
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 6
-     * Memory reads: 3, writes: 2
-     */
-    @Test
-    fun `areaParserTaskHandler_frame2343_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (3 addresses)
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-            memory[0x071F] = 0x05u
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 6 from frame 4937
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 6
-     * Memory reads: 3, writes: 2
-     */
-    @Test
-    fun `areaParserTaskHandler_frame4937_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (3 addresses)
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
+            memory[0x0340] = 0x00u
+            memory[0x03F9] = 0x00u
+            memory[0x03FA] = 0x00u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x00u
+            memory[0x03FF] = 0x00u
+            memory[0x06A1] = 0x81u
+            memory[0x06A2] = 0x84u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x12u
+            memory[0x06AA] = 0x14u
+            memory[0x06AB] = 0x14u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
             memory[0x071F] = 0x07u
+            memory[0x0720] = 0x20u
+            memory[0x0721] = 0x8Cu
+            memory[0x0726] = 0x06u
 
             // Execute decompiled function
             areaParserTaskHandler()
@@ -5070,22 +5462,128 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 5989
+     * Test case 4 from frame 2389
+     * Function: areaParserTaskHandler (0x92B0)
+     * Call depth: 6
+     * Memory reads: 47, writes: 2
+     */
+    @Test
+    fun `areaParserTaskHandler_frame2389_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (47 addresses)
+            memory[0x0000] = 0x08u
+            memory[0x0001] = 0x03u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xFCu
+            memory[0x0007] = 0x93u
+            memory[0x0008] = 0x02u
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x01F0] = 0x67u
+            memory[0x01F1] = 0x95u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
+            memory[0x01F4] = 0xBEu
+            memory[0x01F5] = 0x92u
+            memory[0x01F6] = 0x91u
+            memory[0x01F7] = 0xAFu
+            memory[0x06A0] = 0x13u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x08u
+            memory[0x06AB] = 0x09u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x04u
+            memory[0x0725] = 0x03u
+            memory[0x0726] = 0x03u
+            memory[0x0727] = 0x01u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x03u
+            memory[0x072B] = 0x01u
+            memory[0x072C] = 0x10u
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0xFFu
+            memory[0x0741] = 0x00u
+            memory[0x0742] = 0x02u
+            memory[0x0743] = 0x00u
+            memory[0x074E] = 0x01u
+
+            // Execute decompiled function
+            areaParserTaskHandler()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 5 from frame 5131
      * Function: areaParserTaskHandler (0x92B0)
      * Call depth: 8
-     * Memory reads: 3, writes: 2
+     * Memory reads: 39, writes: 2
      */
     @Test
-    fun `areaParserTaskHandler_frame5989_test7`() {
+    fun `areaParserTaskHandler_frame5131_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (39 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xAEu
+            memory[0x0007] = 0x88u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
+            memory[0x01F4] = 0xBEu
+            memory[0x01F5] = 0x92u
             memory[0x01F6] = 0x91u
             memory[0x01F7] = 0xAFu
-            memory[0x071F] = 0x04u
+            memory[0x0340] = 0x00u
+            memory[0x03F9] = 0x00u
+            memory[0x03FA] = 0x00u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x10u
+            memory[0x03FF] = 0x01u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x00u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x06u
+            memory[0x0720] = 0x20u
+            memory[0x0721] = 0x81u
+            memory[0x0726] = 0x00u
 
             // Execute decompiled function
             areaParserTaskHandler()
@@ -5096,22 +5594,44 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 8 from frame 6185
+     * Test case 6 from frame 5995
      * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 12
-     * Memory reads: 3, writes: 2
+     * Call depth: 8
+     * Memory reads: 25, writes: 2
      */
     @Test
-    fun `areaParserTaskHandler_frame6185_test8`() {
+    fun `areaParserTaskHandler_frame5995_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (25 addresses)
+            memory[0x0000] = 0x27u
+            memory[0x0001] = 0x08u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xDBu
+            memory[0x0007] = 0x92u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
+            memory[0x01F4] = 0xBEu
+            memory[0x01F5] = 0x92u
             memory[0x01F6] = 0x91u
             memory[0x01F7] = 0xAFu
-            memory[0x071F] = 0x05u
+            memory[0x0340] = 0x00u
+            memory[0x03F9] = 0x00u
+            memory[0x03FA] = 0x00u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x50u
+            memory[0x03FF] = 0x05u
+            memory[0x06A0] = 0x15u
+            memory[0x071F] = 0x01u
+            memory[0x0720] = 0x24u
+            memory[0x0721] = 0x8Cu
+            memory[0x0726] = 0x05u
 
             // Execute decompiled function
             areaParserTaskHandler()
@@ -5122,23 +5642,182 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 9 from frame 8463
+     * Test case 7 from frame 8191
      * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 7
-     * Memory reads: 4, writes: 2
+     * Call depth: 8
+     * Memory reads: 39, writes: 2
      */
     @Test
-    fun `areaParserTaskHandler_frame8463_test9`() {
+    fun `areaParserTaskHandler_frame8191_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
-            memory[0x000E] = 0x08u
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x071F] = 0x04u
+            // Setup: Set input memory (39 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xAEu
+            memory[0x0007] = 0x88u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
+            memory[0x01F4] = 0xBEu
+            memory[0x01F5] = 0x92u
+            memory[0x01F6] = 0x91u
+            memory[0x01F7] = 0xAFu
+            memory[0x0340] = 0x00u
+            memory[0x03F9] = 0x20u
+            memory[0x03FA] = 0x02u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x10u
+            memory[0x03FF] = 0x01u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x81u
+            memory[0x06A3] = 0x84u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x13u
+            memory[0x06AB] = 0x15u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x03u
+            memory[0x0720] = 0x24u
+            memory[0x0721] = 0x9Au
+            memory[0x0726] = 0x0Du
+
+            // Execute decompiled function
+            areaParserTaskHandler()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 8 from frame 9107
+     * Function: areaParserTaskHandler (0x92B0)
+     * Call depth: 8
+     * Memory reads: 39, writes: 2
+     */
+    @Test
+    fun `areaParserTaskHandler_frame9107_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (39 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xAEu
+            memory[0x0007] = 0x88u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
+            memory[0x01F4] = 0xBEu
+            memory[0x01F5] = 0x92u
+            memory[0x01F6] = 0x91u
+            memory[0x01F7] = 0xAFu
+            memory[0x0340] = 0x00u
+            memory[0x03F9] = 0x00u
+            memory[0x03FA] = 0x00u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x50u
+            memory[0x03FF] = 0x05u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x08u
+            memory[0x06AB] = 0x09u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x02u
+            memory[0x0720] = 0x24u
+            memory[0x0721] = 0x87u
+            memory[0x0726] = 0x03u
+
+            // Execute decompiled function
+            areaParserTaskHandler()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 9 from frame 12237
+     * Function: areaParserTaskHandler (0x92B0)
+     * Call depth: 8
+     * Memory reads: 39, writes: 2
+     */
+    @Test
+    fun `areaParserTaskHandler_frame12237_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (39 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xAEu
+            memory[0x0007] = 0x88u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
+            memory[0x01F4] = 0xBEu
+            memory[0x01F5] = 0x92u
+            memory[0x01F6] = 0x91u
+            memory[0x01F7] = 0xAFu
+            memory[0x0340] = 0x00u
+            memory[0x03F9] = 0x00u
+            memory[0x03FA] = 0x00u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x00u
+            memory[0x03FF] = 0x00u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x07u
+            memory[0x06AA] = 0x06u
+            memory[0x06AB] = 0x0Au
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x07u
+            memory[0x0720] = 0x24u
+            memory[0x0721] = 0x84u
+            memory[0x0726] = 0x02u
 
             // Execute decompiled function
             areaParserTaskHandler()
@@ -5151,7 +5830,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0x92C8: areaParserTasks
     // Parameters: A
-    // 1464 calls, 37 unique inputs
+    // 1464 calls, 313 unique inputs
     // =========================================
 
     /**
@@ -5159,7 +5838,7 @@ class GeneratedFunctionTests {
      * Function: areaParserTasks (0x92C8)
      * Parameters: A
      * Call depth: 5
-     * Memory reads: 3, writes: 3
+     * Memory reads: 45, writes: 3
      */
     @Test
     fun `areaParserTasks_frame12_test0`() {
@@ -5168,10 +5847,52 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (45 addresses)
+            memory[0x0000] = 0x06u
+            memory[0x0001] = 0x03u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xFCu
+            memory[0x0007] = 0x93u
+            memory[0x0008] = 0x02u
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x01F2] = 0x67u
+            memory[0x01F3] = 0x95u
+            memory[0x01F4] = 0xCAu
+            memory[0x01F5] = 0x92u
             memory[0x01F6] = 0xBEu
             memory[0x01F7] = 0x92u
+            memory[0x06A0] = 0x00u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x05u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
             memory[0x071F] = 0x08u
+            memory[0x0725] = 0x00u
+            memory[0x0726] = 0x00u
+            memory[0x0727] = 0x01u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x00u
+            memory[0x072B] = 0x00u
+            memory[0x072C] = 0x00u
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0xFFu
+            memory[0x0741] = 0x00u
+            memory[0x0742] = 0x02u
+            memory[0x0743] = 0x00u
+            memory[0x074E] = 0x01u
 
             // Execute decompiled function
             areaParserTasks(0x07)
@@ -5182,50 +5903,43 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 13
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 8
-     * Memory reads: 3, writes: 3
-     */
-    @Test
-    fun `areaParserTasks_frame13_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (3 addresses)
-            memory[0x01F6] = 0xBEu
-            memory[0x01F7] = 0x92u
-            memory[0x071F] = 0x05u
-
-            // Execute decompiled function
-            areaParserTasks(0x04)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x04u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 13
+     * Test case 1 from frame 16
      * Function: areaParserTasks (0x92C8)
      * Parameters: A
      * Call depth: 12
-     * Memory reads: 3, writes: 5
+     * Memory reads: 23, writes: 5
      */
     @Test
-    fun `areaParserTasks_frame13_test2`() {
+    fun `areaParserTasks_frame16_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (23 addresses)
+            memory[0x0000] = 0x23u
+            memory[0x0001] = 0x0Cu
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xDBu
+            memory[0x0007] = 0x92u
+            memory[0x01F4] = 0xCAu
+            memory[0x01F5] = 0x92u
             memory[0x01F6] = 0xBEu
             memory[0x01F7] = 0x92u
+            memory[0x0340] = 0x74u
+            memory[0x03F9] = 0x00u
+            memory[0x03FA] = 0x00u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x50u
+            memory[0x03FF] = 0x05u
+            memory[0x06A0] = 0x07u
             memory[0x071F] = 0x01u
+            memory[0x0720] = 0x20u
+            memory[0x0721] = 0x90u
+            memory[0x0726] = 0x07u
 
             // Execute decompiled function
             areaParserTasks(0x00)
@@ -5236,103 +5950,240 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1145
+     * Test case 2 from frame 20
      * Function: areaParserTasks (0x92C8)
      * Parameters: A
-     * Call depth: 7
-     * Memory reads: 2, writes: 2
+     * Call depth: 11
+     * Memory reads: 37, writes: 3
      */
     @Test
-    fun `areaParserTasks_frame1145_test3`() {
+    fun `areaParserTasks_frame20_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (2 addresses)
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-
-            // Execute decompiled function
-            areaParserTasks(0x07)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 4 from frame 1151
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 7
-     * Memory reads: 3, writes: 3
-     */
-    @Test
-    fun `areaParserTasks_frame1151_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (3 addresses)
-            memory[0x01F4] = 0xBEu
+            // Setup: Set input memory (37 addresses)
+            memory[0x0000] = 0x57u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xAEu
+            memory[0x0007] = 0x88u
+            memory[0x01F4] = 0xCAu
             memory[0x01F5] = 0x92u
-            memory[0x071F] = 0x05u
+            memory[0x01F6] = 0xBEu
+            memory[0x01F7] = 0x92u
+            memory[0x0340] = 0x57u
+            memory[0x03F9] = 0x00u
+            memory[0x03FA] = 0x00u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x50u
+            memory[0x03FF] = 0x05u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x04u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x02u
+            memory[0x0720] = 0x20u
+            memory[0x0721] = 0x9Fu
+            memory[0x0726] = 0x0Fu
 
             // Execute decompiled function
-            areaParserTasks(0x04)
+            areaParserTasks(0x01)
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0x04u, memory[0x071F], "Memory 0x071F mismatch")
+            assertEquals(0x01u, memory[0x071F], "Memory 0x071F mismatch")
         }
     }
 
     /**
-     * Test case 5 from frame 1159
+     * Test case 3 from frame 24
      * Function: areaParserTasks (0x92C8)
      * Parameters: A
-     * Call depth: 7
-     * Memory reads: 3, writes: 5
+     * Call depth: 15
+     * Memory reads: 37, writes: 3
      */
     @Test
-    fun `areaParserTasks_frame1159_test5`() {
+    fun `areaParserTasks_frame24_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
-            memory[0x01F4] = 0xBEu
+            // Setup: Set input memory (37 addresses)
+            memory[0x0000] = 0x57u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xAEu
+            memory[0x0007] = 0x88u
+            memory[0x01F4] = 0xCAu
             memory[0x01F5] = 0x92u
-            memory[0x071F] = 0x01u
+            memory[0x01F6] = 0xBEu
+            memory[0x01F7] = 0x92u
+            memory[0x0340] = 0x57u
+            memory[0x03F9] = 0x00u
+            memory[0x03FA] = 0x30u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0xD0u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x50u
+            memory[0x03FF] = 0x05u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0xC0u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x02u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x02u
+            memory[0x0720] = 0x24u
+            memory[0x0721] = 0x8Fu
+            memory[0x0726] = 0x07u
 
             // Execute decompiled function
-            areaParserTasks(0x00)
+            areaParserTasks(0x01)
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x071F], "Memory 0x071F mismatch")
+            assertEquals(0x01u, memory[0x071F], "Memory 0x071F mismatch")
         }
     }
 
     /**
-     * Test case 6 from frame 1261
+     * Test case 4 from frame 1305
      * Function: areaParserTasks (0x92C8)
      * Parameters: A
      * Call depth: 9
-     * Memory reads: 3, writes: 3
+     * Memory reads: 37, writes: 3
      */
     @Test
-    fun `areaParserTasks_frame1261_test6`() {
+    fun `areaParserTasks_frame1305_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (37 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xAEu
+            memory[0x0007] = 0x88u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
             memory[0x01F4] = 0xBEu
             memory[0x01F5] = 0x92u
+            memory[0x0340] = 0x00u
+            memory[0x03F9] = 0xA0u
+            memory[0x03FA] = 0x0Au
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x50u
+            memory[0x03FF] = 0x05u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x82u
+            memory[0x06A3] = 0x85u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x00u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x02u
+            memory[0x0720] = 0x24u
+            memory[0x0721] = 0x9Fu
+            memory[0x0726] = 0x0Fu
+
+            // Execute decompiled function
+            areaParserTasks(0x01)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x01u, memory[0x071F], "Memory 0x071F mismatch")
+        }
+    }
+
+    /**
+     * Test case 5 from frame 1533
+     * Function: areaParserTasks (0x92C8)
+     * Parameters: A
+     * Call depth: 8
+     * Memory reads: 37, writes: 3
+     */
+    @Test
+    fun `areaParserTasks_frame1533_test5`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (37 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x08u
+            memory[0x0003] = 0x80u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xAEu
+            memory[0x0007] = 0x88u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
+            memory[0x01F4] = 0xBEu
+            memory[0x01F5] = 0x92u
+            memory[0x0340] = 0x00u
+            memory[0x03F9] = 0x22u
+            memory[0x03FA] = 0x00u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x10u
+            memory[0x03FF] = 0x01u
+            memory[0x06A1] = 0x82u
+            memory[0x06A2] = 0x85u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x13u
+            memory[0x06AA] = 0x15u
+            memory[0x06AB] = 0x15u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
             memory[0x071F] = 0x03u
+            memory[0x0720] = 0x20u
+            memory[0x0721] = 0x8Eu
+            memory[0x0726] = 0x07u
 
             // Execute decompiled function
             areaParserTasks(0x02)
@@ -5343,52 +6194,78 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 1501
+     * Test case 6 from frame 2297
      * Function: areaParserTasks (0x92C8)
      * Parameters: A
-     * Call depth: 8
-     * Memory reads: 3, writes: 5
+     * Call depth: 7
+     * Memory reads: 55, writes: 2
      */
     @Test
-    fun `areaParserTasks_frame1501_test7`() {
+    fun `areaParserTasks_frame2297_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (55 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x03u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xFCu
+            memory[0x0007] = 0x93u
+            memory[0x0008] = 0x02u
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x01EC] = 0x3Du
+            memory[0x01ED] = 0x99u
+            memory[0x01EE] = 0x66u
+            memory[0x01EF] = 0x96u
+            memory[0x01F0] = 0x67u
+            memory[0x01F1] = 0x95u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
             memory[0x01F4] = 0xBEu
             memory[0x01F5] = 0x92u
-            memory[0x071F] = 0x01u
-
-            // Execute decompiled function
-            areaParserTasks(0x00)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    /**
-     * Test case 8 from frame 6101
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 9
-     * Memory reads: 2, writes: 2
-     */
-    @Test
-    fun `areaParserTasks_frame6101_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (2 addresses)
             memory[0x01F6] = 0x91u
             memory[0x01F7] = 0xAFu
+            memory[0x06A0] = 0x0Fu
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x13u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x00u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x04u
+            memory[0x0725] = 0x02u
+            memory[0x0726] = 0x0Fu
+            memory[0x0727] = 0x01u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x03u
+            memory[0x072B] = 0x01u
+            memory[0x072C] = 0x10u
+            memory[0x072F] = 0x0Eu
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0x00u
+            memory[0x0735] = 0x02u
+            memory[0x0741] = 0x00u
+            memory[0x0742] = 0x02u
+            memory[0x0743] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x075F] = 0x00u
+            memory[0x0760] = 0x00u
 
             // Execute decompiled function
-            areaParserTasks(0x07)
+            areaParserTasks(0x03)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -5396,35 +6273,199 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 9 from frame 6115
+     * Test case 7 from frame 2565
      * Function: areaParserTasks (0x92C8)
      * Parameters: A
-     * Call depth: 9
-     * Memory reads: 3, writes: 5
+     * Call depth: 7
+     * Memory reads: 45, writes: 3
      */
     @Test
-    fun `areaParserTasks_frame6115_test9`() {
+    fun `areaParserTasks_frame2565_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (45 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x03u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xFCu
+            memory[0x0007] = 0x93u
+            memory[0x0008] = 0x02u
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x01F0] = 0x67u
+            memory[0x01F1] = 0x95u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
             memory[0x01F4] = 0xBEu
             memory[0x01F5] = 0x92u
-            memory[0x071F] = 0x01u
+            memory[0x06A0] = 0x17u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x00u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x04u
+            memory[0x0725] = 0x03u
+            memory[0x0726] = 0x07u
+            memory[0x0727] = 0x01u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x03u
+            memory[0x072B] = 0x01u
+            memory[0x072C] = 0x10u
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0xFFu
+            memory[0x0741] = 0x00u
+            memory[0x0742] = 0x02u
+            memory[0x0743] = 0x00u
+            memory[0x074E] = 0x01u
 
             // Execute decompiled function
-            areaParserTasks(0x00)
+            areaParserTasks(0x03)
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x071F], "Memory 0x071F mismatch")
+            assertEquals(0x03u, memory[0x071F], "Memory 0x071F mismatch")
+        }
+    }
+
+    /**
+     * Test case 8 from frame 5413
+     * Function: areaParserTasks (0x92C8)
+     * Parameters: A
+     * Call depth: 8
+     * Memory reads: 37, writes: 3
+     */
+    @Test
+    fun `areaParserTasks_frame5413_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (37 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xAEu
+            memory[0x0007] = 0x88u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
+            memory[0x01F4] = 0xBEu
+            memory[0x01F5] = 0x92u
+            memory[0x0340] = 0x00u
+            memory[0x03F9] = 0x00u
+            memory[0x03FA] = 0x00u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x10u
+            memory[0x03FF] = 0x01u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x03u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x03u
+            memory[0x0720] = 0x20u
+            memory[0x0721] = 0x96u
+            memory[0x0726] = 0x0Bu
+
+            // Execute decompiled function
+            areaParserTasks(0x02)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x02u, memory[0x071F], "Memory 0x071F mismatch")
+        }
+    }
+
+    /**
+     * Test case 9 from frame 6347
+     * Function: areaParserTasks (0x92C8)
+     * Parameters: A
+     * Call depth: 13
+     * Memory reads: 37, writes: 3
+     */
+    @Test
+    fun `areaParserTasks_frame6347_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (37 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0xCAu
+            memory[0x0005] = 0x92u
+            memory[0x0006] = 0xAEu
+            memory[0x0007] = 0x88u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x92u
+            memory[0x01F4] = 0xBEu
+            memory[0x01F5] = 0x92u
+            memory[0x0340] = 0x00u
+            memory[0x03F9] = 0x00u
+            memory[0x03FA] = 0x00u
+            memory[0x03FB] = 0x00u
+            memory[0x03FC] = 0x00u
+            memory[0x03FD] = 0x00u
+            memory[0x03FE] = 0x10u
+            memory[0x03FF] = 0x01u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x04u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x03u
+            memory[0x0720] = 0x24u
+            memory[0x0721] = 0x9Eu
+            memory[0x0726] = 0x0Fu
+
+            // Execute decompiled function
+            areaParserTasks(0x02)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x02u, memory[0x071F], "Memory 0x071F mismatch")
         }
     }
 
     // =========================================
     // 0x9508: processAreaData
-    // 366 calls, 25 unique inputs
+    // 366 calls, 47 unique inputs
     // =========================================
 
     /**
@@ -5468,27 +6509,78 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 21
+     * Test case 1 from frame 22
      * Function: processAreaData (0x9508)
      * Call depth: 7
-     * Memory reads: 26, writes: 20
+     * Memory reads: 15, writes: 4
      */
     @Test
-    fun `processAreaData_frame21_test1`() {
+    fun `processAreaData_frame22_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (26 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0006] = 0xD0u
-            memory[0x0007] = 0x05u
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x20u
+            memory[0x0008] = 0x02u
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
+            memory[0x01F2] = 0x67u
+            memory[0x01F3] = 0x95u
+            memory[0x0725] = 0x01u
+            memory[0x0726] = 0x02u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x01u
+            memory[0x072C] = 0x02u
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0xFFu
+
+            // Execute decompiled function
+            processAreaData()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
+            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
+        }
+    }
+
+    /**
+     * Test case 2 from frame 24
+     * Function: processAreaData (0x9508)
+     * Call depth: 13
+     * Memory reads: 48, writes: 5
+     */
+    @Test
+    fun `processAreaData_frame24_test2`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (48 addresses)
+            memory[0x0000] = 0x20u
+            memory[0x0004] = 0x66u
+            memory[0x0005] = 0x96u
+            memory[0x0006] = 0x2Eu
+            memory[0x0007] = 0x00u
+            memory[0x0008] = 0x02u
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x01ED] = 0xAEu
+            memory[0x01EE] = 0x9Bu
+            memory[0x01EF] = 0x47u
+            memory[0x01F0] = 0x66u
+            memory[0x01F1] = 0x96u
+            memory[0x01F2] = 0x67u
+            memory[0x01F3] = 0x95u
             memory[0x01F4] = 0xD5u
             memory[0x01F5] = 0x94u
-            memory[0x06A0] = 0x10u
+            memory[0x01F6] = 0xBEu
+            memory[0x01F7] = 0x92u
+            memory[0x06A0] = 0x17u
             memory[0x06A1] = 0x00u
             memory[0x06A2] = 0x00u
             memory[0x06A3] = 0x00u
@@ -5496,93 +6588,27 @@ class GeneratedFunctionTests {
             memory[0x06A5] = 0x00u
             memory[0x06A6] = 0x00u
             memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0xC0u
+            memory[0x06A8] = 0x00u
             memory[0x06A9] = 0x00u
             memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x05u
+            memory[0x06AB] = 0x02u
             memory[0x06AC] = 0x54u
             memory[0x06AD] = 0x54u
+            memory[0x071F] = 0x04u
             memory[0x0725] = 0x01u
+            memory[0x0726] = 0x07u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
             memory[0x072A] = 0x01u
-            memory[0x072B] = 0x01u
-            memory[0x072C] = 0x00u
-            memory[0x0732] = 0xFFu
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (15 addresses)
-            assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x05D0], "Memory 0x05D0 mismatch")
-            assertEquals(0x00u, memory[0x05E0], "Memory 0x05E0 mismatch")
-            assertEquals(0x00u, memory[0x05F0], "Memory 0x05F0 mismatch")
-            assertEquals(0x00u, memory[0x0600], "Memory 0x0600 mismatch")
-            assertEquals(0x00u, memory[0x0610], "Memory 0x0610 mismatch")
-            assertEquals(0x00u, memory[0x0620], "Memory 0x0620 mismatch")
-            assertEquals(0x00u, memory[0x0630], "Memory 0x0630 mismatch")
-            assertEquals(0xC0u, memory[0x0640], "Memory 0x0640 mismatch")
-            assertEquals(0x00u, memory[0x0650], "Memory 0x0650 mismatch")
-            assertEquals(0x00u, memory[0x0660], "Memory 0x0660 mismatch")
-            assertEquals(0x00u, memory[0x0670], "Memory 0x0670 mismatch")
-            assertEquals(0x54u, memory[0x0680], "Memory 0x0680 mismatch")
-            assertEquals(0x54u, memory[0x0690], "Memory 0x0690 mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 23
-     * Function: processAreaData (0x9508)
-     * Call depth: 12
-     * Memory reads: 7, writes: 5
-     */
-    @Test
-    fun `processAreaData_frame23_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (7 addresses)
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01F6] = 0xBEu
-            memory[0x01F7] = 0x92u
-            memory[0x071F] = 0x04u
-            memory[0x072C] = 0x04u
-            memory[0x0732] = 0x03u
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x03u, memory[0x071F], "Memory 0x071F mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-        }
-    }
-
-    /**
-     * Test case 3 from frame 24
-     * Function: processAreaData (0x9508)
-     * Call depth: 13
-     * Memory reads: 7, writes: 5
-     */
-    @Test
-    fun `processAreaData_frame24_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (7 addresses)
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01F6] = 0xBEu
-            memory[0x01F7] = 0x92u
-            memory[0x071F] = 0x04u
             memory[0x072C] = 0x08u
+            memory[0x072E] = 0x08u
+            memory[0x072F] = 0x02u
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
             memory[0x0732] = 0x01u
+            memory[0x0735] = 0x00u
+            memory[0x0743] = 0x00u
+            memory[0x074E] = 0x01u
 
             // Execute decompiled function
             processAreaData()
@@ -5595,24 +6621,33 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 4 from frame 1251
+     * Test case 3 from frame 1251
      * Function: processAreaData (0x9508)
      * Call depth: 11
-     * Memory reads: 25, writes: 20
+     * Memory reads: 44, writes: 20
      */
     @Test
-    fun `processAreaData_frame1251_test4`() {
+    fun `processAreaData_frame1251_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (25 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0006] = 0xDCu
-            memory[0x0007] = 0x05u
+            // Setup: Set input memory (44 addresses)
+            memory[0x0000] = 0x70u
+            memory[0x0004] = 0x66u
+            memory[0x0005] = 0x96u
+            memory[0x0006] = 0xE5u
+            memory[0x0007] = 0x00u
+            memory[0x0008] = 0x02u
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
+            memory[0x01EC] = 0x3Du
+            memory[0x01ED] = 0x99u
+            memory[0x01EE] = 0x5Eu
+            memory[0x01EF] = 0x96u
+            memory[0x01F0] = 0x67u
+            memory[0x01F1] = 0x95u
             memory[0x01F2] = 0xD5u
             memory[0x01F3] = 0x94u
             memory[0x06A0] = 0x1Cu
@@ -5626,13 +6661,23 @@ class GeneratedFunctionTests {
             memory[0x06A8] = 0x00u
             memory[0x06A9] = 0x00u
             memory[0x06AA] = 0x12u
-            memory[0x06AB] = 0x14u
+            memory[0x06AB] = 0x00u
             memory[0x06AC] = 0x54u
             memory[0x06AD] = 0x54u
             memory[0x0725] = 0x01u
+            memory[0x0726] = 0x0Cu
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
             memory[0x072A] = 0x01u
+            memory[0x072B] = 0x00u
             memory[0x072C] = 0x0Au
+            memory[0x072F] = 0x0Au
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
             memory[0x0732] = 0xFFu
+            memory[0x0735] = 0x00u
+            memory[0x075F] = 0x00u
+            memory[0x0760] = 0x00u
 
             // Execute decompiled function
             processAreaData()
@@ -5657,25 +6702,27 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 5 from frame 1293
+     * Test case 4 from frame 1345
      * Function: processAreaData (0x9508)
      * Call depth: 11
-     * Memory reads: 14, writes: 4
+     * Memory reads: 16, writes: 4
      */
     @Test
-    fun `processAreaData_frame1293_test5`() {
+    fun `processAreaData_frame1345_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (14 addresses)
+            // Setup: Set input memory (16 addresses)
+            memory[0x0000] = 0x70u
             memory[0x0008] = 0x02u
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
             memory[0x01F0] = 0x67u
             memory[0x01F1] = 0x95u
-            memory[0x0725] = 0x01u
+            memory[0x0725] = 0x02u
+            memory[0x0726] = 0x01u
             memory[0x0728] = 0x00u
             memory[0x0729] = 0x00u
             memory[0x072A] = 0x02u
@@ -5695,87 +6742,156 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 6 from frame 1531
+     * Test case 5 from frame 1523
      * Function: processAreaData (0x9508)
      * Call depth: 10
-     * Memory reads: 23, writes: 20
+     * Memory reads: 44, writes: 20
      */
     @Test
-    fun `processAreaData_frame1531_test6`() {
+    fun `processAreaData_frame1523_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (23 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0006] = 0x07u
-            memory[0x0007] = 0x05u
+            // Setup: Set input memory (44 addresses)
+            memory[0x0000] = 0x70u
+            memory[0x0004] = 0x66u
+            memory[0x0005] = 0x96u
+            memory[0x0006] = 0xE5u
+            memory[0x0007] = 0x00u
+            memory[0x0008] = 0x02u
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
+            memory[0x01EC] = 0x3Du
+            memory[0x01ED] = 0x99u
+            memory[0x01EE] = 0x5Eu
+            memory[0x01EF] = 0x96u
+            memory[0x01F0] = 0x67u
+            memory[0x01F1] = 0x95u
             memory[0x01F2] = 0xD5u
             memory[0x01F3] = 0x94u
-            memory[0x06A0] = 0x07u
-            memory[0x06A1] = 0x82u
-            memory[0x06A2] = 0x85u
+            memory[0x06A0] = 0x06u
+            memory[0x06A1] = 0x81u
+            memory[0x06A2] = 0x84u
             memory[0x06A3] = 0x00u
             memory[0x06A4] = 0x00u
             memory[0x06A5] = 0x00u
             memory[0x06A6] = 0x00u
             memory[0x06A7] = 0x00u
             memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x13u
-            memory[0x06AA] = 0x15u
-            memory[0x06AB] = 0x15u
+            memory[0x06A9] = 0x12u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x00u
             memory[0x06AC] = 0x54u
             memory[0x06AD] = 0x54u
-            memory[0x072C] = 0x0Eu
-            memory[0x0732] = 0x00u
+            memory[0x0725] = 0x02u
+            memory[0x0726] = 0x06u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x02u
+            memory[0x072B] = 0x01u
+            memory[0x072C] = 0x0Cu
+            memory[0x072F] = 0x0Cu
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0xFFu
+            memory[0x0735] = 0x01u
+            memory[0x075F] = 0x00u
+            memory[0x0760] = 0x00u
 
             // Execute decompiled function
             processAreaData()
 
             // Verify: Check output memory (15 addresses)
             assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x0507], "Memory 0x0507 mismatch")
-            assertEquals(0x00u, memory[0x0517], "Memory 0x0517 mismatch")
-            assertEquals(0x00u, memory[0x0527], "Memory 0x0527 mismatch")
-            assertEquals(0x00u, memory[0x0537], "Memory 0x0537 mismatch")
-            assertEquals(0x00u, memory[0x0547], "Memory 0x0547 mismatch")
-            assertEquals(0x00u, memory[0x0557], "Memory 0x0557 mismatch")
-            assertEquals(0x00u, memory[0x0567], "Memory 0x0567 mismatch")
-            assertEquals(0x00u, memory[0x0577], "Memory 0x0577 mismatch")
-            assertEquals(0x13u, memory[0x0587], "Memory 0x0587 mismatch")
-            assertEquals(0x15u, memory[0x0597], "Memory 0x0597 mismatch")
-            assertEquals(0x15u, memory[0x05A7], "Memory 0x05A7 mismatch")
-            assertEquals(0x54u, memory[0x05B7], "Memory 0x05B7 mismatch")
-            assertEquals(0x54u, memory[0x05C7], "Memory 0x05C7 mismatch")
+            assertEquals(0x00u, memory[0x0506], "Memory 0x0506 mismatch")
+            assertEquals(0x00u, memory[0x0516], "Memory 0x0516 mismatch")
+            assertEquals(0x00u, memory[0x0526], "Memory 0x0526 mismatch")
+            assertEquals(0x00u, memory[0x0536], "Memory 0x0536 mismatch")
+            assertEquals(0x00u, memory[0x0546], "Memory 0x0546 mismatch")
+            assertEquals(0x00u, memory[0x0556], "Memory 0x0556 mismatch")
+            assertEquals(0x00u, memory[0x0566], "Memory 0x0566 mismatch")
+            assertEquals(0x00u, memory[0x0576], "Memory 0x0576 mismatch")
+            assertEquals(0x12u, memory[0x0586], "Memory 0x0586 mismatch")
+            assertEquals(0x14u, memory[0x0596], "Memory 0x0596 mismatch")
+            assertEquals(0x14u, memory[0x05A6], "Memory 0x05A6 mismatch")
+            assertEquals(0x54u, memory[0x05B6], "Memory 0x05B6 mismatch")
+            assertEquals(0x54u, memory[0x05C6], "Memory 0x05C6 mismatch")
             assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
         }
     }
 
     /**
-     * Test case 7 from frame 2289
+     * Test case 6 from frame 1617
      * Function: processAreaData (0x9508)
-     * Call depth: 9
-     * Memory reads: 25, writes: 20
+     * Call depth: 10
+     * Memory reads: 15, writes: 4
      */
     @Test
-    fun `processAreaData_frame2289_test7`() {
+    fun `processAreaData_frame1617_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (25 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0006] = 0x0Eu
-            memory[0x0007] = 0x05u
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x70u
+            memory[0x0008] = 0x02u
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
+            memory[0x01F0] = 0x67u
+            memory[0x01F1] = 0x95u
+            memory[0x0725] = 0x02u
+            memory[0x0726] = 0x0Bu
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x02u
+            memory[0x072C] = 0x0Eu
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0xFFu
+
+            // Execute decompiled function
+            processAreaData()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
+            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
+        }
+    }
+
+    /**
+     * Test case 7 from frame 2297
+     * Function: processAreaData (0x9508)
+     * Call depth: 9
+     * Memory reads: 43, writes: 20
+     */
+    @Test
+    fun `processAreaData_frame2297_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (43 addresses)
+            memory[0x0000] = 0x70u
+            memory[0x0004] = 0x66u
+            memory[0x0005] = 0x96u
+            memory[0x0006] = 0xE5u
+            memory[0x0007] = 0x00u
+            memory[0x0008] = 0x02u
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x01EC] = 0x3Du
+            memory[0x01ED] = 0x99u
+            memory[0x01EE] = 0x66u
+            memory[0x01EF] = 0x96u
+            memory[0x01F0] = 0x67u
+            memory[0x01F1] = 0x95u
             memory[0x01F2] = 0xD5u
             memory[0x01F3] = 0x94u
-            memory[0x06A0] = 0x0Eu
+            memory[0x06A0] = 0x0Fu
             memory[0x06A1] = 0x00u
             memory[0x06A2] = 0x00u
             memory[0x06A3] = 0x00u
@@ -5783,58 +6899,116 @@ class GeneratedFunctionTests {
             memory[0x06A5] = 0x00u
             memory[0x06A6] = 0x00u
             memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x12u
-            memory[0x06A9] = 0x14u
-            memory[0x06AA] = 0x14u
-            memory[0x06AB] = 0x14u
+            memory[0x06A8] = 0x13u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x00u
             memory[0x06AC] = 0x54u
             memory[0x06AD] = 0x54u
             memory[0x0725] = 0x02u
-            memory[0x072A] = 0x02u
-            memory[0x072C] = 0x0Eu
-            memory[0x0732] = 0xFFu
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x03u
+            memory[0x072B] = 0x01u
+            memory[0x072C] = 0x10u
+            memory[0x072F] = 0x0Eu
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0x00u
+            memory[0x0735] = 0x02u
+            memory[0x075F] = 0x00u
+            memory[0x0760] = 0x00u
 
             // Execute decompiled function
             processAreaData()
 
             // Verify: Check output memory (15 addresses)
             assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x050E], "Memory 0x050E mismatch")
-            assertEquals(0x00u, memory[0x051E], "Memory 0x051E mismatch")
-            assertEquals(0x00u, memory[0x052E], "Memory 0x052E mismatch")
-            assertEquals(0x00u, memory[0x053E], "Memory 0x053E mismatch")
-            assertEquals(0x00u, memory[0x054E], "Memory 0x054E mismatch")
-            assertEquals(0x00u, memory[0x055E], "Memory 0x055E mismatch")
-            assertEquals(0x00u, memory[0x056E], "Memory 0x056E mismatch")
-            assertEquals(0x12u, memory[0x057E], "Memory 0x057E mismatch")
-            assertEquals(0x14u, memory[0x058E], "Memory 0x058E mismatch")
-            assertEquals(0x14u, memory[0x059E], "Memory 0x059E mismatch")
-            assertEquals(0x14u, memory[0x05AE], "Memory 0x05AE mismatch")
-            assertEquals(0x54u, memory[0x05BE], "Memory 0x05BE mismatch")
-            assertEquals(0x54u, memory[0x05CE], "Memory 0x05CE mismatch")
+            assertEquals(0x00u, memory[0x050F], "Memory 0x050F mismatch")
+            assertEquals(0x00u, memory[0x051F], "Memory 0x051F mismatch")
+            assertEquals(0x00u, memory[0x052F], "Memory 0x052F mismatch")
+            assertEquals(0x00u, memory[0x053F], "Memory 0x053F mismatch")
+            assertEquals(0x00u, memory[0x054F], "Memory 0x054F mismatch")
+            assertEquals(0x00u, memory[0x055F], "Memory 0x055F mismatch")
+            assertEquals(0x00u, memory[0x056F], "Memory 0x056F mismatch")
+            assertEquals(0x13u, memory[0x057F], "Memory 0x057F mismatch")
+            assertEquals(0x15u, memory[0x058F], "Memory 0x058F mismatch")
+            assertEquals(0x15u, memory[0x059F], "Memory 0x059F mismatch")
+            assertEquals(0x15u, memory[0x05AF], "Memory 0x05AF mismatch")
+            assertEquals(0x54u, memory[0x05BF], "Memory 0x05BF mismatch")
+            assertEquals(0x54u, memory[0x05CF], "Memory 0x05CF mismatch")
             assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
         }
     }
 
     /**
-     * Test case 8 from frame 2607
+     * Test case 8 from frame 2423
      * Function: processAreaData (0x9508)
      * Call depth: 9
-     * Memory reads: 26, writes: 20
+     * Memory reads: 16, writes: 4
      */
     @Test
-    fun `processAreaData_frame2607_test8`() {
+    fun `processAreaData_frame2423_test8`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (26 addresses)
+            // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x00u
-            memory[0x0006] = 0xD9u
-            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x02u
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
+            memory[0x01F0] = 0x67u
+            memory[0x01F1] = 0x95u
+            memory[0x0725] = 0x03u
+            memory[0x0726] = 0x04u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x03u
+            memory[0x072B] = 0x01u
+            memory[0x072C] = 0x10u
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0xFFu
+
+            // Execute decompiled function
+            processAreaData()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
+            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
+        }
+    }
+
+    /**
+     * Test case 9 from frame 2607
+     * Function: processAreaData (0x9508)
+     * Call depth: 9
+     * Memory reads: 44, writes: 20
+     */
+    @Test
+    fun `processAreaData_frame2607_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (44 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x66u
+            memory[0x0005] = 0x96u
+            memory[0x0006] = 0xE5u
+            memory[0x0007] = 0x00u
+            memory[0x0008] = 0x02u
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x01EC] = 0x3Du
+            memory[0x01ED] = 0x99u
+            memory[0x01EE] = 0x5Eu
+            memory[0x01EF] = 0x96u
+            memory[0x01F0] = 0x67u
+            memory[0x01F1] = 0x95u
             memory[0x01F2] = 0xD5u
             memory[0x01F3] = 0x94u
             memory[0x06A0] = 0x19u
@@ -5846,16 +7020,25 @@ class GeneratedFunctionTests {
             memory[0x06A6] = 0x00u
             memory[0x06A7] = 0x00u
             memory[0x06A8] = 0x10u
-            memory[0x06A9] = 0x14u
-            memory[0x06AA] = 0x14u
-            memory[0x06AB] = 0x14u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x00u
             memory[0x06AC] = 0x54u
             memory[0x06AD] = 0x54u
             memory[0x0725] = 0x03u
+            memory[0x0726] = 0x09u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
             memory[0x072A] = 0x03u
             memory[0x072B] = 0x01u
             memory[0x072C] = 0x10u
+            memory[0x072F] = 0x10u
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
             memory[0x0732] = 0xFFu
+            memory[0x0735] = 0x02u
+            memory[0x075F] = 0x00u
+            memory[0x0760] = 0x00u
 
             // Execute decompiled function
             processAreaData()
@@ -5875,44 +7058,6 @@ class GeneratedFunctionTests {
             assertEquals(0x14u, memory[0x0679], "Memory 0x0679 mismatch")
             assertEquals(0x54u, memory[0x0689], "Memory 0x0689 mismatch")
             assertEquals(0x54u, memory[0x0699], "Memory 0x0699 mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-        }
-    }
-
-    /**
-     * Test case 9 from frame 6109
-     * Function: processAreaData (0x9508)
-     * Call depth: 11
-     * Memory reads: 14, writes: 4
-     */
-    @Test
-    fun `processAreaData_frame6109_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (14 addresses)
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01F0] = 0x67u
-            memory[0x01F1] = 0x95u
-            memory[0x0725] = 0x03u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x04u
-            memory[0x072B] = 0x01u
-            memory[0x072C] = 0x12u
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
             assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
         }
     }
@@ -6248,7 +7393,7 @@ class GeneratedFunctionTests {
      * Function: decodeAreaData (0x9595)
      * Parameters: X
      * Call depth: 15
-     * Memory reads: 17, writes: 9
+     * Memory reads: 24, writes: 9
      */
     @Test
     fun `decodeAreaData_frame24_test2`() {
@@ -6257,24 +7402,31 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (17 addresses)
+            // Setup: Set input memory (24 addresses)
             memory[0x0000] = 0x01u
+            memory[0x0004] = 0x66u
+            memory[0x0005] = 0x96u
+            memory[0x0006] = 0x0Eu
             memory[0x0007] = 0x16u
             memory[0x0008] = 0x01u
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
+            memory[0x01EF] = 0x32u
             memory[0x01F0] = 0x5Eu
             memory[0x01F1] = 0x96u
             memory[0x01F2] = 0x67u
             memory[0x01F3] = 0x95u
+            memory[0x06A8] = 0x51u
             memory[0x0725] = 0x01u
             memory[0x0726] = 0x07u
             memory[0x0728] = 0x00u
             memory[0x0729] = 0x00u
             memory[0x072A] = 0x01u
             memory[0x072C] = 0x08u
+            memory[0x072E] = 0x08u
             memory[0x0730] = 0xFFu
             memory[0x0731] = 0xFFu
+            memory[0x0735] = 0x00u
 
             // Execute decompiled function
             decodeAreaData(0x01)
@@ -6428,7 +7580,7 @@ class GeneratedFunctionTests {
      * Function: decodeAreaData (0x9595)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 17, writes: 9
+     * Memory reads: 30, writes: 9
      */
     @Test
     fun `decodeAreaData_frame2297_test7`() {
@@ -6437,14 +7589,24 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (17 addresses)
+            // Setup: Set input memory (30 addresses)
             memory[0x0000] = 0x70u
+            memory[0x0004] = 0x66u
+            memory[0x0005] = 0x96u
+            memory[0x0006] = 0xE5u
             memory[0x0007] = 0x00u
             memory[0x0008] = 0x02u
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
+            memory[0x01EC] = 0x3Du
+            memory[0x01ED] = 0x99u
+            memory[0x01EE] = 0x66u
+            memory[0x01EF] = 0x96u
             memory[0x01F0] = 0x67u
             memory[0x01F1] = 0x95u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x00u
             memory[0x0725] = 0x02u
             memory[0x0728] = 0x00u
             memory[0x0729] = 0x00u
@@ -6455,6 +7617,9 @@ class GeneratedFunctionTests {
             memory[0x0730] = 0xFFu
             memory[0x0731] = 0xFFu
             memory[0x0732] = 0x00u
+            memory[0x0735] = 0x02u
+            memory[0x075F] = 0x00u
+            memory[0x0760] = 0x00u
 
             // Execute decompiled function
             decodeAreaData(0x02)
@@ -6538,7 +7703,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0x9939: getPipeHeight
     // Parameters: X
-    // 43 calls, 4 unique inputs
+    // 43 calls, 8 unique inputs
     // =========================================
 
     /**
@@ -6546,7 +7711,7 @@ class GeneratedFunctionTests {
      * Function: getPipeHeight (0x9939)
      * Parameters: X
      * Call depth: 14
-     * Memory reads: 3, writes: 3
+     * Memory reads: 6, writes: 3
      */
     @Test
     fun `getPipeHeight_frame1251_test0`() {
@@ -6555,10 +7720,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
             memory[0x01EC] = 0x3Du
             memory[0x01ED] = 0x99u
-            memory[0x0732] = 0x01u
+            memory[0x072F] = 0x0Au
+            memory[0x0732] = 0xFFu
 
             // Execute decompiled function
             getPipeHeight(0x02)
@@ -6573,7 +7741,7 @@ class GeneratedFunctionTests {
      * Function: getPipeHeight (0x9939)
      * Parameters: X
      * Call depth: 14
-     * Memory reads: 3, writes: 3
+     * Memory reads: 6, writes: 3
      */
     @Test
     fun `getPipeHeight_frame1259_test1`() {
@@ -6582,9 +7750,12 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
             memory[0x01EC] = 0x3Du
             memory[0x01ED] = 0x99u
+            memory[0x072F] = 0x0Au
             memory[0x0732] = 0x00u
 
             // Execute decompiled function
@@ -6596,23 +7767,86 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 2607
+     * Test case 2 from frame 1523
      * Function: getPipeHeight (0x9939)
      * Parameters: X
-     * Call depth: 12
-     * Memory reads: 3, writes: 3
+     * Call depth: 13
+     * Memory reads: 6, writes: 3
      */
     @Test
-    fun `getPipeHeight_frame2607_test2`() {
+    fun `getPipeHeight_frame1523_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
             memory[0x01EC] = 0x3Du
             memory[0x01ED] = 0x99u
-            memory[0x0732] = 0x01u
+            memory[0x072F] = 0x0Cu
+            memory[0x0732] = 0xFFu
+
+            // Execute decompiled function
+            getPipeHeight(0x02)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x02u, memory[0x0006], "Memory 0x0006 mismatch")
+        }
+    }
+
+    /**
+     * Test case 3 from frame 1531
+     * Function: getPipeHeight (0x9939)
+     * Parameters: X
+     * Call depth: 13
+     * Memory reads: 6, writes: 3
+     */
+    @Test
+    fun `getPipeHeight_frame1531_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x01EC] = 0x3Du
+            memory[0x01ED] = 0x99u
+            memory[0x072F] = 0x0Cu
+            memory[0x0732] = 0x00u
+
+            // Execute decompiled function
+            getPipeHeight(0x02)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x02u, memory[0x0006], "Memory 0x0006 mismatch")
+        }
+    }
+
+    /**
+     * Test case 4 from frame 2289
+     * Function: getPipeHeight (0x9939)
+     * Parameters: X
+     * Call depth: 12
+     * Memory reads: 6, writes: 3
+     */
+    @Test
+    fun `getPipeHeight_frame2289_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x01EC] = 0x3Du
+            memory[0x01ED] = 0x99u
+            memory[0x072F] = 0x0Eu
+            memory[0x0732] = 0xFFu
 
             // Execute decompiled function
             getPipeHeight(0x02)
@@ -6623,22 +7857,85 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 6101
+     * Test case 5 from frame 2297
      * Function: getPipeHeight (0x9939)
      * Parameters: X
-     * Call depth: 14
-     * Memory reads: 3, writes: 3
+     * Call depth: 12
+     * Memory reads: 6, writes: 3
      */
     @Test
-    fun `getPipeHeight_frame6101_test3`() {
+    fun `getPipeHeight_frame2297_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
             memory[0x01EC] = 0x3Du
             memory[0x01ED] = 0x99u
+            memory[0x072F] = 0x0Eu
+            memory[0x0732] = 0x00u
+
+            // Execute decompiled function
+            getPipeHeight(0x02)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x03u, memory[0x0006], "Memory 0x0006 mismatch")
+        }
+    }
+
+    /**
+     * Test case 6 from frame 2607
+     * Function: getPipeHeight (0x9939)
+     * Parameters: X
+     * Call depth: 12
+     * Memory reads: 6, writes: 3
+     */
+    @Test
+    fun `getPipeHeight_frame2607_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x01EC] = 0x3Du
+            memory[0x01ED] = 0x99u
+            memory[0x072F] = 0x10u
+            memory[0x0732] = 0xFFu
+
+            // Execute decompiled function
+            getPipeHeight(0x02)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x03u, memory[0x0006], "Memory 0x0006 mismatch")
+        }
+    }
+
+    /**
+     * Test case 7 from frame 6101
+     * Function: getPipeHeight (0x9939)
+     * Parameters: X
+     * Call depth: 14
+     * Memory reads: 6, writes: 3
+     */
+    @Test
+    fun `getPipeHeight_frame6101_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x01EC] = 0x3Du
+            memory[0x01ED] = 0x99u
+            memory[0x072F] = 0x10u
             memory[0x0732] = 0x00u
 
             // Execute decompiled function
@@ -6737,7 +8034,7 @@ class GeneratedFunctionTests {
      * Function: chkLrgObjLength (0x9BAC)
      * Parameters: X, Y
      * Call depth: 10
-     * Memory reads: 3, writes: 3
+     * Memory reads: 6, writes: 3
      */
     @Test
     fun `chkLrgObjLength_frame23_test0`() {
@@ -6746,9 +8043,12 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
             memory[0x01ED] = 0xAEu
             memory[0x01EE] = 0x9Bu
+            memory[0x072F] = 0x02u
             memory[0x0732] = 0xFFu
 
             // Execute decompiled function
@@ -6764,7 +8064,7 @@ class GeneratedFunctionTests {
      * Function: chkLrgObjLength (0x9BAC)
      * Parameters: X, Y
      * Call depth: 15
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
     fun `chkLrgObjLength_frame23_test1`() {
@@ -6773,9 +8073,12 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
             memory[0x01ED] = 0xAEu
             memory[0x01EE] = 0x9Bu
+            memory[0x072F] = 0x02u
             memory[0x0732] = 0x03u
 
             // Execute decompiled function
@@ -6791,7 +8094,7 @@ class GeneratedFunctionTests {
      * Function: chkLrgObjLength (0x9BAC)
      * Parameters: X, Y
      * Call depth: 10
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
     fun `chkLrgObjLength_frame24_test2`() {
@@ -6800,9 +8103,12 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
             memory[0x01ED] = 0xAEu
             memory[0x01EE] = 0x9Bu
+            memory[0x072F] = 0x02u
             memory[0x0732] = 0x02u
 
             // Execute decompiled function
@@ -6818,7 +8124,7 @@ class GeneratedFunctionTests {
      * Function: chkLrgObjLength (0x9BAC)
      * Parameters: X, Y
      * Call depth: 16
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
     fun `chkLrgObjLength_frame24_test3`() {
@@ -6827,9 +8133,12 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
             memory[0x01ED] = 0xAEu
             memory[0x01EE] = 0x9Bu
+            memory[0x072F] = 0x02u
             memory[0x0732] = 0x01u
 
             // Execute decompiled function
@@ -6845,7 +8154,7 @@ class GeneratedFunctionTests {
      * Function: chkLrgObjLength (0x9BAC)
      * Parameters: X, Y
      * Call depth: 12
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
     fun `chkLrgObjLength_frame1145_test4`() {
@@ -6854,9 +8163,12 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
             memory[0x01EB] = 0xAEu
             memory[0x01EC] = 0x9Bu
+            memory[0x072F] = 0x02u
             memory[0x0732] = 0x00u
 
             // Execute decompiled function
@@ -7476,7 +8788,7 @@ class GeneratedFunctionTests {
      * Function: loadAreaPointer (0x9C03)
      * Parameters: A
      * Call depth: 3
-     * Memory reads: 2, writes: 4
+     * Memory reads: 4, writes: 4
      */
     @Test
     fun `loadAreaPointer_frame5_test0`() {
@@ -7485,9 +8797,11 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (2 addresses)
+            // Setup: Set input memory (4 addresses)
             memory[0x01F6] = 0x05u
             memory[0x01F7] = 0x9Cu
+            memory[0x075F] = 0x00u
+            memory[0x0760] = 0x00u
 
             // Execute decompiled function
             loadAreaPointer(0x18)
@@ -7606,14 +8920,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0xAEEA: gameCoreRoutine
-    // 8846 calls, 69 unique inputs
+    // 8846 calls, 4675 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 32
      * Function: gameCoreRoutine (0xAEEA)
      * Call depth: 3
-     * Memory reads: 5, writes: 3
+     * Memory reads: 120, writes: 3
      */
     @Test
     fun `gameCoreRoutine_frame32_test0`() {
@@ -7622,12 +8936,127 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
-            memory[0x000E] = 0x07u
+            // Setup: Set input memory (120 addresses)
+            memory[0x0000] = 0x03u
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB0u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0x31u
+            memory[0x0007] = 0x91u
+            memory[0x0008] = 0x00u
+            memory[0x0009] = 0x1Au
+            memory[0x000A] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x00u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x10u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
+            memory[0x01F1] = 0xD9u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0xC4u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
             memory[0x01F8] = 0xC2u
             memory[0x01F9] = 0x82u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0300] = 0x00u
+            memory[0x0301] = 0x3Fu
+            memory[0x0398] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x046F] = 0x00u
+            memory[0x0490] = 0x00u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
             memory[0x06FC] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x0710] = 0x02u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0715] = 0x01u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0739] = 0x00u
+            memory[0x073A] = 0x00u
+            memory[0x073B] = 0x00u
+            memory[0x073D] = 0x00u
+            memory[0x0744] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0752] = 0x00u
             memory[0x0753] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0756] = 0x00u
+            memory[0x0757] = 0x01u
+            memory[0x0758] = 0x00u
+            memory[0x075F] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x97u
+            memory[0x07A9] = 0x7Au
+            memory[0x07AA] = 0x54u
 
             // Execute decompiled function
             gameCoreRoutine()
@@ -7638,202 +9067,158 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1144
+     * Test case 1 from frame 966
      * Function: gameCoreRoutine (0xAEEA)
      * Call depth: 3
-     * Memory reads: 2, writes: 3
+     * Memory reads: 139, writes: 3
      */
     @Test
-    fun `gameCoreRoutine_frame1144_test1`() {
+    fun `gameCoreRoutine_frame966_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (2 addresses)
-            memory[0x06FC] = 0x01u
-            memory[0x0753] = 0x00u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 1386
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 2, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame1386_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (2 addresses)
-            memory[0x06FC] = 0x81u
-            memory[0x0753] = 0x00u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x81u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 3 from frame 1612
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 2, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame1612_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (2 addresses)
-            memory[0x06FC] = 0x42u
-            memory[0x0753] = 0x00u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x42u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 4 from frame 1864
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 5, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame1864_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x11u
-            memory[0x06FC] = 0x02u
-            memory[0x0753] = 0x00u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 5 from frame 2104
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 2, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame2104_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (2 addresses)
-            memory[0x06FC] = 0xC1u
-            memory[0x0753] = 0x00u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xC1u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 6 from frame 2224
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 2, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame2224_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (2 addresses)
-            memory[0x06FC] = 0x01u
-            memory[0x0753] = 0x00u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 7 from frame 2616
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 5, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame2616_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (139 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0xEDu
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
             memory[0x01FA] = 0x77u
             memory[0x01FB] = 0x81u
             memory[0x01FC] = 0x10u
-            memory[0x06FC] = 0x01u
-            memory[0x0753] = 0x00u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 8 from frame 3224
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 2, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame3224_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (2 addresses)
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
             memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
             memory[0x0753] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0xCBu
+            memory[0x07A9] = 0xCEu
+            memory[0x07AA] = 0x59u
 
             // Execute decompiled function
             gameCoreRoutine()
@@ -7844,40 +9229,1335 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 9 from frame 5958
+     * Test case 2 from frame 3276
      * Function: gameCoreRoutine (0xAEEA)
      * Call depth: 3
-     * Memory reads: 2, writes: 3
+     * Memory reads: 140, writes: 3
      */
     @Test
-    fun `gameCoreRoutine_frame5958_test9`() {
+    fun `gameCoreRoutine_frame3276_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (2 addresses)
-            memory[0x06FC] = 0x41u
+            // Setup: Set input memory (140 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x24u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x01FA] = 0x77u
+            memory[0x01FB] = 0x81u
+            memory[0x01FC] = 0x10u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x046E] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
             memory[0x0753] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x3Du
+            memory[0x07A9] = 0x49u
+            memory[0x07AA] = 0x33u
 
             // Execute decompiled function
             gameCoreRoutine()
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0x41u, memory[0x06FC], "Memory 0x06FC mismatch")
+            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
+        }
+    }
+
+    /**
+     * Test case 3 from frame 4210
+     * Function: gameCoreRoutine (0xAEEA)
+     * Call depth: 3
+     * Memory reads: 140, writes: 3
+     */
+    @Test
+    fun `gameCoreRoutine_frame4210_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (140 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0xF7u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x01FA] = 0x77u
+            memory[0x01FB] = 0x81u
+            memory[0x01FC] = 0x10u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x046D] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0753] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x2Fu
+            memory[0x07A9] = 0xEDu
+            memory[0x07AA] = 0xB2u
+
+            // Execute decompiled function
+            gameCoreRoutine()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
+        }
+    }
+
+    /**
+     * Test case 4 from frame 5692
+     * Function: gameCoreRoutine (0xAEEA)
+     * Call depth: 3
+     * Memory reads: 174, writes: 3
+     */
+    @Test
+    fun `gameCoreRoutine_frame5692_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (174 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0xA0u
+            memory[0x0002] = 0xFFu
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0xDCu
+            memory[0x000A] = 0x80u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000D] = 0x80u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x01u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x01u
+            memory[0x0033] = 0x02u
+            memory[0x0045] = 0x02u
+            memory[0x0057] = 0xE9u
+            memory[0x006D] = 0x01u
+            memory[0x006E] = 0x02u
+            memory[0x006F] = 0x02u
+            memory[0x0070] = 0x02u
+            memory[0x0071] = 0x02u
+            memory[0x0072] = 0x02u
+            memory[0x0076] = 0x01u
+            memory[0x007E] = 0x00u
+            memory[0x0082] = 0x01u
+            memory[0x0086] = 0x46u
+            memory[0x0087] = 0x80u
+            memory[0x0088] = 0x80u
+            memory[0x0089] = 0x80u
+            memory[0x008A] = 0x80u
+            memory[0x008B] = 0x80u
+            memory[0x008F] = 0x60u
+            memory[0x0091] = 0x00u
+            memory[0x0097] = 0x00u
+            memory[0x009B] = 0x65u
+            memory[0x009F] = 0x00u
+            memory[0x00A8] = 0x02u
+            memory[0x00B4] = 0xFFu
+            memory[0x00B5] = 0x01u
+            memory[0x00BE] = 0x01u
+            memory[0x00CA] = 0x01u
+            memory[0x00CE] = 0x70u
+            memory[0x00D7] = 0x4Eu
+            memory[0x00D9] = 0x00u
+            memory[0x00E3] = 0x16u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x00u
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01EC] = 0x1Du
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x01u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x01FA] = 0x77u
+            memory[0x01FB] = 0x81u
+            memory[0x01FC] = 0x11u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x02u
+            memory[0x03B1] = 0x1Du
+            memory[0x03B3] = 0x22u
+            memory[0x03B8] = 0x70u
+            memory[0x03BC] = 0x50u
+            memory[0x03BE] = 0x15u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03D4] = 0x00u
+            memory[0x03E8] = 0xC4u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0xF0u
+            memory[0x041F] = 0xD0u
+            memory[0x042B] = 0x60u
+            memory[0x043C] = 0x10u
+            memory[0x0448] = 0x10u
+            memory[0x0456] = 0x18u
+            memory[0x046B] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x00u
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x24u
+            memory[0x0624] = 0x00u
+            memory[0x0625] = 0x00u
+            memory[0x0634] = 0x00u
+            memory[0x0635] = 0x00u
+            memory[0x0644] = 0x51u
+            memory[0x0645] = 0xC4u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0x08u
+            memory[0x06E4] = 0x04u
+            memory[0x06EC] = 0x58u
+            memory[0x06FB] = 0x50u
+            memory[0x06FC] = 0x80u
+            memory[0x06FF] = 0xFFu
+            memory[0x0700] = 0x17u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x0705] = 0xC4u
+            memory[0x070B] = 0x00u
+            memory[0x070D] = 0x01u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x05u
+            memory[0x073A] = 0x02u
+            memory[0x073B] = 0x01u
+            memory[0x073D] = 0x03u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0753] = 0x00u
+            memory[0x0754] = 0x00u
+            memory[0x0755] = 0x03u
+            memory[0x0756] = 0x01u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0781] = 0x01u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x60u
+            memory[0x07A9] = 0x48u
+            memory[0x07AA] = 0x88u
+
+            // Execute decompiled function
+            gameCoreRoutine()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x80u, memory[0x06FC], "Memory 0x06FC mismatch")
+        }
+    }
+
+    /**
+     * Test case 5 from frame 7760
+     * Function: gameCoreRoutine (0xAEEA)
+     * Call depth: 3
+     * Memory reads: 143, writes: 3
+     */
+    @Test
+    fun `gameCoreRoutine_frame7760_test5`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (143 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x98u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x01FA] = 0x77u
+            memory[0x01FB] = 0x81u
+            memory[0x01FC] = 0x10u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0300] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x046E] = 0x00u
+            memory[0x046F] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D4] = 0x05u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0753] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x6Bu
+            memory[0x07A9] = 0xF3u
+            memory[0x07AA] = 0x24u
+
+            // Execute decompiled function
+            gameCoreRoutine()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
+        }
+    }
+
+    /**
+     * Test case 6 from frame 10392
+     * Function: gameCoreRoutine (0xAEEA)
+     * Call depth: 3
+     * Memory reads: 139, writes: 3
+     */
+    @Test
+    fun `gameCoreRoutine_frame10392_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (139 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x9Au
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x01FA] = 0x77u
+            memory[0x01FB] = 0x81u
+            memory[0x01FC] = 0x10u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0753] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0xCBu
+            memory[0x07A9] = 0xFEu
+            memory[0x07AA] = 0x69u
+
+            // Execute decompiled function
+            gameCoreRoutine()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
+        }
+    }
+
+    /**
+     * Test case 7 from frame 11872
+     * Function: gameCoreRoutine (0xAEEA)
+     * Call depth: 3
+     * Memory reads: 117, writes: 3
+     */
+    @Test
+    fun `gameCoreRoutine_frame11872_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (117 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x6Du
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0x33u
+            memory[0x0007] = 0xB2u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x7Eu
+            memory[0x000A] = 0xC0u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x09u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x02u
+            memory[0x0045] = 0x02u
+            memory[0x0057] = 0xE8u
+            memory[0x006D] = 0x01u
+            memory[0x006E] = 0x02u
+            memory[0x006F] = 0x02u
+            memory[0x0070] = 0x02u
+            memory[0x0071] = 0x02u
+            memory[0x0072] = 0x02u
+            memory[0x0086] = 0x82u
+            memory[0x0087] = 0x80u
+            memory[0x0088] = 0x80u
+            memory[0x0089] = 0x80u
+            memory[0x008A] = 0x80u
+            memory[0x008B] = 0x80u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x6Du
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x06u
+            memory[0x0131] = 0x00u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
+            memory[0x01F1] = 0xD9u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0xC4u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03AD] = 0x3Fu
+            memory[0x03B8] = 0x6Du
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x046F] = 0x00u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0x00u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0xC2u
+            memory[0x0700] = 0x18u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070D] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
+            memory[0x071F] = 0x00u
+            memory[0x0739] = 0x05u
+            memory[0x073A] = 0x02u
+            memory[0x073B] = 0x01u
+            memory[0x073D] = 0x03u
+            memory[0x0745] = 0x00u
+            memory[0x0747] = 0xCFu
+            memory[0x074E] = 0x01u
+            memory[0x0753] = 0x00u
+            memory[0x0754] = 0x00u
+            memory[0x0756] = 0x01u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0781] = 0x04u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x79u
+            memory[0x07A9] = 0x97u
+            memory[0x07AA] = 0x64u
+
+            // Execute decompiled function
+            gameCoreRoutine()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0xC2u, memory[0x06FC], "Memory 0x06FC mismatch")
+        }
+    }
+
+    /**
+     * Test case 8 from frame 13958
+     * Function: gameCoreRoutine (0xAEEA)
+     * Call depth: 3
+     * Memory reads: 141, writes: 3
+     */
+    @Test
+    fun `gameCoreRoutine_frame13958_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (141 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x6Fu
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x01FA] = 0x77u
+            memory[0x01FB] = 0x81u
+            memory[0x01FC] = 0x10u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x046C] = 0x00u
+            memory[0x046E] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0753] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x03u
+            memory[0x07A9] = 0xB1u
+            memory[0x07AA] = 0xB6u
+
+            // Execute decompiled function
+            gameCoreRoutine()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
+        }
+    }
+
+    /**
+     * Test case 9 from frame 16386
+     * Function: gameCoreRoutine (0xAEEA)
+     * Call depth: 3
+     * Memory reads: 142, writes: 3
+     */
+    @Test
+    fun `gameCoreRoutine_frame16386_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (142 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x70u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x01FA] = 0x77u
+            memory[0x01FB] = 0x81u
+            memory[0x01FC] = 0x10u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0300] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x046B] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D4] = 0x04u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0753] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x5Cu
+            memory[0x07A9] = 0x28u
+            memory[0x07AA] = 0x90u
+
+            // Execute decompiled function
+            gameCoreRoutine()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
         }
     }
 
     // =========================================
     // 0xAF93: scrollHandler
-    // 8409 calls, 1242 unique inputs
+    // 8409 calls, 1277 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 36
      * Function: scrollHandler (0xAF93)
      * Call depth: 7
-     * Memory reads: 7, writes: 6
+     * Memory reads: 18, writes: 6
      */
     @Test
     fun `scrollHandler_frame36_test0`() {
@@ -7886,12 +10566,23 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (7 addresses)
+            // Setup: Set input memory (18 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xD7u
+            memory[0x006D] = 0x00u
+            memory[0x0086] = 0x28u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0xF2u
             memory[0x01F2] = 0x04u
             memory[0x01F3] = 0xB0u
             memory[0x03A1] = 0x00u
             memory[0x06FF] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
             memory[0x0723] = 0x00u
             memory[0x0755] = 0x28u
 
@@ -7906,71 +10597,37 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1242
+     * Test case 1 from frame 1248
      * Function: scrollHandler (0xAF93)
      * Call depth: 7
-     * Memory reads: 12, writes: 12
+     * Memory reads: 21, writes: 12
      */
     @Test
-    fun `scrollHandler_frame1242_test1`() {
+    fun `scrollHandler_frame1248_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x00u
-            memory[0x01F2] = 0xF2u
-            memory[0x01F3] = 0xAFu
-            memory[0x03A1] = 0x00u
-            memory[0x06FF] = 0x01u
-            memory[0x071A] = 0x00u
-            memory[0x071C] = 0x59u
-            memory[0x0723] = 0x00u
-            memory[0x073D] = 0x19u
-            memory[0x0755] = 0x70u
-            memory[0x0778] = 0x10u
-            memory[0x0785] = 0x00u
-
-            // Execute decompiled function
-            scrollHandler()
-
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
-            assertEquals(0x01u, memory[0x06FF], "Memory 0x06FF mismatch")
-            assertEquals(0x00u, memory[0x071A], "Memory 0x071A mismatch")
-            assertEquals(0x5Au, memory[0x071C], "Memory 0x071C mismatch")
-            assertEquals(0x1Au, memory[0x073D], "Memory 0x073D mismatch")
-            assertEquals(0x5Au, memory[0x073F], "Memory 0x073F mismatch")
-            assertEquals(0x01u, memory[0x0775], "Memory 0x0775 mismatch")
-            assertEquals(0x10u, memory[0x0778], "Memory 0x0778 mismatch")
-            assertEquals(0x08u, memory[0x0795], "Memory 0x0795 mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 1496
-     * Function: scrollHandler (0xAF93)
-     * Call depth: 7
-     * Memory reads: 12, writes: 12
-     */
-    @Test
-    fun `scrollHandler_frame1496_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (12 addresses)
-            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
+            memory[0x006D] = 0x00u
+            memory[0x0086] = 0xCFu
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0xF2u
             memory[0x01F2] = 0xF2u
             memory[0x01F3] = 0xAFu
             memory[0x03A1] = 0x00u
             memory[0x06FF] = 0x02u
             memory[0x071A] = 0x00u
-            memory[0x071C] = 0xE8u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0x5Du
+            memory[0x071D] = 0x5Eu
             memory[0x0723] = 0x00u
-            memory[0x073D] = 0x08u
+            memory[0x073D] = 0x1Du
             memory[0x0755] = 0x70u
             memory[0x0778] = 0x10u
             memory[0x0785] = 0x00u
@@ -7982,9 +10639,9 @@ class GeneratedFunctionTests {
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
             assertEquals(0x02u, memory[0x06FF], "Memory 0x06FF mismatch")
             assertEquals(0x00u, memory[0x071A], "Memory 0x071A mismatch")
-            assertEquals(0xEAu, memory[0x071C], "Memory 0x071C mismatch")
-            assertEquals(0x0Au, memory[0x073D], "Memory 0x073D mismatch")
-            assertEquals(0xEAu, memory[0x073F], "Memory 0x073F mismatch")
+            assertEquals(0x5Fu, memory[0x071C], "Memory 0x071C mismatch")
+            assertEquals(0x1Fu, memory[0x073D], "Memory 0x073D mismatch")
+            assertEquals(0x5Fu, memory[0x073F], "Memory 0x073F mismatch")
             assertEquals(0x02u, memory[0x0775], "Memory 0x0775 mismatch")
             assertEquals(0x10u, memory[0x0778], "Memory 0x0778 mismatch")
             assertEquals(0x08u, memory[0x0795], "Memory 0x0795 mismatch")
@@ -7992,26 +10649,89 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1868
+     * Test case 2 from frame 1510
      * Function: scrollHandler (0xAF93)
      * Call depth: 7
-     * Memory reads: 7, writes: 6
+     * Memory reads: 21, writes: 12
      */
     @Test
-    fun `scrollHandler_frame1868_test3`() {
+    fun `scrollHandler_frame1510_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (7 addresses)
+            // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x67u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0xF2u
+            memory[0x01F2] = 0xF2u
+            memory[0x01F3] = 0xAFu
+            memory[0x03A1] = 0x00u
+            memory[0x06FF] = 0x02u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xF5u
+            memory[0x071D] = 0xF6u
+            memory[0x0723] = 0x00u
+            memory[0x073D] = 0x15u
+            memory[0x0755] = 0x70u
+            memory[0x0778] = 0x10u
+            memory[0x0785] = 0x00u
+
+            // Execute decompiled function
+            scrollHandler()
+
+            // Verify: Check output memory (9 addresses)
+            assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
+            assertEquals(0x02u, memory[0x06FF], "Memory 0x06FF mismatch")
+            assertEquals(0x00u, memory[0x071A], "Memory 0x071A mismatch")
+            assertEquals(0xF7u, memory[0x071C], "Memory 0x071C mismatch")
+            assertEquals(0x17u, memory[0x073D], "Memory 0x073D mismatch")
+            assertEquals(0xF7u, memory[0x073F], "Memory 0x073F mismatch")
+            assertEquals(0x02u, memory[0x0775], "Memory 0x0775 mismatch")
+            assertEquals(0x10u, memory[0x0778], "Memory 0x0778 mismatch")
+            assertEquals(0x08u, memory[0x0795], "Memory 0x0795 mismatch")
+        }
+    }
+
+    /**
+     * Test case 3 from frame 1890
+     * Function: scrollHandler (0xAF93)
+     * Call depth: 7
+     * Memory reads: 18, writes: 6
+     */
+    @Test
+    fun `scrollHandler_frame1890_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (18 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xD1u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x72u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0xF2u
             memory[0x01F2] = 0x04u
             memory[0x01F3] = 0xB0u
             memory[0x03A1] = 0x00u
             memory[0x06FF] = 0xFFu
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x44u
+            memory[0x071D] = 0x43u
             memory[0x0723] = 0x00u
-            memory[0x0755] = 0x3Au
+            memory[0x0755] = 0x2Fu
 
             // Execute decompiled function
             scrollHandler()
@@ -8024,29 +10744,38 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 4 from frame 2258
+     * Test case 4 from frame 2286
      * Function: scrollHandler (0xAF93)
      * Call depth: 7
-     * Memory reads: 12, writes: 12
+     * Memory reads: 21, writes: 12
      */
     @Test
-    fun `scrollHandler_frame2258_test4`() {
+    fun `scrollHandler_frame2286_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x01u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x94u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0xEAu
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0xF2u
             memory[0x01F2] = 0xF2u
             memory[0x01F3] = 0xAFu
             memory[0x03A1] = 0x00u
             memory[0x06FF] = 0x01u
             memory[0x071A] = 0x01u
-            memory[0x071C] = 0x70u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x7Eu
+            memory[0x071D] = 0x7Eu
             memory[0x0723] = 0x00u
-            memory[0x073D] = 0x10u
-            memory[0x0755] = 0x64u
+            memory[0x073D] = 0x1Eu
+            memory[0x0755] = 0x6Bu
             memory[0x0778] = 0x11u
             memory[0x0785] = 0x00u
 
@@ -8057,9 +10786,9 @@ class GeneratedFunctionTests {
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
             assertEquals(0x01u, memory[0x06FF], "Memory 0x06FF mismatch")
             assertEquals(0x01u, memory[0x071A], "Memory 0x071A mismatch")
-            assertEquals(0x71u, memory[0x071C], "Memory 0x071C mismatch")
-            assertEquals(0x11u, memory[0x073D], "Memory 0x073D mismatch")
-            assertEquals(0x71u, memory[0x073F], "Memory 0x073F mismatch")
+            assertEquals(0x7Fu, memory[0x071C], "Memory 0x071C mismatch")
+            assertEquals(0x1Fu, memory[0x073D], "Memory 0x073D mismatch")
+            assertEquals(0x7Fu, memory[0x073F], "Memory 0x073F mismatch")
             assertEquals(0x01u, memory[0x0775], "Memory 0x0775 mismatch")
             assertEquals(0x11u, memory[0x0778], "Memory 0x0778 mismatch")
             assertEquals(0x08u, memory[0x0795], "Memory 0x0795 mismatch")
@@ -8067,71 +10796,89 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 5 from frame 2526
+     * Test case 5 from frame 2560
      * Function: scrollHandler (0xAF93)
      * Call depth: 7
-     * Memory reads: 12, writes: 12
+     * Memory reads: 21, writes: 12
      */
     @Test
-    fun `scrollHandler_frame2526_test5`() {
+    fun `scrollHandler_frame2560_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
-            memory[0x0000] = 0x01u
-            memory[0x01F2] = 0xF2u
-            memory[0x01F3] = 0xAFu
-            memory[0x03A1] = 0x00u
-            memory[0x06FF] = 0x01u
-            memory[0x071A] = 0x01u
-            memory[0x071C] = 0xEDu
-            memory[0x0723] = 0x00u
-            memory[0x073D] = 0x0Du
-            memory[0x0755] = 0x72u
-            memory[0x0778] = 0x11u
-            memory[0x0785] = 0x00u
-
-            // Execute decompiled function
-            scrollHandler()
-
-            // Verify: Check output memory (9 addresses)
-            assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
-            assertEquals(0x01u, memory[0x06FF], "Memory 0x06FF mismatch")
-            assertEquals(0x01u, memory[0x071A], "Memory 0x071A mismatch")
-            assertEquals(0xEEu, memory[0x071C], "Memory 0x071C mismatch")
-            assertEquals(0x0Eu, memory[0x073D], "Memory 0x073D mismatch")
-            assertEquals(0xEEu, memory[0x073F], "Memory 0x073F mismatch")
-            assertEquals(0x01u, memory[0x0775], "Memory 0x0775 mismatch")
-            assertEquals(0x11u, memory[0x0778], "Memory 0x0778 mismatch")
-            assertEquals(0x08u, memory[0x0795], "Memory 0x0795 mismatch")
-        }
-    }
-
-    /**
-     * Test case 6 from frame 5274
-     * Function: scrollHandler (0xAF93)
-     * Call depth: 7
-     * Memory reads: 12, writes: 12
-     */
-    @Test
-    fun `scrollHandler_frame5274_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Du
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0x76u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0xF2u
+            memory[0x01F2] = 0xF2u
+            memory[0x01F3] = 0xAFu
+            memory[0x03A1] = 0x00u
+            memory[0x06FF] = 0x02u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x02u
+            memory[0x071D] = 0x03u
+            memory[0x0723] = 0x00u
+            memory[0x073D] = 0x02u
+            memory[0x0755] = 0x72u
+            memory[0x0778] = 0x14u
+            memory[0x0785] = 0x00u
+
+            // Execute decompiled function
+            scrollHandler()
+
+            // Verify: Check output memory (9 addresses)
+            assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
+            assertEquals(0x02u, memory[0x06FF], "Memory 0x06FF mismatch")
+            assertEquals(0x02u, memory[0x071A], "Memory 0x071A mismatch")
+            assertEquals(0x04u, memory[0x071C], "Memory 0x071C mismatch")
+            assertEquals(0x04u, memory[0x073D], "Memory 0x073D mismatch")
+            assertEquals(0x04u, memory[0x073F], "Memory 0x073F mismatch")
+            assertEquals(0x02u, memory[0x0775], "Memory 0x0775 mismatch")
+            assertEquals(0x14u, memory[0x0778], "Memory 0x0778 mismatch")
+            assertEquals(0x08u, memory[0x0795], "Memory 0x0795 mismatch")
+        }
+    }
+
+    /**
+     * Test case 6 from frame 5306
+     * Function: scrollHandler (0xAF93)
+     * Call depth: 7
+     * Memory reads: 21, writes: 12
+     */
+    @Test
+    fun `scrollHandler_frame5306_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (21 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x6Au
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0xF2u
             memory[0x01F2] = 0xF2u
             memory[0x01F3] = 0xAFu
             memory[0x03A1] = 0x00u
             memory[0x06FF] = 0x02u
             memory[0x071A] = 0x00u
-            memory[0x071C] = 0xDCu
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xF8u
+            memory[0x071D] = 0xF9u
             memory[0x0723] = 0x00u
-            memory[0x073D] = 0x1Cu
+            memory[0x073D] = 0x18u
             memory[0x0755] = 0x70u
             memory[0x0778] = 0x10u
             memory[0x0785] = 0x00u
@@ -8143,9 +10890,9 @@ class GeneratedFunctionTests {
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
             assertEquals(0x02u, memory[0x06FF], "Memory 0x06FF mismatch")
             assertEquals(0x00u, memory[0x071A], "Memory 0x071A mismatch")
-            assertEquals(0xDEu, memory[0x071C], "Memory 0x071C mismatch")
-            assertEquals(0x1Eu, memory[0x073D], "Memory 0x073D mismatch")
-            assertEquals(0xDEu, memory[0x073F], "Memory 0x073F mismatch")
+            assertEquals(0xFAu, memory[0x071C], "Memory 0x071C mismatch")
+            assertEquals(0x1Au, memory[0x073D], "Memory 0x073D mismatch")
+            assertEquals(0xFAu, memory[0x073F], "Memory 0x073F mismatch")
             assertEquals(0x02u, memory[0x0775], "Memory 0x0775 mismatch")
             assertEquals(0x10u, memory[0x0778], "Memory 0x0778 mismatch")
             assertEquals(0x08u, memory[0x0795], "Memory 0x0795 mismatch")
@@ -8153,60 +10900,80 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 5772
+     * Test case 7 from frame 5762
      * Function: scrollHandler (0xAF93)
      * Call depth: 7
-     * Memory reads: 7, writes: 6
+     * Memory reads: 18, writes: 6
      */
     @Test
-    fun `scrollHandler_frame5772_test7`() {
+    fun `scrollHandler_frame5762_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (7 addresses)
+            // Setup: Set input memory (18 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xF2u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x50u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0xF2u
             memory[0x01F2] = 0x04u
             memory[0x01F3] = 0xB0u
             memory[0x03A1] = 0x00u
-            memory[0x06FF] = 0x02u
+            memory[0x06FF] = 0x01u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
             memory[0x0723] = 0x00u
-            memory[0x0755] = 0x12u
+            memory[0x0755] = 0x0Cu
 
             // Execute decompiled function
             scrollHandler()
 
             // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
-            assertEquals(0x02u, memory[0x06FF], "Memory 0x06FF mismatch")
+            assertEquals(0x01u, memory[0x06FF], "Memory 0x06FF mismatch")
             assertEquals(0x00u, memory[0x0775], "Memory 0x0775 mismatch")
         }
     }
 
     /**
-     * Test case 8 from frame 6020
+     * Test case 8 from frame 6018
      * Function: scrollHandler (0xAF93)
      * Call depth: 7
-     * Memory reads: 12, writes: 12
+     * Memory reads: 21, writes: 12
      */
     @Test
-    fun `scrollHandler_frame6020_test8`() {
+    fun `scrollHandler_frame6018_test8`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0x80u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0xF2u
             memory[0x01F2] = 0xF2u
             memory[0x01F3] = 0xAFu
             memory[0x03A1] = 0x00u
-            memory[0x06FF] = 0x03u
+            memory[0x06FF] = 0x02u
             memory[0x071A] = 0x02u
-            memory[0x071C] = 0x10u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x0Eu
+            memory[0x071D] = 0x0Fu
             memory[0x0723] = 0x00u
-            memory[0x073D] = 0x10u
+            memory[0x073D] = 0x0Eu
             memory[0x0755] = 0x70u
             memory[0x0778] = 0x14u
             memory[0x0785] = 0x00u
@@ -8216,42 +10983,51 @@ class GeneratedFunctionTests {
 
             // Verify: Check output memory (9 addresses)
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
-            assertEquals(0x03u, memory[0x06FF], "Memory 0x06FF mismatch")
+            assertEquals(0x02u, memory[0x06FF], "Memory 0x06FF mismatch")
             assertEquals(0x02u, memory[0x071A], "Memory 0x071A mismatch")
-            assertEquals(0x13u, memory[0x071C], "Memory 0x071C mismatch")
-            assertEquals(0x13u, memory[0x073D], "Memory 0x073D mismatch")
-            assertEquals(0x13u, memory[0x073F], "Memory 0x073F mismatch")
-            assertEquals(0x03u, memory[0x0775], "Memory 0x0775 mismatch")
+            assertEquals(0x10u, memory[0x071C], "Memory 0x071C mismatch")
+            assertEquals(0x10u, memory[0x073D], "Memory 0x073D mismatch")
+            assertEquals(0x10u, memory[0x073F], "Memory 0x073F mismatch")
+            assertEquals(0x02u, memory[0x0775], "Memory 0x0775 mismatch")
             assertEquals(0x14u, memory[0x0778], "Memory 0x0778 mismatch")
             assertEquals(0x08u, memory[0x0795], "Memory 0x0795 mismatch")
         }
     }
 
     /**
-     * Test case 9 from frame 6344
+     * Test case 9 from frame 6348
      * Function: scrollHandler (0xAF93)
      * Call depth: 7
-     * Memory reads: 12, writes: 12
+     * Memory reads: 21, writes: 12
      */
     @Test
-    fun `scrollHandler_frame6344_test9`() {
+    fun `scrollHandler_frame6348_test9`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x9Bu
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0xEAu
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0xF2u
             memory[0x01F2] = 0xF2u
             memory[0x01F3] = 0xAFu
             memory[0x03A1] = 0x00u
-            memory[0x06FF] = 0x01u
+            memory[0x06FF] = 0x02u
             memory[0x071A] = 0x02u
-            memory[0x071C] = 0x83u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x85u
+            memory[0x071D] = 0x85u
             memory[0x0723] = 0x00u
-            memory[0x073D] = 0x03u
+            memory[0x073D] = 0x05u
             memory[0x0755] = 0x63u
-            memory[0x0778] = 0x10u
+            memory[0x0778] = 0x14u
             memory[0x0785] = 0x00u
 
             // Execute decompiled function
@@ -8259,13 +11035,13 @@ class GeneratedFunctionTests {
 
             // Verify: Check output memory (9 addresses)
             assertEquals(0x00u, memory[0x03A1], "Memory 0x03A1 mismatch")
-            assertEquals(0x01u, memory[0x06FF], "Memory 0x06FF mismatch")
+            assertEquals(0x02u, memory[0x06FF], "Memory 0x06FF mismatch")
             assertEquals(0x02u, memory[0x071A], "Memory 0x071A mismatch")
-            assertEquals(0x84u, memory[0x071C], "Memory 0x071C mismatch")
-            assertEquals(0x04u, memory[0x073D], "Memory 0x073D mismatch")
-            assertEquals(0x84u, memory[0x073F], "Memory 0x073F mismatch")
+            assertEquals(0x86u, memory[0x071C], "Memory 0x071C mismatch")
+            assertEquals(0x06u, memory[0x073D], "Memory 0x073D mismatch")
+            assertEquals(0x86u, memory[0x073F], "Memory 0x073F mismatch")
             assertEquals(0x01u, memory[0x0775], "Memory 0x0775 mismatch")
-            assertEquals(0x10u, memory[0x0778], "Memory 0x0778 mismatch")
+            assertEquals(0x14u, memory[0x0778], "Memory 0x0778 mismatch")
             assertEquals(0x08u, memory[0x0795], "Memory 0x0795 mismatch")
         }
     }
@@ -8537,14 +11313,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0xB04A: gameRoutines
-    // 8846 calls, 35 unique inputs
+    // 8846 calls, 5352 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 32
      * Function: gameRoutines (0xB04A)
      * Call depth: 4
-     * Memory reads: 10, writes: 7
+     * Memory reads: 117, writes: 7
      */
     @Test
     fun `gameRoutines_frame32_test0`() {
@@ -8553,17 +11329,124 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
+            // Setup: Set input memory (117 addresses)
+            memory[0x0000] = 0x03u
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB0u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0x31u
+            memory[0x0007] = 0x91u
+            memory[0x0008] = 0x00u
+            memory[0x0009] = 0x1Au
             memory[0x000A] = 0x00u
+            memory[0x000C] = 0x00u
             memory[0x000E] = 0x00u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x10u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
             memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
+            memory[0x01F1] = 0xD9u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0xC4u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
             memory[0x01F6] = 0xF5u
             memory[0x01F7] = 0xAEu
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0300] = 0x00u
+            memory[0x0301] = 0x3Fu
+            memory[0x0398] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x046F] = 0x00u
+            memory[0x0490] = 0x00u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x0710] = 0x02u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0715] = 0x01u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
             memory[0x071F] = 0x00u
+            memory[0x0739] = 0x00u
+            memory[0x073A] = 0x00u
+            memory[0x073B] = 0x00u
             memory[0x073D] = 0x00u
+            memory[0x0744] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0752] = 0x00u
+            memory[0x0753] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0756] = 0x00u
+            memory[0x0757] = 0x01u
+            memory[0x0758] = 0x00u
+            memory[0x075F] = 0x00u
+            memory[0x0770] = 0x00u
             memory[0x0772] = 0x03u
             memory[0x0773] = 0x00u
+            memory[0x079E] = 0x00u
             memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x97u
+            memory[0x07A9] = 0x7Au
+            memory[0x07AA] = 0x54u
 
             // Execute decompiled function
             gameRoutines()
@@ -8576,239 +11459,1425 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 198
+     * Test case 1 from frame 1102
      * Function: gameRoutines (0xB04A)
      * Call depth: 4
-     * Memory reads: 3, writes: 2
+     * Memory reads: 138, writes: 2
      */
     @Test
-    fun `gameRoutines_frame198_test1`() {
+    fun `gameRoutines_frame1102_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (138 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x31u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x01u
             memory[0x000E] = 0x08u
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 2 from frame 1148
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 4, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame1148_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (4 addresses)
-            memory[0x000E] = 0x08u
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x14u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 3 from frame 1378
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 1, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame1378_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (1 addresses)
-            memory[0x000E] = 0x08u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 4 from frame 1540
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 4, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame1540_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (4 addresses)
-            memory[0x000E] = 0x08u
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x11u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 5 from frame 1654
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 4, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame1654_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (4 addresses)
-            memory[0x000E] = 0x08u
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x11u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 6 from frame 1866
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 3, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame1866_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (3 addresses)
-            memory[0x000E] = 0x08u
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 7 from frame 2016
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 4, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame2016_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (4 addresses)
-            memory[0x000E] = 0x08u
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x11u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 8 from frame 3772
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 3, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame3772_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (3 addresses)
-            memory[0x000E] = 0x08u
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 9 from frame 6054
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 4, writes: 5
-     */
-    @Test
-    fun `gameRoutines_frame6054_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (4 addresses)
-            memory[0x000E] = 0x0Au
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x01u
+            memory[0x0057] = 0x18u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x60u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
             memory[0x01F6] = 0xF5u
             memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x56u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x30u
+            memory[0x0456] = 0x18u
+            memory[0x046B] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A6] = 0x00u
+            memory[0x05B6] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0x60u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x01u
+            memory[0x06FF] = 0x01u
+            memory[0x0700] = 0x18u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x0705] = 0x70u
+            memory[0x070B] = 0x00u
+            memory[0x070D] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0x0Au
+            memory[0x071D] = 0x0Au
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x0Au
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x56u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
             memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0778] = 0x10u
+            memory[0x0781] = 0x03u
+            memory[0x0783] = 0x00u
+            memory[0x0785] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x56u
+            memory[0x07A9] = 0xB0u
+            memory[0x07AA] = 0x1Du
 
             // Execute decompiled function
             gameRoutines()
 
-            // Verify: Check output memory (1 addresses)
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 2 from frame 3294
+     * Function: gameRoutines (0xB04A)
+     * Call depth: 4
+     * Memory reads: 136, writes: 2
+     */
+    @Test
+    fun `gameRoutines_frame3294_test2`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (136 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x2Du
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x046F] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0xDDu
+            memory[0x07A9] = 0x1Eu
+            memory[0x07AA] = 0xA4u
+
+            // Execute decompiled function
+            gameRoutines()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 3 from frame 4364
+     * Function: gameRoutines (0xB04A)
+     * Call depth: 4
+     * Memory reads: 135, writes: 2
+     */
+    @Test
+    fun `gameRoutines_frame4364_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (135 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x44u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0xE7u
+            memory[0x07A9] = 0x18u
+            memory[0x07AA] = 0xD6u
+
+            // Execute decompiled function
+            gameRoutines()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 4 from frame 5806
+     * Function: gameRoutines (0xB04A)
+     * Call depth: 4
+     * Memory reads: 151, writes: 2
+     */
+    @Test
+    fun `gameRoutines_frame5806_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (151 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x60u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x15u
+            memory[0x000A] = 0xC0u
+            memory[0x000C] = 0x01u
+            memory[0x000D] = 0xC0u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x01u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x28u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x01u
+            memory[0x0057] = 0x25u
+            memory[0x006D] = 0x01u
+            memory[0x006E] = 0x02u
+            memory[0x006F] = 0x02u
+            memory[0x0070] = 0x02u
+            memory[0x0071] = 0x02u
+            memory[0x0072] = 0x02u
+            memory[0x007E] = 0x00u
+            memory[0x0082] = 0x01u
+            memory[0x0086] = 0x75u
+            memory[0x0087] = 0x80u
+            memory[0x0088] = 0x80u
+            memory[0x0089] = 0x80u
+            memory[0x008A] = 0x80u
+            memory[0x008B] = 0x80u
+            memory[0x0097] = 0x00u
+            memory[0x009B] = 0x65u
+            memory[0x009F] = 0xFBu
+            memory[0x00B5] = 0x01u
+            memory[0x00CA] = 0x01u
+            memory[0x00CE] = 0x61u
+            memory[0x00E3] = 0x26u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x00u
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x01u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x35u
+            memory[0x03B3] = 0x22u
+            memory[0x03B8] = 0x5Cu
+            memory[0x03BE] = 0x26u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0xA0u
+            memory[0x0416] = 0x78u
+            memory[0x0433] = 0x78u
+            memory[0x0456] = 0x28u
+            memory[0x046B] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x00u
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x24u
+            memory[0x0617] = 0x00u
+            memory[0x0618] = 0x00u
+            memory[0x0627] = 0x00u
+            memory[0x0628] = 0x00u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0x20u
+            memory[0x06E4] = 0x04u
+            memory[0x06FB] = 0x50u
+            memory[0x06FC] = 0xC1u
+            memory[0x06FF] = 0x03u
+            memory[0x0700] = 0x25u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0xE4u
+            memory[0x0704] = 0x00u
+            memory[0x0705] = 0xB4u
+            memory[0x0709] = 0x28u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x05u
+            memory[0x073A] = 0x02u
+            memory[0x073B] = 0x01u
+            memory[0x073D] = 0x03u
+            memory[0x0745] = 0x00u
+            memory[0x0747] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x00u
+            memory[0x0755] = 0x32u
+            memory[0x0756] = 0x01u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0775] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0xB6u
+            memory[0x07A9] = 0xFDu
+            memory[0x07AA] = 0x90u
+
+            // Execute decompiled function
+            gameRoutines()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 5 from frame 7884
+     * Function: gameRoutines (0xB04A)
+     * Call depth: 4
+     * Memory reads: 136, writes: 2
+     */
+    @Test
+    fun `gameRoutines_frame7884_test5`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (136 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0xD6u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x046C] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x21u
+            memory[0x07A9] = 0x7Fu
+            memory[0x07AA] = 0x3Du
+
+            // Execute decompiled function
+            gameRoutines()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 6 from frame 10440
+     * Function: gameRoutines (0xB04A)
+     * Call depth: 4
+     * Memory reads: 135, writes: 2
+     */
+    @Test
+    fun `gameRoutines_frame10440_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (135 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0xB2u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0xD9u
+            memory[0x07A9] = 0x28u
+            memory[0x07AA] = 0x9Au
+
+            // Execute decompiled function
+            gameRoutines()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 7 from frame 11882
+     * Function: gameRoutines (0xB04A)
+     * Call depth: 4
+     * Memory reads: 111, writes: 7
+     */
+    @Test
+    fun `gameRoutines_frame11882_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (111 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x6Du
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0x33u
+            memory[0x0007] = 0xB2u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x83u
+            memory[0x000A] = 0xC0u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x09u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x02u
+            memory[0x0045] = 0x02u
+            memory[0x0057] = 0xE8u
+            memory[0x006D] = 0x01u
+            memory[0x006E] = 0x02u
+            memory[0x006F] = 0x02u
+            memory[0x0070] = 0x02u
+            memory[0x0071] = 0x02u
+            memory[0x0072] = 0x02u
+            memory[0x0086] = 0x82u
+            memory[0x0087] = 0x80u
+            memory[0x0088] = 0x80u
+            memory[0x0089] = 0x80u
+            memory[0x008A] = 0x80u
+            memory[0x008B] = 0x80u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x6Du
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
+            memory[0x01F1] = 0xD9u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0xC4u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03AD] = 0x3Fu
+            memory[0x03B8] = 0x6Du
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0x00u
+            memory[0x06E4] = 0x04u
+            memory[0x0700] = 0x18u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070D] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
+            memory[0x071F] = 0x00u
+            memory[0x0739] = 0x05u
+            memory[0x073A] = 0x02u
+            memory[0x073B] = 0x01u
+            memory[0x073D] = 0x03u
+            memory[0x0745] = 0x00u
+            memory[0x0747] = 0xCAu
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x00u
+            memory[0x0756] = 0x01u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0781] = 0x04u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0xBBu
+            memory[0x07A9] = 0xCCu
+            memory[0x07AA] = 0xBBu
+
+            // Execute decompiled function
+            gameRoutines()
+
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
+            assertEquals(0x00u, memory[0x000C], "Memory 0x000C mismatch")
+            assertEquals(0xC0u, memory[0x000D], "Memory 0x000D mismatch")
+        }
+    }
+
+    /**
+     * Test case 8 from frame 14068
+     * Function: gameRoutines (0xB04A)
+     * Call depth: 4
+     * Memory reads: 137, writes: 2
+     */
+    @Test
+    fun `gameRoutines_frame14068_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (137 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0xA6u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x046C] = 0x00u
+            memory[0x046E] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x01u
+            memory[0x07A9] = 0x73u
+            memory[0x07AA] = 0x71u
+
+            // Execute decompiled function
+            gameRoutines()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 9 from frame 16424
+     * Function: gameRoutines (0xB04A)
+     * Call depth: 4
+     * Memory reads: 135, writes: 2
+     */
+    @Test
+    fun `gameRoutines_frame16424_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (135 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x4Eu
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0xE9u
+            memory[0x0007] = 0xB0u
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x83u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x01u
+            memory[0x0070] = 0x01u
+            memory[0x0071] = 0x01u
+            memory[0x0072] = 0x01u
+            memory[0x0086] = 0x28u
+            memory[0x0087] = 0x60u
+            memory[0x0088] = 0x60u
+            memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x0Eu
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x4Eu
+            memory[0x01F5] = 0xB0u
+            memory[0x01F6] = 0xF5u
+            memory[0x01F7] = 0xAEu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0xB8u
+            memory[0x06E4] = 0x04u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x071F] = 0x00u
+            memory[0x0723] = 0x00u
+            memory[0x0739] = 0x03u
+            memory[0x073A] = 0x01u
+            memory[0x073D] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0756] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0772] = 0x03u
+            memory[0x0773] = 0x00u
+            memory[0x0783] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x96u
+            memory[0x07A9] = 0x67u
+            memory[0x07AA] = 0x4Bu
+
+            // Execute decompiled function
+            gameRoutines()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -9355,14 +13424,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0xB329: playerMovementSubs
-    // 8409 calls, 975 unique inputs
+    // 8409 calls, 1700 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 36
      * Function: playerMovementSubs (0xB329)
      * Call depth: 6
-     * Memory reads: 12, writes: 8
+     * Memory reads: 64, writes: 8
      */
     @Test
     fun `playerMovementSubs_frame36_test0`() {
@@ -9371,19 +13440,71 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (64 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x50u
+            memory[0x0005] = 0xB3u
+            memory[0x0006] = 0x5Au
+            memory[0x0007] = 0xB3u
+            memory[0x0008] = 0x05u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x00u
             memory[0x000E] = 0x08u
             memory[0x001D] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x00u
             memory[0x0057] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x0086] = 0x28u
+            memory[0x009F] = 0x00u
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0xB0u
+            memory[0x00EB] = 0x0Eu
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0x3Du
             memory[0x01F3] = 0xB3u
             memory[0x01F4] = 0x2Du
             memory[0x01F5] = 0xB1u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
             memory[0x03C4] = 0x00u
+            memory[0x0400] = 0x00u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x06FC] = 0x00u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
             memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
+            memory[0x0723] = 0x00u
+            memory[0x074E] = 0x01u
             memory[0x0754] = 0x01u
+            memory[0x0755] = 0x28u
+            memory[0x0783] = 0x00u
 
             // Execute decompiled function
             playerMovementSubs()
@@ -9397,107 +13518,85 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1484
+     * Test case 1 from frame 1326
      * Function: playerMovementSubs (0xB329)
      * Call depth: 6
-     * Memory reads: 12, writes: 9
+     * Memory reads: 66, writes: 9
      */
     @Test
-    fun `playerMovementSubs_frame1484_test1`() {
+    fun `playerMovementSubs_frame1326_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (66 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x50u
+            memory[0x0005] = 0xB3u
+            memory[0x0006] = 0x76u
+            memory[0x0007] = 0xB3u
+            memory[0x0008] = 0x05u
+            memory[0x000A] = 0x80u
+            memory[0x000C] = 0x00u
+            memory[0x000D] = 0x80u
             memory[0x000E] = 0x08u
             memory[0x001D] = 0x01u
-            memory[0x0057] = 0x1Du
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x98u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x2Du
-            memory[0x01F5] = 0xB1u
-            memory[0x03C4] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x0754] = 0x01u
-
-            // Execute decompiled function
-            playerMovementSubs()
-
-            // Verify: Check output memory (5 addresses)
-            assertEquals(0x01u, memory[0x0045], "Memory 0x0045 mismatch")
-            assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
-            assertEquals(0x01u, memory[0x0499], "Memory 0x0499 mismatch")
-            assertEquals(0x00u, memory[0x0714], "Memory 0x0714 mismatch")
-            assertEquals(0x18u, memory[0x0789], "Memory 0x0789 mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 1918
-     * Function: playerMovementSubs (0xB329)
-     * Call depth: 6
-     * Memory reads: 11, writes: 6
-     */
-    @Test
-    fun `playerMovementSubs_frame1918_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (11 addresses)
-            memory[0x001D] = 0x01u
-            memory[0x0057] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x2Du
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x2Du
-            memory[0x01F5] = 0xB1u
-            memory[0x070B] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0754] = 0x00u
-
-            // Execute decompiled function
-            playerMovementSubs()
-
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0499], "Memory 0x0499 mismatch")
-            assertEquals(0x18u, memory[0x0789], "Memory 0x0789 mismatch")
-        }
-    }
-
-    /**
-     * Test case 3 from frame 2252
-     * Function: playerMovementSubs (0xB329)
-     * Call depth: 6
-     * Memory reads: 14, writes: 9
-     */
-    @Test
-    fun `playerMovementSubs_frame2252_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (14 addresses)
-            memory[0x000B] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x001D] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x01u
             memory[0x0057] = 0x18u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x08u
+            memory[0x009F] = 0x01u
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0x90u
+            memory[0x00EB] = 0x0Eu
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0x3Du
             memory[0x01F3] = 0xB3u
             memory[0x01F4] = 0x2Du
             memory[0x01F5] = 0xB1u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x70u
+            memory[0x03B8] = 0x91u
             memory[0x03C4] = 0x00u
+            memory[0x0400] = 0x30u
+            memory[0x0416] = 0x36u
+            memory[0x0433] = 0xACu
+            memory[0x0499] = 0x01u
+            memory[0x0650] = 0x00u
+            memory[0x0651] = 0x00u
+            memory[0x0660] = 0x00u
+            memory[0x0661] = 0x00u
+            memory[0x06FF] = 0x01u
+            memory[0x0700] = 0x18u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x0709] = 0x60u
+            memory[0x070A] = 0x60u
             memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
             memory[0x0714] = 0x00u
-            memory[0x0754] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0x98u
+            memory[0x071D] = 0x98u
+            memory[0x0723] = 0x00u
+            memory[0x073D] = 0x18u
+            memory[0x0747] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x70u
+            memory[0x0778] = 0x10u
+            memory[0x0785] = 0x00u
 
             // Execute decompiled function
             playerMovementSubs()
@@ -9505,46 +13604,190 @@ class GeneratedFunctionTests {
             // Verify: Check output memory (5 addresses)
             assertEquals(0x01u, memory[0x0045], "Memory 0x0045 mismatch")
             assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
-            assertEquals(0x00u, memory[0x0499], "Memory 0x0499 mismatch")
+            assertEquals(0x01u, memory[0x0499], "Memory 0x0499 mismatch")
             assertEquals(0x00u, memory[0x0714], "Memory 0x0714 mismatch")
             assertEquals(0x18u, memory[0x0789], "Memory 0x0789 mismatch")
         }
     }
 
     /**
-     * Test case 4 from frame 2696
+     * Test case 2 from frame 1666
      * Function: playerMovementSubs (0xB329)
      * Call depth: 6
-     * Memory reads: 14, writes: 9
+     * Memory reads: 66, writes: 9
      */
     @Test
-    fun `playerMovementSubs_frame2696_test4`() {
+    fun `playerMovementSubs_frame1666_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (14 addresses)
+            // Setup: Set input memory (66 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0xA0u
+            memory[0x0002] = 0xFFu
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x50u
+            memory[0x0005] = 0xB3u
+            memory[0x0006] = 0x76u
+            memory[0x0007] = 0xB3u
+            memory[0x0008] = 0x05u
+            memory[0x000A] = 0xC0u
+            memory[0x000C] = 0x02u
+            memory[0x000D] = 0xC0u
+            memory[0x000E] = 0x08u
+            memory[0x001D] = 0x01u
+            memory[0x0033] = 0x02u
+            memory[0x0045] = 0x02u
+            memory[0x0057] = 0xEBu
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x9Fu
+            memory[0x009F] = 0xFCu
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x99u
+            memory[0x00EB] = 0x0Eu
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x01u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x2Du
+            memory[0x01F5] = 0xB1u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x5Au
+            memory[0x03B8] = 0x96u
+            memory[0x03C4] = 0x00u
+            memory[0x0400] = 0xF0u
+            memory[0x0416] = 0xC2u
+            memory[0x0433] = 0xB4u
+            memory[0x0450] = 0xE8u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x065A] = 0x00u
+            memory[0x066A] = 0x00u
+            memory[0x06FF] = 0xFFu
+            memory[0x0700] = 0x15u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x0705] = 0x1Cu
+            memory[0x0709] = 0x1Eu
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x44u
+            memory[0x071D] = 0x43u
+            memory[0x0723] = 0x00u
+            memory[0x0747] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x5Bu
+            memory[0x0785] = 0x00u
+
+            // Execute decompiled function
+            playerMovementSubs()
+
+            // Verify: Check output memory (5 addresses)
+            assertEquals(0x02u, memory[0x0045], "Memory 0x0045 mismatch")
+            assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
+            assertEquals(0x01u, memory[0x0499], "Memory 0x0499 mismatch")
+            assertEquals(0x00u, memory[0x0714], "Memory 0x0714 mismatch")
+            assertEquals(0x18u, memory[0x0789], "Memory 0x0789 mismatch")
+        }
+    }
+
+    /**
+     * Test case 3 from frame 2128
+     * Function: playerMovementSubs (0xB329)
+     * Call depth: 6
+     * Memory reads: 65, writes: 9
+     */
+    @Test
+    fun `playerMovementSubs_frame2128_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (65 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x50u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x50u
+            memory[0x0005] = 0xB3u
+            memory[0x0006] = 0x5Au
+            memory[0x0007] = 0xB3u
+            memory[0x0008] = 0x05u
+            memory[0x000A] = 0x40u
             memory[0x000B] = 0x00u
+            memory[0x000C] = 0x01u
             memory[0x000E] = 0x08u
             memory[0x001D] = 0x00u
-            memory[0x0057] = 0xEEu
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x01u
+            memory[0x0057] = 0x04u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0xB2u
+            memory[0x009F] = 0x00u
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0xB0u
+            memory[0x00EB] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x01u
             memory[0x01F2] = 0x3Du
             memory[0x01F3] = 0xB3u
             memory[0x01F4] = 0x2Du
             memory[0x01F5] = 0xB1u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x5Du
+            memory[0x03B8] = 0xB0u
             memory[0x03C4] = 0x00u
+            memory[0x0400] = 0xD0u
+            memory[0x0456] = 0x28u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x00u
+            memory[0x066B] = 0x00u
+            memory[0x066C] = 0x12u
+            memory[0x067B] = 0x00u
+            memory[0x068B] = 0x54u
+            memory[0x06FC] = 0x41u
+            memory[0x06FF] = 0x01u
+            memory[0x0700] = 0x04u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0xE4u
+            memory[0x0704] = 0x00u
+            memory[0x0705] = 0x1Cu
             memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
             memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x56u
+            memory[0x071D] = 0x55u
+            memory[0x0723] = 0x00u
+            memory[0x074E] = 0x01u
             memory[0x0754] = 0x00u
+            memory[0x0755] = 0x5Cu
+            memory[0x0785] = 0x0Au
 
             // Execute decompiled function
             playerMovementSubs()
 
             // Verify: Check output memory (5 addresses)
-            assertEquals(0x02u, memory[0x0045], "Memory 0x0045 mismatch")
+            assertEquals(0x01u, memory[0x0045], "Memory 0x0045 mismatch")
             assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
             assertEquals(0x00u, memory[0x0499], "Memory 0x0499 mismatch")
             assertEquals(0x00u, memory[0x0714], "Memory 0x0714 mismatch")
@@ -9553,71 +13796,88 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 5 from frame 5684
+     * Test case 4 from frame 2470
      * Function: playerMovementSubs (0xB329)
      * Call depth: 6
-     * Memory reads: 13, writes: 8
+     * Memory reads: 69, writes: 8
      */
     @Test
-    fun `playerMovementSubs_frame5684_test5`() {
+    fun `playerMovementSubs_frame2470_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
+            // Setup: Set input memory (69 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x40u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x50u
+            memory[0x0005] = 0xB3u
+            memory[0x0006] = 0x76u
+            memory[0x0007] = 0xB3u
+            memory[0x0008] = 0x05u
+            memory[0x000A] = 0xC0u
+            memory[0x000C] = 0x01u
+            memory[0x000D] = 0xC0u
             memory[0x000E] = 0x08u
             memory[0x001D] = 0x01u
-            memory[0x0057] = 0xE8u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x01u
+            memory[0x0057] = 0x03u
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0x52u
+            memory[0x009F] = 0xFCu
             memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x6Du
+            memory[0x00CE] = 0x99u
+            memory[0x00EB] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x01u
             memory[0x01F2] = 0x3Du
             memory[0x01F3] = 0xB3u
             memory[0x01F4] = 0x2Du
             memory[0x01F5] = 0xB1u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x70u
+            memory[0x03B8] = 0x96u
             memory[0x03C4] = 0x00u
+            memory[0x0400] = 0xE0u
+            memory[0x0416] = 0xE0u
+            memory[0x0433] = 0xC0u
+            memory[0x0456] = 0x18u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x00u
+            memory[0x0575] = 0x00u
+            memory[0x0576] = 0x00u
+            memory[0x0585] = 0x00u
+            memory[0x0586] = 0x12u
+            memory[0x0595] = 0x00u
+            memory[0x06FF] = 0x01u
+            memory[0x0700] = 0x03u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x0705] = 0xD4u
+            memory[0x0709] = 0x20u
             memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
             memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0xE3u
+            memory[0x071D] = 0xE2u
+            memory[0x0723] = 0x00u
+            memory[0x0747] = 0x00u
             memory[0x0754] = 0x00u
-
-            // Execute decompiled function
-            playerMovementSubs()
-
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x02u, memory[0x0045], "Memory 0x0045 mismatch")
-            assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
-            assertEquals(0x00u, memory[0x0499], "Memory 0x0499 mismatch")
-            assertEquals(0x18u, memory[0x0789], "Memory 0x0789 mismatch")
-        }
-    }
-
-    /**
-     * Test case 6 from frame 5962
-     * Function: playerMovementSubs (0xB329)
-     * Call depth: 6
-     * Memory reads: 13, writes: 8
-     */
-    @Test
-    fun `playerMovementSubs_frame5962_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (13 addresses)
-            memory[0x000E] = 0x08u
-            memory[0x001D] = 0x01u
-            memory[0x0057] = 0x28u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xA6u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x2Du
-            memory[0x01F5] = 0xB1u
-            memory[0x03C4] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0754] = 0x00u
+            memory[0x0755] = 0x6Fu
+            memory[0x0785] = 0x09u
 
             // Execute decompiled function
             playerMovementSubs()
@@ -9631,31 +13891,88 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 6422
+     * Test case 5 from frame 5244
      * Function: playerMovementSubs (0xB329)
      * Call depth: 6
-     * Memory reads: 12, writes: 9
+     * Memory reads: 69, writes: 9
      */
     @Test
-    fun `playerMovementSubs_frame6422_test7`() {
+    fun `playerMovementSubs_frame5244_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (69 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x50u
+            memory[0x0005] = 0xB3u
+            memory[0x0006] = 0x76u
+            memory[0x0007] = 0xB3u
+            memory[0x0008] = 0x05u
+            memory[0x000A] = 0x40u
+            memory[0x000C] = 0x01u
             memory[0x000E] = 0x08u
-            memory[0x001D] = 0x02u
-            memory[0x0057] = 0x14u
+            memory[0x001D] = 0x01u
+            memory[0x0033] = 0x02u
+            memory[0x0045] = 0x01u
+            memory[0x0057] = 0x18u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x34u
+            memory[0x009F] = 0x01u
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0x9Au
+            memory[0x00EB] = 0x0Eu
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x01u
             memory[0x01F2] = 0x3Du
             memory[0x01F3] = 0xB3u
             memory[0x01F4] = 0x2Du
             memory[0x01F5] = 0xB1u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x70u
+            memory[0x03B8] = 0x9Bu
             memory[0x03C4] = 0x00u
+            memory[0x0400] = 0xD0u
+            memory[0x0416] = 0x00u
+            memory[0x0433] = 0xB0u
+            memory[0x0456] = 0x18u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x0653] = 0x00u
+            memory[0x0663] = 0x00u
+            memory[0x0664] = 0x00u
+            memory[0x06FF] = 0x02u
+            memory[0x0700] = 0x18u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x0705] = 0x40u
+            memory[0x0709] = 0x70u
+            memory[0x070A] = 0x70u
             memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xC4u
+            memory[0x071D] = 0xC5u
+            memory[0x0723] = 0x00u
+            memory[0x073D] = 0x04u
+            memory[0x0747] = 0x00u
             memory[0x0754] = 0x01u
+            memory[0x0755] = 0x70u
+            memory[0x0778] = 0x14u
+            memory[0x0785] = 0x00u
 
             // Execute decompiled function
             playerMovementSubs()
@@ -9670,84 +13987,356 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 8 from frame 6758
+     * Test case 6 from frame 5720
      * Function: playerMovementSubs (0xB329)
      * Call depth: 6
-     * Memory reads: 15, writes: 10
+     * Memory reads: 66, writes: 8
      */
     @Test
-    fun `playerMovementSubs_frame6758_test8`() {
+    fun `playerMovementSubs_frame5720_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (15 addresses)
-            memory[0x0007] = 0x04u
-            memory[0x000E] = 0x0Bu
-            memory[0x001D] = 0x01u
+            // Setup: Set input memory (66 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x50u
+            memory[0x0005] = 0xB3u
+            memory[0x0006] = 0x5Au
+            memory[0x0007] = 0xB3u
+            memory[0x0008] = 0x05u
+            memory[0x000A] = 0x40u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x01u
+            memory[0x000E] = 0x08u
+            memory[0x001D] = 0x00u
+            memory[0x0033] = 0x02u
+            memory[0x0045] = 0x02u
             memory[0x0057] = 0x00u
-            memory[0x00B5] = 0x02u
-            memory[0x00CE] = 0x48u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x43u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x70u
+            memory[0x00EB] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0x3Du
             memory[0x01F3] = 0xB3u
             memory[0x01F4] = 0x2Du
             memory[0x01F5] = 0xB1u
-            memory[0x03C4] = 0x02u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x00u
+            memory[0x03B8] = 0x70u
+            memory[0x03C4] = 0x00u
+            memory[0x0400] = 0xE0u
+            memory[0x0456] = 0x18u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x00u
+            memory[0x0624] = 0x00u
+            memory[0x0625] = 0x00u
+            memory[0x0634] = 0x00u
+            memory[0x0635] = 0x00u
+            memory[0x0644] = 0x51u
+            memory[0x06FC] = 0x41u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x00u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x0705] = 0x00u
             memory[0x070B] = 0x00u
-            memory[0x0743] = 0x00u
-            memory[0x0754] = 0x01u
-            memory[0x0759] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
+            memory[0x0723] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x00u
+            memory[0x0755] = 0x00u
 
             // Execute decompiled function
             playerMovementSubs()
 
-            // Verify: Check output memory (6 addresses)
-            assertEquals(0x04u, memory[0x0007], "Memory 0x0007 mismatch")
-            assertEquals(0x02u, memory[0x03C4], "Memory 0x03C4 mismatch")
-            assertEquals(0x01u, memory[0x0499], "Memory 0x0499 mismatch")
+            // Verify: Check output memory (4 addresses)
+            assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
+            assertEquals(0x00u, memory[0x0499], "Memory 0x0499 mismatch")
             assertEquals(0x00u, memory[0x0714], "Memory 0x0714 mismatch")
-            assertEquals(0x01u, memory[0x0723], "Memory 0x0723 mismatch")
             assertEquals(0x18u, memory[0x0789], "Memory 0x0789 mismatch")
         }
     }
 
     /**
-     * Test case 9 from frame 6952
+     * Test case 7 from frame 6160
      * Function: playerMovementSubs (0xB329)
      * Call depth: 6
-     * Memory reads: 15, writes: 10
+     * Memory reads: 66, writes: 9
      */
     @Test
-    fun `playerMovementSubs_frame6952_test9`() {
+    fun `playerMovementSubs_frame6160_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (15 addresses)
-            memory[0x0007] = 0x04u
-            memory[0x000E] = 0x0Bu
-            memory[0x001D] = 0x01u
-            memory[0x0057] = 0x00u
-            memory[0x00B5] = 0x03u
-            memory[0x00CE] = 0xE2u
+            // Setup: Set input memory (66 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x50u
+            memory[0x0005] = 0xB3u
+            memory[0x0006] = 0x5Au
+            memory[0x0007] = 0xB3u
+            memory[0x0008] = 0x05u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x01u
+            memory[0x000E] = 0x0Au
+            memory[0x001D] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x01u
+            memory[0x0057] = 0x18u
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0xA7u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00EB] = 0x0Eu
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x01u
             memory[0x01F2] = 0x3Du
             memory[0x01F3] = 0xB3u
             memory[0x01F4] = 0x2Du
             memory[0x01F5] = 0xB1u
-            memory[0x03C4] = 0x02u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x51u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x0400] = 0xF0u
+            memory[0x0456] = 0x18u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x05AA] = 0x00u
+            memory[0x05AB] = 0x00u
+            memory[0x05BA] = 0x54u
+            memory[0x05BB] = 0x54u
+            memory[0x06FC] = 0x01u
+            memory[0x06FF] = 0x02u
+            memory[0x0700] = 0x18u
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x0705] = 0xB0u
             memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x58u
+            memory[0x071D] = 0x57u
+            memory[0x0723] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x4Eu
+            memory[0x0783] = 0x00u
+
+            // Execute decompiled function
+            playerMovementSubs()
+
+            // Verify: Check output memory (5 addresses)
+            assertEquals(0x01u, memory[0x0045], "Memory 0x0045 mismatch")
+            assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
+            assertEquals(0x01u, memory[0x0499], "Memory 0x0499 mismatch")
+            assertEquals(0x00u, memory[0x0714], "Memory 0x0714 mismatch")
+            assertEquals(0x18u, memory[0x0789], "Memory 0x0789 mismatch")
+        }
+    }
+
+    /**
+     * Test case 8 from frame 6502
+     * Function: playerMovementSubs (0xB329)
+     * Call depth: 6
+     * Memory reads: 65, writes: 9
+     */
+    @Test
+    fun `playerMovementSubs_frame6502_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (65 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x10u
+            memory[0x0002] = 0xFFu
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x50u
+            memory[0x0005] = 0xB3u
+            memory[0x0006] = 0x5Au
+            memory[0x0007] = 0xB3u
+            memory[0x0008] = 0x05u
+            memory[0x000A] = 0x00u
+            memory[0x000B] = 0x00u
+            memory[0x000C] = 0x02u
+            memory[0x000E] = 0x08u
+            memory[0x001D] = 0x00u
+            memory[0x0033] = 0x02u
+            memory[0x0045] = 0x02u
+            memory[0x0057] = 0xF2u
+            memory[0x006D] = 0x03u
+            memory[0x0086] = 0x23u
+            memory[0x009F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00EB] = 0x0Eu
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x2Du
+            memory[0x01F5] = 0xB1u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x64u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x0400] = 0xA0u
+            memory[0x0450] = 0xE8u
+            memory[0x0490] = 0xFFu
+            memory[0x0499] = 0x01u
+            memory[0x0672] = 0x00u
+            memory[0x0682] = 0x54u
+            memory[0x06FC] = 0x02u
+            memory[0x06FF] = 0xFFu
+            memory[0x0700] = 0x0Eu
+            memory[0x0701] = 0x00u
+            memory[0x0702] = 0x98u
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x0705] = 0x58u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0xBEu
+            memory[0x071D] = 0xBDu
+            memory[0x0723] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0755] = 0x65u
+            memory[0x0783] = 0x00u
+            memory[0x0785] = 0x00u
+
+            // Execute decompiled function
+            playerMovementSubs()
+
+            // Verify: Check output memory (5 addresses)
+            assertEquals(0x02u, memory[0x0045], "Memory 0x0045 mismatch")
+            assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
+            assertEquals(0x01u, memory[0x0499], "Memory 0x0499 mismatch")
+            assertEquals(0x00u, memory[0x0714], "Memory 0x0714 mismatch")
+            assertEquals(0x18u, memory[0x0789], "Memory 0x0789 mismatch")
+        }
+    }
+
+    /**
+     * Test case 9 from frame 6872
+     * Function: playerMovementSubs (0xB329)
+     * Call depth: 6
+     * Memory reads: 54, writes: 9
+     */
+    @Test
+    fun `playerMovementSubs_frame6872_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (54 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0004] = 0x50u
+            memory[0x0005] = 0xB3u
+            memory[0x0006] = 0x76u
+            memory[0x0007] = 0xB3u
+            memory[0x0008] = 0x05u
+            memory[0x000A] = 0x00u
+            memory[0x000C] = 0x00u
+            memory[0x000E] = 0x0Bu
+            memory[0x001D] = 0x01u
+            memory[0x0033] = 0x02u
+            memory[0x0045] = 0x02u
+            memory[0x0057] = 0x00u
+            memory[0x006D] = 0x03u
+            memory[0x0086] = 0x0Bu
+            memory[0x009F] = 0x04u
+            memory[0x00B5] = 0x03u
+            memory[0x00CE] = 0x35u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0x1Du
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0x3Du
+            memory[0x01F3] = 0xB3u
+            memory[0x01F4] = 0x2Du
+            memory[0x01F5] = 0xB1u
+            memory[0x03A1] = 0x00u
+            memory[0x03AD] = 0x4Du
+            memory[0x03B8] = 0x39u
+            memory[0x0400] = 0xB0u
+            memory[0x0416] = 0x48u
+            memory[0x0433] = 0x28u
+            memory[0x0499] = 0x01u
+            memory[0x06FF] = 0x00u
+            memory[0x0700] = 0x0Cu
+            memory[0x0703] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x0709] = 0x28u
+            memory[0x070A] = 0x70u
+            memory[0x070B] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0xBEu
+            memory[0x071D] = 0xBDu
+            memory[0x0723] = 0x01u
             memory[0x0743] = 0x00u
+            memory[0x0747] = 0x5Fu
             memory[0x0754] = 0x01u
             memory[0x0759] = 0x00u
 
             // Execute decompiled function
             playerMovementSubs()
 
-            // Verify: Check output memory (6 addresses)
+            // Verify: Check output memory (5 addresses)
             assertEquals(0x04u, memory[0x0007], "Memory 0x0007 mismatch")
-            assertEquals(0x02u, memory[0x03C4], "Memory 0x03C4 mismatch")
             assertEquals(0x01u, memory[0x0499], "Memory 0x0499 mismatch")
             assertEquals(0x00u, memory[0x0714], "Memory 0x0714 mismatch")
             assertEquals(0x01u, memory[0x0723], "Memory 0x0723 mismatch")
@@ -11833,7 +16422,7 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0xBB96: miscObjectsCore
-    // 8846 calls, 128 unique inputs
+    // 8846 calls, 397 unique inputs
     // =========================================
 
     /**
@@ -11869,20 +16458,27 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1339
+     * Test case 1 from frame 1393
      * Function: miscObjectsCore (0xBB96)
      * Call depth: 8
-     * Memory reads: 13, writes: 6
+     * Memory reads: 42, writes: 6
      */
     @Test
-    fun `miscObjectsCore_frame1339_test1`() {
+    fun `miscObjectsCore_frame1393_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
+            // Setup: Set input memory (42 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x58u
+            memory[0x0002] = 0x77u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA7u
             memory[0x0008] = 0x08u
+            memory[0x0009] = 0xC2u
             memory[0x002A] = 0x00u
             memory[0x002B] = 0x00u
             memory[0x002C] = 0x00u
@@ -11891,10 +16487,67 @@ class GeneratedFunctionTests {
             memory[0x002F] = 0x00u
             memory[0x0030] = 0x00u
             memory[0x0031] = 0x00u
-            memory[0x0032] = 0x01u
-            memory[0x00B4] = 0xFEu
-            memory[0x01F4] = 0xDDu
+            memory[0x0032] = 0x08u
+            memory[0x007E] = 0x00u
+            memory[0x0082] = 0x01u
+            memory[0x0097] = 0x00u
+            memory[0x009B] = 0x05u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x77u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0x4Cu
+            memory[0x01F3] = 0xF1u
+            memory[0x01F4] = 0xEAu
             memory[0x01F5] = 0xBBu
+            memory[0x03B3] = 0x58u
+            memory[0x03BE] = 0x77u
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x5Au
+            memory[0x06FB] = 0xD0u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xADu
+            memory[0x071D] = 0xACu
+            memory[0x0775] = 0x00u
+
+            // Execute decompiled function
+            miscObjectsCore()
+
+            // Verify: Check output memory (4 addresses)
+            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
+            assertEquals(0x09u, memory[0x0032], "Memory 0x0032 mismatch")
+            assertEquals(0x01u, memory[0x0082], "Memory 0x0082 mismatch")
+            assertEquals(0x05u, memory[0x009B], "Memory 0x009B mismatch")
+        }
+    }
+
+    /**
+     * Test case 2 from frame 1491
+     * Function: miscObjectsCore (0xBB96)
+     * Call depth: 10
+     * Memory reads: 9, writes: 1
+     */
+    @Test
+    fun `miscObjectsCore_frame1491_test2`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (9 addresses)
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
 
             // Execute decompiled function
             miscObjectsCore()
@@ -11905,19 +16558,27 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1387
+     * Test case 3 from frame 5177
      * Function: miscObjectsCore (0xBB96)
      * Call depth: 8
-     * Memory reads: 14, writes: 6
+     * Memory reads: 42, writes: 6
      */
     @Test
-    fun `miscObjectsCore_frame1387_test2`() {
+    fun `miscObjectsCore_frame5177_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (14 addresses)
+            // Setup: Set input memory (42 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x58u
+            memory[0x0002] = 0x78u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA7u
+            memory[0x0008] = 0x08u
+            memory[0x0009] = 0xDAu
             memory[0x002A] = 0x00u
             memory[0x002B] = 0x00u
             memory[0x002C] = 0x00u
@@ -11927,10 +16588,30 @@ class GeneratedFunctionTests {
             memory[0x0030] = 0x00u
             memory[0x0031] = 0x00u
             memory[0x0032] = 0x05u
+            memory[0x007E] = 0x00u
             memory[0x0082] = 0x01u
+            memory[0x0097] = 0x00u
             memory[0x009B] = 0x05u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x78u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0x4Cu
+            memory[0x01F3] = 0xF1u
             memory[0x01F4] = 0xEAu
             memory[0x01F5] = 0xBBu
+            memory[0x03B3] = 0x58u
+            memory[0x03BE] = 0x78u
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x5Au
+            memory[0x06FB] = 0x50u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xADu
+            memory[0x071D] = 0xACu
             memory[0x0775] = 0x00u
 
             // Execute decompiled function
@@ -11945,99 +16626,27 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1413
+     * Test case 4 from frame 5255
      * Function: miscObjectsCore (0xBB96)
      * Call depth: 8
-     * Memory reads: 14, writes: 6
+     * Memory reads: 42, writes: 6
      */
     @Test
-    fun `miscObjectsCore_frame1413_test3`() {
+    fun `miscObjectsCore_frame5255_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (14 addresses)
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x12u
-            memory[0x0082] = 0x01u
-            memory[0x009B] = 0x07u
-            memory[0x01F4] = 0xEAu
-            memory[0x01F5] = 0xBBu
-            memory[0x0775] = 0x01u
-
-            // Execute decompiled function
-            miscObjectsCore()
-
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x13u, memory[0x0032], "Memory 0x0032 mismatch")
-            assertEquals(0x01u, memory[0x0082], "Memory 0x0082 mismatch")
-            assertEquals(0x08u, memory[0x009B], "Memory 0x009B mismatch")
-        }
-    }
-
-    /**
-     * Test case 4 from frame 1439
-     * Function: miscObjectsCore (0xBB96)
-     * Call depth: 8
-     * Memory reads: 14, writes: 6
-     */
-    @Test
-    fun `miscObjectsCore_frame1439_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (14 addresses)
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x1Fu
-            memory[0x0082] = 0x01u
-            memory[0x009B] = 0x13u
-            memory[0x01F4] = 0xEAu
-            memory[0x01F5] = 0xBBu
-            memory[0x0775] = 0x01u
-
-            // Execute decompiled function
-            miscObjectsCore()
-
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x20u, memory[0x0032], "Memory 0x0032 mismatch")
-            assertEquals(0x01u, memory[0x0082], "Memory 0x0082 mismatch")
-            assertEquals(0x14u, memory[0x009B], "Memory 0x009B mismatch")
-        }
-    }
-
-    /**
-     * Test case 5 from frame 1465
-     * Function: miscObjectsCore (0xBB96)
-     * Call depth: 8
-     * Memory reads: 14, writes: 6
-     */
-    @Test
-    fun `miscObjectsCore_frame1465_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (14 addresses)
+            // Setup: Set input memory (42 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x58u
+            memory[0x0002] = 0x64u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA7u
+            memory[0x0008] = 0x08u
+            memory[0x0009] = 0x01u
             memory[0x002A] = 0x00u
             memory[0x002B] = 0x00u
             memory[0x002C] = 0x00u
@@ -12047,10 +16656,30 @@ class GeneratedFunctionTests {
             memory[0x0030] = 0x00u
             memory[0x0031] = 0x00u
             memory[0x0032] = 0x2Cu
+            memory[0x007E] = 0x00u
             memory[0x0082] = 0x01u
+            memory[0x0097] = 0x00u
             memory[0x009B] = 0x24u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x64u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0x4Cu
+            memory[0x01F3] = 0xF1u
             memory[0x01F4] = 0xEAu
             memory[0x01F5] = 0xBBu
+            memory[0x03B3] = 0x58u
+            memory[0x03BE] = 0x64u
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x5Au
+            memory[0x06FB] = 0x50u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xCDu
+            memory[0x071D] = 0xCCu
             memory[0x0775] = 0x01u
 
             // Execute decompiled function
@@ -12065,19 +16694,163 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 6 from frame 5261
+     * Test case 5 from frame 5737
+     * Function: miscObjectsCore (0xBB96)
+     * Call depth: 6
+     * Memory reads: 42, writes: 6
+     */
+    @Test
+    fun `miscObjectsCore_frame5737_test5`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (42 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x22u
+            memory[0x0002] = 0x38u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xDDu
+            memory[0x0008] = 0x08u
+            memory[0x0009] = 0xF2u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x05u
+            memory[0x007E] = 0x00u
+            memory[0x0082] = 0x01u
+            memory[0x0097] = 0x00u
+            memory[0x009B] = 0x65u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x38u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0x4Cu
+            memory[0x01F3] = 0xF1u
+            memory[0x01F4] = 0xEAu
+            memory[0x01F5] = 0xBBu
+            memory[0x03B3] = 0x22u
+            memory[0x03BE] = 0x38u
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x24u
+            memory[0x06FB] = 0x98u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
+            memory[0x0775] = 0x00u
+
+            // Execute decompiled function
+            miscObjectsCore()
+
+            // Verify: Check output memory (4 addresses)
+            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
+            assertEquals(0x06u, memory[0x0032], "Memory 0x0032 mismatch")
+            assertEquals(0x01u, memory[0x0082], "Memory 0x0082 mismatch")
+            assertEquals(0x65u, memory[0x009B], "Memory 0x009B mismatch")
+        }
+    }
+
+    /**
+     * Test case 6 from frame 5817
+     * Function: miscObjectsCore (0xBB96)
+     * Call depth: 6
+     * Memory reads: 42, writes: 6
+     */
+    @Test
+    fun `miscObjectsCore_frame5817_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (42 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x22u
+            memory[0x0002] = 0x24u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xDDu
+            memory[0x0008] = 0x08u
+            memory[0x0009] = 0x1Au
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x2Du
+            memory[0x007E] = 0x00u
+            memory[0x0082] = 0x01u
+            memory[0x0097] = 0x00u
+            memory[0x009B] = 0x65u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x24u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0x4Cu
+            memory[0x01F3] = 0xF1u
+            memory[0x01F4] = 0xEAu
+            memory[0x01F5] = 0xBBu
+            memory[0x03B3] = 0x22u
+            memory[0x03BE] = 0x24u
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x24u
+            memory[0x06FB] = 0xD0u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
+            memory[0x0775] = 0x00u
+
+            // Execute decompiled function
+            miscObjectsCore()
+
+            // Verify: Check output memory (4 addresses)
+            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
+            assertEquals(0x2Eu, memory[0x0032], "Memory 0x0032 mismatch")
+            assertEquals(0x01u, memory[0x0082], "Memory 0x0082 mismatch")
+            assertEquals(0x65u, memory[0x009B], "Memory 0x009B mismatch")
+        }
+    }
+
+    /**
+     * Test case 7 from frame 8315
      * Function: miscObjectsCore (0xBB96)
      * Call depth: 8
-     * Memory reads: 12, writes: 4
+     * Memory reads: 42, writes: 6
      */
     @Test
-    fun `miscObjectsCore_frame5261_test6`() {
+    fun `miscObjectsCore_frame8315_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (42 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x58u
+            memory[0x0002] = 0x78u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA7u
+            memory[0x0008] = 0x08u
+            memory[0x0009] = 0xADu
             memory[0x002A] = 0x00u
             memory[0x002B] = 0x00u
             memory[0x002C] = 0x00u
@@ -12086,49 +16859,31 @@ class GeneratedFunctionTests {
             memory[0x002F] = 0x00u
             memory[0x0030] = 0x00u
             memory[0x0031] = 0x00u
-            memory[0x0032] = 0x2Fu
+            memory[0x0032] = 0x04u
+            memory[0x007E] = 0x00u
             memory[0x0082] = 0x01u
-            memory[0x009B] = 0x28u
-            memory[0x0775] = 0x02u
-
-            // Execute decompiled function
-            miscObjectsCore()
-
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x0032], "Memory 0x0032 mismatch")
-            assertEquals(0x01u, memory[0x0082], "Memory 0x0082 mismatch")
-            assertEquals(0x2Au, memory[0x009B], "Memory 0x009B mismatch")
-        }
-    }
-
-    /**
-     * Test case 7 from frame 5749
-     * Function: miscObjectsCore (0xBB96)
-     * Call depth: 6
-     * Memory reads: 14, writes: 6
-     */
-    @Test
-    fun `miscObjectsCore_frame5749_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (14 addresses)
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x0Bu
-            memory[0x0082] = 0x01u
-            memory[0x009B] = 0x65u
+            memory[0x0097] = 0x00u
+            memory[0x009B] = 0x05u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x78u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0x4Cu
+            memory[0x01F3] = 0xF1u
             memory[0x01F4] = 0xEAu
             memory[0x01F5] = 0xBBu
+            memory[0x03B3] = 0x58u
+            memory[0x03BE] = 0x78u
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x5Au
+            memory[0x06FB] = 0xD0u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xADu
+            memory[0x071D] = 0xACu
             memory[0x0775] = 0x00u
 
             // Execute decompiled function
@@ -12136,26 +16891,34 @@ class GeneratedFunctionTests {
 
             // Verify: Check output memory (4 addresses)
             assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x0Cu, memory[0x0032], "Memory 0x0032 mismatch")
+            assertEquals(0x05u, memory[0x0032], "Memory 0x0032 mismatch")
             assertEquals(0x01u, memory[0x0082], "Memory 0x0082 mismatch")
-            assertEquals(0x65u, memory[0x009B], "Memory 0x009B mismatch")
+            assertEquals(0x05u, memory[0x009B], "Memory 0x009B mismatch")
         }
     }
 
     /**
-     * Test case 8 from frame 5775
+     * Test case 8 from frame 8395
      * Function: miscObjectsCore (0xBB96)
-     * Call depth: 6
-     * Memory reads: 14, writes: 6
+     * Call depth: 8
+     * Memory reads: 42, writes: 6
      */
     @Test
-    fun `miscObjectsCore_frame5775_test8`() {
+    fun `miscObjectsCore_frame8395_test8`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (14 addresses)
+            // Setup: Set input memory (42 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x58u
+            memory[0x0002] = 0x64u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA7u
+            memory[0x0008] = 0x08u
+            memory[0x0009] = 0xD5u
             memory[0x002A] = 0x00u
             memory[0x002B] = 0x00u
             memory[0x002C] = 0x00u
@@ -12164,38 +16927,66 @@ class GeneratedFunctionTests {
             memory[0x002F] = 0x00u
             memory[0x0030] = 0x00u
             memory[0x0031] = 0x00u
-            memory[0x0032] = 0x18u
+            memory[0x0032] = 0x2Cu
+            memory[0x007E] = 0x00u
             memory[0x0082] = 0x01u
-            memory[0x009B] = 0x65u
+            memory[0x0097] = 0x00u
+            memory[0x009B] = 0x24u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x64u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0x4Cu
+            memory[0x01F3] = 0xF1u
             memory[0x01F4] = 0xEAu
             memory[0x01F5] = 0xBBu
-            memory[0x0775] = 0x00u
+            memory[0x03B3] = 0x58u
+            memory[0x03BE] = 0x64u
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x5Au
+            memory[0x06FB] = 0x50u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xCDu
+            memory[0x071D] = 0xCCu
+            memory[0x0775] = 0x01u
 
             // Execute decompiled function
             miscObjectsCore()
 
             // Verify: Check output memory (4 addresses)
             assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x19u, memory[0x0032], "Memory 0x0032 mismatch")
+            assertEquals(0x2Du, memory[0x0032], "Memory 0x0032 mismatch")
             assertEquals(0x01u, memory[0x0082], "Memory 0x0082 mismatch")
-            assertEquals(0x65u, memory[0x009B], "Memory 0x009B mismatch")
+            assertEquals(0x25u, memory[0x009B], "Memory 0x009B mismatch")
         }
     }
 
     /**
-     * Test case 9 from frame 5801
+     * Test case 9 from frame 8881
      * Function: miscObjectsCore (0xBB96)
      * Call depth: 6
-     * Memory reads: 14, writes: 6
+     * Memory reads: 42, writes: 6
      */
     @Test
-    fun `miscObjectsCore_frame5801_test9`() {
+    fun `miscObjectsCore_frame8881_test9`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (14 addresses)
+            // Setup: Set input memory (42 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x22u
+            memory[0x0002] = 0x37u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xDDu
+            memory[0x0008] = 0x08u
+            memory[0x0009] = 0xC8u
             memory[0x002A] = 0x00u
             memory[0x002B] = 0x00u
             memory[0x002C] = 0x00u
@@ -12204,11 +16995,31 @@ class GeneratedFunctionTests {
             memory[0x002F] = 0x00u
             memory[0x0030] = 0x00u
             memory[0x0031] = 0x00u
-            memory[0x0032] = 0x25u
+            memory[0x0032] = 0x07u
+            memory[0x007E] = 0x00u
             memory[0x0082] = 0x01u
+            memory[0x0097] = 0x00u
             memory[0x009B] = 0x65u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x37u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0x4Cu
+            memory[0x01F3] = 0xF1u
             memory[0x01F4] = 0xEAu
             memory[0x01F5] = 0xBBu
+            memory[0x03B3] = 0x22u
+            memory[0x03BE] = 0x37u
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x24u
+            memory[0x06FB] = 0x50u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
             memory[0x0775] = 0x00u
 
             // Execute decompiled function
@@ -12216,7 +17027,7 @@ class GeneratedFunctionTests {
 
             // Verify: Check output memory (4 addresses)
             assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x26u, memory[0x0032], "Memory 0x0032 mismatch")
+            assertEquals(0x08u, memory[0x0032], "Memory 0x0032 mismatch")
             assertEquals(0x01u, memory[0x0082], "Memory 0x0082 mismatch")
             assertEquals(0x65u, memory[0x009B], "Memory 0x009B mismatch")
         }
@@ -12231,7 +17042,7 @@ class GeneratedFunctionTests {
      * Test case 0 from frame 10
      * Function: getSBNybbles (0xBC30)
      * Call depth: 4
-     * Memory reads: 6, writes: 3
+     * Memory reads: 20, writes: 3
      */
     @Test
     fun `getSBNybbles_frame10_test0`() {
@@ -12240,13 +17051,27 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (6 addresses)
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x02u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x02u
             memory[0x0008] = 0x00u
+            memory[0x01F3] = 0x03u
+            memory[0x01F4] = 0x0Au
+            memory[0x01F5] = 0x8Fu
             memory[0x01F6] = 0x38u
             memory[0x01F7] = 0xBCu
-            memory[0x0300] = 0x0Eu
+            memory[0x0300] = 0x00u
             memory[0x0309] = 0x00u
             memory[0x0753] = 0x00u
+            memory[0x07DD] = 0x00u
+            memory[0x07DE] = 0x00u
+            memory[0x07DF] = 0x00u
+            memory[0x07E0] = 0x00u
+            memory[0x07E1] = 0x00u
+            memory[0x07E2] = 0x00u
+            memory[0x07ED] = 0x00u
+            memory[0x07EE] = 0x00u
 
             // Execute decompiled function
             getSBNybbles()
@@ -12267,7 +17092,7 @@ class GeneratedFunctionTests {
      * Function: updateNumber (0xBC36)
      * Parameters: A
      * Call depth: 4
-     * Memory reads: 5, writes: 3
+     * Memory reads: 16, writes: 3
      */
     @Test
     fun `updateNumber_frame29_test0`() {
@@ -12276,12 +17101,23 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (16 addresses)
+            memory[0x0000] = 0xFAu
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x06u
             memory[0x0008] = 0x00u
+            memory[0x01F4] = 0x0Au
+            memory[0x01F5] = 0x8Fu
             memory[0x01F6] = 0x38u
             memory[0x01F7] = 0xBCu
-            memory[0x0300] = 0x09u
+            memory[0x0300] = 0x00u
             memory[0x0304] = 0x00u
+            memory[0x07D7] = 0x00u
+            memory[0x07D8] = 0x00u
+            memory[0x07D9] = 0x00u
+            memory[0x07DA] = 0x00u
+            memory[0x07DB] = 0x00u
+            memory[0x07DC] = 0x00u
 
             // Execute decompiled function
             updateNumber(0xFA)
@@ -12302,7 +17138,7 @@ class GeneratedFunctionTests {
      * Function: bumpBlock (0xBD9B)
      * Parameters: X, Y
      * Call depth: 9
-     * Memory reads: 6, writes: 8
+     * Memory reads: 37, writes: 8
      */
     @Test
     fun `bumpBlock_frame1317_test0`() {
@@ -12311,13 +17147,44 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (6 addresses)
+            // Setup: Set input memory (37 addresses)
+            memory[0x0000] = 0x02u
+            memory[0x0002] = 0x70u
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0xBFu
             memory[0x0005] = 0xC0u
+            memory[0x0006] = 0xD0u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0076] = 0x01u
+            memory[0x008F] = 0x00u
+            memory[0x00D7] = 0x90u
+            memory[0x01E9] = 0x03u
+            memory[0x01EA] = 0x0Au
+            memory[0x01EB] = 0x8Fu
+            memory[0x01EC] = 0x0Bu
+            memory[0x01ED] = 0xBCu
             memory[0x01EE] = 0x9Du
             memory[0x01EF] = 0xBDu
             memory[0x01F0] = 0x7Au
             memory[0x01F1] = 0xBDu
+            memory[0x0300] = 0x0Au
+            memory[0x0313] = 0x00u
             memory[0x03EE] = 0x00u
+            memory[0x0630] = 0x00u
+            memory[0x0748] = 0x00u
+            memory[0x0753] = 0x00u
+            memory[0x075E] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x07DD] = 0x00u
+            memory[0x07DE] = 0x00u
+            memory[0x07DF] = 0x00u
+            memory[0x07E0] = 0x00u
+            memory[0x07E1] = 0x00u
+            memory[0x07E2] = 0x00u
+            memory[0x07ED] = 0x00u
+            memory[0x07EE] = 0x00u
 
             // Execute decompiled function
             bumpBlock(0x00, 0x11)
@@ -12337,7 +17204,7 @@ class GeneratedFunctionTests {
      * Function: bumpBlock (0xBD9B)
      * Parameters: X, Y
      * Call depth: 9
-     * Memory reads: 6, writes: 8
+     * Memory reads: 18, writes: 8
      */
     @Test
     fun `bumpBlock_frame1491_test1`() {
@@ -12346,13 +17213,25 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (6 addresses)
+            // Setup: Set input memory (18 addresses)
+            memory[0x0002] = 0x70u
+            memory[0x0004] = 0xBFu
             memory[0x0005] = 0xC1u
+            memory[0x0006] = 0xD5u
+            memory[0x0007] = 0x05u
+            memory[0x0039] = 0x00u
+            memory[0x0077] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x00D8] = 0x90u
             memory[0x01EE] = 0x9Du
             memory[0x01EF] = 0xBDu
             memory[0x01F0] = 0x7Au
             memory[0x01F1] = 0xBDu
+            memory[0x02A9] = 0x87u
+            memory[0x03A9] = 0x00u
             memory[0x03EE] = 0x01u
+            memory[0x0635] = 0x00u
+            memory[0x0756] = 0x00u
 
             // Execute decompiled function
             bumpBlock(0x01, 0x11)
@@ -12372,7 +17251,7 @@ class GeneratedFunctionTests {
      * Function: bumpBlock (0xBD9B)
      * Parameters: X, Y
      * Call depth: 9
-     * Memory reads: 6, writes: 8
+     * Memory reads: 37, writes: 8
      */
     @Test
     fun `bumpBlock_frame5667_test2`() {
@@ -12381,13 +17260,44 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (6 addresses)
+            // Setup: Set input memory (37 addresses)
+            memory[0x0000] = 0x02u
+            memory[0x0002] = 0x30u
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0xBFu
             memory[0x0005] = 0xC0u
+            memory[0x0006] = 0xD6u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0076] = 0x01u
+            memory[0x008F] = 0x60u
+            memory[0x00D7] = 0x50u
+            memory[0x01E9] = 0x03u
+            memory[0x01EA] = 0x0Au
+            memory[0x01EB] = 0x8Fu
+            memory[0x01EC] = 0x0Bu
+            memory[0x01ED] = 0xBCu
             memory[0x01EE] = 0x9Du
             memory[0x01EF] = 0xBDu
             memory[0x01F0] = 0x7Au
             memory[0x01F1] = 0xBDu
+            memory[0x0300] = 0x0Au
+            memory[0x0313] = 0x00u
             memory[0x03EE] = 0x00u
+            memory[0x05F6] = 0x00u
+            memory[0x0748] = 0x01u
+            memory[0x0753] = 0x00u
+            memory[0x075E] = 0x01u
+            memory[0x0770] = 0x00u
+            memory[0x07DD] = 0x00u
+            memory[0x07DE] = 0x00u
+            memory[0x07DF] = 0x00u
+            memory[0x07E0] = 0x00u
+            memory[0x07E1] = 0x00u
+            memory[0x07E2] = 0x00u
+            memory[0x07ED] = 0x00u
+            memory[0x07EE] = 0x00u
 
             // Execute decompiled function
             bumpBlock(0x00, 0x11)
@@ -12650,7 +17560,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xBF02: moveEnemyHorizontally
     // Parameters: A, X
-    // 4150 calls, 7 unique inputs
+    // 4150 calls, 1140 unique inputs
     // =========================================
 
     /**
@@ -12658,7 +17568,7 @@ class GeneratedFunctionTests {
      * Function: moveEnemyHorizontally (0xBF02)
      * Parameters: A, X
      * Call depth: 10
-     * Memory reads: 3, writes: 2
+     * Memory reads: 11, writes: 2
      */
     @Test
     fun `moveEnemyHorizontally_frame1181_test0`() {
@@ -12667,10 +17577,18 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0xFFu
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0xFFu
             memory[0x0008] = 0x00u
+            memory[0x0058] = 0xF8u
+            memory[0x006E] = 0x01u
+            memory[0x0087] = 0x60u
+            memory[0x01EE] = 0x00u
             memory[0x01EF] = 0x05u
             memory[0x01F0] = 0xBFu
+            memory[0x0401] = 0x00u
 
             // Execute decompiled function
             moveEnemyHorizontally(0xF8, 0x00)
@@ -12681,26 +17599,34 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1623
+     * Test case 1 from frame 1409
      * Function: moveEnemyHorizontally (0xBF02)
      * Parameters: A, X
-     * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Call depth: 10
+     * Memory reads: 11, writes: 2
      */
     @Test
-    fun `moveEnemyHorizontally_frame1623_test1`() {
+    fun `moveEnemyHorizontally_frame1409_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
-            memory[0x0008] = 0x05u
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0xFFu
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0xFFu
+            memory[0x0008] = 0x00u
+            memory[0x0058] = 0xF8u
+            memory[0x006E] = 0x01u
+            memory[0x0087] = 0x27u
+            memory[0x01EE] = 0x00u
             memory[0x01EF] = 0x05u
             memory[0x01F0] = 0xBFu
+            memory[0x0401] = 0x00u
 
             // Execute decompiled function
-            moveEnemyHorizontally(0x10, 0x05)
+            moveEnemyHorizontally(0xF8, 0x00)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -12708,23 +17634,31 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 2021
+     * Test case 2 from frame 2135
      * Function: moveEnemyHorizontally (0xBF02)
      * Parameters: A, X
      * Call depth: 10
-     * Memory reads: 3, writes: 2
+     * Memory reads: 11, writes: 2
      */
     @Test
-    fun `moveEnemyHorizontally_frame2021_test2`() {
+    fun `moveEnemyHorizontally_frame2135_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
             memory[0x0008] = 0x00u
+            memory[0x0058] = 0x08u
+            memory[0x006E] = 0x02u
+            memory[0x0087] = 0x9Cu
+            memory[0x01EE] = 0x00u
             memory[0x01EF] = 0x05u
             memory[0x01F0] = 0xBFu
+            memory[0x0401] = 0x00u
 
             // Execute decompiled function
             moveEnemyHorizontally(0x08, 0x00)
@@ -12735,23 +17669,31 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 2621
+     * Test case 3 from frame 2731
      * Function: moveEnemyHorizontally (0xBF02)
      * Parameters: A, X
      * Call depth: 12
-     * Memory reads: 3, writes: 2
+     * Memory reads: 11, writes: 2
      */
     @Test
-    fun `moveEnemyHorizontally_frame2621_test3`() {
+    fun `moveEnemyHorizontally_frame2731_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0xFFu
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0xFFu
             memory[0x0008] = 0x01u
+            memory[0x0059] = 0xF8u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x2Cu
+            memory[0x01EE] = 0x01u
             memory[0x01EF] = 0x05u
             memory[0x01F0] = 0xBFu
+            memory[0x0402] = 0x80u
 
             // Execute decompiled function
             moveEnemyHorizontally(0xF8, 0x01)
@@ -12762,23 +17704,31 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 4 from frame 2843
+     * Test case 4 from frame 2847
      * Function: moveEnemyHorizontally (0xBF02)
      * Parameters: A, X
      * Call depth: 12
-     * Memory reads: 3, writes: 2
+     * Memory reads: 11, writes: 2
      */
     @Test
-    fun `moveEnemyHorizontally_frame2843_test4`() {
+    fun `moveEnemyHorizontally_frame2847_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
             memory[0x0008] = 0x01u
+            memory[0x0059] = 0x08u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x11u
+            memory[0x01EE] = 0x01u
             memory[0x01EF] = 0x05u
             memory[0x01F0] = 0xBFu
+            memory[0x0402] = 0x80u
 
             // Execute decompiled function
             moveEnemyHorizontally(0x08, 0x01)
@@ -12789,26 +17739,34 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 5 from frame 6047
+     * Test case 5 from frame 2987
      * Function: moveEnemyHorizontally (0xBF02)
      * Parameters: A, X
-     * Call depth: 14
-     * Memory reads: 3, writes: 2
+     * Call depth: 12
+     * Memory reads: 11, writes: 2
      */
     @Test
-    fun `moveEnemyHorizontally_frame6047_test5`() {
+    fun `moveEnemyHorizontally_frame2987_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
-            memory[0x0008] = 0x02u
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
+            memory[0x0008] = 0x01u
+            memory[0x0059] = 0x08u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x34u
+            memory[0x01EE] = 0x01u
             memory[0x01EF] = 0x05u
             memory[0x01F0] = 0xBFu
+            memory[0x0402] = 0x80u
 
             // Execute decompiled function
-            moveEnemyHorizontally(0xF8, 0x02)
+            moveEnemyHorizontally(0x08, 0x01)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -12816,26 +17774,139 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 6 from frame 6379
+     * Test case 6 from frame 3101
      * Function: moveEnemyHorizontally (0xBF02)
      * Parameters: A, X
-     * Call depth: 14
-     * Memory reads: 3, writes: 2
+     * Call depth: 12
+     * Memory reads: 11, writes: 2
      */
     @Test
-    fun `moveEnemyHorizontally_frame6379_test6`() {
+    fun `moveEnemyHorizontally_frame3101_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
-            memory[0x0008] = 0x02u
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
+            memory[0x0008] = 0x01u
+            memory[0x0059] = 0x08u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x51u
+            memory[0x01EE] = 0x00u
             memory[0x01EF] = 0x05u
             memory[0x01F0] = 0xBFu
+            memory[0x0402] = 0x00u
 
             // Execute decompiled function
-            moveEnemyHorizontally(0x08, 0x02)
+            moveEnemyHorizontally(0x08, 0x01)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 7 from frame 3215
+     * Function: moveEnemyHorizontally (0xBF02)
+     * Parameters: A, X
+     * Call depth: 12
+     * Memory reads: 11, writes: 2
+     */
+    @Test
+    fun `moveEnemyHorizontally_frame3215_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
+            memory[0x0008] = 0x01u
+            memory[0x0059] = 0x08u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x6Du
+            memory[0x01EE] = 0x01u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x0402] = 0x80u
+
+            // Execute decompiled function
+            moveEnemyHorizontally(0x08, 0x01)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 8 from frame 6223
+     * Function: moveEnemyHorizontally (0xBF02)
+     * Parameters: A, X
+     * Call depth: 10
+     * Memory reads: 11, writes: 2
+     */
+    @Test
+    fun `moveEnemyHorizontally_frame6223_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0xFFu
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0xFFu
+            memory[0x0008] = 0x00u
+            memory[0x0058] = 0xF8u
+            memory[0x006E] = 0x02u
+            memory[0x0087] = 0xA2u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x0401] = 0x00u
+
+            // Execute decompiled function
+            moveEnemyHorizontally(0xF8, 0x00)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 9 from frame 6319
+     * Function: moveEnemyHorizontally (0xBF02)
+     * Parameters: A, X
+     * Call depth: 12
+     * Memory reads: 11, writes: 2
+     */
+    @Test
+    fun `moveEnemyHorizontally_frame6319_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0xFFu
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0xFFu
+            memory[0x0008] = 0x01u
+            memory[0x0059] = 0xF8u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x08u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x0402] = 0x00u
+
+            // Execute decompiled function
+            moveEnemyHorizontally(0xF8, 0x01)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -14466,7 +19537,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xC047: enemiesAndLoopsCore
     // Parameters: X
-    // 53076 calls, 3096 unique inputs
+    // 53076 calls, 7341 unique inputs
     // =========================================
 
     /**
@@ -14522,202 +19593,348 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1203
-     * Function: enemiesAndLoopsCore (0xC047)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 18, writes: 5
-     */
-    @Test
-    fun `enemiesAndLoopsCore_frame1203_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (18 addresses)
-            memory[0x0006] = 0x01u
-            memory[0x0007] = 0x60u
-            memory[0x0012] = 0x00u
-            memory[0x0071] = 0x02u
-            memory[0x008A] = 0x80u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x01F5] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x06CB] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x071B] = 0x01u
-            memory[0x071D] = 0x3Cu
-            memory[0x071F] = 0x00u
-            memory[0x0739] = 0x05u
-            memory[0x073A] = 0x02u
-            memory[0x073B] = 0x01u
-            memory[0x0745] = 0x00u
-
-            // Execute decompiled function
-            enemiesAndLoopsCore(0x03)
-
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x01u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0x60u, memory[0x0007], "Memory 0x0007 mismatch")
-            assertEquals(0x02u, memory[0x0071], "Memory 0x0071 mismatch")
-            assertEquals(0x80u, memory[0x008A], "Memory 0x008A mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 1361
-     * Function: enemiesAndLoopsCore (0xC047)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 18, writes: 5
-     */
-    @Test
-    fun `enemiesAndLoopsCore_frame1361_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (18 addresses)
-            memory[0x0006] = 0x01u
-            memory[0x0007] = 0xD0u
-            memory[0x0012] = 0x00u
-            memory[0x0071] = 0x02u
-            memory[0x008A] = 0x80u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x01F5] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x06CB] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x071B] = 0x01u
-            memory[0x071D] = 0xACu
-            memory[0x071F] = 0x00u
-            memory[0x0739] = 0x05u
-            memory[0x073A] = 0x02u
-            memory[0x073B] = 0x01u
-            memory[0x0745] = 0x00u
-
-            // Execute decompiled function
-            enemiesAndLoopsCore(0x03)
-
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x01u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0xD0u, memory[0x0007], "Memory 0x0007 mismatch")
-            assertEquals(0x02u, memory[0x0071], "Memory 0x0071 mismatch")
-            assertEquals(0x80u, memory[0x008A], "Memory 0x008A mismatch")
-        }
-    }
-
-    /**
-     * Test case 3 from frame 1543
+     * Test case 1 from frame 1409
      * Function: enemiesAndLoopsCore (0xC047)
      * Parameters: X
      * Call depth: 6
-     * Memory reads: 18, writes: 5
+     * Memory reads: 146, writes: 2
      */
     @Test
-    fun `enemiesAndLoopsCore_frame1543_test3`() {
+    fun `enemiesAndLoopsCore_frame1409_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (18 addresses)
-            memory[0x0006] = 0x02u
-            memory[0x0007] = 0x30u
+            // Setup: Set input memory (146 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x91u
+            memory[0x0005] = 0xC8u
+            memory[0x0006] = 0xE0u
+            memory[0x0007] = 0xC8u
+            memory[0x0008] = 0x00u
+            memory[0x0009] = 0xCAu
+            memory[0x000A] = 0x40u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x01u
             memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x06u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x01u
+            memory[0x001E] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x10u
+            memory[0x0033] = 0x02u
+            memory[0x0046] = 0x02u
+            memory[0x0058] = 0xF8u
+            memory[0x006D] = 0x01u
+            memory[0x006E] = 0x01u
             memory[0x006F] = 0x02u
+            memory[0x0070] = 0x02u
+            memory[0x0071] = 0x02u
+            memory[0x0072] = 0x02u
+            memory[0x007E] = 0x00u
+            memory[0x0082] = 0x01u
+            memory[0x0086] = 0x1Bu
+            memory[0x0087] = 0x27u
             memory[0x0088] = 0x80u
+            memory[0x0089] = 0x80u
+            memory[0x008A] = 0x80u
+            memory[0x008B] = 0x80u
+            memory[0x0097] = 0x00u
+            memory[0x009B] = 0x06u
+            memory[0x00B5] = 0x01u
+            memory[0x00B6] = 0x01u
+            memory[0x00CA] = 0x01u
+            memory[0x00CE] = 0x90u
+            memory[0x00CF] = 0xB8u
+            memory[0x00E3] = 0x73u
             memory[0x00E9] = 0x01u
             memory[0x00EA] = 0x9Fu
-            memory[0x01F5] = 0x00u
+            memory[0x00EB] = 0xD0u
+            memory[0x00EC] = 0x00u
+            memory[0x00ED] = 0x00u
+            memory[0x00EF] = 0x06u
+            memory[0x0109] = 0x00u
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01EC] = 0x12u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0x01u
+            memory[0x01F4] = 0x91u
+            memory[0x01F5] = 0x01u
+            memory[0x01F6] = 0x07u
+            memory[0x01F7] = 0xAFu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x0301] = 0x00u
+            memory[0x036A] = 0x00u
             memory[0x0398] = 0x00u
+            memory[0x03AD] = 0x6Cu
+            memory[0x03AE] = 0x78u
+            memory[0x03B3] = 0x58u
+            memory[0x03B8] = 0x90u
+            memory[0x03B9] = 0xB8u
+            memory[0x03BE] = 0x73u
+            memory[0x03C4] = 0x00u
+            memory[0x03C5] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03D1] = 0x00u
+            memory[0x03D8] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0401] = 0x00u
+            memory[0x0491] = 0x00u
+            memory[0x049A] = 0x09u
+            memory[0x04AA] = 0x00u
+            memory[0x04AC] = 0x6Fu
+            memory[0x04AE] = 0x79u
+            memory[0x04B0] = 0x7Bu
+            memory[0x04B2] = 0x85u
+            memory[0x04F0] = 0x5Au
+            memory[0x0672] = 0x00u
+            memory[0x0682] = 0x54u
             memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
             memory[0x06CD] = 0x00u
-            memory[0x071B] = 0x02u
-            memory[0x071D] = 0x0Eu
+            memory[0x06D5] = 0x80u
+            memory[0x06E4] = 0x04u
+            memory[0x06E5] = 0xD0u
+            memory[0x06FB] = 0x98u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xAFu
+            memory[0x071D] = 0xAEu
             memory[0x071F] = 0x00u
             memory[0x0739] = 0x05u
             memory[0x073A] = 0x02u
             memory[0x073B] = 0x01u
+            memory[0x073D] = 0x0Fu
             memory[0x0745] = 0x00u
+            memory[0x0747] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0770] = 0x00u
+            memory[0x0773] = 0x00u
+            memory[0x0775] = 0x01u
+            memory[0x0796] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A9] = 0x5Bu
+            memory[0x07AA] = 0x3Fu
 
             // Execute decompiled function
-            enemiesAndLoopsCore(0x01)
+            enemiesAndLoopsCore(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x02u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0x30u, memory[0x0007], "Memory 0x0007 mismatch")
-            assertEquals(0x02u, memory[0x006F], "Memory 0x006F mismatch")
-            assertEquals(0x80u, memory[0x0088], "Memory 0x0088 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
     /**
-     * Test case 4 from frame 2201
+     * Test case 2 from frame 2081
      * Function: enemiesAndLoopsCore (0xC047)
      * Parameters: X
      * Call depth: 6
-     * Memory reads: 18, writes: 5
+     * Memory reads: 132, writes: 2
      */
     @Test
-    fun `enemiesAndLoopsCore_frame2201_test4`() {
+    fun `enemiesAndLoopsCore_frame2081_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (18 addresses)
-            memory[0x0006] = 0x02u
-            memory[0x0007] = 0x80u
+            // Setup: Set input memory (132 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x91u
+            memory[0x0005] = 0xC8u
+            memory[0x0006] = 0xE0u
+            memory[0x0007] = 0xC8u
+            memory[0x0008] = 0x00u
+            memory[0x0009] = 0x1Au
+            memory[0x000A] = 0xC0u
+            memory[0x000C] = 0x01u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x01u
+            memory[0x0010] = 0x00u
             memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x06u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x001E] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0046] = 0x01u
+            memory[0x0057] = 0x01u
+            memory[0x0058] = 0x08u
+            memory[0x006D] = 0x01u
+            memory[0x006E] = 0x02u
+            memory[0x006F] = 0x03u
             memory[0x0070] = 0x03u
+            memory[0x0071] = 0x03u
+            memory[0x0072] = 0x03u
+            memory[0x0086] = 0xB2u
+            memory[0x0087] = 0x8Eu
+            memory[0x0088] = 0x60u
             memory[0x0089] = 0x60u
+            memory[0x008A] = 0x60u
+            memory[0x008B] = 0x60u
+            memory[0x00B5] = 0x01u
+            memory[0x00B6] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00CF] = 0xB8u
             memory[0x00E9] = 0x01u
             memory[0x00EA] = 0x9Fu
-            memory[0x01F5] = 0x00u
+            memory[0x00EB] = 0xD0u
+            memory[0x00EC] = 0x00u
+            memory[0x00ED] = 0x00u
+            memory[0x00EF] = 0x06u
+            memory[0x0109] = 0x00u
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01EC] = 0x09u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0x01u
+            memory[0x01F4] = 0x91u
+            memory[0x01F5] = 0x01u
+            memory[0x01F6] = 0x07u
+            memory[0x01F7] = 0xAFu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x0301] = 0x00u
+            memory[0x036A] = 0x00u
             memory[0x0398] = 0x00u
+            memory[0x03AD] = 0x5Cu
+            memory[0x03AE] = 0x38u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03C5] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03D1] = 0x0Fu
+            memory[0x03D8] = 0x08u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0401] = 0x80u
+            memory[0x05A9] = 0x00u
+            memory[0x05B9] = 0x54u
             memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
             memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0x08u
+            memory[0x06E4] = 0x04u
+            memory[0x06E5] = 0xD0u
+            memory[0x0700] = 0x01u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070D] = 0x01u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x071A] = 0x01u
             memory[0x071B] = 0x02u
-            memory[0x071D] = 0x56u
+            memory[0x071C] = 0x56u
+            memory[0x071D] = 0x55u
             memory[0x071F] = 0x00u
             memory[0x0739] = 0x07u
             memory[0x073A] = 0x03u
             memory[0x073B] = 0x01u
+            memory[0x073D] = 0x16u
             memory[0x0745] = 0x00u
+            memory[0x0747] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0773] = 0x00u
+            memory[0x0781] = 0x06u
+            memory[0x0796] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A9] = 0x99u
+            memory[0x07AA] = 0x1Eu
 
             // Execute decompiled function
-            enemiesAndLoopsCore(0x02)
+            enemiesAndLoopsCore(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x02u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0x80u, memory[0x0007], "Memory 0x0007 mismatch")
-            assertEquals(0x03u, memory[0x0070], "Memory 0x0070 mismatch")
-            assertEquals(0x60u, memory[0x0089], "Memory 0x0089 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
     /**
-     * Test case 5 from frame 2329
+     * Test case 3 from frame 2555
      * Function: enemiesAndLoopsCore (0xC047)
      * Parameters: X
      * Call depth: 6
      * Memory reads: 18, writes: 5
      */
     @Test
-    fun `enemiesAndLoopsCore_frame2329_test5`() {
+    fun `enemiesAndLoopsCore_frame2555_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
             // Setup: Set input memory (18 addresses)
-            memory[0x0006] = 0x02u
-            memory[0x0007] = 0xC0u
+            memory[0x0006] = 0x03u
+            memory[0x0007] = 0x20u
             memory[0x0013] = 0x00u
             memory[0x0072] = 0x03u
             memory[0x008B] = 0x60u
@@ -14728,7 +19945,7 @@ class GeneratedFunctionTests {
             memory[0x06CB] = 0x00u
             memory[0x06CD] = 0x00u
             memory[0x071B] = 0x02u
-            memory[0x071D] = 0x99u
+            memory[0x071D] = 0xFEu
             memory[0x071F] = 0x00u
             memory[0x0739] = 0x07u
             memory[0x073A] = 0x03u
@@ -14739,67 +19956,22 @@ class GeneratedFunctionTests {
             enemiesAndLoopsCore(0x04)
 
             // Verify: Check output memory (4 addresses)
-            assertEquals(0x02u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0xC0u, memory[0x0007], "Memory 0x0007 mismatch")
+            assertEquals(0x03u, memory[0x0006], "Memory 0x0006 mismatch")
+            assertEquals(0x20u, memory[0x0007], "Memory 0x0007 mismatch")
             assertEquals(0x03u, memory[0x0072], "Memory 0x0072 mismatch")
             assertEquals(0x60u, memory[0x008B], "Memory 0x008B mismatch")
         }
     }
 
     /**
-     * Test case 6 from frame 2525
+     * Test case 4 from frame 5293
      * Function: enemiesAndLoopsCore (0xC047)
      * Parameters: X
      * Call depth: 6
      * Memory reads: 18, writes: 5
      */
     @Test
-    fun `enemiesAndLoopsCore_frame2525_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (18 addresses)
-            memory[0x0006] = 0x03u
-            memory[0x0007] = 0x10u
-            memory[0x0010] = 0x00u
-            memory[0x006F] = 0x03u
-            memory[0x0088] = 0x60u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x01F5] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x06CB] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x071B] = 0x02u
-            memory[0x071D] = 0xECu
-            memory[0x071F] = 0x00u
-            memory[0x0739] = 0x07u
-            memory[0x073A] = 0x03u
-            memory[0x073B] = 0x01u
-            memory[0x0745] = 0x00u
-
-            // Execute decompiled function
-            enemiesAndLoopsCore(0x01)
-
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x03u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0x10u, memory[0x0007], "Memory 0x0007 mismatch")
-            assertEquals(0x03u, memory[0x006F], "Memory 0x006F mismatch")
-            assertEquals(0x60u, memory[0x0088], "Memory 0x0088 mismatch")
-        }
-    }
-
-    /**
-     * Test case 7 from frame 5273
-     * Function: enemiesAndLoopsCore (0xC047)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 18, writes: 5
-     */
-    @Test
-    fun `enemiesAndLoopsCore_frame5273_test7`() {
+    fun `enemiesAndLoopsCore_frame5293_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
@@ -14807,7 +19979,7 @@ class GeneratedFunctionTests {
 
             // Setup: Set input memory (18 addresses)
             memory[0x0006] = 0x02u
-            memory[0x0007] = 0x00u
+            memory[0x0007] = 0x10u
             memory[0x0010] = 0x00u
             memory[0x006F] = 0x02u
             memory[0x0088] = 0x80u
@@ -14818,7 +19990,7 @@ class GeneratedFunctionTests {
             memory[0x06CB] = 0x00u
             memory[0x06CD] = 0x00u
             memory[0x071B] = 0x01u
-            memory[0x071D] = 0xDBu
+            memory[0x071D] = 0xEDu
             memory[0x071F] = 0x00u
             memory[0x0739] = 0x05u
             memory[0x073A] = 0x02u
@@ -14830,98 +20002,859 @@ class GeneratedFunctionTests {
 
             // Verify: Check output memory (4 addresses)
             assertEquals(0x02u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
+            assertEquals(0x10u, memory[0x0007], "Memory 0x0007 mismatch")
             assertEquals(0x02u, memory[0x006F], "Memory 0x006F mismatch")
             assertEquals(0x80u, memory[0x0088], "Memory 0x0088 mismatch")
         }
     }
 
     /**
-     * Test case 8 from frame 5991
+     * Test case 5 from frame 6141
      * Function: enemiesAndLoopsCore (0xC047)
      * Parameters: X
-     * Call depth: 8
-     * Memory reads: 18, writes: 5
+     * Call depth: 7
+     * Memory reads: 114, writes: 7
      */
     @Test
-    fun `enemiesAndLoopsCore_frame5991_test8`() {
+    fun `enemiesAndLoopsCore_frame6141_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (18 addresses)
-            memory[0x0006] = 0x03u
-            memory[0x0007] = 0x10u
-            memory[0x0010] = 0x00u
-            memory[0x006F] = 0x03u
-            memory[0x0088] = 0x60u
+            // Setup: Set input memory (114 addresses)
+            memory[0x0000] = 0x02u
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x91u
+            memory[0x0005] = 0xC8u
+            memory[0x0006] = 0xE0u
+            memory[0x0007] = 0xC8u
+            memory[0x0008] = 0x02u
+            memory[0x0009] = 0xBCu
+            memory[0x000A] = 0x00u
+            memory[0x000E] = 0x0Au
+            memory[0x000F] = 0x01u
+            memory[0x0010] = 0x01u
+            memory[0x0011] = 0x01u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x06u
+            memory[0x0017] = 0x06u
+            memory[0x0018] = 0x06u
+            memory[0x001B] = 0x00u
+            memory[0x0020] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0048] = 0x02u
+            memory[0x006D] = 0x02u
+            memory[0x0070] = 0x03u
+            memory[0x0071] = 0x05u
+            memory[0x0072] = 0x05u
+            memory[0x0086] = 0xA6u
+            memory[0x0089] = 0x46u
+            memory[0x008A] = 0x00u
+            memory[0x008B] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00B8] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00D1] = 0xB8u
             memory[0x00E9] = 0x01u
             memory[0x00EA] = 0x9Fu
-            memory[0x01F5] = 0x00u
+            memory[0x00EB] = 0x60u
+            memory[0x00EC] = 0x00u
+            memory[0x00ED] = 0x00u
+            memory[0x00EF] = 0x06u
+            memory[0x0109] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01EC] = 0x14u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0x01u
+            memory[0x01F4] = 0x91u
+            memory[0x01F5] = 0x01u
+            memory[0x01F6] = 0x07u
+            memory[0x01F7] = 0xAFu
+            memory[0x0301] = 0x00u
+            memory[0x036A] = 0x00u
             memory[0x0398] = 0x00u
+            memory[0x03AD] = 0x52u
+            memory[0x03AE] = 0xF2u
+            memory[0x03B8] = 0xB0u
+            memory[0x03B9] = 0xB8u
+            memory[0x03C4] = 0x00u
+            memory[0x03C7] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03D1] = 0x03u
+            memory[0x03DA] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x049C] = 0x09u
+            memory[0x04BA] = 0xFFu
+            memory[0x0674] = 0x00u
+            memory[0x0684] = 0x54u
             memory[0x06CB] = 0x00u
             memory[0x06CD] = 0x00u
-            memory[0x071B] = 0x02u
-            memory[0x071D] = 0xECu
-            memory[0x071F] = 0x03u
-            memory[0x0739] = 0x07u
-            memory[0x073A] = 0x03u
-            memory[0x073B] = 0x01u
+            memory[0x06D5] = 0x88u
+            memory[0x06E4] = 0x04u
+            memory[0x06E7] = 0x60u
+            memory[0x070B] = 0x01u
+            memory[0x070D] = 0x07u
+            memory[0x0711] = 0x00u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x54u
+            memory[0x071D] = 0x53u
+            memory[0x071F] = 0x00u
+            memory[0x0739] = 0x0Bu
+            memory[0x073A] = 0x05u
+            memory[0x073D] = 0x14u
             memory[0x0745] = 0x00u
+            memory[0x0747] = 0xD3u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0770] = 0x00u
+            memory[0x0773] = 0x00u
+            memory[0x0798] = 0x00u
+            memory[0x079E] = 0x08u
+            memory[0x079F] = 0x00u
 
             // Execute decompiled function
-            enemiesAndLoopsCore(0x01)
+            enemiesAndLoopsCore(0x02)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x03u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0x10u, memory[0x0007], "Memory 0x0007 mismatch")
-            assertEquals(0x03u, memory[0x006F], "Memory 0x006F mismatch")
-            assertEquals(0x60u, memory[0x0088], "Memory 0x0088 mismatch")
+            // Verify: Check output memory (3 addresses)
+            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
+            assertEquals(0x00u, memory[0x000C], "Memory 0x000C mismatch")
+            assertEquals(0x00u, memory[0x000D], "Memory 0x000D mismatch")
         }
     }
 
     /**
-     * Test case 9 from frame 6367
+     * Test case 6 from frame 6852
      * Function: enemiesAndLoopsCore (0xC047)
      * Parameters: X
-     * Call depth: 12
-     * Memory reads: 17, writes: 5
+     * Call depth: 6
+     * Memory reads: 136, writes: 5
      */
     @Test
-    fun `enemiesAndLoopsCore_frame6367_test9`() {
+    fun `enemiesAndLoopsCore_frame6852_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (17 addresses)
-            memory[0x0006] = 0x03u
-            memory[0x0007] = 0xB0u
+            // Setup: Set input memory (136 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x91u
+            memory[0x0005] = 0xC8u
+            memory[0x0006] = 0xE0u
+            memory[0x0007] = 0xC8u
+            memory[0x0008] = 0x00u
+            memory[0x0009] = 0x20u
+            memory[0x000A] = 0x00u
+            memory[0x000E] = 0x0Bu
+            memory[0x000F] = 0x01u
+            memory[0x0010] = 0x01u
+            memory[0x0011] = 0x00u
             memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x06u
+            memory[0x0017] = 0x06u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001E] = 0x00u
+            memory[0x001F] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x02u
+            memory[0x0046] = 0x01u
+            memory[0x0047] = 0x01u
+            memory[0x006D] = 0x03u
+            memory[0x006E] = 0x02u
+            memory[0x006F] = 0x03u
+            memory[0x0070] = 0x05u
             memory[0x0071] = 0x05u
+            memory[0x0072] = 0x05u
+            memory[0x0086] = 0x0Bu
+            memory[0x0087] = 0xB0u
+            memory[0x0088] = 0x03u
+            memory[0x0089] = 0x00u
             memory[0x008A] = 0x00u
+            memory[0x008B] = 0x00u
+            memory[0x00B5] = 0x03u
+            memory[0x00B6] = 0x01u
+            memory[0x00B7] = 0x01u
+            memory[0x00CE] = 0x0Fu
+            memory[0x00CF] = 0xB8u
+            memory[0x00D0] = 0xB8u
             memory[0x00E9] = 0x01u
             memory[0x00EA] = 0x9Fu
-            memory[0x01F5] = 0x00u
+            memory[0x00EB] = 0xD0u
+            memory[0x00EC] = 0x00u
+            memory[0x00ED] = 0x00u
+            memory[0x00EF] = 0x06u
+            memory[0x0109] = 0x00u
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01EC] = 0x0Bu
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0x01u
+            memory[0x01F4] = 0x91u
+            memory[0x01F5] = 0x01u
+            memory[0x01F6] = 0x07u
+            memory[0x01F7] = 0xAFu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x0216] = 0x43u
+            memory[0x021A] = 0x43u
+            memory[0x021E] = 0x43u
+            memory[0x0222] = 0x43u
+            memory[0x0300] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x036A] = 0x00u
             memory[0x0398] = 0x00u
+            memory[0x03AD] = 0x4Du
+            memory[0x03AE] = 0xF2u
+            memory[0x03B8] = 0x0Fu
+            memory[0x03B9] = 0xB8u
+            memory[0x03C4] = 0x03u
+            memory[0x03C5] = 0x00u
+            memory[0x03C6] = 0x00u
+            memory[0x03D0] = 0xF0u
+            memory[0x03D1] = 0x0Cu
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x046E] = 0x00u
+            memory[0x049B] = 0x09u
+            memory[0x04B4] = 0x48u
+            memory[0x05AC] = 0x00u
+            memory[0x05BB] = 0x54u
+            memory[0x0671] = 0x00u
+            memory[0x0680] = 0x54u
             memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
             memory[0x06CD] = 0x00u
+            memory[0x06D4] = 0x02u
+            memory[0x06D5] = 0xB0u
+            memory[0x06E4] = 0x04u
+            memory[0x06E5] = 0xD0u
+            memory[0x06E6] = 0xE8u
+            memory[0x0711] = 0x00u
+            memory[0x071A] = 0x02u
             memory[0x071B] = 0x03u
-            memory[0x071D] = 0x8Eu
+            memory[0x071C] = 0xBEu
+            memory[0x071D] = 0xBDu
             memory[0x071F] = 0x00u
             memory[0x0739] = 0x0Bu
             memory[0x073A] = 0x05u
+            memory[0x073D] = 0x1Eu
             memory[0x0745] = 0x00u
+            memory[0x0747] = 0x69u
+            memory[0x074E] = 0x01u
+            memory[0x0770] = 0x00u
+            memory[0x0773] = 0x00u
+            memory[0x0796] = 0x00u
+            memory[0x0797] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07AA] = 0xF3u
 
             // Execute decompiled function
-            enemiesAndLoopsCore(0x03)
+            enemiesAndLoopsCore(0x00)
 
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x03u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0xB0u, memory[0x0007], "Memory 0x0007 mismatch")
-            assertEquals(0x05u, memory[0x0071], "Memory 0x0071 mismatch")
-            assertEquals(0x00u, memory[0x008A], "Memory 0x008A mismatch")
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x01u, memory[0x0008], "Memory 0x0008 mismatch")
+        }
+    }
+
+    /**
+     * Test case 7 from frame 9485
+     * Function: enemiesAndLoopsCore (0xC047)
+     * Parameters: X
+     * Call depth: 10
+     * Memory reads: 163, writes: 2
+     */
+    @Test
+    fun `enemiesAndLoopsCore_frame9485_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (163 addresses)
+            memory[0x0000] = 0x02u
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x91u
+            memory[0x0005] = 0xC8u
+            memory[0x0006] = 0xE0u
+            memory[0x0007] = 0xC8u
+            memory[0x0008] = 0x02u
+            memory[0x0009] = 0xF6u
+            memory[0x000A] = 0x00u
+            memory[0x000C] = 0x01u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x01u
+            memory[0x0010] = 0x01u
+            memory[0x0011] = 0x01u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x06u
+            memory[0x0017] = 0x06u
+            memory[0x0018] = 0x06u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x0020] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x01u
+            memory[0x0048] = 0x02u
+            memory[0x0057] = 0x14u
+            memory[0x005A] = 0xF8u
+            memory[0x006D] = 0x02u
+            memory[0x0070] = 0x03u
+            memory[0x0071] = 0x05u
+            memory[0x0072] = 0x05u
+            memory[0x0086] = 0xE7u
+            memory[0x0089] = 0x19u
+            memory[0x008A] = 0x00u
+            memory[0x008B] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00B8] = 0x01u
+            memory[0x00CE] = 0x70u
+            memory[0x00D1] = 0xB8u
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0x60u
+            memory[0x00EC] = 0x00u
+            memory[0x00ED] = 0x00u
+            memory[0x00EF] = 0x06u
+            memory[0x0109] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01EC] = 0x12u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0x01u
+            memory[0x01F4] = 0x91u
+            memory[0x01F5] = 0x01u
+            memory[0x01F6] = 0x07u
+            memory[0x01F7] = 0xAFu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x01FA] = 0x77u
+            memory[0x01FB] = 0x81u
+            memory[0x01FC] = 0x14u
+            memory[0x0301] = 0x00u
+            memory[0x036A] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03AD] = 0x63u
+            memory[0x03AE] = 0x95u
+            memory[0x03B8] = 0x70u
+            memory[0x03B9] = 0xB8u
+            memory[0x03C4] = 0x00u
+            memory[0x03C7] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03D1] = 0x00u
+            memory[0x03DA] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0403] = 0x00u
+            memory[0x0493] = 0x00u
+            memory[0x049C] = 0x09u
+            memory[0x04AC] = 0x66u
+            memory[0x04AE] = 0x70u
+            memory[0x04B8] = 0x98u
+            memory[0x04BA] = 0xA2u
+            memory[0x0671] = 0x00u
+            memory[0x0682] = 0x54u
+            memory[0x06A0] = 0x1Fu
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x04u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D5] = 0x70u
+            memory[0x06E4] = 0x04u
+            memory[0x06E7] = 0x60u
+            memory[0x0700] = 0x14u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070C] = 0x04u
+            memory[0x070D] = 0x02u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x84u
+            memory[0x071D] = 0x83u
+            memory[0x071F] = 0x04u
+            memory[0x0725] = 0x03u
+            memory[0x0726] = 0x0Fu
+            memory[0x0727] = 0x01u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x04u
+            memory[0x072B] = 0x01u
+            memory[0x072C] = 0x12u
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0xFFu
+            memory[0x0739] = 0x0Bu
+            memory[0x073A] = 0x05u
+            memory[0x0741] = 0x00u
+            memory[0x0742] = 0x02u
+            memory[0x0743] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x0747] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0770] = 0x00u
+            memory[0x0773] = 0x00u
+            memory[0x0781] = 0x00u
+            memory[0x0798] = 0x00u
+            memory[0x079E] = 0x04u
+            memory[0x079F] = 0x00u
+
+            // Execute decompiled function
+            enemiesAndLoopsCore(0x02)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 8 from frame 11683
+     * Function: enemiesAndLoopsCore (0xC047)
+     * Parameters: X
+     * Call depth: 6
+     * Memory reads: 127, writes: 9
+     */
+    @Test
+    fun `enemiesAndLoopsCore_frame11683_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (127 addresses)
+            memory[0x0000] = 0x05u
+            memory[0x0001] = 0x0Fu
+            memory[0x0002] = 0x79u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x91u
+            memory[0x0005] = 0xC8u
+            memory[0x0006] = 0x85u
+            memory[0x0007] = 0xBCu
+            memory[0x0008] = 0x05u
+            memory[0x0009] = 0x1Fu
+            memory[0x000A] = 0x40u
+            memory[0x000C] = 0x02u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x00u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0014] = 0x01u
+            memory[0x0016] = 0x00u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x2Eu
+            memory[0x001D] = 0x00u
+            memory[0x0023] = 0x10u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x02u
+            memory[0x0039] = 0x00u
+            memory[0x0045] = 0x01u
+            memory[0x0057] = 0x17u
+            memory[0x006D] = 0x01u
+            memory[0x0073] = 0x01u
+            memory[0x0086] = 0xB1u
+            memory[0x008C] = 0x50u
+            memory[0x00B5] = 0x01u
+            memory[0x00BB] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x00D4] = 0x79u
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x0115] = 0x00u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0x6Du
+            memory[0x01F3] = 0xF1u
+            memory[0x01F4] = 0x91u
+            memory[0x01F5] = 0x01u
+            memory[0x01F6] = 0x07u
+            memory[0x01F7] = 0xAFu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x0301] = 0x00u
+            memory[0x03AD] = 0x70u
+            memory[0x03AE] = 0x0Fu
+            memory[0x03B8] = 0xB0u
+            memory[0x03B9] = 0x79u
+            memory[0x03C4] = 0x00u
+            memory[0x03CA] = 0x20u
+            memory[0x03D0] = 0x00u
+            memory[0x03D1] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x046D] = 0x00u
+            memory[0x049F] = 0x03u
+            memory[0x04C4] = 0x11u
+            memory[0x06A0] = 0x0Au
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x03u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x06CC] = 0x00u
+            memory[0x06D5] = 0x78u
+            memory[0x06E4] = 0x04u
+            memory[0x06EA] = 0xA8u
+            memory[0x0700] = 0x17u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x41u
+            memory[0x071D] = 0x40u
+            memory[0x071F] = 0x00u
+            memory[0x0725] = 0x02u
+            memory[0x0726] = 0x0Au
+            memory[0x0727] = 0x01u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x02u
+            memory[0x072C] = 0x0Eu
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0xFFu
+            memory[0x073D] = 0x21u
+            memory[0x0741] = 0x00u
+            memory[0x0742] = 0x02u
+            memory[0x0743] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0770] = 0x00u
+            memory[0x0773] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A8] = 0x9Du
+            memory[0x07A9] = 0x08u
+            memory[0x07AA] = 0x32u
+
+            // Execute decompiled function
+            enemiesAndLoopsCore(0x05)
+
+            // Verify: Check output memory (5 addresses)
+            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
+            assertEquals(0x00u, memory[0x000C], "Memory 0x000C mismatch")
+            assertEquals(0x40u, memory[0x000D], "Memory 0x000D mismatch")
+            assertEquals(0x00u, memory[0x0340], "Memory 0x0340 mismatch")
+            assertEquals(0x01u, memory[0x073D], "Memory 0x073D mismatch")
+        }
+    }
+
+    /**
+     * Test case 9 from frame 14665
+     * Function: enemiesAndLoopsCore (0xC047)
+     * Parameters: X
+     * Call depth: 6
+     * Memory reads: 184, writes: 2
+     */
+    @Test
+    fun `enemiesAndLoopsCore_frame14665_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (184 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x91u
+            memory[0x0005] = 0xC8u
+            memory[0x0006] = 0xE0u
+            memory[0x0007] = 0xC8u
+            memory[0x0008] = 0x00u
+            memory[0x0009] = 0xD0u
+            memory[0x000A] = 0x40u
+            memory[0x000E] = 0x08u
+            memory[0x000F] = 0x01u
+            memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
+            memory[0x0016] = 0x06u
+            memory[0x0017] = 0x00u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x01u
+            memory[0x001E] = 0x04u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x27u
+            memory[0x0033] = 0x02u
+            memory[0x0046] = 0x02u
+            memory[0x006D] = 0x01u
+            memory[0x006E] = 0x01u
+            memory[0x006F] = 0x02u
+            memory[0x0070] = 0x02u
+            memory[0x0071] = 0x02u
+            memory[0x0072] = 0x02u
+            memory[0x007E] = 0x00u
+            memory[0x0082] = 0x01u
+            memory[0x0086] = 0x36u
+            memory[0x0087] = 0x22u
+            memory[0x0088] = 0x80u
+            memory[0x0089] = 0x80u
+            memory[0x008A] = 0x80u
+            memory[0x008B] = 0x80u
+            memory[0x0097] = 0x00u
+            memory[0x009B] = 0x1Cu
+            memory[0x00B5] = 0x01u
+            memory[0x00B6] = 0x01u
+            memory[0x00CA] = 0x01u
+            memory[0x00CE] = 0x9Bu
+            memory[0x00CF] = 0xB8u
+            memory[0x00E3] = 0x67u
+            memory[0x00E7] = 0x90u
+            memory[0x00E8] = 0xA6u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0xD0u
+            memory[0x00EC] = 0x04u
+            memory[0x00ED] = 0x04u
+            memory[0x00EF] = 0x06u
+            memory[0x0109] = 0x00u
+            memory[0x0110] = 0x01u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x0117] = 0x6Cu
+            memory[0x011E] = 0xAAu
+            memory[0x012C] = 0x22u
+            memory[0x01EC] = 0x12u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0x01u
+            memory[0x01F4] = 0x91u
+            memory[0x01F5] = 0x01u
+            memory[0x01F6] = 0x07u
+            memory[0x01F7] = 0xAFu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
+            memory[0x01FA] = 0x77u
+            memory[0x01FB] = 0x81u
+            memory[0x01FC] = 0x14u
+            memory[0x02D2] = 0x03u
+            memory[0x02DA] = 0x03u
+            memory[0x0300] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x036A] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03AD] = 0x70u
+            memory[0x03AE] = 0x5Cu
+            memory[0x03B3] = 0x58u
+            memory[0x03B8] = 0x9Bu
+            memory[0x03B9] = 0xB8u
+            memory[0x03BE] = 0x67u
+            memory[0x03C4] = 0x00u
+            memory[0x03C5] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03D1] = 0x00u
+            memory[0x03D8] = 0x00u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x046B] = 0x00u
+            memory[0x0470] = 0x00u
+            memory[0x0491] = 0x00u
+            memory[0x049A] = 0x09u
+            memory[0x04AA] = 0x00u
+            memory[0x04AC] = 0x73u
+            memory[0x04AE] = 0x7Du
+            memory[0x04B0] = 0x5Fu
+            memory[0x04B2] = 0x69u
+            memory[0x04F0] = 0x5Au
+            memory[0x0682] = 0x54u
+            memory[0x06A0] = 0x03u
+            memory[0x06A1] = 0x00u
+            memory[0x06A2] = 0x00u
+            memory[0x06A3] = 0x00u
+            memory[0x06A4] = 0x00u
+            memory[0x06A5] = 0x00u
+            memory[0x06A6] = 0x00u
+            memory[0x06A7] = 0x00u
+            memory[0x06A8] = 0x00u
+            memory[0x06A9] = 0x00u
+            memory[0x06AA] = 0x00u
+            memory[0x06AB] = 0x00u
+            memory[0x06AC] = 0x54u
+            memory[0x06AD] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
+            memory[0x06D4] = 0x02u
+            memory[0x06D5] = 0x80u
+            memory[0x06E4] = 0x04u
+            memory[0x06E5] = 0xD0u
+            memory[0x06FB] = 0x98u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xC6u
+            memory[0x071D] = 0xC5u
+            memory[0x071F] = 0x04u
+            memory[0x0725] = 0x02u
+            memory[0x0726] = 0x03u
+            memory[0x0727] = 0x01u
+            memory[0x0728] = 0x00u
+            memory[0x0729] = 0x00u
+            memory[0x072A] = 0x02u
+            memory[0x072B] = 0x01u
+            memory[0x072C] = 0x0Cu
+            memory[0x0730] = 0xFFu
+            memory[0x0731] = 0xFFu
+            memory[0x0732] = 0xFFu
+            memory[0x0739] = 0x05u
+            memory[0x073A] = 0x02u
+            memory[0x073B] = 0x01u
+            memory[0x0741] = 0x00u
+            memory[0x0742] = 0x02u
+            memory[0x0743] = 0x00u
+            memory[0x0745] = 0x00u
+            memory[0x0747] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x01u
+            memory[0x0770] = 0x00u
+            memory[0x0773] = 0x00u
+            memory[0x0775] = 0x02u
+            memory[0x0796] = 0x0Fu
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07A9] = 0xD0u
+            memory[0x07AA] = 0xF5u
+
+            // Execute decompiled function
+            enemiesAndLoopsCore(0x00)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -14936,7 +20869,7 @@ class GeneratedFunctionTests {
      * Function: initEnemyObject (0xC226)
      * Parameters: X
      * Call depth: 7
-     * Memory reads: 5, writes: 5
+     * Memory reads: 16, writes: 5
      */
     @Test
     fun `initEnemyObject_frame1179_test0`() {
@@ -14945,12 +20878,23 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (16 addresses)
+            memory[0x0004] = 0x81u
+            memory[0x0005] = 0xC2u
+            memory[0x0006] = 0xF1u
+            memory[0x0007] = 0xC2u
             memory[0x0008] = 0x00u
             memory[0x000F] = 0x01u
+            memory[0x0016] = 0x06u
+            memory[0x00CF] = 0xB0u
+            memory[0x01F0] = 0x81u
+            memory[0x01F1] = 0xC2u
+            memory[0x01F2] = 0x2Cu
+            memory[0x01F3] = 0xC2u
             memory[0x01F4] = 0x10u
             memory[0x01F5] = 0xC2u
             memory[0x0739] = 0x03u
+            memory[0x076A] = 0x00u
 
             // Execute decompiled function
             initEnemyObject(0x00)
@@ -14967,7 +20911,7 @@ class GeneratedFunctionTests {
      * Function: initEnemyObject (0xC226)
      * Parameters: X
      * Call depth: 7
-     * Memory reads: 5, writes: 5
+     * Memory reads: 16, writes: 5
      */
     @Test
     fun `initEnemyObject_frame2017_test1`() {
@@ -14976,12 +20920,23 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (16 addresses)
+            memory[0x0004] = 0x81u
+            memory[0x0005] = 0xC2u
+            memory[0x0006] = 0xF1u
+            memory[0x0007] = 0xC2u
             memory[0x0008] = 0x00u
             memory[0x000F] = 0x01u
+            memory[0x0016] = 0x06u
+            memory[0x00CF] = 0xB0u
+            memory[0x01F0] = 0x81u
+            memory[0x01F1] = 0xC2u
+            memory[0x01F2] = 0x2Cu
+            memory[0x01F3] = 0xC2u
             memory[0x01F4] = 0x10u
             memory[0x01F5] = 0xC2u
             memory[0x0739] = 0x05u
+            memory[0x076A] = 0x00u
 
             // Execute decompiled function
             initEnemyObject(0x00)
@@ -15004,7 +20959,7 @@ class GeneratedFunctionTests {
      * Function: checkpointEnemyID (0xC26C)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 4, writes: 4
+     * Memory reads: 11, writes: 4
      */
     @Test
     fun `checkpointEnemyID_frame1179_test0`() {
@@ -15013,11 +20968,18 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (11 addresses)
+            memory[0x0004] = 0x81u
+            memory[0x0005] = 0xC2u
+            memory[0x0006] = 0xF1u
+            memory[0x0007] = 0xC2u
             memory[0x0016] = 0x06u
             memory[0x00CF] = 0xB0u
+            memory[0x01F0] = 0x81u
+            memory[0x01F1] = 0xC2u
             memory[0x01F2] = 0x2Cu
             memory[0x01F3] = 0xC2u
+            memory[0x076A] = 0x00u
 
             // Execute decompiled function
             checkpointEnemyID(0x00)
@@ -15033,7 +20995,7 @@ class GeneratedFunctionTests {
      * Function: checkpointEnemyID (0xC26C)
      * Parameters: X
      * Call depth: 7
-     * Memory reads: 16, writes: 18
+     * Memory reads: 136, writes: 18
      */
     @Test
     fun `checkpointEnemyID_frame2621_test1`() {
@@ -15042,23 +21004,143 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (16 addresses)
+            // Setup: Set input memory (136 addresses)
             memory[0x0000] = 0xB0u
             memory[0x0001] = 0x06u
             memory[0x0002] = 0x03u
             memory[0x0003] = 0x48u
+            memory[0x0004] = 0x81u
+            memory[0x0005] = 0xC2u
+            memory[0x0006] = 0xF1u
+            memory[0x0007] = 0xC2u
+            memory[0x0008] = 0x00u
+            memory[0x0009] = 0x28u
+            memory[0x000A] = 0x00u
+            memory[0x000C] = 0x02u
+            memory[0x000E] = 0x08u
             memory[0x000F] = 0x01u
             memory[0x0010] = 0x00u
+            memory[0x0011] = 0x00u
+            memory[0x0012] = 0x00u
+            memory[0x0013] = 0x00u
+            memory[0x0014] = 0x00u
             memory[0x0016] = 0x06u
+            memory[0x0017] = 0x06u
+            memory[0x0018] = 0x00u
+            memory[0x001B] = 0x00u
+            memory[0x001D] = 0x00u
+            memory[0x001F] = 0x00u
+            memory[0x0026] = 0x00u
+            memory[0x0027] = 0x00u
+            memory[0x002A] = 0x00u
+            memory[0x002B] = 0x00u
+            memory[0x002C] = 0x00u
+            memory[0x002D] = 0x00u
+            memory[0x002E] = 0x00u
+            memory[0x002F] = 0x00u
+            memory[0x0030] = 0x00u
+            memory[0x0031] = 0x00u
+            memory[0x0032] = 0x00u
+            memory[0x0033] = 0x02u
+            memory[0x0045] = 0x01u
+            memory[0x0047] = 0x02u
+            memory[0x0057] = 0x16u
+            memory[0x0059] = 0xF8u
+            memory[0x006D] = 0x02u
+            memory[0x006F] = 0x03u
+            memory[0x0070] = 0x05u
+            memory[0x0071] = 0x05u
+            memory[0x0072] = 0x05u
+            memory[0x0086] = 0xA3u
+            memory[0x0088] = 0x48u
+            memory[0x0089] = 0x00u
+            memory[0x008A] = 0x00u
+            memory[0x008B] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00B7] = 0x01u
+            memory[0x00CE] = 0xB0u
             memory[0x00CF] = 0xB0u
+            memory[0x00D0] = 0xB0u
+            memory[0x00E9] = 0x01u
+            memory[0x00EA] = 0x9Fu
+            memory[0x00EB] = 0xE8u
+            memory[0x00EC] = 0x00u
+            memory[0x00ED] = 0x00u
+            memory[0x00EF] = 0x06u
+            memory[0x0109] = 0x00u
+            memory[0x0110] = 0x00u
+            memory[0x0111] = 0x00u
+            memory[0x0112] = 0x00u
+            memory[0x0113] = 0x00u
+            memory[0x0114] = 0x00u
+            memory[0x0115] = 0x00u
+            memory[0x01EC] = 0x15u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0x81u
+            memory[0x01F3] = 0xC2u
             memory[0x01F4] = 0x7Eu
             memory[0x01F5] = 0xC7u
             memory[0x01F6] = 0x07u
             memory[0x01F7] = 0xAFu
+            memory[0x01F8] = 0xC2u
+            memory[0x01F9] = 0x82u
             memory[0x01FA] = 0x77u
             memory[0x01FB] = 0x81u
             memory[0x01FC] = 0x10u
+            memory[0x0300] = 0x00u
+            memory[0x0301] = 0x00u
+            memory[0x036A] = 0x00u
+            memory[0x0398] = 0x00u
+            memory[0x03AD] = 0x72u
+            memory[0x03AE] = 0x17u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03C6] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03D1] = 0x0Fu
+            memory[0x03D9] = 0x08u
+            memory[0x03EC] = 0x00u
+            memory[0x03ED] = 0x00u
+            memory[0x0402] = 0x00u
+            memory[0x0674] = 0x00u
+            memory[0x0685] = 0x54u
+            memory[0x06CB] = 0x00u
+            memory[0x06CC] = 0x00u
+            memory[0x06CD] = 0x00u
             memory[0x06D3] = 0x02u
+            memory[0x06D4] = 0x05u
+            memory[0x06D5] = 0x18u
+            memory[0x06E4] = 0x04u
+            memory[0x06E6] = 0xE8u
+            memory[0x0700] = 0x16u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x31u
+            memory[0x071D] = 0x30u
+            memory[0x071F] = 0x00u
+            memory[0x0739] = 0x07u
+            memory[0x073A] = 0x05u
+            memory[0x073B] = 0x00u
+            memory[0x073D] = 0x11u
+            memory[0x0745] = 0x00u
+            memory[0x0747] = 0x00u
+            memory[0x074E] = 0x01u
+            memory[0x0754] = 0x00u
+            memory[0x076A] = 0x00u
+            memory[0x0770] = 0x00u
+            memory[0x0773] = 0x00u
+            memory[0x0797] = 0x00u
+            memory[0x079E] = 0x00u
+            memory[0x079F] = 0x00u
+            memory[0x07AA] = 0xBCu
 
             // Execute decompiled function
             checkpointEnemyID(0x00)
@@ -15083,7 +21165,7 @@ class GeneratedFunctionTests {
      * Function: checkpointEnemyID (0xC26C)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 7, writes: 7
+     * Memory reads: 14, writes: 7
      */
     @Test
     fun `checkpointEnemyID_frame2621_test2`() {
@@ -15092,14 +21174,21 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (7 addresses)
+            // Setup: Set input memory (14 addresses)
+            memory[0x0004] = 0x81u
+            memory[0x0005] = 0xC2u
+            memory[0x0006] = 0xF1u
+            memory[0x0007] = 0xC2u
             memory[0x0008] = 0x00u
             memory[0x0017] = 0x06u
             memory[0x00D0] = 0xB0u
+            memory[0x01F2] = 0x81u
+            memory[0x01F3] = 0xC2u
             memory[0x01F4] = 0x7Eu
             memory[0x01F5] = 0xC7u
             memory[0x06D3] = 0x01u
             memory[0x0739] = 0x07u
+            memory[0x076A] = 0x00u
 
             // Execute decompiled function
             checkpointEnemyID(0x01)
@@ -15118,7 +21207,7 @@ class GeneratedFunctionTests {
      * Function: checkpointEnemyID (0xC26C)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 14, writes: 18
+     * Memory reads: 26, writes: 18
      */
     @Test
     fun `checkpointEnemyID_frame6047_test3`() {
@@ -15127,21 +21216,33 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (14 addresses)
+            // Setup: Set input memory (26 addresses)
             memory[0x0000] = 0xB0u
             memory[0x0001] = 0x06u
             memory[0x0002] = 0x03u
             memory[0x0003] = 0x48u
+            memory[0x0004] = 0x81u
+            memory[0x0005] = 0xC2u
+            memory[0x0006] = 0xF1u
+            memory[0x0007] = 0xC2u
+            memory[0x0008] = 0x01u
             memory[0x000F] = 0x01u
             memory[0x0010] = 0x01u
             memory[0x0011] = 0x00u
             memory[0x0017] = 0x06u
+            memory[0x0018] = 0x06u
             memory[0x00D0] = 0xB0u
+            memory[0x00D1] = 0xB0u
+            memory[0x0111] = 0x00u
+            memory[0x01F2] = 0x81u
+            memory[0x01F3] = 0xC2u
             memory[0x01F4] = 0x7Eu
             memory[0x01F5] = 0xC7u
             memory[0x01F6] = 0x07u
             memory[0x01F7] = 0xAFu
             memory[0x06D3] = 0x02u
+            memory[0x0739] = 0x07u
+            memory[0x076A] = 0x00u
 
             // Execute decompiled function
             checkpointEnemyID(0x01)
@@ -15166,7 +21267,7 @@ class GeneratedFunctionTests {
      * Function: checkpointEnemyID (0xC26C)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 7, writes: 7
+     * Memory reads: 14, writes: 7
      */
     @Test
     fun `checkpointEnemyID_frame6047_test4`() {
@@ -15175,14 +21276,21 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (7 addresses)
+            // Setup: Set input memory (14 addresses)
+            memory[0x0004] = 0x81u
+            memory[0x0005] = 0xC2u
+            memory[0x0006] = 0xF1u
+            memory[0x0007] = 0xC2u
             memory[0x0008] = 0x01u
             memory[0x0018] = 0x06u
             memory[0x00D1] = 0xB0u
+            memory[0x01F2] = 0x81u
+            memory[0x01F3] = 0xC2u
             memory[0x01F4] = 0x7Eu
             memory[0x01F5] = 0xC7u
             memory[0x06D3] = 0x01u
             memory[0x0739] = 0x07u
+            memory[0x076A] = 0x00u
 
             // Execute decompiled function
             checkpointEnemyID(0x02)
@@ -15353,7 +21461,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xC905: enemyMovementSubs
     // Parameters: X
-    // 4229 calls, 1915 unique inputs
+    // 4229 calls, 2027 unique inputs
     // =========================================
 
     /**
@@ -15361,7 +21469,7 @@ class GeneratedFunctionTests {
      * Function: enemyMovementSubs (0xC905)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 13, writes: 6
+     * Memory reads: 27, writes: 6
      */
     @Test
     fun `enemyMovementSubs_frame1181_test0`() {
@@ -15370,16 +21478,30 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
+            // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0xFFu
-            memory[0x0001] = 0xE9u
-            memory[0x0002] = 0x01u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0xFFu
             memory[0x0003] = 0x79u
+            memory[0x0004] = 0x09u
+            memory[0x0005] = 0xC9u
+            memory[0x0006] = 0x77u
+            memory[0x0007] = 0xCAu
+            memory[0x0008] = 0x00u
             memory[0x0016] = 0x06u
+            memory[0x001E] = 0x00u
+            memory[0x0058] = 0xF8u
             memory[0x006E] = 0x01u
-            memory[0x0087] = 0x5Fu
+            memory[0x0087] = 0x60u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0x09u
+            memory[0x01F3] = 0xC9u
             memory[0x01F4] = 0x01u
             memory[0x01F5] = 0xC9u
+            memory[0x0401] = 0x00u
             memory[0x071A] = 0x00u
             memory[0x071B] = 0x01u
             memory[0x071C] = 0x32u
@@ -15394,29 +21516,43 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 2087
+     * Test case 1 from frame 2109
      * Function: enemyMovementSubs (0xC905)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 13, writes: 6
+     * Memory reads: 27, writes: 6
      */
     @Test
-    fun `enemyMovementSubs_frame2087_test1`() {
+    fun `enemyMovementSubs_frame2109_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x01u
-            memory[0x0001] = 0x0Du
-            memory[0x0002] = 0x02u
+            // Setup: Set input memory (27 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
             memory[0x0003] = 0x9Eu
+            memory[0x0004] = 0x09u
+            memory[0x0005] = 0xC9u
+            memory[0x0006] = 0x77u
+            memory[0x0007] = 0xCAu
+            memory[0x0008] = 0x00u
             memory[0x0016] = 0x06u
+            memory[0x001E] = 0x00u
+            memory[0x0058] = 0x08u
             memory[0x006E] = 0x02u
-            memory[0x0087] = 0x90u
+            memory[0x0087] = 0x95u
+            memory[0x01EE] = 0x01u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0x09u
+            memory[0x01F3] = 0xC9u
             memory[0x01F4] = 0x01u
             memory[0x01F5] = 0xC9u
+            memory[0x0401] = 0x80u
             memory[0x071A] = 0x01u
             memory[0x071B] = 0x02u
             memory[0x071C] = 0x56u
@@ -15431,29 +21567,43 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 2785
+     * Test case 2 from frame 2807
      * Function: enemyMovementSubs (0xC905)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 13, writes: 6
+     * Memory reads: 27, writes: 6
      */
     @Test
-    fun `enemyMovementSubs_frame2785_test2`() {
+    fun `enemyMovementSubs_frame2807_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x01u
-            memory[0x0001] = 0xF1u
-            memory[0x0002] = 0x03u
+            // Setup: Set input memory (27 addresses)
+            memory[0x0000] = 0xFFu
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0xFFu
             memory[0x0003] = 0x82u
+            memory[0x0004] = 0x09u
+            memory[0x0005] = 0xC9u
+            memory[0x0006] = 0x77u
+            memory[0x0007] = 0xCAu
+            memory[0x0008] = 0x01u
             memory[0x0017] = 0x06u
+            memory[0x001F] = 0x00u
+            memory[0x0059] = 0xF8u
             memory[0x006F] = 0x03u
-            memory[0x0088] = 0x1Eu
+            memory[0x0088] = 0x19u
+            memory[0x01EE] = 0x01u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0x09u
+            memory[0x01F3] = 0xC9u
             memory[0x01F4] = 0x01u
             memory[0x01F5] = 0xC9u
+            memory[0x0402] = 0x80u
             memory[0x071A] = 0x02u
             memory[0x071B] = 0x03u
             memory[0x071C] = 0x3Au
@@ -15468,36 +21618,50 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 3083
+     * Test case 3 from frame 3023
      * Function: enemyMovementSubs (0xC905)
      * Parameters: X
-     * Call depth: 8
-     * Memory reads: 13, writes: 6
+     * Call depth: 10
+     * Memory reads: 27, writes: 6
      */
     @Test
-    fun `enemyMovementSubs_frame3083_test3`() {
+    fun `enemyMovementSubs_frame3023_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x01u
-            memory[0x0001] = 0xF1u
-            memory[0x0002] = 0x03u
+            // Setup: Set input memory (27 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
             memory[0x0003] = 0x82u
-            memory[0x0016] = 0x06u
-            memory[0x006E] = 0x03u
-            memory[0x0087] = 0x34u
+            memory[0x0004] = 0x09u
+            memory[0x0005] = 0xC9u
+            memory[0x0006] = 0x77u
+            memory[0x0007] = 0xCAu
+            memory[0x0008] = 0x01u
+            memory[0x0017] = 0x06u
+            memory[0x001F] = 0x00u
+            memory[0x0059] = 0x08u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x3Du
+            memory[0x01EE] = 0x01u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0x09u
+            memory[0x01F3] = 0xC9u
             memory[0x01F4] = 0x01u
             memory[0x01F5] = 0xC9u
+            memory[0x0402] = 0x80u
             memory[0x071A] = 0x02u
             memory[0x071B] = 0x03u
             memory[0x071C] = 0x3Au
             memory[0x071D] = 0x39u
 
             // Execute decompiled function
-            enemyMovementSubs(0x00)
+            enemyMovementSubs(0x01)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x82u, memory[0x0003], "Memory 0x0003 mismatch")
@@ -15505,110 +21669,152 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 4 from frame 5067
+     * Test case 4 from frame 3225
      * Function: enemyMovementSubs (0xC905)
      * Parameters: X
-     * Call depth: 8
-     * Memory reads: 13, writes: 6
+     * Call depth: 10
+     * Memory reads: 27, writes: 6
      */
     @Test
-    fun `enemyMovementSubs_frame5067_test4`() {
+    fun `enemyMovementSubs_frame3225_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
+            // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0x00u
-            memory[0x0001] = 0x2Bu
-            memory[0x0002] = 0x01u
-            memory[0x0003] = 0xBCu
-            memory[0x0016] = 0x06u
-            memory[0x006E] = 0x01u
-            memory[0x0087] = 0x47u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0x82u
+            memory[0x0004] = 0x09u
+            memory[0x0005] = 0xC9u
+            memory[0x0006] = 0x77u
+            memory[0x0007] = 0xCAu
+            memory[0x0008] = 0x01u
+            memory[0x0017] = 0x06u
+            memory[0x001F] = 0x00u
+            memory[0x0059] = 0x08u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x70u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0x09u
+            memory[0x01F3] = 0xC9u
             memory[0x01F4] = 0x01u
             memory[0x01F5] = 0xC9u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x01u
-            memory[0x071C] = 0x74u
-            memory[0x071D] = 0x73u
+            memory[0x0402] = 0x00u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x3Au
+            memory[0x071D] = 0x39u
 
             // Execute decompiled function
-            enemyMovementSubs(0x00)
+            enemyMovementSubs(0x01)
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0xBCu, memory[0x0003], "Memory 0x0003 mismatch")
+            assertEquals(0x82u, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
 
     /**
-     * Test case 5 from frame 6043
+     * Test case 5 from frame 5941
      * Function: enemyMovementSubs (0xC905)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 13, writes: 6
+     * Memory reads: 27, writes: 6
      */
     @Test
-    fun `enemyMovementSubs_frame6043_test5`() {
+    fun `enemyMovementSubs_frame5941_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x01u
-            memory[0x0001] = 0xE5u
-            memory[0x0002] = 0x03u
-            memory[0x0003] = 0x76u
+            // Setup: Set input memory (27 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0xF7u
+            memory[0x0004] = 0x09u
+            memory[0x0005] = 0xC9u
+            memory[0x0006] = 0x77u
+            memory[0x0007] = 0xCAu
+            memory[0x0008] = 0x00u
             memory[0x0016] = 0x06u
+            memory[0x001E] = 0x00u
+            memory[0x0058] = 0x08u
             memory[0x006E] = 0x02u
-            memory[0x0087] = 0xAFu
+            memory[0x0087] = 0x95u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0x09u
+            memory[0x01F3] = 0xC9u
             memory[0x01F4] = 0x01u
             memory[0x01F5] = 0xC9u
-            memory[0x071A] = 0x02u
-            memory[0x071B] = 0x03u
-            memory[0x071C] = 0x2Eu
-            memory[0x071D] = 0x2Du
+            memory[0x0401] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0xAFu
+            memory[0x071D] = 0xAEu
 
             // Execute decompiled function
             enemyMovementSubs(0x00)
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0x76u, memory[0x0003], "Memory 0x0003 mismatch")
+            assertEquals(0xF7u, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
 
     /**
-     * Test case 6 from frame 6283
+     * Test case 6 from frame 6257
      * Function: enemyMovementSubs (0xC905)
      * Parameters: X
-     * Call depth: 12
-     * Memory reads: 13, writes: 6
+     * Call depth: 10
+     * Memory reads: 27, writes: 6
      */
     @Test
-    fun `enemyMovementSubs_frame6283_test6`() {
+    fun `enemyMovementSubs_frame6257_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x02u
-            memory[0x0001] = 0x2Bu
-            memory[0x0002] = 0x03u
+            // Setup: Set input memory (27 addresses)
+            memory[0x0000] = 0xFFu
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0xFFu
             memory[0x0003] = 0xBCu
-            memory[0x0018] = 0x06u
-            memory[0x0070] = 0x03u
-            memory[0x0089] = 0x28u
+            memory[0x0004] = 0x09u
+            memory[0x0005] = 0xC9u
+            memory[0x0006] = 0x77u
+            memory[0x0007] = 0xCAu
+            memory[0x0008] = 0x01u
+            memory[0x0017] = 0x06u
+            memory[0x001F] = 0x00u
+            memory[0x0059] = 0xF8u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x17u
+            memory[0x01EE] = 0x01u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0x09u
+            memory[0x01F3] = 0xC9u
             memory[0x01F4] = 0x01u
             memory[0x01F5] = 0xC9u
+            memory[0x0402] = 0x80u
             memory[0x071A] = 0x02u
             memory[0x071B] = 0x03u
             memory[0x071C] = 0x74u
             memory[0x071D] = 0x73u
 
             // Execute decompiled function
-            enemyMovementSubs(0x02)
+            enemyMovementSubs(0x01)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0xBCu, memory[0x0003], "Memory 0x0003 mismatch")
@@ -15616,110 +21822,152 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 6411
+     * Test case 7 from frame 6391
      * Function: enemyMovementSubs (0xC905)
      * Parameters: X
-     * Call depth: 10
-     * Memory reads: 13, writes: 6
+     * Call depth: 12
+     * Memory reads: 27, writes: 6
      */
     @Test
-    fun `enemyMovementSubs_frame6411_test7`() {
+    fun `enemyMovementSubs_frame6391_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x02u
-            memory[0x0001] = 0x5Fu
-            memory[0x0002] = 0x03u
-            memory[0x0003] = 0xF0u
-            memory[0x0017] = 0x06u
-            memory[0x006F] = 0x03u
-            memory[0x0088] = 0x00u
+            // Setup: Set input memory (27 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0x00u
+            memory[0x0003] = 0xE3u
+            memory[0x0004] = 0x09u
+            memory[0x0005] = 0xC9u
+            memory[0x0006] = 0x77u
+            memory[0x0007] = 0xCAu
+            memory[0x0008] = 0x02u
+            memory[0x0018] = 0x06u
+            memory[0x0020] = 0x00u
+            memory[0x005A] = 0x08u
+            memory[0x0070] = 0x03u
+            memory[0x0089] = 0x13u
+            memory[0x01EE] = 0x01u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0x09u
+            memory[0x01F3] = 0xC9u
             memory[0x01F4] = 0x01u
             memory[0x01F5] = 0xC9u
+            memory[0x0403] = 0x80u
             memory[0x071A] = 0x02u
             memory[0x071B] = 0x03u
-            memory[0x071C] = 0xA8u
-            memory[0x071D] = 0xA7u
+            memory[0x071C] = 0x9Bu
+            memory[0x071D] = 0x9Au
 
             // Execute decompiled function
-            enemyMovementSubs(0x01)
+            enemyMovementSubs(0x02)
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0xF0u, memory[0x0003], "Memory 0x0003 mismatch")
+            assertEquals(0xE3u, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
 
     /**
-     * Test case 8 from frame 8211
+     * Test case 8 from frame 8119
      * Function: enemyMovementSubs (0xC905)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 13, writes: 6
+     * Memory reads: 27, writes: 6
      */
     @Test
-    fun `enemyMovementSubs_frame8211_test8`() {
+    fun `enemyMovementSubs_frame8119_test8`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x2Eu
-            memory[0x0002] = 0x01u
-            memory[0x0003] = 0xBFu
+            // Setup: Set input memory (27 addresses)
+            memory[0x0000] = 0xFFu
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0xFFu
+            memory[0x0003] = 0x7Du
+            memory[0x0004] = 0x09u
+            memory[0x0005] = 0xC9u
+            memory[0x0006] = 0x77u
+            memory[0x0007] = 0xCAu
+            memory[0x0008] = 0x00u
             memory[0x0016] = 0x06u
+            memory[0x001E] = 0x00u
+            memory[0x0058] = 0xF8u
             memory[0x006E] = 0x01u
-            memory[0x0087] = 0x46u
+            memory[0x0087] = 0x5Eu
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0x09u
+            memory[0x01F3] = 0xC9u
             memory[0x01F4] = 0x01u
             memory[0x01F5] = 0xC9u
+            memory[0x0401] = 0x00u
             memory[0x071A] = 0x00u
             memory[0x071B] = 0x01u
-            memory[0x071C] = 0x77u
-            memory[0x071D] = 0x76u
+            memory[0x071C] = 0x36u
+            memory[0x071D] = 0x35u
 
             // Execute decompiled function
             enemyMovementSubs(0x00)
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0xBFu, memory[0x0003], "Memory 0x0003 mismatch")
+            assertEquals(0x7Du, memory[0x0003], "Memory 0x0003 mismatch")
         }
     }
 
     /**
-     * Test case 9 from frame 9411
+     * Test case 9 from frame 9399
      * Function: enemyMovementSubs (0xC905)
      * Parameters: X
-     * Call depth: 12
-     * Memory reads: 13, writes: 6
+     * Call depth: 8
+     * Memory reads: 27, writes: 6
      */
     @Test
-    fun `enemyMovementSubs_frame9411_test9`() {
+    fun `enemyMovementSubs_frame9399_test9`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x02u
-            memory[0x0001] = 0x2Bu
-            memory[0x0002] = 0x03u
+            // Setup: Set input memory (27 addresses)
+            memory[0x0000] = 0xFFu
+            memory[0x0001] = 0x80u
+            memory[0x0002] = 0xFFu
             memory[0x0003] = 0xBCu
-            memory[0x0018] = 0x06u
-            memory[0x0070] = 0x03u
-            memory[0x0089] = 0x2Bu
+            memory[0x0004] = 0x09u
+            memory[0x0005] = 0xC9u
+            memory[0x0006] = 0x77u
+            memory[0x0007] = 0xCAu
+            memory[0x0008] = 0x00u
+            memory[0x0016] = 0x06u
+            memory[0x001E] = 0x00u
+            memory[0x0058] = 0xF8u
+            memory[0x006E] = 0x02u
+            memory[0x0087] = 0x99u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0x09u
+            memory[0x01F3] = 0xC9u
             memory[0x01F4] = 0x01u
             memory[0x01F5] = 0xC9u
+            memory[0x0401] = 0x00u
             memory[0x071A] = 0x02u
             memory[0x071B] = 0x03u
             memory[0x071C] = 0x74u
             memory[0x071D] = 0x73u
 
             // Execute decompiled function
-            enemyMovementSubs(0x02)
+            enemyMovementSubs(0x00)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0xBCu, memory[0x0003], "Memory 0x0003 mismatch")
@@ -15855,7 +22103,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xCA77: moveNormalEnemy
     // Parameters: X
-    // 258 calls, 2 unique inputs
+    // 258 calls, 48 unique inputs
     // =========================================
 
     /**
@@ -15863,7 +22111,7 @@ class GeneratedFunctionTests {
      * Function: moveNormalEnemy (0xCA77)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 5, writes: 4
+     * Memory reads: 15, writes: 4
      */
     @Test
     fun `moveNormalEnemy_frame1623_test0`() {
@@ -15872,12 +22120,22 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0008] = 0x05u
             memory[0x0023] = 0x80u
             memory[0x005D] = 0x10u
+            memory[0x0073] = 0x01u
+            memory[0x008C] = 0x50u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
             memory[0x01F1] = 0xC3u
             memory[0x01F2] = 0xCAu
             memory[0x01F3] = 0x10u
+            memory[0x0406] = 0x00u
 
             // Execute decompiled function
             moveNormalEnemy(0x05)
@@ -15888,26 +22146,354 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1625
+     * Test case 1 from frame 1631
      * Function: moveNormalEnemy (0xCA77)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 6, writes: 4
+     * Memory reads: 22, writes: 4
      */
     @Test
-    fun `moveNormalEnemy_frame1625_test1`() {
+    fun `moveNormalEnemy_frame1631_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (6 addresses)
+            // Setup: Set input memory (22 addresses)
+            memory[0x0000] = 0x3Du
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x03u
+            memory[0x0007] = 0x00u
+            memory[0x0008] = 0x05u
             memory[0x001B] = 0x2Eu
             memory[0x0023] = 0xC0u
             memory[0x005D] = 0x10u
-            memory[0x01F1] = 0xC3u
+            memory[0x0073] = 0x01u
+            memory[0x008C] = 0x54u
+            memory[0x00A5] = 0x00u
+            memory[0x00BB] = 0x01u
+            memory[0x00D4] = 0x77u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0x9Bu
+            memory[0x01F1] = 0xBFu
             memory[0x01F2] = 0x9Au
             memory[0x01F3] = 0xCAu
+            memory[0x0406] = 0x00u
+            memory[0x041C] = 0xB7u
+            memory[0x0439] = 0xB7u
+
+            // Execute decompiled function
+            moveNormalEnemy(0x05)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x10u, memory[0x005D], "Memory 0x005D mismatch")
+        }
+    }
+
+    /**
+     * Test case 2 from frame 1641
+     * Function: moveNormalEnemy (0xCA77)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 15, writes: 4
+     */
+    @Test
+    fun `moveNormalEnemy_frame1641_test2`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0008] = 0x05u
+            memory[0x0023] = 0x80u
+            memory[0x005D] = 0x10u
+            memory[0x0073] = 0x01u
+            memory[0x008C] = 0x59u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x10u
+            memory[0x0406] = 0x00u
+
+            // Execute decompiled function
+            moveNormalEnemy(0x05)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x10u, memory[0x005D], "Memory 0x005D mismatch")
+        }
+    }
+
+    /**
+     * Test case 3 from frame 1651
+     * Function: moveNormalEnemy (0xCA77)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 15, writes: 4
+     */
+    @Test
+    fun `moveNormalEnemy_frame1651_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0008] = 0x05u
+            memory[0x0023] = 0x80u
+            memory[0x005D] = 0x10u
+            memory[0x0073] = 0x01u
+            memory[0x008C] = 0x5Eu
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x10u
+            memory[0x0406] = 0x00u
+
+            // Execute decompiled function
+            moveNormalEnemy(0x05)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x10u, memory[0x005D], "Memory 0x005D mismatch")
+        }
+    }
+
+    /**
+     * Test case 4 from frame 1661
+     * Function: moveNormalEnemy (0xCA77)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 15, writes: 4
+     */
+    @Test
+    fun `moveNormalEnemy_frame1661_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0008] = 0x05u
+            memory[0x0023] = 0x80u
+            memory[0x005D] = 0x10u
+            memory[0x0073] = 0x01u
+            memory[0x008C] = 0x63u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x10u
+            memory[0x0406] = 0x00u
+
+            // Execute decompiled function
+            moveNormalEnemy(0x05)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x10u, memory[0x005D], "Memory 0x005D mismatch")
+        }
+    }
+
+    /**
+     * Test case 5 from frame 1671
+     * Function: moveNormalEnemy (0xCA77)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 15, writes: 4
+     */
+    @Test
+    fun `moveNormalEnemy_frame1671_test5`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0008] = 0x05u
+            memory[0x0023] = 0x80u
+            memory[0x005D] = 0x10u
+            memory[0x0073] = 0x01u
+            memory[0x008C] = 0x68u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x10u
+            memory[0x0406] = 0x00u
+
+            // Execute decompiled function
+            moveNormalEnemy(0x05)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x10u, memory[0x005D], "Memory 0x005D mismatch")
+        }
+    }
+
+    /**
+     * Test case 6 from frame 1679
+     * Function: moveNormalEnemy (0xCA77)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 15, writes: 4
+     */
+    @Test
+    fun `moveNormalEnemy_frame1679_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0008] = 0x05u
+            memory[0x0023] = 0x80u
+            memory[0x005D] = 0x10u
+            memory[0x0073] = 0x01u
+            memory[0x008C] = 0x6Cu
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x10u
+            memory[0x0406] = 0x00u
+
+            // Execute decompiled function
+            moveNormalEnemy(0x05)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x10u, memory[0x005D], "Memory 0x005D mismatch")
+        }
+    }
+
+    /**
+     * Test case 7 from frame 1689
+     * Function: moveNormalEnemy (0xCA77)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 15, writes: 4
+     */
+    @Test
+    fun `moveNormalEnemy_frame1689_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0008] = 0x05u
+            memory[0x0023] = 0x80u
+            memory[0x005D] = 0x10u
+            memory[0x0073] = 0x01u
+            memory[0x008C] = 0x71u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x10u
+            memory[0x0406] = 0x00u
+
+            // Execute decompiled function
+            moveNormalEnemy(0x05)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x10u, memory[0x005D], "Memory 0x005D mismatch")
+        }
+    }
+
+    /**
+     * Test case 8 from frame 1699
+     * Function: moveNormalEnemy (0xCA77)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 15, writes: 4
+     */
+    @Test
+    fun `moveNormalEnemy_frame1699_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0008] = 0x05u
+            memory[0x0023] = 0x80u
+            memory[0x005D] = 0x10u
+            memory[0x0073] = 0x01u
+            memory[0x008C] = 0x76u
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x10u
+            memory[0x0406] = 0x00u
+
+            // Execute decompiled function
+            moveNormalEnemy(0x05)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x10u, memory[0x005D], "Memory 0x005D mismatch")
+        }
+    }
+
+    /**
+     * Test case 9 from frame 1709
+     * Function: moveNormalEnemy (0xCA77)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 15, writes: 4
+     */
+    @Test
+    fun `moveNormalEnemy_frame1709_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0001] = 0x00u
+            memory[0x0002] = 0x00u
+            memory[0x0008] = 0x05u
+            memory[0x0023] = 0x80u
+            memory[0x005D] = 0x10u
+            memory[0x0073] = 0x01u
+            memory[0x008C] = 0x7Bu
+            memory[0x01EE] = 0x00u
+            memory[0x01EF] = 0x05u
+            memory[0x01F0] = 0xBFu
+            memory[0x01F1] = 0xC3u
+            memory[0x01F2] = 0xCAu
+            memory[0x01F3] = 0x10u
+            memory[0x0406] = 0x00u
 
             // Execute decompiled function
             moveNormalEnemy(0x05)
@@ -16276,7 +22862,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xD853: playerEnemyCollision
     // Parameters: X, Y
-    // 6897 calls, 2071 unique inputs
+    // 6897 calls, 2631 unique inputs
     // =========================================
 
     /**
@@ -16284,7 +22870,7 @@ class GeneratedFunctionTests {
      * Function: playerEnemyCollision (0xD853)
      * Parameters: X, Y
      * Call depth: 8
-     * Memory reads: 4, writes: 2
+     * Memory reads: 7, writes: 2
      */
     @Test
     fun `playerEnemyCollision_frame1181_test0`() {
@@ -16293,10 +22879,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (7 addresses)
             memory[0x0009] = 0x58u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
             memory[0x01F2] = 0x5Au
             memory[0x01F3] = 0xD8u
+            memory[0x03D0] = 0x00u
             memory[0x03D8] = 0x08u
 
             // Execute decompiled function
@@ -16308,56 +22897,30 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1625
+     * Test case 1 from frame 2037
      * Function: playerEnemyCollision (0xD853)
      * Parameters: X, Y
      * Call depth: 8
-     * Memory reads: 8, writes: 3
+     * Memory reads: 7, writes: 2
      */
     @Test
-    fun `playerEnemyCollision_frame1625_test1`() {
+    fun `playerEnemyCollision_frame2037_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x36u
-            memory[0x000E] = 0x08u
-            memory[0x0023] = 0xC0u
+            // Setup: Set input memory (7 addresses)
+            memory[0x0009] = 0x04u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
             memory[0x01F2] = 0x5Au
             memory[0x01F3] = 0xD8u
-            memory[0x03DD] = 0x00u
-            memory[0x0496] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03D8] = 0x08u
 
             // Execute decompiled function
-            playerEnemyCollision(0x05, 0x70)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0496], "Memory 0x0496 mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 2719
-     * Function: playerEnemyCollision (0xD853)
-     * Parameters: X, Y
-     * Call depth: 10
-     * Memory reads: 1, writes: 0
-     */
-    @Test
-    fun `playerEnemyCollision_frame2719_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (1 addresses)
-            memory[0x0009] = 0x59u
-
-            // Execute decompiled function
-            playerEnemyCollision(0x01, 0x08)
+            playerEnemyCollision(0x00, 0x18)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -16365,28 +22928,103 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 3025
+     * Test case 2 from frame 2845
      * Function: playerEnemyCollision (0xD853)
      * Parameters: X, Y
      * Call depth: 8
-     * Memory reads: 8, writes: 3
+     * Memory reads: 17, writes: 3
      */
     @Test
-    fun `playerEnemyCollision_frame3025_test3`() {
+    fun `playerEnemyCollision_frame2845_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
+            // Setup: Set input memory (17 addresses)
+            memory[0x0006] = 0x04u
             memory[0x0008] = 0x00u
-            memory[0x0009] = 0xF2u
+            memory[0x0009] = 0x98u
             memory[0x000E] = 0x08u
             memory[0x001E] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
             memory[0x01F2] = 0x5Au
             memory[0x01F3] = 0xD8u
+            memory[0x03D0] = 0x00u
+            memory[0x03D1] = 0x00u
+            memory[0x03D8] = 0x00u
+            memory[0x0491] = 0x40u
+            memory[0x04AC] = 0x46u
+            memory[0x04AE] = 0x52u
+            memory[0x04B0] = 0xCFu
+            memory[0x04B2] = 0xD9u
+
+            // Execute decompiled function
+            playerEnemyCollision(0x00, 0x18)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x40u, memory[0x0491], "Memory 0x0491 mismatch")
+        }
+    }
+
+    /**
+     * Test case 3 from frame 3207
+     * Function: playerEnemyCollision (0xD853)
+     * Parameters: X, Y
+     * Call depth: 10
+     * Memory reads: 1, writes: 0
+     */
+    @Test
+    fun `playerEnemyCollision_frame3207_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (1 addresses)
+            memory[0x0009] = 0x4Du
+
+            // Execute decompiled function
+            playerEnemyCollision(0x01, 0x18)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 4 from frame 5989
+     * Function: playerEnemyCollision (0xD853)
+     * Parameters: X, Y
+     * Call depth: 8
+     * Memory reads: 17, writes: 3
+     */
+    @Test
+    fun `playerEnemyCollision_frame5989_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (17 addresses)
+            memory[0x0006] = 0x04u
+            memory[0x0008] = 0x00u
+            memory[0x0009] = 0x70u
+            memory[0x000E] = 0x08u
+            memory[0x001E] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x75u
+            memory[0x01F2] = 0x5Au
+            memory[0x01F3] = 0xD8u
+            memory[0x03D0] = 0x00u
+            memory[0x03D1] = 0x00u
             memory[0x03D8] = 0x00u
             memory[0x0491] = 0x00u
+            memory[0x04AC] = 0x72u
+            memory[0x04AE] = 0x7Eu
+            memory[0x04B0] = 0xB9u
+            memory[0x04B2] = 0xC3u
 
             // Execute decompiled function
             playerEnemyCollision(0x00, 0x18)
@@ -16397,167 +23035,165 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 4 from frame 5321
+     * Test case 5 from frame 6283
      * Function: playerEnemyCollision (0xD853)
      * Parameters: X, Y
-     * Call depth: 8
-     * Memory reads: 8, writes: 3
+     * Call depth: 10
+     * Memory reads: 1, writes: 0
      */
     @Test
-    fun `playerEnemyCollision_frame5321_test4`() {
+    fun `playerEnemyCollision_frame6283_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x22u
-            memory[0x000E] = 0x08u
-            memory[0x0023] = 0x06u
-            memory[0x01F2] = 0x5Au
-            memory[0x01F3] = 0xD8u
-            memory[0x03DD] = 0x00u
-            memory[0x0496] = 0x00u
+            // Setup: Set input memory (1 addresses)
+            memory[0x0009] = 0x03u
 
             // Execute decompiled function
-            playerEnemyCollision(0x05, 0x28)
+            playerEnemyCollision(0x01, 0x08)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 6 from frame 6473
+     * Function: playerEnemyCollision (0xD853)
+     * Parameters: X, Y
+     * Call depth: 8
+     * Memory reads: 7, writes: 2
+     */
+    @Test
+    fun `playerEnemyCollision_frame6473_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (7 addresses)
+            memory[0x0009] = 0x62u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x01F2] = 0x5Au
+            memory[0x01F3] = 0xD8u
+            memory[0x03D0] = 0x00u
+            memory[0x03D8] = 0x04u
+
+            // Execute decompiled function
+            playerEnemyCollision(0x00, 0x18)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 7 from frame 6819
+     * Function: playerEnemyCollision (0xD853)
+     * Parameters: X, Y
+     * Call depth: 8
+     * Memory reads: 1, writes: 0
+     */
+    @Test
+    fun `playerEnemyCollision_frame6819_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (1 addresses)
+            memory[0x0009] = 0x0Fu
+
+            // Execute decompiled function
+            playerEnemyCollision(0x00, 0x18)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 8 from frame 9125
+     * Function: playerEnemyCollision (0xD853)
+     * Parameters: X, Y
+     * Call depth: 8
+     * Memory reads: 17, writes: 3
+     */
+    @Test
+    fun `playerEnemyCollision_frame9125_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (17 addresses)
+            memory[0x0006] = 0x04u
+            memory[0x0008] = 0x00u
+            memory[0x0009] = 0x42u
+            memory[0x000E] = 0x08u
+            memory[0x001E] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x7Bu
+            memory[0x01F2] = 0x5Au
+            memory[0x01F3] = 0xD8u
+            memory[0x03D0] = 0x00u
+            memory[0x03D1] = 0x00u
+            memory[0x03D8] = 0x00u
+            memory[0x0491] = 0x00u
+            memory[0x04AC] = 0x72u
+            memory[0x04AE] = 0x7Eu
+            memory[0x04B0] = 0xBDu
+            memory[0x04B2] = 0xC7u
+
+            // Execute decompiled function
+            playerEnemyCollision(0x00, 0x18)
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0496], "Memory 0x0496 mismatch")
+            assertEquals(0x00u, memory[0x0491], "Memory 0x0491 mismatch")
         }
     }
 
     /**
-     * Test case 5 from frame 6161
+     * Test case 9 from frame 9477
      * Function: playerEnemyCollision (0xD853)
      * Parameters: X, Y
-     * Call depth: 8
-     * Memory reads: 5, writes: 2
+     * Call depth: 10
+     * Memory reads: 17, writes: 3
      */
     @Test
-    fun `playerEnemyCollision_frame6161_test5`() {
+    fun `playerEnemyCollision_frame9477_test9`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
-            memory[0x0009] = 0xC6u
-            memory[0x000E] = 0x0Au
+            // Setup: Set input memory (17 addresses)
+            memory[0x0006] = 0x08u
+            memory[0x0008] = 0x01u
+            memory[0x0009] = 0xF2u
+            memory[0x000E] = 0x08u
+            memory[0x001F] = 0x00u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x70u
             memory[0x01F2] = 0x5Au
             memory[0x01F3] = 0xD8u
-            memory[0x03D8] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x03D1] = 0x00u
+            memory[0x03D9] = 0x00u
+            memory[0x0492] = 0x00u
+            memory[0x04AC] = 0x65u
+            memory[0x04AE] = 0x6Fu
+            memory[0x04B4] = 0x86u
+            memory[0x04B6] = 0x90u
 
             // Execute decompiled function
-            playerEnemyCollision(0x00, 0x18)
+            playerEnemyCollision(0x01, 0x18)
 
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 6 from frame 6371
-     * Function: playerEnemyCollision (0xD853)
-     * Parameters: X, Y
-     * Call depth: 8
-     * Memory reads: 1, writes: 0
-     */
-    @Test
-    fun `playerEnemyCollision_frame6371_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (1 addresses)
-            memory[0x0009] = 0x2Fu
-
-            // Execute decompiled function
-            playerEnemyCollision(0x00, 0x18)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 7 from frame 6579
-     * Function: playerEnemyCollision (0xD853)
-     * Parameters: X, Y
-     * Call depth: 7
-     * Memory reads: 1, writes: 0
-     */
-    @Test
-    fun `playerEnemyCollision_frame6579_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (1 addresses)
-            memory[0x0009] = 0x97u
-
-            // Execute decompiled function
-            playerEnemyCollision(0x00, 0x18)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 8 from frame 6855
-     * Function: playerEnemyCollision (0xD853)
-     * Parameters: X, Y
-     * Call depth: 8
-     * Memory reads: 1, writes: 0
-     */
-    @Test
-    fun `playerEnemyCollision_frame6855_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (1 addresses)
-            memory[0x0009] = 0x21u
-
-            // Execute decompiled function
-            playerEnemyCollision(0x00, 0x18)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 9 from frame 9257
-     * Function: playerEnemyCollision (0xD853)
-     * Parameters: X, Y
-     * Call depth: 7
-     * Memory reads: 5, writes: 2
-     */
-    @Test
-    fun `playerEnemyCollision_frame9257_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0009] = 0x84u
-            memory[0x000E] = 0x0Au
-            memory[0x01F2] = 0x5Au
-            memory[0x01F3] = 0xD8u
-            memory[0x03D8] = 0x00u
-
-            // Execute decompiled function
-            playerEnemyCollision(0x00, 0x18)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x0492], "Memory 0x0492 mismatch")
         }
     }
 
@@ -16734,7 +23370,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xDA33: enemiesCollision
     // Parameters: X, Y
-    // 6345 calls, 1851 unique inputs
+    // 6345 calls, 1930 unique inputs
     // =========================================
 
     /**
@@ -16763,14 +23399,14 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 2075
+     * Test case 1 from frame 2091
      * Function: enemiesCollision (0xDA33)
      * Parameters: X, Y
      * Call depth: 8
      * Memory reads: 5, writes: 0
      */
     @Test
-    fun `enemiesCollision_frame2075_test1`() {
+    fun `enemiesCollision_frame2091_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
@@ -16778,7 +23414,7 @@ class GeneratedFunctionTests {
 
             // Setup: Set input memory (5 addresses)
             memory[0x0008] = 0x00u
-            memory[0x0009] = 0x17u
+            memory[0x0009] = 0x1Fu
             memory[0x0016] = 0x06u
             memory[0x03D8] = 0x08u
             memory[0x074E] = 0x01u
@@ -16792,32 +23428,38 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 2803
+     * Test case 2 from frame 2819
      * Function: enemiesCollision (0xDA33)
      * Parameters: X, Y
      * Call depth: 10
-     * Memory reads: 13, writes: 5
+     * Memory reads: 19, writes: 5
      */
     @Test
-    fun `enemiesCollision_frame2803_test2`() {
+    fun `enemiesCollision_frame2819_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
+            // Setup: Set input memory (19 addresses)
             memory[0x0001] = 0x00u
+            memory[0x0006] = 0x08u
             memory[0x0008] = 0x01u
-            memory[0x0009] = 0x83u
+            memory[0x0009] = 0x8Bu
             memory[0x000F] = 0x01u
             memory[0x0016] = 0x06u
             memory[0x0017] = 0x06u
             memory[0x01F1] = 0x7Au
             memory[0x01F2] = 0x52u
             memory[0x01F3] = 0xDAu
+            memory[0x03D1] = 0x00u
             memory[0x03D8] = 0x00u
             memory[0x03D9] = 0x00u
             memory[0x0491] = 0x00u
+            memory[0x04B0] = 0xC9u
+            memory[0x04B2] = 0xD3u
+            memory[0x04B4] = 0xDFu
+            memory[0x04B6] = 0xE9u
             memory[0x074E] = 0x01u
 
             // Execute decompiled function
@@ -16829,112 +23471,85 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 3009
+     * Test case 3 from frame 3027
      * Function: enemiesCollision (0xDA33)
      * Parameters: X, Y
      * Call depth: 8
-     * Memory reads: 1, writes: 0
+     * Memory reads: 8, writes: 2
      */
     @Test
-    fun `enemiesCollision_frame3009_test3`() {
+    fun `enemiesCollision_frame3027_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (1 addresses)
-            memory[0x0009] = 0xEAu
-
-            // Execute decompiled function
-            enemiesCollision(0x00, 0x18)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 4 from frame 5019
-     * Function: enemiesCollision (0xDA33)
-     * Parameters: X, Y
-     * Call depth: 8
-     * Memory reads: 5, writes: 0
-     */
-    @Test
-    fun `enemiesCollision_frame5019_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (8 addresses)
             memory[0x0008] = 0x00u
-            memory[0x0009] = 0x8Bu
+            memory[0x0009] = 0xF3u
             memory[0x0016] = 0x06u
-            memory[0x03D8] = 0x08u
-            memory[0x074E] = 0x01u
-
-            // Execute decompiled function
-            enemiesCollision(0x00, 0x18)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 5 from frame 6123
-     * Function: enemiesCollision (0xDA33)
-     * Parameters: X, Y
-     * Call depth: 8
-     * Memory reads: 13, writes: 5
-     */
-    @Test
-    fun `enemiesCollision_frame6123_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (13 addresses)
-            memory[0x0001] = 0x00u
-            memory[0x0008] = 0x01u
-            memory[0x0009] = 0xB3u
-            memory[0x000F] = 0x01u
-            memory[0x0016] = 0x06u
-            memory[0x0017] = 0x06u
-            memory[0x01F1] = 0x7Au
             memory[0x01F2] = 0x52u
             memory[0x01F3] = 0xDAu
+            memory[0x03D1] = 0x01u
             memory[0x03D8] = 0x00u
-            memory[0x03D9] = 0x00u
-            memory[0x0491] = 0x01u
             memory[0x074E] = 0x01u
 
             // Execute decompiled function
-            enemiesCollision(0x01, 0x18)
+            enemiesCollision(0x00, 0x18)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0491], "Memory 0x0491 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
     /**
-     * Test case 6 from frame 6285
+     * Test case 4 from frame 5199
      * Function: enemiesCollision (0xDA33)
      * Parameters: X, Y
-     * Call depth: 12
+     * Call depth: 8
+     * Memory reads: 8, writes: 2
+     */
+    @Test
+    fun `enemiesCollision_frame5199_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (8 addresses)
+            memory[0x0008] = 0x00u
+            memory[0x0009] = 0xE5u
+            memory[0x0016] = 0x06u
+            memory[0x01F2] = 0x52u
+            memory[0x01F3] = 0xDAu
+            memory[0x03D1] = 0x00u
+            memory[0x03D8] = 0x00u
+            memory[0x074E] = 0x01u
+
+            // Execute decompiled function
+            enemiesCollision(0x00, 0x18)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 5 from frame 6149
+     * Function: enemiesCollision (0xDA33)
+     * Parameters: X, Y
+     * Call depth: 9
      * Memory reads: 1, writes: 0
      */
     @Test
-    fun `enemiesCollision_frame6285_test6`() {
+    fun `enemiesCollision_frame6149_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
             // Setup: Set input memory (1 addresses)
-            memory[0x0009] = 0x04u
+            memory[0x0009] = 0xC0u
 
             // Execute decompiled function
             enemiesCollision(0x02, 0x18)
@@ -16945,24 +23560,24 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 6433
+     * Test case 6 from frame 6309
      * Function: enemiesCollision (0xDA33)
      * Parameters: X, Y
-     * Call depth: 12
+     * Call depth: 10
      * Memory reads: 1, writes: 0
      */
     @Test
-    fun `enemiesCollision_frame6433_test7`() {
+    fun `enemiesCollision_frame6309_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
             // Setup: Set input memory (1 addresses)
-            memory[0x0009] = 0x4Eu
+            memory[0x0009] = 0x10u
 
             // Execute decompiled function
-            enemiesCollision(0x02, 0x15)
+            enemiesCollision(0x01, 0x18)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -16970,68 +23585,124 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 8 from frame 6711
+     * Test case 7 from frame 6471
      * Function: enemiesCollision (0xDA33)
      * Parameters: X, Y
-     * Call depth: 8
-     * Memory reads: 5, writes: 0
+     * Call depth: 10
+     * Memory reads: 12, writes: 3
      */
     @Test
-    fun `enemiesCollision_frame6711_test8`() {
+    fun `enemiesCollision_frame6471_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
-            memory[0x0008] = 0x00u
-            memory[0x0009] = 0xD9u
-            memory[0x0016] = 0x06u
-            memory[0x03D8] = 0x04u
-            memory[0x074E] = 0x01u
-
-            // Execute decompiled function
-            enemiesCollision(0x00, 0x18)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 9 from frame 9255
-     * Function: enemiesCollision (0xDA33)
-     * Parameters: X, Y
-     * Call depth: 8
-     * Memory reads: 13, writes: 5
-     */
-    @Test
-    fun `enemiesCollision_frame9255_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (13 addresses)
+            // Setup: Set input memory (12 addresses)
             memory[0x0001] = 0x00u
             memory[0x0008] = 0x01u
-            memory[0x0009] = 0x83u
+            memory[0x0009] = 0x61u
             memory[0x000F] = 0x01u
             memory[0x0016] = 0x06u
             memory[0x0017] = 0x06u
-            memory[0x01F1] = 0x7Au
             memory[0x01F2] = 0x52u
             memory[0x01F3] = 0xDAu
-            memory[0x03D8] = 0x00u
+            memory[0x03D1] = 0x00u
+            memory[0x03D8] = 0x04u
             memory[0x03D9] = 0x00u
-            memory[0x0491] = 0x01u
             memory[0x074E] = 0x01u
 
             // Execute decompiled function
             enemiesCollision(0x01, 0x18)
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x0491], "Memory 0x0491 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 8 from frame 6811
+     * Function: enemiesCollision (0xDA33)
+     * Parameters: X, Y
+     * Call depth: 9
+     * Memory reads: 12, writes: 3
+     */
+    @Test
+    fun `enemiesCollision_frame6811_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (12 addresses)
+            memory[0x0001] = 0x00u
+            memory[0x0008] = 0x01u
+            memory[0x0009] = 0x0Bu
+            memory[0x000F] = 0x01u
+            memory[0x0016] = 0x06u
+            memory[0x0017] = 0x06u
+            memory[0x01F2] = 0x52u
+            memory[0x01F3] = 0xDAu
+            memory[0x03D1] = 0x00u
+            memory[0x03D8] = 0x04u
+            memory[0x03D9] = 0x00u
+            memory[0x074E] = 0x01u
+
+            // Execute decompiled function
+            enemiesCollision(0x01, 0x18)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 9 from frame 9335
+     * Function: enemiesCollision (0xDA33)
+     * Parameters: X, Y
+     * Call depth: 12
+     * Memory reads: 25, writes: 6
+     */
+    @Test
+    fun `enemiesCollision_frame9335_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (25 addresses)
+            memory[0x0001] = 0x01u
+            memory[0x0006] = 0x0Cu
+            memory[0x0008] = 0x02u
+            memory[0x0009] = 0xABu
+            memory[0x000F] = 0x01u
+            memory[0x0010] = 0x01u
+            memory[0x0016] = 0x06u
+            memory[0x0017] = 0x06u
+            memory[0x0018] = 0x06u
+            memory[0x01F1] = 0x7Au
+            memory[0x01F2] = 0x52u
+            memory[0x01F3] = 0xDAu
+            memory[0x03D1] = 0x00u
+            memory[0x03D8] = 0x00u
+            memory[0x03D9] = 0x00u
+            memory[0x03DA] = 0x00u
+            memory[0x0491] = 0x00u
+            memory[0x0492] = 0x00u
+            memory[0x04B0] = 0x44u
+            memory[0x04B2] = 0x4Eu
+            memory[0x04B4] = 0xC2u
+            memory[0x04B6] = 0xCCu
+            memory[0x04B8] = 0xD9u
+            memory[0x04BA] = 0xE3u
+            memory[0x074E] = 0x01u
+
+            // Execute decompiled function
+            enemiesCollision(0x02, 0x18)
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x00u, memory[0x0491], "Memory 0x0491 mismatch")
+            assertEquals(0x00u, memory[0x0492], "Memory 0x0492 mismatch")
         }
     }
 
@@ -17046,7 +23717,7 @@ class GeneratedFunctionTests {
      * Function: procEnemyCollisions (0xDAB4)
      * Parameters: X, Y
      * Call depth: 11
-     * Memory reads: 8, writes: 4
+     * Memory reads: 11, writes: 4
      */
     @Test
     fun `procEnemyCollisions_frame2843_test0`() {
@@ -17055,12 +23726,15 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
+            // Setup: Set input memory (11 addresses)
             memory[0x0008] = 0x01u
+            memory[0x0016] = 0x06u
             memory[0x0017] = 0x06u
             memory[0x001E] = 0x00u
             memory[0x001F] = 0x00u
+            memory[0x0046] = 0x01u
             memory[0x0047] = 0x02u
+            memory[0x0058] = 0x08u
             memory[0x0059] = 0xF8u
             memory[0x01EF] = 0x19u
             memory[0x01F0] = 0xDBu
@@ -17079,7 +23753,7 @@ class GeneratedFunctionTests {
      * Function: procEnemyCollisions (0xDAB4)
      * Parameters: X, Y
      * Call depth: 13
-     * Memory reads: 8, writes: 4
+     * Memory reads: 11, writes: 4
      */
     @Test
     fun `procEnemyCollisions_frame6379_test1`() {
@@ -17088,12 +23762,15 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
+            // Setup: Set input memory (11 addresses)
             memory[0x0008] = 0x02u
+            memory[0x0017] = 0x06u
             memory[0x0018] = 0x06u
             memory[0x001F] = 0x00u
             memory[0x0020] = 0x00u
+            memory[0x0047] = 0x01u
             memory[0x0048] = 0x02u
+            memory[0x0059] = 0x08u
             memory[0x005A] = 0xF8u
             memory[0x01EF] = 0x19u
             memory[0x01F0] = 0xDBu
@@ -17112,7 +23789,7 @@ class GeneratedFunctionTests {
      * Function: procEnemyCollisions (0xDAB4)
      * Parameters: X, Y
      * Call depth: 13
-     * Memory reads: 8, writes: 4
+     * Memory reads: 11, writes: 4
      */
     @Test
     fun `procEnemyCollisions_frame6471_test2`() {
@@ -17121,12 +23798,15 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
+            // Setup: Set input memory (11 addresses)
             memory[0x0008] = 0x02u
+            memory[0x0017] = 0x06u
             memory[0x0018] = 0x06u
             memory[0x001F] = 0x00u
             memory[0x0020] = 0x04u
+            memory[0x0047] = 0x01u
             memory[0x0048] = 0x01u
+            memory[0x0059] = 0x08u
             memory[0x005A] = 0x08u
             memory[0x01EF] = 0x19u
             memory[0x01F0] = 0xDBu
@@ -17750,14 +24430,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0xDC64: playerBGCollision
-    // 8409 calls, 310 unique inputs
+    // 8409 calls, 1108 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 36
      * Function: playerBGCollision (0xDC64)
      * Call depth: 7
-     * Memory reads: 16, writes: 12
+     * Memory reads: 32, writes: 12
      */
     @Test
     fun `playerBGCollision_frame36_test0`() {
@@ -17766,18 +24446,34 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (16 addresses)
+            // Setup: Set input memory (32 addresses)
             memory[0x0000] = 0x02u
-            memory[0x0004] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x0Eu
+            memory[0x0005] = 0x30u
+            memory[0x0006] = 0x03u
+            memory[0x0007] = 0x05u
+            memory[0x000B] = 0x00u
             memory[0x000E] = 0x08u
             memory[0x001D] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x0086] = 0x28u
             memory[0x009F] = 0x00u
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0xB0u
             memory[0x00EB] = 0x0Eu
-            memory[0x01F1] = 0x09u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x03u
+            memory[0x01EE] = 0x03u
+            memory[0x01EF] = 0x0Au
+            memory[0x01F0] = 0xE4u
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0xC3u
             memory[0x01F3] = 0xDCu
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
             memory[0x0704] = 0x00u
             memory[0x070E] = 0x00u
             memory[0x0714] = 0x00u
@@ -17799,28 +24495,103 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1462
+     * Test case 1 from frame 1232
      * Function: playerBGCollision (0xDC64)
      * Call depth: 7
-     * Memory reads: 13, writes: 7
+     * Memory reads: 31, writes: 12
      */
     @Test
-    fun `playerBGCollision_frame1462_test1`() {
+    fun `playerBGCollision_frame1232_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x00u
+            // Setup: Set input memory (31 addresses)
+            memory[0x0000] = 0x02u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x0Eu
+            memory[0x0005] = 0xCBu
+            memory[0x0006] = 0x0Cu
+            memory[0x0007] = 0x05u
+            memory[0x000B] = 0x00u
             memory[0x000E] = 0x08u
-            memory[0x001D] = 0x01u
+            memory[0x001D] = 0x00u
+            memory[0x006D] = 0x00u
+            memory[0x0086] = 0xC3u
+            memory[0x009F] = 0x00u
             memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xAEu
+            memory[0x00CE] = 0xB0u
             memory[0x00EB] = 0x0Eu
-            memory[0x01F1] = 0x09u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x0Cu
+            memory[0x01EE] = 0x0Cu
+            memory[0x01EF] = 0x0Au
+            memory[0x01F0] = 0xE4u
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0xC3u
             memory[0x01F3] = 0xDCu
+            memory[0x05AC] = 0x00u
+            memory[0x05AD] = 0x00u
+            memory[0x05BC] = 0x54u
+            memory[0x0704] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x0754] = 0x01u
+
+            // Execute decompiled function
+            playerBGCollision()
+
+            // Verify: Check output memory (7 addresses)
+            assertEquals(0x00u, memory[0x001D], "Memory 0x001D mismatch")
+            assertEquals(0x00u, memory[0x009F], "Memory 0x009F mismatch")
+            assertEquals(0xB0u, memory[0x00CE], "Memory 0x00CE mismatch")
+            assertEquals(0x13u, memory[0x00EB], "Memory 0x00EB mismatch")
+            assertEquals(0x00u, memory[0x0433], "Memory 0x0433 mismatch")
+            assertEquals(0x00u, memory[0x0484], "Memory 0x0484 mismatch")
+            assertEquals(0xFFu, memory[0x0490], "Memory 0x0490 mismatch")
+        }
+    }
+
+    /**
+     * Test case 2 from frame 1476
+     * Function: playerBGCollision (0xDC64)
+     * Call depth: 7
+     * Memory reads: 28, writes: 7
+     */
+    @Test
+    fun `playerBGCollision_frame1476_test2`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (28 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x0Eu
+            memory[0x0005] = 0x50u
+            memory[0x0006] = 0xD5u
+            memory[0x0007] = 0x05u
+            memory[0x000E] = 0x08u
+            memory[0x001D] = 0x01u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x48u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xABu
+            memory[0x00EB] = 0x0Eu
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x15u
+            memory[0x01EE] = 0x15u
+            memory[0x01EF] = 0x0Au
+            memory[0x01F0] = 0xE4u
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0xC3u
+            memory[0x01F3] = 0xDCu
+            memory[0x0665] = 0x00u
+            memory[0x0674] = 0x00u
+            memory[0x0675] = 0x00u
             memory[0x0704] = 0x00u
             memory[0x0714] = 0x00u
             memory[0x0716] = 0x00u
@@ -17836,28 +24607,44 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1840
+     * Test case 3 from frame 1848
      * Function: playerBGCollision (0xDC64)
      * Call depth: 7
-     * Memory reads: 13, writes: 7
+     * Memory reads: 29, writes: 7
      */
     @Test
-    fun `playerBGCollision_frame1840_test2`() {
+    fun `playerBGCollision_frame1848_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
+            // Setup: Set input memory (29 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x8Eu
+            memory[0x0006] = 0xD8u
+            memory[0x0007] = 0x05u
             memory[0x000E] = 0x08u
             memory[0x001D] = 0x02u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x86u
             memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x6Au
+            memory[0x00CE] = 0x6Eu
             memory[0x00EB] = 0x00u
-            memory[0x01F1] = 0x09u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x19u
+            memory[0x01EE] = 0x18u
+            memory[0x01EF] = 0x0Au
+            memory[0x01F0] = 0xE4u
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0xC3u
             memory[0x01F3] = 0xDCu
+            memory[0x0628] = 0x00u
+            memory[0x0629] = 0x00u
+            memory[0x0638] = 0x00u
+            memory[0x0639] = 0x00u
             memory[0x0704] = 0x00u
             memory[0x0714] = 0x00u
             memory[0x0716] = 0x00u
@@ -17873,102 +24660,45 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1916
+     * Test case 4 from frame 2214
      * Function: playerBGCollision (0xDC64)
      * Call depth: 7
-     * Memory reads: 13, writes: 7
+     * Memory reads: 30, writes: 7
      */
     @Test
-    fun `playerBGCollision_frame1916_test3`() {
+    fun `playerBGCollision_frame2214_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
+            // Setup: Set input memory (30 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0xC3u
+            memory[0x0006] = 0xDCu
+            memory[0x0007] = 0x05u
             memory[0x000E] = 0x08u
             memory[0x001D] = 0x01u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x2Eu
-            memory[0x00EB] = 0x00u
-            memory[0x01F1] = 0x09u
-            memory[0x01F2] = 0xC3u
-            memory[0x01F3] = 0xDCu
-            memory[0x0704] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x0754] = 0x00u
-
-            // Execute decompiled function
-            playerBGCollision()
-
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x05u, memory[0x00EB], "Memory 0x00EB mismatch")
-            assertEquals(0xFFu, memory[0x0490], "Memory 0x0490 mismatch")
-        }
-    }
-
-    /**
-     * Test case 4 from frame 2012
-     * Function: playerBGCollision (0xDC64)
-     * Call depth: 7
-     * Memory reads: 13, writes: 7
-     */
-    @Test
-    fun `playerBGCollision_frame2012_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x001D] = 0x02u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x88u
-            memory[0x00EB] = 0x00u
-            memory[0x01F1] = 0x09u
-            memory[0x01F2] = 0xC3u
-            memory[0x01F3] = 0xDCu
-            memory[0x0704] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x0754] = 0x00u
-
-            // Execute decompiled function
-            playerBGCollision()
-
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x05u, memory[0x00EB], "Memory 0x00EB mismatch")
-            assertEquals(0xFFu, memory[0x0490], "Memory 0x0490 mismatch")
-        }
-    }
-
-    /**
-     * Test case 5 from frame 2206
-     * Function: playerBGCollision (0xDC64)
-     * Call depth: 7
-     * Memory reads: 13, writes: 7
-     */
-    @Test
-    fun `playerBGCollision_frame2206_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x001D] = 0x01u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0xBBu
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0x7Au
             memory[0x00EB] = 0x00u
-            memory[0x01F1] = 0x09u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x1Cu
+            memory[0x01EE] = 0x1Cu
+            memory[0x01EF] = 0x0Au
+            memory[0x01F0] = 0xE4u
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0xC3u
             memory[0x01F3] = 0xDCu
+            memory[0x062C] = 0x00u
+            memory[0x063B] = 0x00u
+            memory[0x063C] = 0x00u
+            memory[0x064B] = 0x00u
+            memory[0x064C] = 0x00u
             memory[0x0704] = 0x00u
             memory[0x0714] = 0x00u
             memory[0x0716] = 0x00u
@@ -17984,102 +24714,43 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 6 from frame 2574
+     * Test case 5 from frame 2462
      * Function: playerBGCollision (0xDC64)
      * Call depth: 7
-     * Memory reads: 13, writes: 7
+     * Memory reads: 28, writes: 7
      */
     @Test
-    fun `playerBGCollision_frame2574_test6`() {
+    fun `playerBGCollision_frame2462_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
+            // Setup: Set input memory (28 addresses)
             memory[0x0000] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x001D] = 0x02u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x81u
-            memory[0x00EB] = 0x00u
-            memory[0x01F1] = 0x09u
-            memory[0x01F2] = 0xC3u
-            memory[0x01F3] = 0xDCu
-            memory[0x0704] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x0754] = 0x00u
-
-            // Execute decompiled function
-            playerBGCollision()
-
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x05u, memory[0x00EB], "Memory 0x00EB mismatch")
-            assertEquals(0xFFu, memory[0x0490], "Memory 0x0490 mismatch")
-        }
-    }
-
-    /**
-     * Test case 7 from frame 5630
-     * Function: playerBGCollision (0xDC64)
-     * Call depth: 7
-     * Memory reads: 13, writes: 7
-     */
-    @Test
-    fun `playerBGCollision_frame5630_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x001D] = 0x02u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x6Fu
-            memory[0x00EB] = 0x00u
-            memory[0x01F1] = 0x09u
-            memory[0x01F2] = 0xC3u
-            memory[0x01F3] = 0xDCu
-            memory[0x0704] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x0754] = 0x00u
-
-            // Execute decompiled function
-            playerBGCollision()
-
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x05u, memory[0x00EB], "Memory 0x00EB mismatch")
-            assertEquals(0xFFu, memory[0x0490], "Memory 0x0490 mismatch")
-        }
-    }
-
-    /**
-     * Test case 8 from frame 5970
-     * Function: playerBGCollision (0xDC64)
-     * Call depth: 7
-     * Memory reads: 13, writes: 7
-     */
-    @Test
-    fun `playerBGCollision_frame5970_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (13 addresses)
-            memory[0x0000] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x5Au
+            memory[0x0006] = 0x05u
+            memory[0x0007] = 0x05u
             memory[0x000E] = 0x08u
             memory[0x001D] = 0x01u
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0x52u
             memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x94u
+            memory[0x00CE] = 0xA4u
             memory[0x00EB] = 0x00u
-            memory[0x01F1] = 0x09u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x05u
+            memory[0x01EE] = 0x05u
+            memory[0x01EF] = 0x0Au
+            memory[0x01F0] = 0xE4u
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0xC3u
             memory[0x01F3] = 0xDCu
+            memory[0x0585] = 0x00u
+            memory[0x0595] = 0x00u
+            memory[0x05A5] = 0x00u
             memory[0x0704] = 0x00u
             memory[0x0714] = 0x00u
             memory[0x0716] = 0x00u
@@ -18095,28 +24766,246 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 9 from frame 6390
+     * Test case 6 from frame 2740
      * Function: playerBGCollision (0xDC64)
      * Call depth: 7
-     * Memory reads: 13, writes: 7
+     * Memory reads: 28, writes: 7
      */
     @Test
-    fun `playerBGCollision_frame6390_test9`() {
+    fun `playerBGCollision_frame2740_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
+            // Setup: Set input memory (28 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x86u
+            memory[0x0006] = 0x08u
+            memory[0x0007] = 0x05u
             memory[0x000E] = 0x08u
-            memory[0x001D] = 0x02u
+            memory[0x001D] = 0x01u
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0x7Eu
             memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x7Cu
-            memory[0x00EB] = 0x0Eu
-            memory[0x01F1] = 0x09u
+            memory[0x00CE] = 0x96u
+            memory[0x00EB] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x08u
+            memory[0x01EE] = 0x08u
+            memory[0x01EF] = 0x0Au
+            memory[0x01F0] = 0xE4u
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0xC3u
             memory[0x01F3] = 0xDCu
+            memory[0x0578] = 0x00u
+            memory[0x0588] = 0x00u
+            memory[0x0598] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x0754] = 0x00u
+
+            // Execute decompiled function
+            playerBGCollision()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x05u, memory[0x00EB], "Memory 0x00EB mismatch")
+            assertEquals(0xFFu, memory[0x0490], "Memory 0x0490 mismatch")
+        }
+    }
+
+    /**
+     * Test case 7 from frame 5666
+     * Function: playerBGCollision (0xDC64)
+     * Call depth: 7
+     * Memory reads: 64, writes: 5
+     */
+    @Test
+    fun `playerBGCollision_frame5666_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (64 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x30u
+            memory[0x0003] = 0xC0u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x60u
+            memory[0x0006] = 0xD6u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x001D] = 0x01u
+            memory[0x0026] = 0x11u
+            memory[0x0032] = 0x00u
+            memory[0x006D] = 0x01u
+            memory[0x0076] = 0x01u
+            memory[0x0086] = 0x58u
+            memory[0x008F] = 0x60u
+            memory[0x009F] = 0xFCu
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x59u
+            memory[0x00D7] = 0x50u
+            memory[0x00EB] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01E9] = 0x03u
+            memory[0x01EA] = 0x0Au
+            memory[0x01EB] = 0x8Fu
+            memory[0x01EC] = 0x0Bu
+            memory[0x01ED] = 0x8Eu
+            memory[0x01EE] = 0x16u
+            memory[0x01EF] = 0x0Au
+            memory[0x01F0] = 0xE4u
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0xC3u
+            memory[0x01F3] = 0xDCu
+            memory[0x01F4] = 0x5Cu
+            memory[0x01F5] = 0xB1u
+            memory[0x0300] = 0x00u
+            memory[0x0313] = 0x00u
+            memory[0x03C4] = 0x00u
+            memory[0x03EE] = 0x00u
+            memory[0x05F6] = 0x00u
+            memory[0x0606] = 0xC0u
+            memory[0x0615] = 0x00u
+            memory[0x0616] = 0x00u
+            memory[0x0625] = 0x00u
+            memory[0x0626] = 0x00u
+            memory[0x0704] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x0748] = 0x01u
+            memory[0x074E] = 0x01u
+            memory[0x0753] = 0x00u
+            memory[0x0754] = 0x00u
+            memory[0x075E] = 0x01u
+            memory[0x0770] = 0x00u
+            memory[0x0784] = 0x00u
+            memory[0x07DD] = 0x00u
+            memory[0x07DE] = 0x00u
+            memory[0x07DF] = 0x00u
+            memory[0x07E0] = 0x00u
+            memory[0x07E1] = 0x00u
+            memory[0x07E2] = 0x00u
+            memory[0x07ED] = 0x00u
+            memory[0x07EE] = 0x00u
+
+            // Execute decompiled function
+            playerBGCollision()
+
+            // Verify: Check output memory (3 addresses)
+            assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
+            assertEquals(0x00u, memory[0x03C4], "Memory 0x03C4 mismatch")
+            assertEquals(0xFFu, memory[0x0490], "Memory 0x0490 mismatch")
+        }
+    }
+
+    /**
+     * Test case 8 from frame 5944
+     * Function: playerBGCollision (0xDC64)
+     * Call depth: 7
+     * Memory reads: 34, writes: 12
+     */
+    @Test
+    fun `playerBGCollision_frame5944_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (34 addresses)
+            memory[0x0000] = 0x02u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x2Cu
+            memory[0x0006] = 0x02u
+            memory[0x0007] = 0x05u
+            memory[0x000B] = 0x00u
+            memory[0x000E] = 0x08u
+            memory[0x001D] = 0x01u
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0x24u
+            memory[0x009F] = 0x04u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB1u
+            memory[0x00EB] = 0x00u
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x03u
+            memory[0x01EE] = 0x02u
+            memory[0x01EF] = 0x0Au
+            memory[0x01F0] = 0xE4u
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0xC3u
+            memory[0x01F3] = 0xDCu
+            memory[0x0592] = 0x00u
+            memory[0x0593] = 0x00u
+            memory[0x05A2] = 0x00u
+            memory[0x05A3] = 0x00u
+            memory[0x05B2] = 0x54u
+            memory[0x05B3] = 0x54u
+            memory[0x0704] = 0x00u
+            memory[0x070E] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0716] = 0x00u
+            memory[0x0754] = 0x00u
+
+            // Execute decompiled function
+            playerBGCollision()
+
+            // Verify: Check output memory (7 addresses)
+            assertEquals(0x00u, memory[0x001D], "Memory 0x001D mismatch")
+            assertEquals(0x00u, memory[0x009F], "Memory 0x009F mismatch")
+            assertEquals(0xB0u, memory[0x00CE], "Memory 0x00CE mismatch")
+            assertEquals(0x05u, memory[0x00EB], "Memory 0x00EB mismatch")
+            assertEquals(0x00u, memory[0x0433], "Memory 0x0433 mismatch")
+            assertEquals(0x00u, memory[0x0484], "Memory 0x0484 mismatch")
+            assertEquals(0xFFu, memory[0x0490], "Memory 0x0490 mismatch")
+        }
+    }
+
+    /**
+     * Test case 9 from frame 6312
+     * Function: playerBGCollision (0xDC64)
+     * Call depth: 7
+     * Memory reads: 27, writes: 7
+     */
+    @Test
+    fun `playerBGCollision_frame6312_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (27 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0003] = 0x00u
+            memory[0x0004] = 0x0Eu
+            memory[0x0005] = 0xE0u
+            memory[0x0006] = 0x0Eu
+            memory[0x0007] = 0x05u
+            memory[0x000E] = 0x08u
+            memory[0x001D] = 0x01u
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0xD8u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x6Eu
+            memory[0x00EB] = 0x0Eu
+            memory[0x01A9] = 0x00u
+            memory[0x01ED] = 0x0Eu
+            memory[0x01EE] = 0x0Eu
+            memory[0x01EF] = 0x0Au
+            memory[0x01F0] = 0xE4u
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0xC3u
+            memory[0x01F3] = 0xDCu
+            memory[0x056D] = 0x00u
+            memory[0x056E] = 0x00u
             memory[0x0704] = 0x00u
             memory[0x0714] = 0x00u
             memory[0x0716] = 0x00u
@@ -20338,7 +27227,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xDFC1: enemyToBGCollisionDet
     // Parameters: X
-    // 6603 calls, 632 unique inputs
+    // 6603 calls, 1027 unique inputs
     // =========================================
 
     /**
@@ -20346,7 +27235,7 @@ class GeneratedFunctionTests {
      * Function: enemyToBGCollisionDet (0xDFC1)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 8, writes: 3
+     * Memory reads: 23, writes: 3
      */
     @Test
     fun `enemyToBGCollisionDet_frame1181_test0`() {
@@ -20355,15 +27244,30 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
-            memory[0x0004] = 0x08u
+            // Setup: Set input memory (23 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x68u
+            memory[0x0006] = 0xD6u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
             memory[0x0016] = 0x06u
             memory[0x001E] = 0x00u
             memory[0x0046] = 0x02u
+            memory[0x006E] = 0x01u
+            memory[0x0087] = 0x60u
             memory[0x00CF] = 0xB8u
             memory[0x00EB] = 0x02u
+            memory[0x01EC] = 0x16u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0xC9u
             memory[0x01F3] = 0xDFu
+            memory[0x0676] = 0x00u
+            memory[0x0686] = 0x54u
 
             // Execute decompiled function
             enemyToBGCollisionDet(0x00)
@@ -20374,121 +27278,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1383
+     * Test case 1 from frame 1439
      * Function: enemyToBGCollisionDet (0xDFC1)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 8, writes: 3
+     * Memory reads: 20, writes: 2
      */
     @Test
-    fun `enemyToBGCollisionDet_frame1383_test1`() {
+    fun `enemyToBGCollisionDet_frame1439_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
-            memory[0x0004] = 0x08u
-            memory[0x0016] = 0x06u
-            memory[0x001E] = 0x00u
-            memory[0x0046] = 0x02u
-            memory[0x00CF] = 0xB8u
-            memory[0x00EB] = 0x02u
-            memory[0x01F2] = 0xC9u
-            memory[0x01F3] = 0xDFu
-
-            // Execute decompiled function
-            enemyToBGCollisionDet(0x00)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 2679
-     * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
-     * Call depth: 10
-     * Memory reads: 8, writes: 3
-     */
-    @Test
-    fun `enemyToBGCollisionDet_frame2679_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (8 addresses)
-            memory[0x0004] = 0x08u
-            memory[0x0017] = 0x06u
-            memory[0x001F] = 0x00u
-            memory[0x0047] = 0x02u
-            memory[0x00D0] = 0xB8u
-            memory[0x00EB] = 0x02u
-            memory[0x01F2] = 0xC9u
-            memory[0x01F3] = 0xDFu
-
-            // Execute decompiled function
-            enemyToBGCollisionDet(0x01)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
-        }
-    }
-
-    /**
-     * Test case 3 from frame 2881
-     * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
-     * Call depth: 10
-     * Memory reads: 8, writes: 3
-     */
-    @Test
-    fun `enemyToBGCollisionDet_frame2881_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (8 addresses)
-            memory[0x0004] = 0x08u
-            memory[0x0017] = 0x06u
-            memory[0x001F] = 0x00u
-            memory[0x0047] = 0x01u
-            memory[0x00D0] = 0xB8u
-            memory[0x00EB] = 0x02u
-            memory[0x01F2] = 0xC9u
-            memory[0x01F3] = 0xDFu
-
-            // Execute decompiled function
-            enemyToBGCollisionDet(0x01)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
-        }
-    }
-
-    /**
-     * Test case 4 from frame 5255
-     * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 5, writes: 2
-     */
-    @Test
-    fun `enemyToBGCollisionDet_frame5255_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0004] = 0x08u
+            // Setup: Set input memory (20 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x2Bu
+            memory[0x0006] = 0xD2u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
             memory[0x0016] = 0x06u
             memory[0x001E] = 0x04u
+            memory[0x006E] = 0x01u
+            memory[0x0087] = 0x23u
+            memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x12u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0xC9u
             memory[0x01F3] = 0xDFu
+            memory[0x0682] = 0x54u
 
             // Execute decompiled function
             enemyToBGCollisionDet(0x00)
@@ -20499,60 +27322,43 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 5 from frame 6141
-     * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
-     * Call depth: 7
-     * Memory reads: 8, writes: 3
-     */
-    @Test
-    fun `enemyToBGCollisionDet_frame6141_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (8 addresses)
-            memory[0x0004] = 0x08u
-            memory[0x0016] = 0x06u
-            memory[0x001E] = 0x00u
-            memory[0x0046] = 0x02u
-            memory[0x00CF] = 0xB8u
-            memory[0x00EB] = 0x02u
-            memory[0x01F2] = 0xC9u
-            memory[0x01F3] = 0xDFu
-
-            // Execute decompiled function
-            enemyToBGCollisionDet(0x00)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
-        }
-    }
-
-    /**
-     * Test case 6 from frame 6201
+     * Test case 2 from frame 2123
      * Function: enemyToBGCollisionDet (0xDFC1)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 8, writes: 3
+     * Memory reads: 23, writes: 3
      */
     @Test
-    fun `enemyToBGCollisionDet_frame6201_test6`() {
+    fun `enemyToBGCollisionDet_frame2123_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
-            memory[0x0004] = 0x08u
+            // Setup: Set input memory (23 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0xA1u
+            memory[0x0006] = 0x0Au
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
             memory[0x0016] = 0x06u
             memory[0x001E] = 0x00u
-            memory[0x0046] = 0x02u
+            memory[0x0046] = 0x01u
+            memory[0x006E] = 0x02u
+            memory[0x0087] = 0x99u
             memory[0x00CF] = 0xB8u
             memory[0x00EB] = 0x02u
+            memory[0x01EC] = 0x0Au
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0xC9u
             memory[0x01F3] = 0xDFu
+            memory[0x05AA] = 0x00u
+            memory[0x05BA] = 0x54u
 
             // Execute decompiled function
             enemyToBGCollisionDet(0x00)
@@ -20563,28 +27369,228 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 6265
+     * Test case 3 from frame 2815
+     * Function: enemyToBGCollisionDet (0xDFC1)
+     * Parameters: X
+     * Call depth: 10
+     * Memory reads: 23, writes: 3
+     */
+    @Test
+    fun `enemyToBGCollisionDet_frame2815_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (23 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x1Fu
+            memory[0x0006] = 0xD1u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x01u
+            memory[0x0017] = 0x06u
+            memory[0x001F] = 0x00u
+            memory[0x0047] = 0x02u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x17u
+            memory[0x00D0] = 0xB8u
+            memory[0x00EB] = 0x02u
+            memory[0x01EC] = 0x11u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0xC9u
+            memory[0x01F3] = 0xDFu
+            memory[0x0671] = 0x00u
+            memory[0x0681] = 0x54u
+
+            // Execute decompiled function
+            enemyToBGCollisionDet(0x01)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
+        }
+    }
+
+    /**
+     * Test case 4 from frame 3045
+     * Function: enemyToBGCollisionDet (0xDFC1)
+     * Parameters: X
+     * Call depth: 10
+     * Memory reads: 23, writes: 3
+     */
+    @Test
+    fun `enemyToBGCollisionDet_frame3045_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (23 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x4Bu
+            memory[0x0006] = 0xD4u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x01u
+            memory[0x0017] = 0x06u
+            memory[0x001F] = 0x00u
+            memory[0x0047] = 0x01u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x43u
+            memory[0x00D0] = 0xB8u
+            memory[0x00EB] = 0x02u
+            memory[0x01EC] = 0x14u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0xC9u
+            memory[0x01F3] = 0xDFu
+            memory[0x0675] = 0x00u
+            memory[0x0684] = 0x54u
+
+            // Execute decompiled function
+            enemyToBGCollisionDet(0x01)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
+        }
+    }
+
+    /**
+     * Test case 5 from frame 5241
      * Function: enemyToBGCollisionDet (0xDFC1)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 8, writes: 3
+     * Memory reads: 20, writes: 2
      */
     @Test
-    fun `enemyToBGCollisionDet_frame6265_test7`() {
+    fun `enemyToBGCollisionDet_frame5241_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
-            memory[0x0004] = 0x08u
+            // Setup: Set input memory (20 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x2Au
+            memory[0x0006] = 0xD2u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
+            memory[0x0016] = 0x06u
+            memory[0x001E] = 0x04u
+            memory[0x006E] = 0x01u
+            memory[0x0087] = 0x22u
+            memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x12u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0xC9u
+            memory[0x01F3] = 0xDFu
+            memory[0x0682] = 0x54u
+
+            // Execute decompiled function
+            enemyToBGCollisionDet(0x00)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 6 from frame 6101
+     * Function: enemyToBGCollisionDet (0xDFC1)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 23, writes: 3
+     */
+    @Test
+    fun `enemyToBGCollisionDet_frame6101_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (23 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x37u
+            memory[0x0006] = 0xD3u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x01u
+            memory[0x0017] = 0x06u
+            memory[0x001F] = 0x00u
+            memory[0x0047] = 0x02u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x2Fu
+            memory[0x00D0] = 0xB8u
+            memory[0x00EB] = 0x02u
+            memory[0x01EC] = 0x13u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
+            memory[0x01F2] = 0xC9u
+            memory[0x01F3] = 0xDFu
+            memory[0x0672] = 0x00u
+            memory[0x0683] = 0x54u
+
+            // Execute decompiled function
+            enemyToBGCollisionDet(0x01)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
+        }
+    }
+
+    /**
+     * Test case 7 from frame 6197
+     * Function: enemyToBGCollisionDet (0xDFC1)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 23, writes: 3
+     */
+    @Test
+    fun `enemyToBGCollisionDet_frame6197_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (23 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0xB0u
+            memory[0x0006] = 0x0Bu
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
             memory[0x0016] = 0x06u
             memory[0x001E] = 0x00u
             memory[0x0046] = 0x02u
+            memory[0x006E] = 0x02u
+            memory[0x0087] = 0xA8u
             memory[0x00CF] = 0xB8u
             memory[0x00EB] = 0x02u
+            memory[0x01EC] = 0x0Bu
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0xC9u
             memory[0x01F3] = 0xDFu
+            memory[0x05AA] = 0x00u
+            memory[0x05BB] = 0x54u
 
             // Execute decompiled function
             enemyToBGCollisionDet(0x00)
@@ -20595,31 +27601,46 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 8 from frame 6331
+     * Test case 8 from frame 6309
      * Function: enemyToBGCollisionDet (0xDFC1)
      * Parameters: X
-     * Call depth: 12
-     * Memory reads: 8, writes: 3
+     * Call depth: 10
+     * Memory reads: 23, writes: 3
      */
     @Test
-    fun `enemyToBGCollisionDet_frame6331_test8`() {
+    fun `enemyToBGCollisionDet_frame6309_test8`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
-            memory[0x0004] = 0x08u
-            memory[0x0018] = 0x06u
-            memory[0x0020] = 0x00u
-            memory[0x0048] = 0x02u
-            memory[0x00D1] = 0xB8u
+            // Setup: Set input memory (23 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x12u
+            memory[0x0006] = 0xD1u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x01u
+            memory[0x0017] = 0x06u
+            memory[0x001F] = 0x00u
+            memory[0x0047] = 0x02u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x0Au
+            memory[0x00D0] = 0xB8u
             memory[0x00EB] = 0x02u
+            memory[0x01EC] = 0x11u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0xC9u
             memory[0x01F3] = 0xDFu
+            memory[0x0670] = 0x00u
+            memory[0x0681] = 0x54u
 
             // Execute decompiled function
-            enemyToBGCollisionDet(0x02)
+            enemyToBGCollisionDet(0x01)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
@@ -20631,7 +27652,7 @@ class GeneratedFunctionTests {
      * Function: enemyToBGCollisionDet (0xDFC1)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 8, writes: 3
+     * Memory reads: 23, writes: 3
      */
     @Test
     fun `enemyToBGCollisionDet_frame6395_test9`() {
@@ -20640,15 +27661,30 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
-            memory[0x0004] = 0x08u
+            // Setup: Set input memory (23 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x0Bu
+            memory[0x0006] = 0xD0u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x01u
             memory[0x0017] = 0x06u
             memory[0x001F] = 0x00u
             memory[0x0047] = 0x02u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x03u
             memory[0x00D0] = 0xB8u
             memory[0x00EB] = 0x02u
+            memory[0x01EC] = 0x10u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
             memory[0x01F2] = 0xC9u
             memory[0x01F3] = 0xDFu
+            memory[0x0670] = 0x00u
+            memory[0x0680] = 0x54u
 
             // Execute decompiled function
             enemyToBGCollisionDet(0x01)
@@ -20950,7 +27986,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xE1AE: chkUnderEnemy
     // Parameters: X
-    // 6603 calls, 5 unique inputs
+    // 6603 calls, 422 unique inputs
     // =========================================
 
     /**
@@ -20958,7 +27994,7 @@ class GeneratedFunctionTests {
      * Function: chkUnderEnemy (0xE1AE)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Memory reads: 16, writes: 2
      */
     @Test
     fun `chkUnderEnemy_frame1181_test0`() {
@@ -20967,10 +28003,23 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (16 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x68u
+            memory[0x0006] = 0xD6u
+            memory[0x0007] = 0x05u
             memory[0x0008] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x0087] = 0x60u
+            memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x16u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
             memory[0x01F0] = 0xA7u
             memory[0x01F1] = 0x00u
+            memory[0x0686] = 0x54u
 
             // Execute decompiled function
             chkUnderEnemy(0x00)
@@ -20981,23 +28030,76 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1623
+     * Test case 1 from frame 1347
      * Function: chkUnderEnemy (0xE1AE)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Memory reads: 16, writes: 2
      */
     @Test
-    fun `chkUnderEnemy_frame1623_test1`() {
+    fun `chkUnderEnemy_frame1347_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
-            memory[0x0008] = 0x05u
+            // Setup: Set input memory (16 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x3Eu
+            memory[0x0006] = 0xD3u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x0087] = 0x36u
+            memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x13u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
             memory[0x01F0] = 0xA7u
             memory[0x01F1] = 0x00u
+            memory[0x0683] = 0x54u
+
+            // Execute decompiled function
+            chkUnderEnemy(0x00)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 2 from frame 1667
+     * Function: chkUnderEnemy (0xE1AE)
+     * Parameters: X
+     * Call depth: 9
+     * Memory reads: 16, writes: 2
+     */
+    @Test
+    fun `chkUnderEnemy_frame1667_test2`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (16 addresses)
+            memory[0x0003] = 0x51u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x6Fu
+            memory[0x0006] = 0xD6u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x05u
+            memory[0x0073] = 0x01u
+            memory[0x008C] = 0x67u
+            memory[0x00D4] = 0x78u
+            memory[0x01EC] = 0x16u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
+            memory[0x0646] = 0x51u
 
             // Execute decompiled function
             chkUnderEnemy(0x05)
@@ -21008,26 +28110,39 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1631
+     * Test case 3 from frame 2083
      * Function: chkUnderEnemy (0xE1AE)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Memory reads: 16, writes: 2
      */
     @Test
-    fun `chkUnderEnemy_frame1631_test2`() {
+    fun `chkUnderEnemy_frame2083_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
-            memory[0x0008] = 0x05u
+            // Setup: Set input memory (16 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x97u
+            memory[0x0006] = 0x09u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x02u
+            memory[0x0087] = 0x8Fu
+            memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x09u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
             memory[0x01F0] = 0xA7u
             memory[0x01F1] = 0x00u
+            memory[0x05B9] = 0x54u
 
             // Execute decompiled function
-            chkUnderEnemy(0x05)
+            chkUnderEnemy(0x00)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -21035,23 +28150,76 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 2621
+     * Test case 4 from frame 2673
+     * Function: chkUnderEnemy (0xE1AE)
+     * Parameters: X
+     * Call depth: 9
+     * Memory reads: 16, writes: 2
+     */
+    @Test
+    fun `chkUnderEnemy_frame2673_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (16 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x2Bu
+            memory[0x0006] = 0xD2u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x03u
+            memory[0x0087] = 0x23u
+            memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x12u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
+            memory[0x0682] = 0x54u
+
+            // Execute decompiled function
+            chkUnderEnemy(0x00)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 5 from frame 2759
      * Function: chkUnderEnemy (0xE1AE)
      * Parameters: X
      * Call depth: 11
-     * Memory reads: 3, writes: 2
+     * Memory reads: 16, writes: 2
      */
     @Test
-    fun `chkUnderEnemy_frame2621_test3`() {
+    fun `chkUnderEnemy_frame2759_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (16 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x2Du
+            memory[0x0006] = 0xD2u
+            memory[0x0007] = 0x05u
             memory[0x0008] = 0x01u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x25u
+            memory[0x00D0] = 0xB8u
+            memory[0x01EC] = 0x12u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
             memory[0x01F0] = 0xA7u
             memory[0x01F1] = 0x00u
+            memory[0x0682] = 0x54u
 
             // Execute decompiled function
             chkUnderEnemy(0x01)
@@ -21062,23 +28230,156 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 4 from frame 6047
+     * Test case 6 from frame 3079
      * Function: chkUnderEnemy (0xE1AE)
      * Parameters: X
-     * Call depth: 13
-     * Memory reads: 3, writes: 2
+     * Call depth: 9
+     * Memory reads: 16, writes: 2
      */
     @Test
-    fun `chkUnderEnemy_frame6047_test4`() {
+    fun `chkUnderEnemy_frame3079_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
-            memory[0x0008] = 0x02u
+            // Setup: Set input memory (16 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x3Bu
+            memory[0x0006] = 0xD3u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x03u
+            memory[0x0087] = 0x33u
+            memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x13u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
             memory[0x01F0] = 0xA7u
             memory[0x01F1] = 0x00u
+            memory[0x0683] = 0x54u
+
+            // Execute decompiled function
+            chkUnderEnemy(0x00)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 7 from frame 3163
+     * Function: chkUnderEnemy (0xE1AE)
+     * Parameters: X
+     * Call depth: 9
+     * Memory reads: 16, writes: 2
+     */
+    @Test
+    fun `chkUnderEnemy_frame3163_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (16 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x50u
+            memory[0x0006] = 0xD5u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x03u
+            memory[0x0087] = 0x48u
+            memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x15u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
+            memory[0x0685] = 0x54u
+
+            // Execute decompiled function
+            chkUnderEnemy(0x00)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 8 from frame 6013
+     * Function: chkUnderEnemy (0xE1AE)
+     * Parameters: X
+     * Call depth: 9
+     * Memory reads: 16, writes: 2
+     */
+    @Test
+    fun `chkUnderEnemy_frame6013_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (16 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0xAFu
+            memory[0x0006] = 0x0Au
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x02u
+            memory[0x0087] = 0xA7u
+            memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x0Au
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
+            memory[0x05BA] = 0x54u
+
+            // Execute decompiled function
+            chkUnderEnemy(0x00)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 9 from frame 6279
+     * Function: chkUnderEnemy (0xE1AE)
+     * Parameters: X
+     * Call depth: 13
+     * Memory reads: 16, writes: 2
+     */
+    @Test
+    fun `chkUnderEnemy_frame6279_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (16 addresses)
+            memory[0x0003] = 0x54u
+            memory[0x0004] = 0x15u
+            memory[0x0005] = 0x31u
+            memory[0x0006] = 0xD3u
+            memory[0x0007] = 0x05u
+            memory[0x0008] = 0x02u
+            memory[0x0070] = 0x03u
+            memory[0x0089] = 0x29u
+            memory[0x00D1] = 0xB8u
+            memory[0x01EC] = 0x13u
+            memory[0x01ED] = 0x0Au
+            memory[0x01EE] = 0xE4u
+            memory[0x01EF] = 0x00u
+            memory[0x01F0] = 0xA7u
+            memory[0x01F1] = 0x00u
+            memory[0x0683] = 0x54u
 
             // Execute decompiled function
             chkUnderEnemy(0x02)
@@ -21297,7 +28598,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xE236: getMiscBoundBox
     // Parameters: X
-    // 770 calls, 54 unique inputs
+    // 770 calls, 117 unique inputs
     // =========================================
 
     /**
@@ -21305,7 +28606,7 @@ class GeneratedFunctionTests {
      * Function: getMiscBoundBox (0xE236)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 10, writes: 4
+     * Memory reads: 15, writes: 4
      */
     @Test
     fun `getMiscBoundBox_frame1317_test0`() {
@@ -21314,14 +28615,19 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0001] = 0x01u
-            memory[0x0002] = 0x12u
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x11u
+            memory[0x0001] = 0x73u
+            memory[0x0002] = 0x7Au
             memory[0x0008] = 0x08u
             memory[0x007E] = 0x00u
             memory[0x0097] = 0x00u
+            memory[0x01F1] = 0x44u
             memory[0x01F2] = 0x3Fu
             memory[0x01F3] = 0xE2u
+            memory[0x03B3] = 0x73u
+            memory[0x03BE] = 0x7Au
+            memory[0x04AA] = 0x00u
             memory[0x04F0] = 0x75u
             memory[0x071A] = 0x00u
             memory[0x071C] = 0x92u
@@ -21335,30 +28641,35 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1327
+     * Test case 1 from frame 1339
      * Function: getMiscBoundBox (0xE236)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 10, writes: 4
+     * Memory reads: 15, writes: 4
      */
     @Test
-    fun `getMiscBoundBox_frame1327_test1`() {
+    fun `getMiscBoundBox_frame1339_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0001] = 0x01u
-            memory[0x0002] = 0x19u
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x11u
+            memory[0x0001] = 0x63u
+            memory[0x0002] = 0x57u
             memory[0x0008] = 0x08u
             memory[0x007E] = 0x00u
             memory[0x0097] = 0x00u
+            memory[0x01F1] = 0x44u
             memory[0x01F2] = 0x3Fu
             memory[0x01F3] = 0xE2u
-            memory[0x04F0] = 0x6Eu
+            memory[0x03B3] = 0x63u
+            memory[0x03BE] = 0x57u
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x65u
             memory[0x071A] = 0x00u
-            memory[0x071C] = 0x99u
+            memory[0x071C] = 0xA2u
 
             // Execute decompiled function
             getMiscBoundBox(0x08)
@@ -21369,95 +28680,32 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1337
+     * Test case 2 from frame 1363
      * Function: getMiscBoundBox (0xE236)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 10, writes: 4
+     * Memory reads: 15, writes: 4
      */
     @Test
-    fun `getMiscBoundBox_frame1337_test2`() {
+    fun `getMiscBoundBox_frame1363_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0001] = 0x01u
-            memory[0x0002] = 0x20u
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x11u
+            memory[0x0001] = 0x58u
+            memory[0x0002] = 0x5Du
             memory[0x0008] = 0x08u
             memory[0x007E] = 0x00u
             memory[0x0097] = 0x00u
+            memory[0x01F1] = 0x44u
             memory[0x01F2] = 0x3Fu
             memory[0x01F3] = 0xE2u
-            memory[0x04F0] = 0x67u
-            memory[0x071A] = 0x00u
-            memory[0x071C] = 0xA0u
-
-            // Execute decompiled function
-            getMiscBoundBox(0x08)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 3 from frame 1349
-     * Function: getMiscBoundBox (0xE236)
-     * Parameters: X
-     * Call depth: 9
-     * Memory reads: 10, writes: 4
-     */
-    @Test
-    fun `getMiscBoundBox_frame1349_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (10 addresses)
-            memory[0x0001] = 0x01u
-            memory[0x0002] = 0x28u
-            memory[0x0008] = 0x08u
-            memory[0x007E] = 0x00u
-            memory[0x0097] = 0x00u
-            memory[0x01F2] = 0x3Fu
-            memory[0x01F3] = 0xE2u
-            memory[0x04F0] = 0x5Fu
-            memory[0x071A] = 0x00u
-            memory[0x071C] = 0xA8u
-
-            // Execute decompiled function
-            getMiscBoundBox(0x08)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 4 from frame 1361
-     * Function: getMiscBoundBox (0xE236)
-     * Parameters: X
-     * Call depth: 9
-     * Memory reads: 10, writes: 4
-     */
-    @Test
-    fun `getMiscBoundBox_frame1361_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (10 addresses)
-            memory[0x0001] = 0x01u
-            memory[0x0002] = 0x2Du
-            memory[0x0008] = 0x08u
-            memory[0x007E] = 0x00u
-            memory[0x0097] = 0x00u
-            memory[0x01F2] = 0x3Fu
-            memory[0x01F3] = 0xE2u
+            memory[0x03B3] = 0x58u
+            memory[0x03BE] = 0x5Du
+            memory[0x04AA] = 0x00u
             memory[0x04F0] = 0x5Au
             memory[0x071A] = 0x00u
             memory[0x071C] = 0xADu
@@ -21471,30 +28719,35 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 5 from frame 1421
+     * Test case 3 from frame 1395
      * Function: getMiscBoundBox (0xE236)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 10, writes: 4
+     * Memory reads: 15, writes: 4
      */
     @Test
-    fun `getMiscBoundBox_frame1421_test5`() {
+    fun `getMiscBoundBox_frame1395_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0001] = 0x01u
-            memory[0x0002] = 0x33u
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x11u
+            memory[0x0001] = 0x58u
+            memory[0x0002] = 0x76u
             memory[0x0008] = 0x08u
             memory[0x007E] = 0x00u
             memory[0x0097] = 0x00u
+            memory[0x01F1] = 0x44u
             memory[0x01F2] = 0x3Fu
             memory[0x01F3] = 0xE2u
+            memory[0x03B3] = 0x58u
+            memory[0x03BE] = 0x76u
+            memory[0x04AA] = 0x00u
             memory[0x04F0] = 0x5Au
             memory[0x071A] = 0x00u
-            memory[0x071C] = 0xB3u
+            memory[0x071C] = 0xADu
 
             // Execute decompiled function
             getMiscBoundBox(0x08)
@@ -21505,30 +28758,35 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 6 from frame 1431
+     * Test case 4 from frame 1423
      * Function: getMiscBoundBox (0xE236)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 10, writes: 4
+     * Memory reads: 15, writes: 4
      */
     @Test
-    fun `getMiscBoundBox_frame1431_test6`() {
+    fun `getMiscBoundBox_frame1423_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0001] = 0x01u
-            memory[0x0002] = 0x38u
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x11u
+            memory[0x0001] = 0x58u
+            memory[0x0002] = 0x6Fu
             memory[0x0008] = 0x08u
             memory[0x007E] = 0x00u
             memory[0x0097] = 0x00u
+            memory[0x01F1] = 0x44u
             memory[0x01F2] = 0x3Fu
             memory[0x01F3] = 0xE2u
+            memory[0x03B3] = 0x58u
+            memory[0x03BE] = 0x6Fu
+            memory[0x04AA] = 0x00u
             memory[0x04F0] = 0x5Au
             memory[0x071A] = 0x00u
-            memory[0x071C] = 0xB8u
+            memory[0x071C] = 0xB4u
 
             // Execute decompiled function
             getMiscBoundBox(0x08)
@@ -21539,30 +28797,35 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 1441
+     * Test case 5 from frame 1447
      * Function: getMiscBoundBox (0xE236)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 10, writes: 4
+     * Memory reads: 15, writes: 4
      */
     @Test
-    fun `getMiscBoundBox_frame1441_test7`() {
+    fun `getMiscBoundBox_frame1447_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0001] = 0x01u
-            memory[0x0002] = 0x3Du
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x11u
+            memory[0x0001] = 0x58u
+            memory[0x0002] = 0x69u
             memory[0x0008] = 0x08u
             memory[0x007E] = 0x00u
             memory[0x0097] = 0x00u
+            memory[0x01F1] = 0x44u
             memory[0x01F2] = 0x3Fu
             memory[0x01F3] = 0xE2u
+            memory[0x03B3] = 0x58u
+            memory[0x03BE] = 0x69u
+            memory[0x04AA] = 0x00u
             memory[0x04F0] = 0x5Au
             memory[0x071A] = 0x00u
-            memory[0x071C] = 0xBDu
+            memory[0x071C] = 0xC0u
 
             // Execute decompiled function
             getMiscBoundBox(0x08)
@@ -21573,30 +28836,35 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 8 from frame 1453
+     * Test case 6 from frame 5207
      * Function: getMiscBoundBox (0xE236)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 10, writes: 4
+     * Memory reads: 15, writes: 4
      */
     @Test
-    fun `getMiscBoundBox_frame1453_test8`() {
+    fun `getMiscBoundBox_frame5207_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0001] = 0x01u
-            memory[0x0002] = 0x44u
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x11u
+            memory[0x0001] = 0x58u
+            memory[0x0002] = 0x70u
             memory[0x0008] = 0x08u
             memory[0x007E] = 0x00u
             memory[0x0097] = 0x00u
+            memory[0x01F1] = 0x44u
             memory[0x01F2] = 0x3Fu
             memory[0x01F3] = 0xE2u
+            memory[0x03B3] = 0x58u
+            memory[0x03BE] = 0x70u
+            memory[0x04AA] = 0x00u
             memory[0x04F0] = 0x5Au
             memory[0x071A] = 0x00u
-            memory[0x071C] = 0xC4u
+            memory[0x071C] = 0xB1u
 
             // Execute decompiled function
             getMiscBoundBox(0x08)
@@ -21607,30 +28875,113 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 9 from frame 1463
+     * Test case 7 from frame 5251
      * Function: getMiscBoundBox (0xE236)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 10, writes: 4
+     * Memory reads: 15, writes: 4
      */
     @Test
-    fun `getMiscBoundBox_frame1463_test9`() {
+    fun `getMiscBoundBox_frame5251_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0001] = 0x01u
-            memory[0x0002] = 0x4Cu
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x11u
+            memory[0x0001] = 0x58u
+            memory[0x0002] = 0x65u
             memory[0x0008] = 0x08u
             memory[0x007E] = 0x00u
             memory[0x0097] = 0x00u
+            memory[0x01F1] = 0x44u
             memory[0x01F2] = 0x3Fu
             memory[0x01F3] = 0xE2u
+            memory[0x03B3] = 0x58u
+            memory[0x03BE] = 0x65u
+            memory[0x04AA] = 0x00u
             memory[0x04F0] = 0x5Au
             memory[0x071A] = 0x00u
-            memory[0x071C] = 0xCCu
+            memory[0x071C] = 0xCAu
+
+            // Execute decompiled function
+            getMiscBoundBox(0x08)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 8 from frame 5685
+     * Function: getMiscBoundBox (0xE236)
+     * Parameters: X
+     * Call depth: 7
+     * Memory reads: 15, writes: 4
+     */
+    @Test
+    fun `getMiscBoundBox_frame5685_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x11u
+            memory[0x0001] = 0x22u
+            memory[0x0002] = 0x1Bu
+            memory[0x0008] = 0x08u
+            memory[0x007E] = 0x00u
+            memory[0x0097] = 0x00u
+            memory[0x01F1] = 0x44u
+            memory[0x01F2] = 0x3Fu
+            memory[0x01F3] = 0xE2u
+            memory[0x03B3] = 0x22u
+            memory[0x03BE] = 0x1Bu
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x24u
+            memory[0x071A] = 0x01u
+            memory[0x071C] = 0x43u
+
+            // Execute decompiled function
+            getMiscBoundBox(0x08)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 9 from frame 5759
+     * Function: getMiscBoundBox (0xE236)
+     * Parameters: X
+     * Call depth: 7
+     * Memory reads: 15, writes: 4
+     */
+    @Test
+    fun `getMiscBoundBox_frame5759_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x11u
+            memory[0x0001] = 0x22u
+            memory[0x0002] = 0x32u
+            memory[0x0008] = 0x08u
+            memory[0x007E] = 0x00u
+            memory[0x0097] = 0x00u
+            memory[0x01F1] = 0x44u
+            memory[0x01F2] = 0x3Fu
+            memory[0x01F3] = 0xE2u
+            memory[0x03B3] = 0x22u
+            memory[0x03BE] = 0x32u
+            memory[0x04AA] = 0x00u
+            memory[0x04F0] = 0x24u
+            memory[0x071A] = 0x01u
+            memory[0x071C] = 0x43u
 
             // Execute decompiled function
             getMiscBoundBox(0x08)
@@ -21643,7 +28994,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xE243: getEnemyBoundBox
     // Parameters: X
-    // 6897 calls, 1707 unique inputs
+    // 6897 calls, 1719 unique inputs
     // =========================================
 
     /**
@@ -21682,32 +29033,36 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1551
+     * Test case 1 from frame 1553
      * Function: getEnemyBoundBox (0xE243)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 12, writes: 6
+     * Memory reads: 16, writes: 6
      */
     @Test
-    fun `getEnemyBoundBox_frame1551_test1`() {
+    fun `getEnemyBoundBox_frame1553_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x48u
-            memory[0x0001] = 0x3Bu
-            memory[0x0002] = 0x95u
+            memory[0x0001] = 0x39u
+            memory[0x0002] = 0x80u
             memory[0x0008] = 0x05u
             memory[0x0073] = 0x01u
             memory[0x008C] = 0x50u
+            memory[0x01F1] = 0x18u
             memory[0x01F2] = 0x85u
             memory[0x01F3] = 0xE2u
+            memory[0x03AE] = 0x39u
+            memory[0x03B9] = 0x80u
             memory[0x03D1] = 0x00u
-            memory[0x04C4] = 0x3Du
+            memory[0x049F] = 0x03u
+            memory[0x04C4] = 0x3Bu
             memory[0x071A] = 0x01u
-            memory[0x071C] = 0x15u
+            memory[0x071C] = 0x17u
 
             // Execute decompiled function
             getEnemyBoundBox(0x05)
@@ -21721,8 +29076,8 @@ class GeneratedFunctionTests {
      * Test case 2 from frame 2651
      * Function: getEnemyBoundBox (0xE243)
      * Parameters: X
-     * Call depth: 8
-     * Memory reads: 12, writes: 6
+     * Call depth: 10
+     * Memory reads: 7, writes: 7
      */
     @Test
     fun `getEnemyBoundBox_frame2651_test2`() {
@@ -21731,83 +29086,11 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
-            memory[0x0000] = 0x48u
-            memory[0x0001] = 0xEFu
-            memory[0x0002] = 0xBAu
-            memory[0x0008] = 0x00u
-            memory[0x006E] = 0x03u
-            memory[0x0087] = 0x29u
-            memory[0x01F2] = 0x85u
-            memory[0x01F3] = 0xE2u
-            memory[0x03D1] = 0x01u
-            memory[0x04B2] = 0xFCu
-            memory[0x071A] = 0x02u
-            memory[0x071C] = 0x3Au
-
-            // Execute decompiled function
-            getEnemyBoundBox(0x00)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x03D8], "Memory 0x03D8 mismatch")
-        }
-    }
-
-    /**
-     * Test case 3 from frame 2825
-     * Function: getEnemyBoundBox (0xE243)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 12, writes: 6
-     */
-    @Test
-    fun `getEnemyBoundBox_frame2825_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (12 addresses)
-            memory[0x0000] = 0x48u
-            memory[0x0001] = 0xC7u
-            memory[0x0002] = 0xBAu
-            memory[0x0008] = 0x00u
-            memory[0x006E] = 0x03u
-            memory[0x0087] = 0x01u
-            memory[0x01F2] = 0x85u
-            memory[0x01F3] = 0xE2u
-            memory[0x03D1] = 0x00u
-            memory[0x04B2] = 0xD4u
-            memory[0x071A] = 0x02u
-            memory[0x071C] = 0x3Au
-
-            // Execute decompiled function
-            getEnemyBoundBox(0x00)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x03D8], "Memory 0x03D8 mismatch")
-        }
-    }
-
-    /**
-     * Test case 4 from frame 3143
-     * Function: getEnemyBoundBox (0xE243)
-     * Parameters: X
-     * Call depth: 10
-     * Memory reads: 7, writes: 7
-     */
-    @Test
-    fun `getEnemyBoundBox_frame3143_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x48u
-            memory[0x0001] = 0x21u
+            memory[0x0001] = 0x06u
             memory[0x006F] = 0x03u
-            memory[0x0088] = 0x5Bu
+            memory[0x0088] = 0x40u
             memory[0x03D1] = 0x0Fu
             memory[0x071A] = 0x02u
             memory[0x071C] = 0x3Au
@@ -21825,32 +29108,111 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 5 from frame 5149
+     * Test case 3 from frame 2827
      * Function: getEnemyBoundBox (0xE243)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 12, writes: 6
+     * Memory reads: 16, writes: 6
      */
     @Test
-    fun `getEnemyBoundBox_frame5149_test5`() {
+    fun `getEnemyBoundBox_frame2827_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x48u
-            memory[0x0001] = 0x87u
-            memory[0x0002] = 0x2Cu
+            memory[0x0001] = 0xC8u
+            memory[0x0002] = 0xB8u
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x03u
+            memory[0x0087] = 0x02u
+            memory[0x01F1] = 0x04u
+            memory[0x01F2] = 0x85u
+            memory[0x01F3] = 0xE2u
+            memory[0x03AE] = 0xC8u
+            memory[0x03B9] = 0xB8u
+            memory[0x03D1] = 0x00u
+            memory[0x049A] = 0x09u
+            memory[0x04B2] = 0xD5u
+            memory[0x071A] = 0x02u
+            memory[0x071C] = 0x3Au
+
+            // Execute decompiled function
+            getEnemyBoundBox(0x00)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x03D8], "Memory 0x03D8 mismatch")
+        }
+    }
+
+    /**
+     * Test case 4 from frame 3147
+     * Function: getEnemyBoundBox (0xE243)
+     * Parameters: X
+     * Call depth: 10
+     * Memory reads: 7, writes: 7
+     */
+    @Test
+    fun `getEnemyBoundBox_frame3147_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x48u
+            memory[0x0001] = 0x22u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x5Cu
+            memory[0x03D1] = 0x0Fu
+            memory[0x071A] = 0x02u
+            memory[0x071C] = 0x3Au
+
+            // Execute decompiled function
+            getEnemyBoundBox(0x01)
+
+            // Verify: Check output memory (5 addresses)
+            assertEquals(0x08u, memory[0x03D9], "Memory 0x03D9 mismatch")
+            assertEquals(0xFFu, memory[0x04B4], "Memory 0x04B4 mismatch")
+            assertEquals(0xFFu, memory[0x04B5], "Memory 0x04B5 mismatch")
+            assertEquals(0xFFu, memory[0x04B6], "Memory 0x04B6 mismatch")
+            assertEquals(0xFFu, memory[0x04B7], "Memory 0x04B7 mismatch")
+        }
+    }
+
+    /**
+     * Test case 5 from frame 5167
+     * Function: getEnemyBoundBox (0xE243)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 16, writes: 6
+     */
+    @Test
+    fun `getEnemyBoundBox_frame5167_test5`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (16 addresses)
+            memory[0x0000] = 0x48u
+            memory[0x0001] = 0x82u
+            memory[0x0002] = 0xB8u
             memory[0x0008] = 0x00u
             memory[0x006E] = 0x01u
-            memory[0x0087] = 0x33u
+            memory[0x0087] = 0x2Fu
+            memory[0x01F1] = 0x04u
             memory[0x01F2] = 0x85u
             memory[0x01F3] = 0xE2u
+            memory[0x03AE] = 0x82u
+            memory[0x03B9] = 0xB8u
             memory[0x03D1] = 0x00u
-            memory[0x04B2] = 0x94u
+            memory[0x049A] = 0x09u
+            memory[0x04B2] = 0x8Fu
             memory[0x071A] = 0x00u
-            memory[0x071C] = 0xACu
+            memory[0x071C] = 0xADu
 
             // Execute decompiled function
             getEnemyBoundBox(0x00)
@@ -21861,32 +29223,36 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 6 from frame 5985
+     * Test case 6 from frame 5975
      * Function: getEnemyBoundBox (0xE243)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 12, writes: 6
+     * Memory reads: 16, writes: 6
      */
     @Test
-    fun `getEnemyBoundBox_frame5985_test6`() {
+    fun `getEnemyBoundBox_frame5975_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x48u
-            memory[0x0001] = 0xBAu
-            memory[0x0002] = 0x66u
+            memory[0x0001] = 0xC4u
+            memory[0x0002] = 0xB8u
             memory[0x0008] = 0x00u
             memory[0x006E] = 0x02u
-            memory[0x0087] = 0xA0u
+            memory[0x0087] = 0x9Du
+            memory[0x01F1] = 0x04u
             memory[0x01F2] = 0x85u
             memory[0x01F3] = 0xE2u
+            memory[0x03AE] = 0xC4u
+            memory[0x03B9] = 0xB8u
             memory[0x03D1] = 0x00u
-            memory[0x04B2] = 0xC7u
+            memory[0x049A] = 0x09u
+            memory[0x04B2] = 0xD1u
             memory[0x071A] = 0x01u
-            memory[0x071C] = 0xE6u
+            memory[0x071C] = 0xD9u
 
             // Execute decompiled function
             getEnemyBoundBox(0x00)
@@ -21897,32 +29263,36 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 6177
+     * Test case 7 from frame 6175
      * Function: getEnemyBoundBox (0xE243)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 12, writes: 6
+     * Memory reads: 16, writes: 6
      */
     @Test
-    fun `getEnemyBoundBox_frame6177_test7`() {
+    fun `getEnemyBoundBox_frame6175_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x48u
-            memory[0x0001] = 0x4Eu
-            memory[0x0002] = 0xDFu
+            memory[0x0001] = 0x50u
+            memory[0x0002] = 0xB8u
             memory[0x0008] = 0x00u
             memory[0x006E] = 0x02u
-            memory[0x0087] = 0xADu
+            memory[0x0087] = 0xAEu
+            memory[0x01F1] = 0x04u
             memory[0x01F2] = 0x85u
             memory[0x01F3] = 0xE2u
+            memory[0x03AE] = 0x50u
+            memory[0x03B9] = 0xB8u
             memory[0x03D1] = 0x00u
-            memory[0x04B0] = 0x51u
+            memory[0x049A] = 0x09u
+            memory[0x04B0] = 0x53u
             memory[0x071A] = 0x02u
-            memory[0x071C] = 0x5Fu
+            memory[0x071C] = 0x5Eu
 
             // Execute decompiled function
             getEnemyBoundBox(0x00)
@@ -21933,71 +29303,82 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 8 from frame 6291
+     * Test case 8 from frame 6289
      * Function: getEnemyBoundBox (0xE243)
      * Parameters: X
-     * Call depth: 8
-     * Memory reads: 12, writes: 6
+     * Call depth: 10
+     * Memory reads: 16, writes: 6
      */
     @Test
-    fun `getEnemyBoundBox_frame6291_test8`() {
+    fun `getEnemyBoundBox_frame6289_test8`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x48u
-            memory[0x0001] = 0x1Du
-            memory[0x0002] = 0xF4u
-            memory[0x0008] = 0x00u
-            memory[0x006E] = 0x02u
-            memory[0x0087] = 0x91u
+            memory[0x0001] = 0x9Bu
+            memory[0x0002] = 0xB8u
+            memory[0x0008] = 0x01u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x0Fu
+            memory[0x01F1] = 0x08u
             memory[0x01F2] = 0x85u
             memory[0x01F3] = 0xE2u
+            memory[0x03AE] = 0x9Bu
+            memory[0x03B9] = 0xB8u
             memory[0x03D1] = 0x00u
-            memory[0x04B0] = 0x20u
+            memory[0x049B] = 0x09u
+            memory[0x04B6] = 0xA8u
             memory[0x071A] = 0x02u
             memory[0x071C] = 0x74u
 
             // Execute decompiled function
-            getEnemyBoundBox(0x00)
+            getEnemyBoundBox(0x01)
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x03D8], "Memory 0x03D8 mismatch")
+            assertEquals(0x00u, memory[0x03D9], "Memory 0x03D9 mismatch")
         }
     }
 
     /**
-     * Test case 9 from frame 6405
+     * Test case 9 from frame 6403
      * Function: getEnemyBoundBox (0xE243)
      * Parameters: X
-     * Call depth: 8
-     * Memory reads: 5, writes: 7
+     * Call depth: 12
+     * Memory reads: 16, writes: 6
      */
     @Test
-    fun `getEnemyBoundBox_frame6405_test9`() {
+    fun `getEnemyBoundBox_frame6403_test9`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
-            memory[0x006E] = 0x02u
-            memory[0x0087] = 0x8Au
-            memory[0x03D1] = 0x0Fu
+            // Setup: Set input memory (16 addresses)
+            memory[0x0000] = 0x48u
+            memory[0x0001] = 0x74u
+            memory[0x0002] = 0xB8u
+            memory[0x0008] = 0x02u
+            memory[0x0070] = 0x03u
+            memory[0x0089] = 0x16u
+            memory[0x01F1] = 0x0Cu
+            memory[0x01F2] = 0x85u
+            memory[0x01F3] = 0xE2u
+            memory[0x03AE] = 0x74u
+            memory[0x03B9] = 0xB8u
+            memory[0x03D1] = 0x00u
+            memory[0x049C] = 0x09u
+            memory[0x04B8] = 0x77u
             memory[0x071A] = 0x02u
-            memory[0x071C] = 0xA3u
+            memory[0x071C] = 0xA2u
 
             // Execute decompiled function
-            getEnemyBoundBox(0x00)
+            getEnemyBoundBox(0x02)
 
-            // Verify: Check output memory (5 addresses)
-            assertEquals(0x04u, memory[0x03D8], "Memory 0x03D8 mismatch")
-            assertEquals(0xFFu, memory[0x04B0], "Memory 0x04B0 mismatch")
-            assertEquals(0xFFu, memory[0x04B1], "Memory 0x04B1 mismatch")
-            assertEquals(0xFFu, memory[0x04B2], "Memory 0x04B2 mismatch")
-            assertEquals(0xFFu, memory[0x04B3], "Memory 0x04B3 mismatch")
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x03DA], "Memory 0x03DA mismatch")
         }
     }
 
@@ -22970,7 +30351,7 @@ class GeneratedFunctionTests {
      * Function: blockBufferCollision (0xE3F0)
      * Parameters: A, X, Y
      * Call depth: 10
-     * Memory reads: 12, writes: 7
+     * Memory reads: 13, writes: 7
      */
     @Test
     fun `blockBufferCollision_frame1181_test0`() {
@@ -22979,7 +30360,7 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
             memory[0x0005] = 0x68u
@@ -22988,6 +30369,7 @@ class GeneratedFunctionTests {
             memory[0x006E] = 0x01u
             memory[0x0087] = 0x60u
             memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x16u
             memory[0x01ED] = 0x0Au
             memory[0x01EE] = 0xE4u
             memory[0x01EF] = 0x00u
@@ -23008,7 +30390,7 @@ class GeneratedFunctionTests {
      * Function: blockBufferCollision (0xE3F0)
      * Parameters: A, X, Y
      * Call depth: 10
-     * Memory reads: 12, writes: 7
+     * Memory reads: 13, writes: 7
      */
     @Test
     fun `blockBufferCollision_frame1383_test1`() {
@@ -23017,7 +30399,7 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
             memory[0x0005] = 0x35u
@@ -23026,6 +30408,7 @@ class GeneratedFunctionTests {
             memory[0x006E] = 0x01u
             memory[0x0087] = 0x2Du
             memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x13u
             memory[0x01ED] = 0x0Au
             memory[0x01EE] = 0xE4u
             memory[0x01EF] = 0x00u
@@ -23046,7 +30429,7 @@ class GeneratedFunctionTests {
      * Function: blockBufferCollision (0xE3F0)
      * Parameters: A, X, Y
      * Call depth: 10
-     * Memory reads: 12, writes: 7
+     * Memory reads: 13, writes: 7
      */
     @Test
     fun `blockBufferCollision_frame1703_test2`() {
@@ -23055,7 +30438,7 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x00u
             memory[0x0004] = 0x17u
             memory[0x0005] = 0x89u
@@ -23064,6 +30447,7 @@ class GeneratedFunctionTests {
             memory[0x0073] = 0x01u
             memory[0x008C] = 0x79u
             memory[0x00D4] = 0x78u
+            memory[0x01EC] = 0x18u
             memory[0x01ED] = 0x0Au
             memory[0x01EE] = 0xE4u
             memory[0x01EF] = 0x01u
@@ -23084,7 +30468,7 @@ class GeneratedFunctionTests {
      * Function: blockBufferCollision (0xE3F0)
      * Parameters: A, X, Y
      * Call depth: 12
-     * Memory reads: 12, writes: 7
+     * Memory reads: 13, writes: 7
      */
     @Test
     fun `blockBufferCollision_frame2643_test3`() {
@@ -23093,7 +30477,7 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
             memory[0x0005] = 0x4Au
@@ -23102,6 +30486,7 @@ class GeneratedFunctionTests {
             memory[0x006F] = 0x03u
             memory[0x0088] = 0x42u
             memory[0x00D0] = 0xB8u
+            memory[0x01EC] = 0x14u
             memory[0x01ED] = 0x0Au
             memory[0x01EE] = 0xE4u
             memory[0x01EF] = 0x00u
@@ -23122,7 +30507,7 @@ class GeneratedFunctionTests {
      * Function: blockBufferCollision (0xE3F0)
      * Parameters: A, X, Y
      * Call depth: 10
-     * Memory reads: 12, writes: 7
+     * Memory reads: 13, writes: 7
      */
     @Test
     fun `blockBufferCollision_frame2745_test4`() {
@@ -23131,7 +30516,7 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x00u
             memory[0x0004] = 0x16u
             memory[0x0005] = 0x11u
@@ -23140,6 +30525,7 @@ class GeneratedFunctionTests {
             memory[0x006E] = 0x03u
             memory[0x0087] = 0x11u
             memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x11u
             memory[0x01ED] = 0x0Au
             memory[0x01EE] = 0xE4u
             memory[0x01EF] = 0x01u
@@ -23160,7 +30546,7 @@ class GeneratedFunctionTests {
      * Function: blockBufferCollision (0xE3F0)
      * Parameters: A, X, Y
      * Call depth: 12
-     * Memory reads: 12, writes: 7
+     * Memory reads: 13, writes: 7
      */
     @Test
     fun `blockBufferCollision_frame2877_test5`() {
@@ -23169,7 +30555,7 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x00u
             memory[0x0004] = 0x17u
             memory[0x0005] = 0x29u
@@ -23178,6 +30564,7 @@ class GeneratedFunctionTests {
             memory[0x006F] = 0x03u
             memory[0x0088] = 0x19u
             memory[0x00D0] = 0xB8u
+            memory[0x01EC] = 0x12u
             memory[0x01ED] = 0x0Au
             memory[0x01EE] = 0xE4u
             memory[0x01EF] = 0x01u
@@ -23198,7 +30585,7 @@ class GeneratedFunctionTests {
      * Function: blockBufferCollision (0xE3F0)
      * Parameters: A, X, Y
      * Call depth: 12
-     * Memory reads: 12, writes: 7
+     * Memory reads: 13, writes: 7
      */
     @Test
     fun `blockBufferCollision_frame3081_test6`() {
@@ -23207,7 +30594,7 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
             memory[0x0005] = 0x54u
@@ -23216,6 +30603,7 @@ class GeneratedFunctionTests {
             memory[0x006F] = 0x03u
             memory[0x0088] = 0x4Cu
             memory[0x00D0] = 0xB8u
+            memory[0x01EC] = 0x15u
             memory[0x01ED] = 0x0Au
             memory[0x01EE] = 0xE4u
             memory[0x01EF] = 0x00u
@@ -23236,7 +30624,7 @@ class GeneratedFunctionTests {
      * Function: blockBufferCollision (0xE3F0)
      * Parameters: A, X, Y
      * Call depth: 10
-     * Memory reads: 12, writes: 7
+     * Memory reads: 13, writes: 7
      */
     @Test
     fun `blockBufferCollision_frame3183_test7`() {
@@ -23245,7 +30633,7 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x00u
             memory[0x0004] = 0x17u
             memory[0x0005] = 0x5Du
@@ -23254,6 +30642,7 @@ class GeneratedFunctionTests {
             memory[0x006E] = 0x03u
             memory[0x0087] = 0x4Du
             memory[0x00CF] = 0xB8u
+            memory[0x01EC] = 0x15u
             memory[0x01ED] = 0x0Au
             memory[0x01EE] = 0xE4u
             memory[0x01EF] = 0x01u
@@ -23274,7 +30663,7 @@ class GeneratedFunctionTests {
      * Function: blockBufferCollision (0xE3F0)
      * Parameters: A, X, Y
      * Call depth: 14
-     * Memory reads: 12, writes: 7
+     * Memory reads: 13, writes: 7
      */
     @Test
     fun `blockBufferCollision_frame6179_test8`() {
@@ -23283,7 +30672,7 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
             memory[0x0005] = 0x4Au
@@ -23292,6 +30681,7 @@ class GeneratedFunctionTests {
             memory[0x0070] = 0x03u
             memory[0x0089] = 0x42u
             memory[0x00D1] = 0xB8u
+            memory[0x01EC] = 0x14u
             memory[0x01ED] = 0x0Au
             memory[0x01EE] = 0xE4u
             memory[0x01EF] = 0x00u
@@ -23312,7 +30702,7 @@ class GeneratedFunctionTests {
      * Function: blockBufferCollision (0xE3F0)
      * Parameters: A, X, Y
      * Call depth: 14
-     * Memory reads: 12, writes: 7
+     * Memory reads: 13, writes: 7
      */
     @Test
     fun `blockBufferCollision_frame6303_test9`() {
@@ -23321,7 +30711,7 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (12 addresses)
+            // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x00u
             memory[0x0004] = 0x16u
             memory[0x0005] = 0x23u
@@ -23330,6 +30720,7 @@ class GeneratedFunctionTests {
             memory[0x0070] = 0x03u
             memory[0x0089] = 0x23u
             memory[0x00D1] = 0xB8u
+            memory[0x01EC] = 0x12u
             memory[0x01ED] = 0x0Au
             memory[0x01EE] = 0xE4u
             memory[0x01EF] = 0x01u
@@ -24166,7 +31557,7 @@ class GeneratedFunctionTests {
      * Test case 0 from frame 1525
      * Function: drawPowerUp (0xE6D2)
      * Call depth: 8
-     * Memory reads: 11, writes: 9
+     * Memory reads: 17, writes: 9
      */
     @Test
     fun `drawPowerUp_frame1525_test0`() {
@@ -24175,7 +31566,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (11 addresses)
+            // Setup: Set input memory (17 addresses)
+            memory[0x0000] = 0x76u
+            memory[0x0001] = 0x77u
+            memory[0x0002] = 0x8Bu
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x22u
+            memory[0x0005] = 0x4Du
             memory[0x0007] = 0x01u
             memory[0x0008] = 0x05u
             memory[0x0039] = 0x00u
@@ -24203,7 +31600,7 @@ class GeneratedFunctionTests {
      * Test case 1 from frame 1555
      * Function: drawPowerUp (0xE6D2)
      * Call depth: 8
-     * Memory reads: 11, writes: 9
+     * Memory reads: 17, writes: 9
      */
     @Test
     fun `drawPowerUp_frame1555_test1`() {
@@ -24212,7 +31609,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (11 addresses)
+            // Setup: Set input memory (17 addresses)
+            memory[0x0000] = 0x76u
+            memory[0x0001] = 0x77u
+            memory[0x0002] = 0x88u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x22u
+            memory[0x0005] = 0x38u
             memory[0x0007] = 0x01u
             memory[0x0008] = 0x05u
             memory[0x0039] = 0x00u
@@ -24240,7 +31643,7 @@ class GeneratedFunctionTests {
      * Test case 2 from frame 1587
      * Function: drawPowerUp (0xE6D2)
      * Call depth: 8
-     * Memory reads: 11, writes: 9
+     * Memory reads: 17, writes: 9
      */
     @Test
     fun `drawPowerUp_frame1587_test2`() {
@@ -24249,7 +31652,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (11 addresses)
+            // Setup: Set input memory (17 addresses)
+            memory[0x0000] = 0x76u
+            memory[0x0001] = 0x77u
+            memory[0x0002] = 0x84u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x22u
+            memory[0x0005] = 0x20u
             memory[0x0007] = 0x01u
             memory[0x0008] = 0x05u
             memory[0x0039] = 0x00u
@@ -24277,7 +31686,7 @@ class GeneratedFunctionTests {
      * Test case 3 from frame 1617
      * Function: drawPowerUp (0xE6D2)
      * Call depth: 8
-     * Memory reads: 11, writes: 9
+     * Memory reads: 17, writes: 9
      */
     @Test
     fun `drawPowerUp_frame1617_test3`() {
@@ -24286,7 +31695,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (11 addresses)
+            // Setup: Set input memory (17 addresses)
+            memory[0x0000] = 0x76u
+            memory[0x0001] = 0x77u
+            memory[0x0002] = 0x80u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x22u
+            memory[0x0005] = 0x0Cu
             memory[0x0007] = 0x01u
             memory[0x0008] = 0x05u
             memory[0x0039] = 0x00u
@@ -24314,7 +31729,7 @@ class GeneratedFunctionTests {
      * Test case 4 from frame 1651
      * Function: drawPowerUp (0xE6D2)
      * Call depth: 8
-     * Memory reads: 11, writes: 9
+     * Memory reads: 17, writes: 9
      */
     @Test
     fun `drawPowerUp_frame1651_test4`() {
@@ -24323,7 +31738,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (11 addresses)
+            // Setup: Set input memory (17 addresses)
+            memory[0x0000] = 0x76u
+            memory[0x0001] = 0x77u
+            memory[0x0002] = 0x80u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x02u
+            memory[0x0005] = 0x1Bu
             memory[0x0007] = 0x01u
             memory[0x0008] = 0x05u
             memory[0x0039] = 0x00u
@@ -24351,7 +31772,7 @@ class GeneratedFunctionTests {
      * Test case 5 from frame 1683
      * Function: drawPowerUp (0xE6D2)
      * Call depth: 8
-     * Memory reads: 11, writes: 9
+     * Memory reads: 17, writes: 9
      */
     @Test
     fun `drawPowerUp_frame1683_test5`() {
@@ -24360,7 +31781,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (11 addresses)
+            // Setup: Set input memory (17 addresses)
+            memory[0x0000] = 0x76u
+            memory[0x0001] = 0x77u
+            memory[0x0002] = 0x80u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x02u
+            memory[0x0005] = 0x2Bu
             memory[0x0007] = 0x01u
             memory[0x0008] = 0x05u
             memory[0x0039] = 0x00u
@@ -24388,7 +31815,7 @@ class GeneratedFunctionTests {
      * Test case 6 from frame 1713
      * Function: drawPowerUp (0xE6D2)
      * Call depth: 8
-     * Memory reads: 11, writes: 9
+     * Memory reads: 17, writes: 9
      */
     @Test
     fun `drawPowerUp_frame1713_test6`() {
@@ -24397,7 +31824,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (11 addresses)
+            // Setup: Set input memory (17 addresses)
+            memory[0x0000] = 0x76u
+            memory[0x0001] = 0x77u
+            memory[0x0002] = 0x80u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x02u
+            memory[0x0005] = 0x3Au
             memory[0x0007] = 0x01u
             memory[0x0008] = 0x05u
             memory[0x0039] = 0x00u
@@ -24425,7 +31858,7 @@ class GeneratedFunctionTests {
      * Test case 7 from frame 5405
      * Function: drawPowerUp (0xE6D2)
      * Call depth: 8
-     * Memory reads: 11, writes: 9
+     * Memory reads: 17, writes: 9
      */
     @Test
     fun `drawPowerUp_frame5405_test7`() {
@@ -24434,7 +31867,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (11 addresses)
+            // Setup: Set input memory (17 addresses)
+            memory[0x0000] = 0x76u
+            memory[0x0001] = 0x77u
+            memory[0x0002] = 0x80u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x22u
+            memory[0x0005] = 0x0Eu
             memory[0x0007] = 0x01u
             memory[0x0008] = 0x05u
             memory[0x0039] = 0x00u
@@ -24462,7 +31901,7 @@ class GeneratedFunctionTests {
      * Test case 8 from frame 5435
      * Function: drawPowerUp (0xE6D2)
      * Call depth: 8
-     * Memory reads: 11, writes: 9
+     * Memory reads: 17, writes: 9
      */
     @Test
     fun `drawPowerUp_frame5435_test8`() {
@@ -24471,7 +31910,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (11 addresses)
+            // Setup: Set input memory (17 addresses)
+            memory[0x0000] = 0x76u
+            memory[0x0001] = 0x77u
+            memory[0x0002] = 0x80u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x02u
+            memory[0x0005] = 0x18u
             memory[0x0007] = 0x01u
             memory[0x0008] = 0x05u
             memory[0x0039] = 0x00u
@@ -24499,7 +31944,7 @@ class GeneratedFunctionTests {
      * Test case 9 from frame 5467
      * Function: drawPowerUp (0xE6D2)
      * Call depth: 8
-     * Memory reads: 11, writes: 9
+     * Memory reads: 17, writes: 9
      */
     @Test
     fun `drawPowerUp_frame5467_test9`() {
@@ -24508,7 +31953,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (11 addresses)
+            // Setup: Set input memory (17 addresses)
+            memory[0x0000] = 0x76u
+            memory[0x0001] = 0x77u
+            memory[0x0002] = 0x80u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x02u
+            memory[0x0005] = 0x28u
             memory[0x0007] = 0x01u
             memory[0x0008] = 0x05u
             memory[0x0039] = 0x00u
@@ -24543,7 +31994,7 @@ class GeneratedFunctionTests {
      * Function: enemyGfxHandler (0xE87D)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 22, writes: 12
+     * Memory reads: 29, writes: 12
      */
     @Test
     fun `enemyGfxHandler_frame1181_test0`() {
@@ -24552,8 +32003,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (22 addresses)
+            // Setup: Set input memory (29 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x02u
             memory[0x0004] = 0x00u
+            memory[0x0005] = 0x2Eu
             memory[0x0008] = 0x00u
             memory[0x0009] = 0x58u
             memory[0x0016] = 0x06u
@@ -24565,6 +32021,8 @@ class GeneratedFunctionTests {
             memory[0x00ED] = 0x00u
             memory[0x00EF] = 0x06u
             memory[0x0109] = 0x00u
+            memory[0x01EF] = 0xC8u
+            memory[0x01F0] = 0xEBu
             memory[0x01F1] = 0x73u
             memory[0x01F2] = 0x4Fu
             memory[0x01F3] = 0xEAu
@@ -24595,7 +32053,7 @@ class GeneratedFunctionTests {
      * Function: enemyGfxHandler (0xE87D)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 23, writes: 12
+     * Memory reads: 29, writes: 12
      */
     @Test
     fun `enemyGfxHandler_frame2705_test1`() {
@@ -24604,9 +32062,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (23 addresses)
+            // Setup: Set input memory (29 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
             memory[0x0003] = 0x02u
             memory[0x0004] = 0x00u
+            memory[0x0005] = 0xF9u
             memory[0x0008] = 0x01u
             memory[0x0009] = 0x52u
             memory[0x0017] = 0x06u
@@ -24618,6 +32080,8 @@ class GeneratedFunctionTests {
             memory[0x00ED] = 0x00u
             memory[0x00EF] = 0x06u
             memory[0x0109] = 0x00u
+            memory[0x01EF] = 0xC8u
+            memory[0x01F0] = 0xEBu
             memory[0x01F1] = 0x73u
             memory[0x01F2] = 0x4Fu
             memory[0x01F3] = 0xEAu
@@ -24648,7 +32112,7 @@ class GeneratedFunctionTests {
      * Function: enemyGfxHandler (0xE87D)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 21, writes: 11
+     * Memory reads: 26, writes: 11
      */
     @Test
     fun `enemyGfxHandler_frame3009_test2`() {
@@ -24657,8 +32121,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (21 addresses)
+            // Setup: Set input memory (26 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x01u
             memory[0x0004] = 0x00u
+            memory[0x0005] = 0xE7u
             memory[0x0008] = 0x00u
             memory[0x0009] = 0xEAu
             memory[0x0016] = 0x06u
@@ -24699,7 +32168,7 @@ class GeneratedFunctionTests {
      * Function: enemyGfxHandler (0xE87D)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 21, writes: 11
+     * Memory reads: 26, writes: 11
      */
     @Test
     fun `enemyGfxHandler_frame5141_test3`() {
@@ -24708,8 +32177,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (21 addresses)
+            // Setup: Set input memory (26 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x02u
             memory[0x0004] = 0x00u
+            memory[0x0005] = 0x8Cu
             memory[0x0008] = 0x00u
             memory[0x0009] = 0xC8u
             memory[0x0016] = 0x06u
@@ -24750,7 +32224,7 @@ class GeneratedFunctionTests {
      * Function: enemyGfxHandler (0xE87D)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 20, writes: 11
+     * Memory reads: 25, writes: 11
      */
     @Test
     fun `enemyGfxHandler_frame6135_test4`() {
@@ -24759,8 +32233,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (20 addresses)
+            // Setup: Set input memory (25 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x02u
             memory[0x0004] = 0x00u
+            memory[0x0005] = 0xF5u
             memory[0x0008] = 0x02u
             memory[0x0018] = 0x06u
             memory[0x0020] = 0x00u
@@ -24800,7 +32279,7 @@ class GeneratedFunctionTests {
      * Function: enemyGfxHandler (0xE87D)
      * Parameters: X
      * Call depth: 12
-     * Memory reads: 21, writes: 11
+     * Memory reads: 26, writes: 11
      */
     @Test
     fun `enemyGfxHandler_frame6337_test5`() {
@@ -24809,8 +32288,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (21 addresses)
+            // Setup: Set input memory (26 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x02u
             memory[0x0004] = 0x00u
+            memory[0x0005] = 0x9Bu
             memory[0x0008] = 0x02u
             memory[0x0009] = 0x1Eu
             memory[0x0018] = 0x06u
@@ -24851,7 +32335,7 @@ class GeneratedFunctionTests {
      * Function: enemyGfxHandler (0xE87D)
      * Parameters: X
      * Call depth: 7
-     * Memory reads: 21, writes: 12
+     * Memory reads: 28, writes: 12
      */
     @Test
     fun `enemyGfxHandler_frame6570_test6`() {
@@ -24860,8 +32344,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (21 addresses)
+            // Setup: Set input memory (28 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x01u
             memory[0x0004] = 0x00u
+            memory[0x0005] = 0xF2u
             memory[0x0008] = 0x00u
             memory[0x0016] = 0x06u
             memory[0x001E] = 0x00u
@@ -24872,6 +32361,8 @@ class GeneratedFunctionTests {
             memory[0x00ED] = 0x00u
             memory[0x00EF] = 0x06u
             memory[0x0109] = 0x00u
+            memory[0x01EF] = 0xC8u
+            memory[0x01F0] = 0xEBu
             memory[0x01F1] = 0x73u
             memory[0x01F2] = 0x4Fu
             memory[0x01F3] = 0xEAu
@@ -24902,7 +32393,7 @@ class GeneratedFunctionTests {
      * Function: enemyGfxHandler (0xE87D)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 20, writes: 11
+     * Memory reads: 25, writes: 11
      */
     @Test
     fun `enemyGfxHandler_frame6873_test7`() {
@@ -24911,8 +32402,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (20 addresses)
+            // Setup: Set input memory (25 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x01u
             memory[0x0004] = 0x00u
+            memory[0x0005] = 0x45u
             memory[0x0008] = 0x01u
             memory[0x0017] = 0x06u
             memory[0x001F] = 0x00u
@@ -24952,7 +32448,7 @@ class GeneratedFunctionTests {
      * Function: enemyGfxHandler (0xE87D)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 22, writes: 11
+     * Memory reads: 26, writes: 11
      */
     @Test
     fun `enemyGfxHandler_frame9093_test8`() {
@@ -24961,9 +32457,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (22 addresses)
+            // Setup: Set input memory (26 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
             memory[0x0003] = 0x01u
             memory[0x0004] = 0x00u
+            memory[0x0005] = 0xDAu
             memory[0x0008] = 0x00u
             memory[0x0009] = 0x32u
             memory[0x0016] = 0x06u
@@ -25004,7 +32504,7 @@ class GeneratedFunctionTests {
      * Function: enemyGfxHandler (0xE87D)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 21, writes: 11
+     * Memory reads: 26, writes: 11
      */
     @Test
     fun `enemyGfxHandler_frame9467_test9`() {
@@ -25013,8 +32513,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (21 addresses)
+            // Setup: Set input memory (26 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB8u
+            memory[0x0003] = 0x02u
             memory[0x0004] = 0x00u
+            memory[0x0005] = 0x8Bu
             memory[0x0008] = 0x01u
             memory[0x0009] = 0xEDu
             memory[0x0017] = 0x06u
@@ -26346,14 +33851,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0xEEE9: playerGfxHandler
-    // 8846 calls, 620 unique inputs
+    // 8846 calls, 1836 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 33
      * Function: playerGfxHandler (0xEEE9)
      * Call depth: 5
-     * Memory reads: 10, writes: 4
+     * Memory reads: 30, writes: 4
      */
     @Test
     fun `playerGfxHandler_frame33_test0`() {
@@ -26362,16 +33867,36 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x00u
+            // Setup: Set input memory (30 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB0u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x28u
+            memory[0x0007] = 0x04u
+            memory[0x000C] = 0x00u
             memory[0x000E] = 0x07u
+            memory[0x001D] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0057] = 0x00u
+            memory[0x01F2] = 0x2Au
+            memory[0x01F3] = 0xF0u
             memory[0x01F4] = 0x36u
             memory[0x01F5] = 0xEFu
+            memory[0x021E] = 0x00u
+            memory[0x0222] = 0x00u
+            memory[0x03AD] = 0x28u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
             memory[0x03D0] = 0x00u
+            memory[0x06D5] = 0xB8u
             memory[0x06E4] = 0x04u
             memory[0x0704] = 0x00u
             memory[0x070B] = 0x00u
             memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0754] = 0x01u
             memory[0x079E] = 0x00u
 
             // Execute decompiled function
@@ -26383,28 +33908,203 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1189
+     * Test case 1 from frame 1431
      * Function: playerGfxHandler (0xEEE9)
      * Call depth: 8
-     * Memory reads: 10, writes: 4
+     * Memory reads: 26, writes: 4
      */
     @Test
-    fun `playerGfxHandler_frame1189_test1`() {
+    fun `playerGfxHandler_frame1431_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x00u
+            // Setup: Set input memory (26 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0x9Eu
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x6Cu
+            memory[0x0007] = 0x04u
             memory[0x000E] = 0x08u
+            memory[0x001D] = 0x01u
+            memory[0x0033] = 0x02u
+            memory[0x01F2] = 0x2Au
+            memory[0x01F3] = 0xF0u
             memory[0x01F4] = 0x36u
             memory[0x01F5] = 0xEFu
+            memory[0x03AD] = 0x6Cu
+            memory[0x03B8] = 0x9Eu
+            memory[0x03C4] = 0x00u
             memory[0x03D0] = 0x00u
+            memory[0x06D5] = 0x80u
             memory[0x06E4] = 0x04u
             memory[0x0704] = 0x00u
             memory[0x070B] = 0x00u
             memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x079E] = 0x00u
+
+            // Execute decompiled function
+            playerGfxHandler()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x80u, memory[0x06D5], "Memory 0x06D5 mismatch")
+        }
+    }
+
+    /**
+     * Test case 2 from frame 1923
+     * Function: playerGfxHandler (0xEEE9)
+     * Call depth: 6
+     * Memory reads: 26, writes: 4
+     */
+    @Test
+    fun `playerGfxHandler_frame1923_test2`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (26 addresses)
+            memory[0x0000] = 0x20u
+            memory[0x0001] = 0x21u
+            memory[0x0002] = 0x2Bu
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x2Au
+            memory[0x0007] = 0x04u
+            memory[0x000E] = 0x08u
+            memory[0x001D] = 0x01u
+            memory[0x0033] = 0x02u
+            memory[0x01F2] = 0x2Au
+            memory[0x01F3] = 0xF0u
+            memory[0x01F4] = 0x36u
+            memory[0x01F5] = 0xEFu
+            memory[0x03AD] = 0x2Au
+            memory[0x03B8] = 0x2Bu
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x06D5] = 0x20u
+            memory[0x06E4] = 0x04u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0754] = 0x00u
+            memory[0x079E] = 0x00u
+
+            // Execute decompiled function
+            playerGfxHandler()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x20u, memory[0x06D5], "Memory 0x06D5 mismatch")
+        }
+    }
+
+    /**
+     * Test case 3 from frame 2313
+     * Function: playerGfxHandler (0xEEE9)
+     * Call depth: 6
+     * Memory reads: 32, writes: 4
+     */
+    @Test
+    fun `playerGfxHandler_frame2313_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (32 addresses)
+            memory[0x0000] = 0x08u
+            memory[0x0001] = 0x09u
+            memory[0x0002] = 0xB0u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x70u
+            memory[0x0007] = 0x04u
+            memory[0x000C] = 0x01u
+            memory[0x000E] = 0x08u
+            memory[0x001D] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x01u
+            memory[0x0057] = 0x18u
+            memory[0x01F2] = 0x40u
+            memory[0x01F3] = 0xF0u
+            memory[0x01F4] = 0x36u
+            memory[0x01F5] = 0xEFu
+            memory[0x03AD] = 0x70u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x06D5] = 0x08u
+            memory[0x06E4] = 0x04u
+            memory[0x0700] = 0x18u
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070D] = 0x01u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0754] = 0x00u
+            memory[0x0781] = 0x03u
+            memory[0x079E] = 0x00u
+
+            // Execute decompiled function
+            playerGfxHandler()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x08u, memory[0x06D5], "Memory 0x06D5 mismatch")
+        }
+    }
+
+    /**
+     * Test case 4 from frame 5265
+     * Function: playerGfxHandler (0xEEE9)
+     * Call depth: 8
+     * Memory reads: 32, writes: 4
+     */
+    @Test
+    fun `playerGfxHandler_frame5265_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (32 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB0u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x70u
+            memory[0x0007] = 0x04u
+            memory[0x000C] = 0x01u
+            memory[0x000E] = 0x08u
+            memory[0x001D] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x01u
+            memory[0x0057] = 0x1Cu
+            memory[0x01F2] = 0x40u
+            memory[0x01F3] = 0xF0u
+            memory[0x01F4] = 0x36u
+            memory[0x01F5] = 0xEFu
+            memory[0x03AD] = 0x70u
+            memory[0x03B8] = 0xB0u
+            memory[0x03C4] = 0x00u
+            memory[0x03D0] = 0x00u
+            memory[0x06D5] = 0x68u
+            memory[0x06E4] = 0x04u
+            memory[0x0700] = 0x1Cu
+            memory[0x0704] = 0x00u
+            memory[0x070B] = 0x00u
+            memory[0x070D] = 0x01u
+            memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0781] = 0x02u
             memory[0x079E] = 0x00u
 
             // Execute decompiled function
@@ -26416,270 +34116,207 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 5619
+     * Test case 5 from frame 5791
      * Function: playerGfxHandler (0xEEE9)
      * Call depth: 6
-     * Memory reads: 10, writes: 4
+     * Memory reads: 33, writes: 4
      */
     @Test
-    fun `playerGfxHandler_frame5619_test2`() {
+    fun `playerGfxHandler_frame5791_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x00u
+            // Setup: Set input memory (33 addresses)
+            memory[0x0000] = 0x03u
+            memory[0x0001] = 0x09u
+            memory[0x0002] = 0x70u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x23u
+            memory[0x0007] = 0x04u
+            memory[0x000C] = 0x01u
             memory[0x000E] = 0x08u
+            memory[0x001D] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x01u
+            memory[0x0057] = 0x1Fu
+            memory[0x01F2] = 0x40u
+            memory[0x01F3] = 0xF0u
             memory[0x01F4] = 0x36u
             memory[0x01F5] = 0xEFu
+            memory[0x03AD] = 0x23u
+            memory[0x03B8] = 0x70u
+            memory[0x03C4] = 0x00u
             memory[0x03D0] = 0x00u
+            memory[0x06D5] = 0x08u
             memory[0x06E4] = 0x04u
+            memory[0x0700] = 0x1Fu
             memory[0x0704] = 0x00u
             memory[0x070B] = 0x00u
+            memory[0x070C] = 0x02u
+            memory[0x070D] = 0x01u
             memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0754] = 0x00u
+            memory[0x0781] = 0x00u
             memory[0x079E] = 0x00u
 
             // Execute decompiled function
             playerGfxHandler()
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x06D5], "Memory 0x06D5 mismatch")
+            assertEquals(0x08u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
 
     /**
-     * Test case 3 from frame 6105
+     * Test case 6 from frame 6175
      * Function: playerGfxHandler (0xEEE9)
-     * Call depth: 8
-     * Memory reads: 10, writes: 4
+     * Call depth: 12
+     * Memory reads: 2, writes: 0
      */
     @Test
-    fun `playerGfxHandler_frame6105_test3`() {
+    fun `playerGfxHandler_frame6175_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0009] = 0xAAu
-            memory[0x000E] = 0x0Au
-            memory[0x01F4] = 0x3Cu
-            memory[0x01F5] = 0xEFu
-            memory[0x03D0] = 0x00u
-            memory[0x06E4] = 0x04u
-            memory[0x070B] = 0x01u
-            memory[0x0711] = 0x00u
+            // Setup: Set input memory (2 addresses)
+            memory[0x0009] = 0xCDu
             memory[0x079E] = 0x08u
 
             // Execute decompiled function
             playerGfxHandler()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x28u, memory[0x06D5], "Memory 0x06D5 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
     /**
-     * Test case 4 from frame 6229
-     * Function: playerGfxHandler (0xEEE9)
-     * Call depth: 12
-     * Memory reads: 11, writes: 4
-     */
-    @Test
-    fun `playerGfxHandler_frame6229_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (11 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0009] = 0xE8u
-            memory[0x000E] = 0x08u
-            memory[0x01F4] = 0x36u
-            memory[0x01F5] = 0xEFu
-            memory[0x03D0] = 0x00u
-            memory[0x06E4] = 0x04u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x079E] = 0x06u
-
-            // Execute decompiled function
-            playerGfxHandler()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x70u, memory[0x06D5], "Memory 0x06D5 mismatch")
-        }
-    }
-
-    /**
-     * Test case 5 from frame 6353
-     * Function: playerGfxHandler (0xEEE9)
-     * Call depth: 12
-     * Memory reads: 11, writes: 4
-     */
-    @Test
-    fun `playerGfxHandler_frame6353_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (11 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0009] = 0x26u
-            memory[0x000E] = 0x08u
-            memory[0x01F4] = 0x36u
-            memory[0x01F5] = 0xEFu
-            memory[0x03D0] = 0x00u
-            memory[0x06E4] = 0x04u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x079E] = 0x03u
-
-            // Execute decompiled function
-            playerGfxHandler()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x60u, memory[0x06D5], "Memory 0x06D5 mismatch")
-        }
-    }
-
-    /**
-     * Test case 6 from frame 6485
+     * Test case 7 from frame 6543
      * Function: playerGfxHandler (0xEEE9)
      * Call depth: 10
-     * Memory reads: 10, writes: 4
+     * Memory reads: 26, writes: 4
      */
     @Test
-    fun `playerGfxHandler_frame6485_test6`() {
+    fun `playerGfxHandler_frame6543_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x00u
+            // Setup: Set input memory (26 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xADu
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x51u
+            memory[0x0007] = 0x04u
             memory[0x000E] = 0x08u
+            memory[0x001D] = 0x01u
+            memory[0x0033] = 0x02u
+            memory[0x01F2] = 0x2Au
+            memory[0x01F3] = 0xF0u
             memory[0x01F4] = 0x36u
             memory[0x01F5] = 0xEFu
+            memory[0x03AD] = 0x51u
+            memory[0x03B8] = 0xADu
+            memory[0x03C4] = 0x00u
             memory[0x03D0] = 0x00u
+            memory[0x06D5] = 0x80u
             memory[0x06E4] = 0x04u
             memory[0x0704] = 0x00u
             memory[0x070B] = 0x00u
             memory[0x0711] = 0x00u
+            memory[0x0714] = 0x00u
+            memory[0x0754] = 0x01u
             memory[0x079E] = 0x00u
 
             // Execute decompiled function
             playerGfxHandler()
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0x70u, memory[0x06D5], "Memory 0x06D5 mismatch")
+            assertEquals(0x80u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
 
     /**
-     * Test case 7 from frame 9245
+     * Test case 8 from frame 8660
      * Function: playerGfxHandler (0xEEE9)
-     * Call depth: 8
-     * Memory reads: 10, writes: 4
+     * Call depth: 5
+     * Memory reads: 27, writes: 4
      */
     @Test
-    fun `playerGfxHandler_frame9245_test7`() {
+    fun `playerGfxHandler_frame8660_test8`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0009] = 0x7Eu
-            memory[0x000E] = 0x0Au
+            // Setup: Set input memory (27 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0x6Du
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x3Fu
+            memory[0x0007] = 0x04u
+            memory[0x0009] = 0x5Au
+            memory[0x000E] = 0x09u
+            memory[0x0033] = 0x02u
+            memory[0x01F2] = 0xE6u
+            memory[0x01F3] = 0xEFu
             memory[0x01F4] = 0x3Cu
             memory[0x01F5] = 0xEFu
+            memory[0x021E] = 0x40u
+            memory[0x0222] = 0x40u
+            memory[0x03AD] = 0x3Fu
+            memory[0x03B8] = 0x6Du
+            memory[0x03C4] = 0x00u
             memory[0x03D0] = 0x00u
+            memory[0x06D5] = 0xC0u
             memory[0x06E4] = 0x04u
             memory[0x070B] = 0x01u
+            memory[0x070D] = 0x01u
             memory[0x0711] = 0x00u
-            memory[0x079E] = 0x08u
+            memory[0x0754] = 0x00u
+            memory[0x079E] = 0x00u
 
             // Execute decompiled function
             playerGfxHandler()
 
             // Verify: Check output memory (1 addresses)
-            assertEquals(0x28u, memory[0x06D5], "Memory 0x06D5 mismatch")
+            assertEquals(0xC0u, memory[0x06D5], "Memory 0x06D5 mismatch")
         }
     }
 
     /**
-     * Test case 8 from frame 9369
+     * Test case 9 from frame 9491
      * Function: playerGfxHandler (0xEEE9)
      * Call depth: 12
-     * Memory reads: 11, writes: 4
+     * Memory reads: 2, writes: 0
      */
     @Test
-    fun `playerGfxHandler_frame9369_test8`() {
+    fun `playerGfxHandler_frame9491_test9`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (11 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0009] = 0xBCu
-            memory[0x000E] = 0x08u
-            memory[0x01F4] = 0x36u
-            memory[0x01F5] = 0xEFu
-            memory[0x03D0] = 0x00u
-            memory[0x06E4] = 0x04u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x079E] = 0x06u
-
-            // Execute decompiled function
-            playerGfxHandler()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x70u, memory[0x06D5], "Memory 0x06D5 mismatch")
-        }
-    }
-
-    /**
-     * Test case 9 from frame 9493
-     * Function: playerGfxHandler (0xEEE9)
-     * Call depth: 12
-     * Memory reads: 11, writes: 4
-     */
-    @Test
-    fun `playerGfxHandler_frame9493_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (11 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0009] = 0xFAu
-            memory[0x000E] = 0x08u
-            memory[0x01F4] = 0x36u
-            memory[0x01F5] = 0xEFu
-            memory[0x03D0] = 0x00u
-            memory[0x06E4] = 0x04u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x0711] = 0x00u
+            // Setup: Set input memory (2 addresses)
+            memory[0x0009] = 0xF9u
             memory[0x079E] = 0x03u
 
             // Execute decompiled function
             playerGfxHandler()
 
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x60u, memory[0x06D5], "Memory 0x06D5 mismatch")
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -26694,7 +34331,7 @@ class GeneratedFunctionTests {
      * Function: renderPlayerSub (0xEFBE)
      * Parameters: A
      * Call depth: 6
-     * Memory reads: 9, writes: 9
+     * Memory reads: 15, writes: 9
      */
     @Test
     fun `renderPlayerSub_frame33_test0`() {
@@ -26703,7 +34340,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB0u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x28u
             memory[0x0007] = 0x04u
             memory[0x0033] = 0x01u
             memory[0x01F2] = 0xE6u
@@ -26731,7 +34374,7 @@ class GeneratedFunctionTests {
      * Function: renderPlayerSub (0xEFBE)
      * Parameters: A
      * Call depth: 9
-     * Memory reads: 9, writes: 9
+     * Memory reads: 15, writes: 9
      */
     @Test
     fun `renderPlayerSub_frame1367_test1`() {
@@ -26740,7 +34383,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0xB0u
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x6Fu
             memory[0x0007] = 0x04u
             memory[0x0033] = 0x02u
             memory[0x01F2] = 0xE6u
@@ -26768,7 +34417,7 @@ class GeneratedFunctionTests {
      * Function: renderPlayerSub (0xEFBE)
      * Parameters: A
      * Call depth: 7
-     * Memory reads: 9, writes: 9
+     * Memory reads: 15, writes: 9
      */
     @Test
     fun `renderPlayerSub_frame1857_test2`() {
@@ -26777,7 +34426,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x08u
+            memory[0x0001] = 0x09u
+            memory[0x0002] = 0x70u
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x3Fu
             memory[0x0007] = 0x04u
             memory[0x0033] = 0x02u
             memory[0x01F2] = 0xE6u
@@ -26805,7 +34460,7 @@ class GeneratedFunctionTests {
      * Function: renderPlayerSub (0xEFBE)
      * Parameters: A
      * Call depth: 7
-     * Memory reads: 9, writes: 9
+     * Memory reads: 15, writes: 9
      */
     @Test
     fun `renderPlayerSub_frame2207_test3`() {
@@ -26814,7 +34469,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x20u
+            memory[0x0001] = 0x21u
+            memory[0x0002] = 0x7Au
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x5Fu
             memory[0x0007] = 0x04u
             memory[0x0033] = 0x01u
             memory[0x01F2] = 0xE6u
@@ -26842,7 +34503,7 @@ class GeneratedFunctionTests {
      * Function: renderPlayerSub (0xEFBE)
      * Parameters: A
      * Call depth: 11
-     * Memory reads: 9, writes: 9
+     * Memory reads: 15, writes: 9
      */
     @Test
     fun `renderPlayerSub_frame2687_test4`() {
@@ -26851,7 +34512,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x08u
+            memory[0x0001] = 0x09u
+            memory[0x0002] = 0xB0u
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x67u
             memory[0x0007] = 0x04u
             memory[0x0033] = 0x02u
             memory[0x01F2] = 0xE6u
@@ -26879,7 +34546,7 @@ class GeneratedFunctionTests {
      * Function: renderPlayerSub (0xEFBE)
      * Parameters: A
      * Call depth: 7
-     * Memory reads: 9, writes: 9
+     * Memory reads: 15, writes: 9
      */
     @Test
     fun `renderPlayerSub_frame5655_test5`() {
@@ -26888,7 +34555,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0001] = 0x01u
+            memory[0x0002] = 0x70u
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x1Eu
             memory[0x0007] = 0x04u
             memory[0x0033] = 0x02u
             memory[0x01F2] = 0xE6u
@@ -26916,7 +34589,7 @@ class GeneratedFunctionTests {
      * Function: renderPlayerSub (0xEFBE)
      * Parameters: A
      * Call depth: 9
-     * Memory reads: 9, writes: 9
+     * Memory reads: 15, writes: 9
      */
     @Test
     fun `renderPlayerSub_frame5901_test6`() {
@@ -26925,7 +34598,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0x20u
+            memory[0x0001] = 0x21u
+            memory[0x0002] = 0x59u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x70u
             memory[0x0007] = 0x04u
             memory[0x0033] = 0x01u
             memory[0x01F2] = 0xE6u
@@ -26953,7 +34632,7 @@ class GeneratedFunctionTests {
      * Function: renderPlayerSub (0xEFBE)
      * Parameters: A
      * Call depth: 13
-     * Memory reads: 9, writes: 9
+     * Memory reads: 15, writes: 9
      */
     @Test
     fun `renderPlayerSub_frame6397_test7`() {
@@ -26962,7 +34641,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0x88u
+            memory[0x0003] = 0x01u
+            memory[0x0004] = 0x00u
+            memory[0x0005] = 0x6Fu
             memory[0x0007] = 0x04u
             memory[0x0033] = 0x01u
             memory[0x01F2] = 0xE6u
@@ -26990,7 +34675,7 @@ class GeneratedFunctionTests {
      * Function: renderPlayerSub (0xEFBE)
      * Parameters: A
      * Call depth: 9
-     * Memory reads: 9, writes: 9
+     * Memory reads: 15, writes: 9
      */
     @Test
     fun `renderPlayerSub_frame6763_test8`() {
@@ -26999,7 +34684,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0x50u
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x02u
+            memory[0x0005] = 0x4Du
             memory[0x0007] = 0x04u
             memory[0x0033] = 0x02u
             memory[0x01F2] = 0xE6u
@@ -27027,7 +34718,7 @@ class GeneratedFunctionTests {
      * Function: renderPlayerSub (0xEFBE)
      * Parameters: A
      * Call depth: 9
-     * Memory reads: 9, writes: 9
+     * Memory reads: 15, writes: 9
      */
     @Test
     fun `renderPlayerSub_frame9885_test9`() {
@@ -27036,7 +34727,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (15 addresses)
+            memory[0x0000] = 0xFCu
+            memory[0x0001] = 0xFCu
+            memory[0x0002] = 0x2Au
+            memory[0x0003] = 0x02u
+            memory[0x0004] = 0x03u
+            memory[0x0005] = 0x4Du
             memory[0x0007] = 0x04u
             memory[0x0033] = 0x02u
             memory[0x01F2] = 0xE6u
@@ -27061,14 +34758,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0xEFEC: processPlayerAction
-    // 7421 calls, 330 unique inputs
+    // 7421 calls, 452 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 33
      * Function: processPlayerAction (0xEFEC)
      * Call depth: 6
-     * Memory reads: 6, writes: 3
+     * Memory reads: 7, writes: 3
      */
     @Test
     fun `processPlayerAction_frame33_test0`() {
@@ -27077,13 +34774,14 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (6 addresses)
+            // Setup: Set input memory (7 addresses)
             memory[0x000C] = 0x00u
             memory[0x001D] = 0x00u
             memory[0x0057] = 0x00u
             memory[0x01F2] = 0x2Au
             memory[0x01F3] = 0xF0u
             memory[0x0714] = 0x00u
+            memory[0x0754] = 0x01u
 
             // Execute decompiled function
             processPlayerAction()
@@ -27094,31 +34792,32 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1053
+     * Test case 1 from frame 1077
      * Function: processPlayerAction (0xEFEC)
      * Call depth: 7
-     * Memory reads: 13, writes: 5
+     * Memory reads: 14, writes: 5
      */
     @Test
-    fun `processPlayerAction_frame1053_test1`() {
+    fun `processPlayerAction_frame1077_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (13 addresses)
+            // Setup: Set input memory (14 addresses)
             memory[0x0000] = 0x03u
             memory[0x000C] = 0x01u
             memory[0x001D] = 0x00u
             memory[0x0033] = 0x01u
             memory[0x0045] = 0x01u
-            memory[0x0057] = 0x14u
+            memory[0x0057] = 0x18u
             memory[0x01F2] = 0x40u
             memory[0x01F3] = 0xF0u
-            memory[0x0700] = 0x14u
+            memory[0x0700] = 0x18u
             memory[0x070C] = 0x04u
             memory[0x070D] = 0x02u
             memory[0x0714] = 0x00u
+            memory[0x0754] = 0x01u
             memory[0x0781] = 0x00u
 
             // Execute decompiled function
@@ -27131,26 +34830,68 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1371
+     * Test case 2 from frame 1521
      * Function: processPlayerAction (0xEFEC)
-     * Call depth: 9
-     * Memory reads: 8, writes: 3
+     * Call depth: 8
+     * Memory reads: 14, writes: 5
      */
     @Test
-    fun `processPlayerAction_frame1371_test2`() {
+    fun `processPlayerAction_frame1521_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (8 addresses)
-            memory[0x000C] = 0x02u
+            // Setup: Set input memory (14 addresses)
+            memory[0x0000] = 0x03u
+            memory[0x000C] = 0x00u
             memory[0x001D] = 0x00u
-            memory[0x0057] = 0xFCu
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x01u
+            memory[0x0057] = 0x1Cu
             memory[0x01F2] = 0x40u
             memory[0x01F3] = 0xF0u
-            memory[0x0700] = 0x04u
+            memory[0x0700] = 0x1Cu
+            memory[0x070C] = 0x02u
+            memory[0x070D] = 0x01u
             memory[0x0714] = 0x00u
+            memory[0x0754] = 0x01u
+            memory[0x0781] = 0x00u
+
+            // Execute decompiled function
+            processPlayerAction()
+
+            // Verify: Check output memory (2 addresses)
+            assertEquals(0x02u, memory[0x070D], "Memory 0x070D mismatch")
+            assertEquals(0x02u, memory[0x0781], "Memory 0x0781 mismatch")
+        }
+    }
+
+    /**
+     * Test case 3 from frame 1859
+     * Function: processPlayerAction (0xEFEC)
+     * Call depth: 7
+     * Memory reads: 12, writes: 3
+     */
+    @Test
+    fun `processPlayerAction_frame1859_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (12 addresses)
+            memory[0x000C] = 0x02u
+            memory[0x001D] = 0x00u
+            memory[0x0033] = 0x02u
+            memory[0x0045] = 0x02u
+            memory[0x0057] = 0xF2u
+            memory[0x01F2] = 0x40u
+            memory[0x01F3] = 0xF0u
+            memory[0x0700] = 0x0Eu
+            memory[0x070D] = 0x01u
+            memory[0x0714] = 0x00u
+            memory[0x0754] = 0x00u
             memory[0x0781] = 0x03u
 
             // Execute decompiled function
@@ -27162,157 +34903,63 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1625
-     * Function: processPlayerAction (0xEFEC)
-     * Call depth: 8
-     * Memory reads: 8, writes: 3
-     */
-    @Test
-    fun `processPlayerAction_frame1625_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (8 addresses)
-            memory[0x000C] = 0x02u
-            memory[0x001D] = 0x00u
-            memory[0x0057] = 0xFBu
-            memory[0x01F2] = 0x40u
-            memory[0x01F3] = 0xF0u
-            memory[0x0700] = 0x05u
-            memory[0x0714] = 0x00u
-            memory[0x0781] = 0x06u
-
-            // Execute decompiled function
-            processPlayerAction()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 4 from frame 2037
+     * Test case 4 from frame 2097
      * Function: processPlayerAction (0xEFEC)
      * Call depth: 9
-     * Memory reads: 11, writes: 5
-     */
-    @Test
-    fun `processPlayerAction_frame2037_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (11 addresses)
-            memory[0x0000] = 0x03u
-            memory[0x000C] = 0x01u
-            memory[0x001D] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x01F2] = 0x40u
-            memory[0x01F3] = 0xF0u
-            memory[0x0700] = 0x04u
-            memory[0x070C] = 0x07u
-            memory[0x070D] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0781] = 0x00u
-
-            // Execute decompiled function
-            processPlayerAction()
-
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x01u, memory[0x070D], "Memory 0x070D mismatch")
-            assertEquals(0x07u, memory[0x0781], "Memory 0x0781 mismatch")
-        }
-    }
-
-    /**
-     * Test case 5 from frame 2169
-     * Function: processPlayerAction (0xEFEC)
-     * Call depth: 7
-     * Memory reads: 8, writes: 3
-     */
-    @Test
-    fun `processPlayerAction_frame2169_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (8 addresses)
-            memory[0x000C] = 0x01u
-            memory[0x001D] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x01F2] = 0x40u
-            memory[0x01F3] = 0xF0u
-            memory[0x0700] = 0x05u
-            memory[0x0714] = 0x00u
-            memory[0x0781] = 0x04u
-
-            // Execute decompiled function
-            processPlayerAction()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 6 from frame 2631
-     * Function: processPlayerAction (0xEFEC)
-     * Call depth: 11
-     * Memory reads: 9, writes: 3
-     */
-    @Test
-    fun `processPlayerAction_frame2631_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (9 addresses)
-            memory[0x000C] = 0x02u
-            memory[0x001D] = 0x00u
-            memory[0x0033] = 0x02u
-            memory[0x0045] = 0x01u
-            memory[0x0057] = 0x10u
-            memory[0x01F2] = 0x2Au
-            memory[0x01F3] = 0xF0u
-            memory[0x0700] = 0x10u
-            memory[0x0714] = 0x00u
-
-            // Execute decompiled function
-            processPlayerAction()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x070D], "Memory 0x070D mismatch")
-        }
-    }
-
-    /**
-     * Test case 7 from frame 2705
-     * Function: processPlayerAction (0xEFEC)
-     * Call depth: 11
      * Memory reads: 10, writes: 3
      */
     @Test
-    fun `processPlayerAction_frame2705_test7`() {
+    fun `processPlayerAction_frame2097_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
             // Setup: Set input memory (10 addresses)
-            memory[0x000C] = 0x02u
+            memory[0x000C] = 0x01u
             memory[0x001D] = 0x00u
-            memory[0x0033] = 0x02u
-            memory[0x0045] = 0x02u
-            memory[0x0057] = 0xECu
+            memory[0x0057] = 0x02u
             memory[0x01F2] = 0x40u
             memory[0x01F3] = 0xF0u
-            memory[0x0700] = 0x14u
+            memory[0x0700] = 0x02u
+            memory[0x070D] = 0x02u
             memory[0x0714] = 0x00u
+            memory[0x0754] = 0x00u
+            memory[0x0781] = 0x05u
+
+            // Execute decompiled function
+            processPlayerAction()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 5 from frame 2251
+     * Function: processPlayerAction (0xEFEC)
+     * Call depth: 7
+     * Memory reads: 12, writes: 3
+     */
+    @Test
+    fun `processPlayerAction_frame2251_test5`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (12 addresses)
+            memory[0x000C] = 0x01u
+            memory[0x001D] = 0x00u
+            memory[0x0033] = 0x01u
+            memory[0x0045] = 0x01u
+            memory[0x0057] = 0x17u
+            memory[0x01F2] = 0x40u
+            memory[0x01F3] = 0xF0u
+            memory[0x0700] = 0x17u
+            memory[0x070D] = 0x02u
+            memory[0x0714] = 0x00u
+            memory[0x0754] = 0x00u
             memory[0x0781] = 0x02u
 
             // Execute decompiled function
@@ -27324,28 +34971,58 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 8 from frame 5643
+     * Test case 6 from frame 2571
      * Function: processPlayerAction (0xEFEC)
      * Call depth: 7
-     * Memory reads: 10, writes: 3
+     * Memory reads: 5, writes: 2
      */
     @Test
-    fun `processPlayerAction_frame5643_test8`() {
+    fun `processPlayerAction_frame2571_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
+            // Setup: Set input memory (5 addresses)
+            memory[0x001D] = 0x02u
+            memory[0x01F2] = 0x38u
+            memory[0x01F3] = 0xF0u
+            memory[0x070D] = 0x00u
+            memory[0x0754] = 0x00u
+
+            // Execute decompiled function
+            processPlayerAction()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 7 from frame 2703
+     * Function: processPlayerAction (0xEFEC)
+     * Call depth: 11
+     * Memory reads: 12, writes: 3
+     */
+    @Test
+    fun `processPlayerAction_frame2703_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (12 addresses)
             memory[0x000C] = 0x02u
             memory[0x001D] = 0x00u
             memory[0x0033] = 0x02u
             memory[0x0045] = 0x02u
-            memory[0x0057] = 0xE8u
+            memory[0x0057] = 0xEDu
             memory[0x01F2] = 0x40u
             memory[0x01F3] = 0xF0u
-            memory[0x0700] = 0x18u
+            memory[0x0700] = 0x13u
+            memory[0x070D] = 0x00u
             memory[0x0714] = 0x00u
+            memory[0x0754] = 0x00u
             memory[0x0781] = 0x03u
 
             // Execute decompiled function
@@ -27357,28 +35034,65 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 9 from frame 5947
+     * Test case 8 from frame 5637
      * Function: processPlayerAction (0xEFEC)
-     * Call depth: 9
-     * Memory reads: 10, writes: 3
+     * Call depth: 7
+     * Memory reads: 12, writes: 3
      */
     @Test
-    fun `processPlayerAction_frame5947_test9`() {
+    fun `processPlayerAction_frame5637_test8`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (10 addresses)
+            // Setup: Set input memory (12 addresses)
+            memory[0x000C] = 0x02u
+            memory[0x001D] = 0x00u
+            memory[0x0033] = 0x02u
+            memory[0x0045] = 0x02u
+            memory[0x0057] = 0xE8u
+            memory[0x01F2] = 0x40u
+            memory[0x01F3] = 0xF0u
+            memory[0x0700] = 0x18u
+            memory[0x070D] = 0x01u
+            memory[0x0714] = 0x00u
+            memory[0x0754] = 0x00u
+            memory[0x0781] = 0x02u
+
+            // Execute decompiled function
+            processPlayerAction()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 9 from frame 5789
+     * Function: processPlayerAction (0xEFEC)
+     * Call depth: 7
+     * Memory reads: 12, writes: 3
+     */
+    @Test
+    fun `processPlayerAction_frame5789_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (12 addresses)
             memory[0x000C] = 0x01u
             memory[0x001D] = 0x00u
             memory[0x0033] = 0x01u
             memory[0x0045] = 0x01u
-            memory[0x0057] = 0x28u
+            memory[0x0057] = 0x1Eu
             memory[0x01F2] = 0x40u
             memory[0x01F3] = 0xF0u
-            memory[0x0700] = 0x28u
+            memory[0x0700] = 0x1Eu
+            memory[0x070D] = 0x01u
             memory[0x0714] = 0x00u
+            memory[0x0754] = 0x00u
             memory[0x0781] = 0x01u
 
             // Execute decompiled function
@@ -28449,14 +36163,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0xF12A: relativePlayerPosition
-    // 17255 calls, 13 unique inputs
+    // 17255 calls, 2632 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 32
      * Function: relativePlayerPosition (0xF12A)
      * Call depth: 5
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
     fun `relativePlayerPosition_frame32_test0`() {
@@ -28465,10 +36179,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
+            memory[0x0086] = 0x28u
+            memory[0x00CE] = 0xB0u
             memory[0x01F4] = 0x44u
             memory[0x01F5] = 0xF1u
+            memory[0x071C] = 0x00u
 
             // Execute decompiled function
             relativePlayerPosition()
@@ -28479,22 +36196,54 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 36
+     * Test case 1 from frame 1275
      * Function: relativePlayerPosition (0xF12A)
-     * Call depth: 7
-     * Memory reads: 3, writes: 2
+     * Call depth: 8
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativePlayerPosition_frame36_test1`() {
+    fun `relativePlayerPosition_frame1275_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
+            memory[0x0086] = 0xE2u
+            memory[0x00CE] = 0xB0u
+            memory[0x01F4] = 0x44u
+            memory[0x01F5] = 0xF1u
+            memory[0x071C] = 0x72u
+
+            // Execute decompiled function
+            relativePlayerPosition()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 2 from frame 1556
+     * Function: relativePlayerPosition (0xF12A)
+     * Call depth: 7
+     * Memory reads: 6, writes: 2
+     */
+    @Test
+    fun `relativePlayerPosition_frame1556_test2`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x0008] = 0x05u
+            memory[0x0086] = 0x8Au
+            memory[0x00CE] = 0xB0u
             memory[0x01F2] = 0x44u
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x1Au
 
             // Execute decompiled function
             relativePlayerPosition()
@@ -28505,22 +36254,54 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1146
+     * Test case 3 from frame 1976
      * Function: relativePlayerPosition (0xF12A)
      * Call depth: 7
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativePlayerPosition_frame1146_test2`() {
+    fun `relativePlayerPosition_frame1976_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
+            memory[0x0008] = 0x05u
+            memory[0x0086] = 0x82u
+            memory[0x00CE] = 0x72u
+            memory[0x01F2] = 0x44u
+            memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x44u
+
+            // Execute decompiled function
+            relativePlayerPosition()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 4 from frame 2390
+     * Function: relativePlayerPosition (0xF12A)
+     * Call depth: 7
+     * Memory reads: 6, writes: 2
+     */
+    @Test
+    fun `relativePlayerPosition_frame2390_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x00u
+            memory[0x0086] = 0x38u
+            memory[0x00CE] = 0xB0u
             memory[0x01F2] = 0x44u
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0xC8u
 
             // Execute decompiled function
             relativePlayerPosition()
@@ -28531,74 +36312,25 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 5696
+     * Test case 5 from frame 2719
      * Function: relativePlayerPosition (0xF12A)
-     * Call depth: 7
-     * Memory reads: 3, writes: 2
+     * Call depth: 10
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativePlayerPosition_frame5696_test3`() {
+    fun `relativePlayerPosition_frame2719_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
-            memory[0x01F2] = 0x44u
-            memory[0x01F3] = 0xF1u
-
-            // Execute decompiled function
-            relativePlayerPosition()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 4 from frame 6710
-     * Function: relativePlayerPosition (0xF12A)
-     * Call depth: 7
-     * Memory reads: 3, writes: 2
-     */
-    @Test
-    fun `relativePlayerPosition_frame6710_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (3 addresses)
-            memory[0x0008] = 0x05u
-            memory[0x01F2] = 0x44u
-            memory[0x01F3] = 0xF1u
-
-            // Execute decompiled function
-            relativePlayerPosition()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 5 from frame 6711
-     * Function: relativePlayerPosition (0xF12A)
-     * Call depth: 8
-     * Memory reads: 3, writes: 2
-     */
-    @Test
-    fun `relativePlayerPosition_frame6711_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (3 addresses)
-            memory[0x0008] = 0x05u
+            memory[0x0086] = 0x8Du
+            memory[0x00CE] = 0xA4u
             memory[0x01F4] = 0x44u
             memory[0x01F5] = 0xF1u
+            memory[0x071C] = 0x3Au
 
             // Execute decompiled function
             relativePlayerPosition()
@@ -28609,22 +36341,25 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 6 from frame 6714
+     * Test case 6 from frame 5664
      * Function: relativePlayerPosition (0xF12A)
      * Call depth: 7
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativePlayerPosition_frame6714_test6`() {
+    fun `relativePlayerPosition_frame5664_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
+            memory[0x0086] = 0x5Au
+            memory[0x00CE] = 0x5Du
             memory[0x01F2] = 0x44u
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x43u
 
             // Execute decompiled function
             relativePlayerPosition()
@@ -28635,22 +36370,25 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 6718
+     * Test case 7 from frame 5994
      * Function: relativePlayerPosition (0xF12A)
      * Call depth: 7
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativePlayerPosition_frame6718_test7`() {
+    fun `relativePlayerPosition_frame5994_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
+            memory[0x0086] = 0x62u
+            memory[0x00CE] = 0x6Eu
             memory[0x01F2] = 0x44u
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0xF2u
 
             // Execute decompiled function
             relativePlayerPosition()
@@ -28661,48 +36399,54 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 8 from frame 6719
-     * Function: relativePlayerPosition (0xF12A)
-     * Call depth: 8
-     * Memory reads: 3, writes: 2
-     */
-    @Test
-    fun `relativePlayerPosition_frame6719_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (3 addresses)
-            memory[0x0008] = 0x05u
-            memory[0x01F4] = 0x44u
-            memory[0x01F5] = 0xF1u
-
-            // Execute decompiled function
-            relativePlayerPosition()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 9 from frame 6722
+     * Test case 8 from frame 6340
      * Function: relativePlayerPosition (0xF12A)
      * Call depth: 7
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativePlayerPosition_frame6722_test9`() {
+    fun `relativePlayerPosition_frame6340_test8`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
+            memory[0x0086] = 0xE5u
+            memory[0x00CE] = 0x70u
             memory[0x01F2] = 0x44u
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x82u
+
+            // Execute decompiled function
+            relativePlayerPosition()
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 9 from frame 6702
+     * Function: relativePlayerPosition (0xF12A)
+     * Call depth: 7
+     * Memory reads: 6, writes: 2
+     */
+    @Test
+    fun `relativePlayerPosition_frame6702_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (6 addresses)
+            memory[0x0008] = 0x05u
+            memory[0x0086] = 0x0Bu
+            memory[0x00CE] = 0xD1u
+            memory[0x01F2] = 0x44u
+            memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0xBEu
 
             // Execute decompiled function
             relativePlayerPosition()
@@ -28715,7 +36459,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xF148: relativeMiscPosition
     // Parameters: X
-    // 770 calls, 57 unique inputs
+    // 770 calls, 176 unique inputs
     // =========================================
 
     /**
@@ -28723,7 +36467,7 @@ class GeneratedFunctionTests {
      * Function: relativeMiscPosition (0xF148)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
     fun `relativeMiscPosition_frame1317_test0`() {
@@ -28732,10 +36476,13 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
+            memory[0x009B] = 0x05u
+            memory[0x00E3] = 0x7Au
             memory[0x01F2] = 0x4Cu
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x92u
 
             // Execute decompiled function
             relativeMiscPosition(0x08)
@@ -28746,23 +36493,26 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1347
+     * Test case 1 from frame 1351
      * Function: relativeMiscPosition (0xF148)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativeMiscPosition_frame1347_test1`() {
+    fun `relativeMiscPosition_frame1351_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
+            memory[0x009B] = 0x05u
+            memory[0x00E3] = 0x54u
             memory[0x01F2] = 0x4Cu
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0xA9u
 
             // Execute decompiled function
             relativeMiscPosition(0x08)
@@ -28773,23 +36523,26 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1379
+     * Test case 2 from frame 1387
      * Function: relativeMiscPosition (0xF148)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativeMiscPosition_frame1379_test2`() {
+    fun `relativeMiscPosition_frame1387_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
+            memory[0x009B] = 0x05u
+            memory[0x00E3] = 0x78u
             memory[0x01F2] = 0x4Cu
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0xADu
 
             // Execute decompiled function
             relativeMiscPosition(0x08)
@@ -28800,23 +36553,26 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1391
+     * Test case 3 from frame 1421
      * Function: relativeMiscPosition (0xF148)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativeMiscPosition_frame1391_test3`() {
+    fun `relativeMiscPosition_frame1421_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
+            memory[0x009B] = 0x0Bu
+            memory[0x00E3] = 0x70u
             memory[0x01F2] = 0x4Cu
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0xB3u
 
             // Execute decompiled function
             relativeMiscPosition(0x08)
@@ -28827,23 +36583,26 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 4 from frame 1401
+     * Test case 4 from frame 1457
      * Function: relativeMiscPosition (0xF148)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativeMiscPosition_frame1401_test4`() {
+    fun `relativeMiscPosition_frame1457_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
+            memory[0x009B] = 0x1Fu
+            memory[0x00E3] = 0x67u
             memory[0x01F2] = 0x4Cu
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0xC7u
 
             // Execute decompiled function
             relativeMiscPosition(0x08)
@@ -28854,23 +36613,26 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 5 from frame 1413
+     * Test case 5 from frame 5215
      * Function: relativeMiscPosition (0xF148)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativeMiscPosition_frame1413_test5`() {
+    fun `relativeMiscPosition_frame5215_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
+            memory[0x009B] = 0x0Du
+            memory[0x00E3] = 0x6Eu
             memory[0x01F2] = 0x4Cu
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0xB5u
 
             // Execute decompiled function
             relativeMiscPosition(0x08)
@@ -28881,23 +36643,26 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 6 from frame 1425
+     * Test case 6 from frame 5677
      * Function: relativeMiscPosition (0xF148)
      * Parameters: X
-     * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Call depth: 7
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativeMiscPosition_frame1425_test6`() {
+    fun `relativeMiscPosition_frame5677_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
+            memory[0x009B] = 0x65u
+            memory[0x00E3] = 0x25u
             memory[0x01F2] = 0x4Cu
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x43u
 
             // Execute decompiled function
             relativeMiscPosition(0x08)
@@ -28908,23 +36673,26 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 1435
+     * Test case 7 from frame 5715
      * Function: relativeMiscPosition (0xF148)
      * Parameters: X
-     * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Call depth: 7
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativeMiscPosition_frame1435_test7`() {
+    fun `relativeMiscPosition_frame5715_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
+            memory[0x009B] = 0x65u
+            memory[0x00E3] = 0x1Fu
             memory[0x01F2] = 0x4Cu
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x43u
 
             // Execute decompiled function
             relativeMiscPosition(0x08)
@@ -28935,23 +36703,26 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 8 from frame 1447
+     * Test case 8 from frame 5749
      * Function: relativeMiscPosition (0xF148)
      * Parameters: X
-     * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Call depth: 7
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativeMiscPosition_frame1447_test8`() {
+    fun `relativeMiscPosition_frame5749_test8`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
+            memory[0x009B] = 0x65u
+            memory[0x00E3] = 0x35u
             memory[0x01F2] = 0x4Cu
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x43u
 
             // Execute decompiled function
             relativeMiscPosition(0x08)
@@ -28962,23 +36733,26 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 9 from frame 1459
+     * Test case 9 from frame 5785
      * Function: relativeMiscPosition (0xF148)
      * Parameters: X
-     * Call depth: 9
-     * Memory reads: 3, writes: 2
+     * Call depth: 7
+     * Memory reads: 6, writes: 2
      */
     @Test
-    fun `relativeMiscPosition_frame1459_test9`() {
+    fun `relativeMiscPosition_frame5785_test9`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (3 addresses)
+            // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
+            memory[0x009B] = 0x65u
+            memory[0x00E3] = 0x2Cu
             memory[0x01F2] = 0x4Cu
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x43u
 
             // Execute decompiled function
             relativeMiscPosition(0x08)
@@ -28991,7 +36765,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xF152: relativeEnemyPosition
     // Parameters: X
-    // 6897 calls, 33 unique inputs
+    // 6897 calls, 1176 unique inputs
     // =========================================
 
     /**
@@ -28999,7 +36773,7 @@ class GeneratedFunctionTests {
      * Function: relativeEnemyPosition (0xF152)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 4, writes: 3
+     * Memory reads: 7, writes: 3
      */
     @Test
     fun `relativeEnemyPosition_frame1181_test0`() {
@@ -29008,11 +36782,14 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
+            memory[0x0087] = 0x60u
+            memory[0x00CF] = 0xB8u
             memory[0x01F2] = 0x6Du
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x32u
 
             // Execute decompiled function
             relativeEnemyPosition(0x00)
@@ -29023,24 +36800,27 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1251
+     * Test case 1 from frame 1437
      * Function: relativeEnemyPosition (0xF152)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 4, writes: 3
+     * Memory reads: 7, writes: 3
      */
     @Test
-    fun `relativeEnemyPosition_frame1251_test1`() {
+    fun `relativeEnemyPosition_frame1437_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
+            memory[0x0087] = 0x23u
+            memory[0x00CF] = 0xB8u
             memory[0x01F2] = 0x6Du
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0xBBu
 
             // Execute decompiled function
             relativeEnemyPosition(0x00)
@@ -29051,24 +36831,27 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1533
+     * Test case 2 from frame 1709
      * Function: relativeEnemyPosition (0xF152)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 4, writes: 3
+     * Memory reads: 7, writes: 3
      */
     @Test
-    fun `relativeEnemyPosition_frame1533_test2`() {
+    fun `relativeEnemyPosition_frame1709_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x05u
             memory[0x0008] = 0x05u
+            memory[0x008C] = 0x7Cu
+            memory[0x00D4] = 0x78u
             memory[0x01F2] = 0x6Du
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x44u
 
             // Execute decompiled function
             relativeEnemyPosition(0x05)
@@ -29079,136 +36862,27 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1557
-     * Function: relativeEnemyPosition (0xF152)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 4, writes: 3
-     */
-    @Test
-    fun `relativeEnemyPosition_frame1557_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
-            memory[0x01F2] = 0x6Du
-            memory[0x01F3] = 0xF1u
-
-            // Execute decompiled function
-            relativeEnemyPosition(0x05)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 4 from frame 1589
-     * Function: relativeEnemyPosition (0xF152)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 4, writes: 3
-     */
-    @Test
-    fun `relativeEnemyPosition_frame1589_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
-            memory[0x01F2] = 0x6Du
-            memory[0x01F3] = 0xF1u
-
-            // Execute decompiled function
-            relativeEnemyPosition(0x05)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 5 from frame 1613
-     * Function: relativeEnemyPosition (0xF152)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 4, writes: 3
-     */
-    @Test
-    fun `relativeEnemyPosition_frame1613_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
-            memory[0x01F2] = 0x6Du
-            memory[0x01F3] = 0xF1u
-
-            // Execute decompiled function
-            relativeEnemyPosition(0x05)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 6 from frame 1631
-     * Function: relativeEnemyPosition (0xF152)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 4, writes: 3
-     */
-    @Test
-    fun `relativeEnemyPosition_frame1631_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
-            memory[0x01F2] = 0x6Du
-            memory[0x01F3] = 0xF1u
-
-            // Execute decompiled function
-            relativeEnemyPosition(0x05)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 7 from frame 2743
+     * Test case 3 from frame 2763
      * Function: relativeEnemyPosition (0xF152)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 4, writes: 3
+     * Memory reads: 7, writes: 3
      */
     @Test
-    fun `relativeEnemyPosition_frame2743_test7`() {
+    fun `relativeEnemyPosition_frame2763_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
+            memory[0x0088] = 0x24u
+            memory[0x00D0] = 0xB8u
             memory[0x01F2] = 0x6Du
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x3Au
 
             // Execute decompiled function
             relativeEnemyPosition(0x01)
@@ -29219,24 +36893,89 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 8 from frame 6115
+     * Test case 4 from frame 3217
      * Function: relativeEnemyPosition (0xF152)
      * Parameters: X
-     * Call depth: 9
-     * Memory reads: 4, writes: 3
+     * Call depth: 10
+     * Memory reads: 7, writes: 3
      */
     @Test
-    fun `relativeEnemyPosition_frame6115_test8`() {
+    fun `relativeEnemyPosition_frame3217_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x02u
-            memory[0x0008] = 0x02u
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0008] = 0x01u
+            memory[0x0088] = 0x6Eu
+            memory[0x00D0] = 0xB8u
             memory[0x01F2] = 0x6Du
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x3Au
+
+            // Execute decompiled function
+            relativeEnemyPosition(0x01)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 5 from frame 5897
+     * Function: relativeEnemyPosition (0xF152)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 7, writes: 3
+     */
+    @Test
+    fun `relativeEnemyPosition_frame5897_test5`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0008] = 0x00u
+            memory[0x0087] = 0x8Au
+            memory[0x00CF] = 0xB8u
+            memory[0x01F2] = 0x6Du
+            memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x78u
+
+            // Execute decompiled function
+            relativeEnemyPosition(0x00)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 6 from frame 6105
+     * Function: relativeEnemyPosition (0xF152)
+     * Parameters: X
+     * Call depth: 9
+     * Memory reads: 7, writes: 3
+     */
+    @Test
+    fun `relativeEnemyPosition_frame6105_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x02u
+            memory[0x0008] = 0x02u
+            memory[0x0089] = 0x46u
+            memory[0x00D1] = 0xB8u
+            memory[0x01F2] = 0x6Du
+            memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x42u
 
             // Execute decompiled function
             relativeEnemyPosition(0x02)
@@ -29247,27 +36986,92 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 9 from frame 6173
+     * Test case 7 from frame 6199
      * Function: relativeEnemyPosition (0xF152)
      * Parameters: X
-     * Call depth: 12
-     * Memory reads: 4, writes: 3
+     * Call depth: 8
+     * Memory reads: 7, writes: 3
      */
     @Test
-    fun `relativeEnemyPosition_frame6173_test9`() {
+    fun `relativeEnemyPosition_frame6199_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x02u
-            memory[0x0008] = 0x02u
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0008] = 0x00u
+            memory[0x0087] = 0xA8u
+            memory[0x00CF] = 0xB8u
             memory[0x01F2] = 0x6Du
             memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x6Au
+
+            // Execute decompiled function
+            relativeEnemyPosition(0x00)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 8 from frame 6323
+     * Function: relativeEnemyPosition (0xF152)
+     * Parameters: X
+     * Call depth: 12
+     * Memory reads: 7, writes: 3
+     */
+    @Test
+    fun `relativeEnemyPosition_frame6323_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x02u
+            memory[0x0008] = 0x02u
+            memory[0x0089] = 0x1Eu
+            memory[0x00D1] = 0xB8u
+            memory[0x01F2] = 0x6Du
+            memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0x79u
 
             // Execute decompiled function
             relativeEnemyPosition(0x02)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 9 from frame 6403
+     * Function: relativeEnemyPosition (0xF152)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 7, writes: 3
+     */
+    @Test
+    fun `relativeEnemyPosition_frame6403_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0008] = 0x00u
+            memory[0x0087] = 0x8Au
+            memory[0x00CF] = 0xB8u
+            memory[0x01F2] = 0x6Du
+            memory[0x01F3] = 0xF1u
+            memory[0x071C] = 0xA2u
+
+            // Execute decompiled function
+            relativeEnemyPosition(0x00)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -29277,7 +37081,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xF159: relativeBlockPosition
     // Parameters: X
-    // 224 calls, 6 unique inputs
+    // 224 calls, 53 unique inputs
     // =========================================
 
     /**
@@ -29285,7 +37089,7 @@ class GeneratedFunctionTests {
      * Function: relativeBlockPosition (0xF159)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 4, writes: 3
+     * Memory reads: 11, writes: 3
      */
     @Test
     fun `relativeBlockPosition_frame1317_test0`() {
@@ -29294,11 +37098,18 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x02u
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
+            memory[0x008F] = 0x00u
+            memory[0x0091] = 0x00u
+            memory[0x00D7] = 0x8Eu
+            memory[0x00D9] = 0x00u
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0x5Fu
             memory[0x01F2] = 0xF1u
+            memory[0x071C] = 0x92u
 
             // Execute decompiled function
             relativeBlockPosition(0x00)
@@ -29309,24 +37120,31 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1329
+     * Test case 1 from frame 1327
      * Function: relativeBlockPosition (0xF159)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 4, writes: 3
+     * Memory reads: 11, writes: 3
      */
     @Test
-    fun `relativeBlockPosition_frame1329_test1`() {
+    fun `relativeBlockPosition_frame1327_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x02u
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
+            memory[0x008F] = 0x00u
+            memory[0x0091] = 0x00u
+            memory[0x00D7] = 0x88u
+            memory[0x00D9] = 0x00u
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0x5Fu
             memory[0x01F2] = 0xF1u
+            memory[0x071C] = 0x99u
 
             // Execute decompiled function
             relativeBlockPosition(0x00)
@@ -29337,24 +37155,31 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1331
+     * Test case 2 from frame 1337
      * Function: relativeBlockPosition (0xF159)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 4, writes: 3
+     * Memory reads: 11, writes: 3
      */
     @Test
-    fun `relativeBlockPosition_frame1331_test2`() {
+    fun `relativeBlockPosition_frame1337_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x02u
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
+            memory[0x008F] = 0x00u
+            memory[0x0091] = 0x00u
+            memory[0x00D7] = 0x8Bu
+            memory[0x00D9] = 0x00u
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0x5Fu
             memory[0x01F2] = 0xF1u
+            memory[0x071C] = 0xA0u
 
             // Execute decompiled function
             relativeBlockPosition(0x00)
@@ -29365,24 +37190,31 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1491
+     * Test case 3 from frame 1493
      * Function: relativeBlockPosition (0xF159)
      * Parameters: X
-     * Call depth: 11
-     * Memory reads: 4, writes: 3
+     * Call depth: 10
+     * Memory reads: 11, writes: 3
      */
     @Test
-    fun `relativeBlockPosition_frame1491_test3`() {
+    fun `relativeBlockPosition_frame1493_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x03u
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x0092] = 0x00u
+            memory[0x00D8] = 0x8Cu
+            memory[0x00DA] = 0x00u
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0x5Fu
             memory[0x01F2] = 0xF1u
+            memory[0x071C] = 0xE6u
 
             // Execute decompiled function
             relativeBlockPosition(0x01)
@@ -29393,24 +37225,31 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 4 from frame 1503
+     * Test case 4 from frame 1505
      * Function: relativeBlockPosition (0xF159)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 4, writes: 3
+     * Memory reads: 11, writes: 3
      */
     @Test
-    fun `relativeBlockPosition_frame1503_test4`() {
+    fun `relativeBlockPosition_frame1505_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x03u
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x0092] = 0x00u
+            memory[0x00D8] = 0x88u
+            memory[0x00DA] = 0x00u
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0x5Fu
             memory[0x01F2] = 0xF1u
+            memory[0x071C] = 0xF1u
 
             // Execute decompiled function
             relativeBlockPosition(0x01)
@@ -29421,27 +37260,174 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 5 from frame 1505
+     * Test case 5 from frame 1515
      * Function: relativeBlockPosition (0xF159)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 4, writes: 3
+     * Memory reads: 11, writes: 3
      */
     @Test
-    fun `relativeBlockPosition_frame1505_test5`() {
+    fun `relativeBlockPosition_frame1515_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x03u
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x0092] = 0x00u
+            memory[0x00D8] = 0x8Eu
+            memory[0x00DA] = 0x00u
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0x5Fu
             memory[0x01F2] = 0xF1u
+            memory[0x071C] = 0xFAu
 
             // Execute decompiled function
             relativeBlockPosition(0x01)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 6 from frame 5287
+     * Function: relativeBlockPosition (0xF159)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 11, writes: 3
+     */
+    @Test
+    fun `relativeBlockPosition_frame5287_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0008] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x0092] = 0x00u
+            memory[0x00D8] = 0x89u
+            memory[0x00DA] = 0x00u
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0x5Fu
+            memory[0x01F2] = 0xF1u
+            memory[0x071C] = 0xE9u
+
+            // Execute decompiled function
+            relativeBlockPosition(0x01)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 7 from frame 5301
+     * Function: relativeBlockPosition (0xF159)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 11, writes: 3
+     */
+    @Test
+    fun `relativeBlockPosition_frame5301_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0008] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x0092] = 0x00u
+            memory[0x00D8] = 0x8Bu
+            memory[0x00DA] = 0x00u
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0x5Fu
+            memory[0x01F2] = 0xF1u
+            memory[0x071C] = 0xF5u
+
+            // Execute decompiled function
+            relativeBlockPosition(0x01)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 8 from frame 5669
+     * Function: relativeBlockPosition (0xF159)
+     * Parameters: X
+     * Call depth: 7
+     * Memory reads: 11, writes: 3
+     */
+    @Test
+    fun `relativeBlockPosition_frame5669_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0008] = 0x00u
+            memory[0x008F] = 0x60u
+            memory[0x0091] = 0x00u
+            memory[0x00D7] = 0x4Cu
+            memory[0x00D9] = 0x00u
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0x5Fu
+            memory[0x01F2] = 0xF1u
+            memory[0x071C] = 0x43u
+
+            // Execute decompiled function
+            relativeBlockPosition(0x00)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 9 from frame 5681
+     * Function: relativeBlockPosition (0xF159)
+     * Parameters: X
+     * Call depth: 7
+     * Memory reads: 11, writes: 3
+     */
+    @Test
+    fun `relativeBlockPosition_frame5681_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (11 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0008] = 0x00u
+            memory[0x008F] = 0x60u
+            memory[0x0091] = 0x00u
+            memory[0x00D7] = 0x49u
+            memory[0x00D9] = 0x00u
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0x5Fu
+            memory[0x01F2] = 0xF1u
+            memory[0x071C] = 0x43u
+
+            // Execute decompiled function
+            relativeBlockPosition(0x00)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -29451,7 +37437,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xF165: variableObjOfsRelPos
     // Parameters: A, X, Y
-    // 224 calls, 4 unique inputs
+    // 224 calls, 52 unique inputs
     // =========================================
 
     /**
@@ -29459,7 +37445,7 @@ class GeneratedFunctionTests {
      * Function: variableObjOfsRelPos (0xF165)
      * Parameters: A, X, Y
      * Call depth: 11
-     * Memory reads: 4, writes: 3
+     * Memory reads: 7, writes: 3
      */
     @Test
     fun `variableObjOfsRelPos_frame1317_test0`() {
@@ -29468,11 +37454,14 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
+            memory[0x008F] = 0x00u
+            memory[0x00D7] = 0x8Eu
             memory[0x01EF] = 0x6Du
             memory[0x01F0] = 0xF1u
+            memory[0x071C] = 0x92u
 
             // Execute decompiled function
             variableObjOfsRelPos(0x09, 0x00, 0x04)
@@ -29483,24 +37472,27 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1329
+     * Test case 1 from frame 1327
      * Function: variableObjOfsRelPos (0xF165)
      * Parameters: A, X, Y
      * Call depth: 10
-     * Memory reads: 4, writes: 3
+     * Memory reads: 7, writes: 3
      */
     @Test
-    fun `variableObjOfsRelPos_frame1329_test1`() {
+    fun `variableObjOfsRelPos_frame1327_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
+            memory[0x008F] = 0x00u
+            memory[0x00D7] = 0x88u
             memory[0x01EF] = 0x6Du
             memory[0x01F0] = 0xF1u
+            memory[0x071C] = 0x99u
 
             // Execute decompiled function
             variableObjOfsRelPos(0x09, 0x00, 0x04)
@@ -29511,24 +37503,58 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1491
+     * Test case 2 from frame 1337
      * Function: variableObjOfsRelPos (0xF165)
      * Parameters: A, X, Y
-     * Call depth: 12
-     * Memory reads: 4, writes: 3
+     * Call depth: 10
+     * Memory reads: 7, writes: 3
      */
     @Test
-    fun `variableObjOfsRelPos_frame1491_test2`() {
+    fun `variableObjOfsRelPos_frame1337_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
-            memory[0x0000] = 0x01u
-            memory[0x0008] = 0x01u
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0008] = 0x00u
+            memory[0x008F] = 0x00u
+            memory[0x00D7] = 0x8Bu
             memory[0x01EF] = 0x6Du
             memory[0x01F0] = 0xF1u
+            memory[0x071C] = 0xA0u
+
+            // Execute decompiled function
+            variableObjOfsRelPos(0x09, 0x00, 0x04)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 3 from frame 1493
+     * Function: variableObjOfsRelPos (0xF165)
+     * Parameters: A, X, Y
+     * Call depth: 11
+     * Memory reads: 7, writes: 3
+     */
+    @Test
+    fun `variableObjOfsRelPos_frame1493_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0008] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x00D8] = 0x8Cu
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
+            memory[0x071C] = 0xE6u
 
             // Execute decompiled function
             variableObjOfsRelPos(0x09, 0x01, 0x04)
@@ -29539,27 +37565,185 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1503
+     * Test case 4 from frame 1503
      * Function: variableObjOfsRelPos (0xF165)
      * Parameters: A, X, Y
      * Call depth: 9
-     * Memory reads: 4, writes: 3
+     * Memory reads: 7, writes: 3
      */
     @Test
-    fun `variableObjOfsRelPos_frame1503_test3`() {
+    fun `variableObjOfsRelPos_frame1503_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (4 addresses)
+            // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x00D8] = 0x88u
             memory[0x01EF] = 0x6Du
             memory[0x01F0] = 0xF1u
+            memory[0x071C] = 0xEFu
 
             // Execute decompiled function
             variableObjOfsRelPos(0x09, 0x01, 0x04)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 5 from frame 1515
+     * Function: variableObjOfsRelPos (0xF165)
+     * Parameters: A, X, Y
+     * Call depth: 9
+     * Memory reads: 7, writes: 3
+     */
+    @Test
+    fun `variableObjOfsRelPos_frame1515_test5`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0008] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x00D8] = 0x8Eu
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
+            memory[0x071C] = 0xFAu
+
+            // Execute decompiled function
+            variableObjOfsRelPos(0x09, 0x01, 0x04)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 6 from frame 5287
+     * Function: variableObjOfsRelPos (0xF165)
+     * Parameters: A, X, Y
+     * Call depth: 9
+     * Memory reads: 7, writes: 3
+     */
+    @Test
+    fun `variableObjOfsRelPos_frame5287_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0008] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x00D8] = 0x89u
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
+            memory[0x071C] = 0xE9u
+
+            // Execute decompiled function
+            variableObjOfsRelPos(0x09, 0x01, 0x04)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 7 from frame 5299
+     * Function: variableObjOfsRelPos (0xF165)
+     * Parameters: A, X, Y
+     * Call depth: 9
+     * Memory reads: 7, writes: 3
+     */
+    @Test
+    fun `variableObjOfsRelPos_frame5299_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0008] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x00D8] = 0x8Au
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
+            memory[0x071C] = 0xF3u
+
+            // Execute decompiled function
+            variableObjOfsRelPos(0x09, 0x01, 0x04)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 8 from frame 5667
+     * Function: variableObjOfsRelPos (0xF165)
+     * Parameters: A, X, Y
+     * Call depth: 9
+     * Memory reads: 7, writes: 3
+     */
+    @Test
+    fun `variableObjOfsRelPos_frame5667_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0008] = 0x00u
+            memory[0x008F] = 0x60u
+            memory[0x00D7] = 0x4Eu
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
+            memory[0x071C] = 0x43u
+
+            // Execute decompiled function
+            variableObjOfsRelPos(0x09, 0x00, 0x04)
+
+            // Verify: Check output memory (0 addresses)
+            // No memory outputs to verify (or only stack writes)
+        }
+    }
+
+    /**
+     * Test case 9 from frame 5679
+     * Function: variableObjOfsRelPos (0xF165)
+     * Parameters: A, X, Y
+     * Call depth: 8
+     * Memory reads: 7, writes: 3
+     */
+    @Test
+    fun `variableObjOfsRelPos_frame5679_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (7 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0008] = 0x00u
+            memory[0x008F] = 0x60u
+            memory[0x00D7] = 0x49u
+            memory[0x01EF] = 0x6Du
+            memory[0x01F0] = 0xF1u
+            memory[0x071C] = 0x43u
+
+            // Execute decompiled function
+            variableObjOfsRelPos(0x09, 0x00, 0x04)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -29854,14 +38038,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0xF180: getPlayerOffscreenBits
-    // 17255 calls, 19 unique inputs
+    // 17255 calls, 2685 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 32
      * Function: getPlayerOffscreenBits (0xF180)
      * Call depth: 5
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
     fun `getPlayerOffscreenBits_frame32_test0`() {
@@ -29870,12 +38054,27 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xD7u
             memory[0x0008] = 0x05u
+            memory[0x006D] = 0x00u
+            memory[0x0086] = 0x28u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
+            memory[0x01F1] = 0xD9u
+            memory[0x01F2] = 0xF1u
             memory[0x01F3] = 0xC4u
             memory[0x01F4] = 0xF1u
             memory[0x01F5] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
 
             // Execute decompiled function
             getPlayerOffscreenBits()
@@ -29886,24 +38085,39 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 36
+     * Test case 1 from frame 1280
      * Function: getPlayerOffscreenBits (0xF180)
      * Call depth: 7
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getPlayerOffscreenBits_frame36_test1`() {
+    fun `getPlayerOffscreenBits_frame1280_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
             memory[0x0008] = 0x05u
+            memory[0x006D] = 0x00u
+            memory[0x0086] = 0xE7u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0xF1u
             memory[0x01F3] = 0x00u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0x77u
+            memory[0x071D] = 0x76u
 
             // Execute decompiled function
             getPlayerOffscreenBits()
@@ -29914,108 +38128,39 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1147
-     * Function: getPlayerOffscreenBits (0xF180)
-     * Call depth: 6
-     * Memory reads: 5, writes: 5
-     */
-    @Test
-    fun `getPlayerOffscreenBits_frame1147_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0008] = 0x05u
-            memory[0x01F3] = 0xC4u
-            memory[0x01F4] = 0xF1u
-            memory[0x01F5] = 0x00u
-
-            // Execute decompiled function
-            getPlayerOffscreenBits()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x03D0], "Memory 0x03D0 mismatch")
-        }
-    }
-
-    /**
-     * Test case 3 from frame 1449
-     * Function: getPlayerOffscreenBits (0xF180)
-     * Call depth: 8
-     * Memory reads: 5, writes: 5
-     */
-    @Test
-    fun `getPlayerOffscreenBits_frame1449_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0008] = 0x05u
-            memory[0x01F3] = 0xC4u
-            memory[0x01F4] = 0xF1u
-            memory[0x01F5] = 0x00u
-
-            // Execute decompiled function
-            getPlayerOffscreenBits()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x03D0], "Memory 0x03D0 mismatch")
-        }
-    }
-
-    /**
-     * Test case 4 from frame 1491
-     * Function: getPlayerOffscreenBits (0xF180)
-     * Call depth: 10
-     * Memory reads: 5, writes: 5
-     */
-    @Test
-    fun `getPlayerOffscreenBits_frame1491_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0008] = 0x05u
-            memory[0x01F3] = 0xC4u
-            memory[0x01F4] = 0xF1u
-            memory[0x01F5] = 0x00u
-
-            // Execute decompiled function
-            getPlayerOffscreenBits()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x03D0], "Memory 0x03D0 mismatch")
-        }
-    }
-
-    /**
-     * Test case 5 from frame 1717
+     * Test case 2 from frame 1567
      * Function: getPlayerOffscreenBits (0xF180)
      * Call depth: 7
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getPlayerOffscreenBits_frame1717_test5`() {
+    fun `getPlayerOffscreenBits_frame1567_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
             memory[0x0008] = 0x05u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x91u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
+            memory[0x01F1] = 0xD9u
+            memory[0x01F2] = 0xF1u
             memory[0x01F3] = 0xC4u
             memory[0x01F4] = 0xF1u
             memory[0x01F5] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x21u
+            memory[0x071D] = 0x20u
 
             // Execute decompiled function
             getPlayerOffscreenBits()
@@ -30026,52 +38171,39 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 6 from frame 1720
-     * Function: getPlayerOffscreenBits (0xF180)
-     * Call depth: 5
-     * Memory reads: 5, writes: 5
-     */
-    @Test
-    fun `getPlayerOffscreenBits_frame1720_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0008] = 0x05u
-            memory[0x01F3] = 0xC4u
-            memory[0x01F4] = 0xF1u
-            memory[0x01F5] = 0x00u
-
-            // Execute decompiled function
-            getPlayerOffscreenBits()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x03D0], "Memory 0x03D0 mismatch")
-        }
-    }
-
-    /**
-     * Test case 7 from frame 2227
+     * Test case 3 from frame 1985
      * Function: getPlayerOffscreenBits (0xF180)
      * Call depth: 6
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getPlayerOffscreenBits_frame2227_test7`() {
+    fun `getPlayerOffscreenBits_frame1985_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xBAu
             memory[0x0008] = 0x05u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x89u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x70u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
+            memory[0x01F1] = 0xD9u
+            memory[0x01F2] = 0xF1u
             memory[0x01F3] = 0xC4u
             memory[0x01F4] = 0xF1u
             memory[0x01F5] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x44u
+            memory[0x071D] = 0x43u
 
             // Execute decompiled function
             getPlayerOffscreenBits()
@@ -30082,65 +38214,267 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 8 from frame 5239
+     * Test case 4 from frame 2389
+     * Function: getPlayerOffscreenBits (0xF180)
+     * Call depth: 6
+     * Memory reads: 20, writes: 5
+     */
+    @Test
+    fun `getPlayerOffscreenBits_frame2389_test4`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
+            memory[0x0008] = 0x05u
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0x37u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
+            memory[0x01F1] = 0xD9u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0xC4u
+            memory[0x01F4] = 0xF1u
+            memory[0x01F5] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0xC7u
+            memory[0x071D] = 0xC6u
+
+            // Execute decompiled function
+            getPlayerOffscreenBits()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x03D0], "Memory 0x03D0 mismatch")
+        }
+    }
+
+    /**
+     * Test case 5 from frame 2713
+     * Function: getPlayerOffscreenBits (0xF180)
+     * Call depth: 10
+     * Memory reads: 20, writes: 5
+     */
+    @Test
+    fun `getPlayerOffscreenBits_frame2713_test5`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA8u
+            memory[0x0008] = 0x05u
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0x91u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xB0u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
+            memory[0x01F1] = 0xD9u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0xC4u
+            memory[0x01F4] = 0xF1u
+            memory[0x01F5] = 0x00u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x3Au
+            memory[0x071D] = 0x39u
+
+            // Execute decompiled function
+            getPlayerOffscreenBits()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x03D0], "Memory 0x03D0 mismatch")
+        }
+    }
+
+    /**
+     * Test case 6 from frame 5660
+     * Function: getPlayerOffscreenBits (0xF180)
+     * Call depth: 7
+     * Memory reads: 20, writes: 5
+     */
+    @Test
+    fun `getPlayerOffscreenBits_frame5660_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xE5u
+            memory[0x0008] = 0x05u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x5Du
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x64u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
+
+            // Execute decompiled function
+            getPlayerOffscreenBits()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x03D0], "Memory 0x03D0 mismatch")
+        }
+    }
+
+    /**
+     * Test case 7 from frame 5994
+     * Function: getPlayerOffscreenBits (0xF180)
+     * Call depth: 7
+     * Memory reads: 20, writes: 5
+     */
+    @Test
+    fun `getPlayerOffscreenBits_frame5994_test7`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
+            memory[0x0008] = 0x05u
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0x62u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x6Eu
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0x00u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0xF2u
+            memory[0x071D] = 0xF1u
+
+            // Execute decompiled function
+            getPlayerOffscreenBits()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x03D0], "Memory 0x03D0 mismatch")
+        }
+    }
+
+    /**
+     * Test case 8 from frame 6338
+     * Function: getPlayerOffscreenBits (0xF180)
+     * Call depth: 7
+     * Memory reads: 20, writes: 5
+     */
+    @Test
+    fun `getPlayerOffscreenBits_frame6338_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x9Du
+            memory[0x0008] = 0x00u
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0xE3u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x70u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0x00u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x81u
+            memory[0x071D] = 0x80u
+
+            // Execute decompiled function
+            getPlayerOffscreenBits()
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x03D0], "Memory 0x03D0 mismatch")
+        }
+    }
+
+    /**
+     * Test case 9 from frame 6699
      * Function: getPlayerOffscreenBits (0xF180)
      * Call depth: 8
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getPlayerOffscreenBits_frame5239_test8`() {
+    fun `getPlayerOffscreenBits_frame6699_test9`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xB2u
             memory[0x0008] = 0x05u
+            memory[0x006D] = 0x03u
+            memory[0x0086] = 0x0Bu
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0xC9u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
+            memory[0x01F1] = 0xD9u
+            memory[0x01F2] = 0xF1u
             memory[0x01F3] = 0xC4u
             memory[0x01F4] = 0xF1u
             memory[0x01F5] = 0x00u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0xBEu
+            memory[0x071D] = 0xBDu
 
             // Execute decompiled function
             getPlayerOffscreenBits()
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D0], "Memory 0x03D0 mismatch")
-        }
-    }
-
-    /**
-     * Test case 9 from frame 5697
-     * Function: getPlayerOffscreenBits (0xF180)
-     * Call depth: 6
-     * Memory reads: 5, writes: 5
-     */
-    @Test
-    fun `getPlayerOffscreenBits_frame5697_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x08u
-            memory[0x0008] = 0x05u
-            memory[0x01F3] = 0xC4u
-            memory[0x01F4] = 0xF1u
-            memory[0x01F5] = 0x00u
-
-            // Execute decompiled function
-            getPlayerOffscreenBits()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x08u, memory[0x03D0], "Memory 0x03D0 mismatch")
         }
     }
 
     // =========================================
     // 0xF19B: getMiscOffscreenBits
     // Parameters: X
-    // 770 calls, 23 unique inputs
+    // 770 calls, 117 unique inputs
     // =========================================
 
     /**
@@ -30148,7 +38482,7 @@ class GeneratedFunctionTests {
      * Function: getMiscOffscreenBits (0xF19B)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
     fun `getMiscOffscreenBits_frame1317_test0`() {
@@ -30157,12 +38491,27 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Cu
             memory[0x0008] = 0x08u
+            memory[0x0082] = 0x01u
+            memory[0x009B] = 0x05u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x7Au
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0x9Fu
             memory[0x01F3] = 0xF1u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0x92u
+            memory[0x071D] = 0x91u
 
             // Execute decompiled function
             getMiscOffscreenBits(0x08)
@@ -30173,25 +38522,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1321
+     * Test case 1 from frame 1339
      * Function: getMiscOffscreenBits (0xF19B)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getMiscOffscreenBits_frame1321_test1`() {
+    fun `getMiscOffscreenBits_frame1339_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x9Cu
             memory[0x0008] = 0x08u
+            memory[0x0082] = 0x01u
+            memory[0x009B] = 0x05u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x57u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0x9Fu
             memory[0x01F3] = 0xF1u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xA2u
+            memory[0x071D] = 0xA1u
 
             // Execute decompiled function
             getMiscOffscreenBits(0x08)
@@ -30202,25 +38566,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1325
+     * Test case 2 from frame 1363
      * Function: getMiscOffscreenBits (0xF19B)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getMiscOffscreenBits_frame1325_test2`() {
+    fun `getMiscOffscreenBits_frame1363_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA7u
             memory[0x0008] = 0x08u
+            memory[0x0082] = 0x01u
+            memory[0x009B] = 0x05u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x5Du
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0x9Fu
             memory[0x01F3] = 0xF1u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xADu
+            memory[0x071D] = 0xACu
 
             // Execute decompiled function
             getMiscOffscreenBits(0x08)
@@ -30231,25 +38610,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1329
+     * Test case 3 from frame 1395
      * Function: getMiscOffscreenBits (0xF19B)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getMiscOffscreenBits_frame1329_test3`() {
+    fun `getMiscOffscreenBits_frame1395_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA7u
             memory[0x0008] = 0x08u
+            memory[0x0082] = 0x01u
+            memory[0x009B] = 0x05u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x76u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0x9Fu
             memory[0x01F3] = 0xF1u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xADu
+            memory[0x071D] = 0xACu
 
             // Execute decompiled function
             getMiscOffscreenBits(0x08)
@@ -30260,25 +38654,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 4 from frame 1335
+     * Test case 4 from frame 1423
      * Function: getMiscOffscreenBits (0xF19B)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getMiscOffscreenBits_frame1335_test4`() {
+    fun `getMiscOffscreenBits_frame1423_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA7u
             memory[0x0008] = 0x08u
+            memory[0x0082] = 0x01u
+            memory[0x009B] = 0x0Cu
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x6Fu
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0x9Fu
             memory[0x01F3] = 0xF1u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xB4u
+            memory[0x071D] = 0xB3u
 
             // Execute decompiled function
             getMiscOffscreenBits(0x08)
@@ -30289,25 +38698,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 5 from frame 1339
+     * Test case 5 from frame 1447
      * Function: getMiscOffscreenBits (0xF19B)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getMiscOffscreenBits_frame1339_test5`() {
+    fun `getMiscOffscreenBits_frame1447_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA7u
             memory[0x0008] = 0x08u
+            memory[0x0082] = 0x01u
+            memory[0x009B] = 0x18u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x69u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0x9Fu
             memory[0x01F3] = 0xF1u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xC0u
+            memory[0x071D] = 0xBFu
 
             // Execute decompiled function
             getMiscOffscreenBits(0x08)
@@ -30318,25 +38742,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 6 from frame 1343
+     * Test case 6 from frame 5207
      * Function: getMiscOffscreenBits (0xF19B)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getMiscOffscreenBits_frame1343_test6`() {
+    fun `getMiscOffscreenBits_frame5207_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA7u
             memory[0x0008] = 0x08u
+            memory[0x0082] = 0x01u
+            memory[0x009B] = 0x09u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x70u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0x9Fu
             memory[0x01F3] = 0xF1u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xB1u
+            memory[0x071D] = 0xB0u
 
             // Execute decompiled function
             getMiscOffscreenBits(0x08)
@@ -30347,25 +38786,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 1349
+     * Test case 7 from frame 5251
      * Function: getMiscOffscreenBits (0xF19B)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getMiscOffscreenBits_frame1349_test7`() {
+    fun `getMiscOffscreenBits_frame5251_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA7u
             memory[0x0008] = 0x08u
+            memory[0x0082] = 0x01u
+            memory[0x009B] = 0x22u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x65u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0x9Fu
             memory[0x01F3] = 0xF1u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xCAu
+            memory[0x071D] = 0xC9u
 
             // Execute decompiled function
             getMiscOffscreenBits(0x08)
@@ -30376,25 +38830,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 8 from frame 1353
+     * Test case 8 from frame 5685
      * Function: getMiscOffscreenBits (0xF19B)
      * Parameters: X
-     * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Call depth: 7
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getMiscOffscreenBits_frame1353_test8`() {
+    fun `getMiscOffscreenBits_frame5685_test8`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xDDu
             memory[0x0008] = 0x08u
+            memory[0x0082] = 0x01u
+            memory[0x009B] = 0x65u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x1Bu
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0x9Fu
             memory[0x01F3] = 0xF1u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
 
             // Execute decompiled function
             getMiscOffscreenBits(0x08)
@@ -30405,25 +38874,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 9 from frame 1359
+     * Test case 9 from frame 5759
      * Function: getMiscOffscreenBits (0xF19B)
      * Parameters: X
-     * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Call depth: 7
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getMiscOffscreenBits_frame1359_test9`() {
+    fun `getMiscOffscreenBits_frame5759_test9`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xDDu
             memory[0x0008] = 0x08u
+            memory[0x0082] = 0x01u
+            memory[0x009B] = 0x65u
+            memory[0x00CA] = 0x01u
+            memory[0x00E3] = 0x32u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0x9Fu
             memory[0x01F3] = 0xF1u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
 
             // Execute decompiled function
             getMiscOffscreenBits(0x08)
@@ -30692,7 +39176,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xF1AF: getEnemyOffscreenBits
     // Parameters: X
-    // 6897 calls, 69 unique inputs
+    // 6897 calls, 1178 unique inputs
     // =========================================
 
     /**
@@ -30700,7 +39184,7 @@ class GeneratedFunctionTests {
      * Function: getEnemyOffscreenBits (0xF1AF)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 5, writes: 5
+     * Memory reads: 16, writes: 5
      */
     @Test
     fun `getEnemyOffscreenBits_frame1181_test0`() {
@@ -30709,12 +39193,23 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x01u
+            memory[0x0006] = 0x20u
+            memory[0x0007] = 0x47u
             memory[0x0008] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x0087] = 0x60u
+            memory[0x00B6] = 0x01u
+            memory[0x00CF] = 0xB8u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0xF1u
             memory[0x01F3] = 0x01u
+            memory[0x071B] = 0x01u
+            memory[0x071D] = 0x31u
 
             // Execute decompiled function
             getEnemyOffscreenBits(0x00)
@@ -30725,25 +39220,84 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1535
+     * Test case 1 from frame 1437
      * Function: getEnemyOffscreenBits (0xF1AF)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getEnemyOffscreenBits_frame1535_test1`() {
+    fun `getEnemyOffscreenBits_frame1437_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x01u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x97u
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x01u
+            memory[0x0087] = 0x23u
+            memory[0x00B6] = 0x01u
+            memory[0x00CF] = 0xB8u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0xF1u
             memory[0x01F3] = 0x01u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xBBu
+            memory[0x071D] = 0xBAu
+
+            // Execute decompiled function
+            getEnemyOffscreenBits(0x00)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x03D1], "Memory 0x03D1 mismatch")
+        }
+    }
+
+    /**
+     * Test case 2 from frame 1709
+     * Function: getEnemyOffscreenBits (0xF1AF)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 20, writes: 5
+     */
+    @Test
+    fun `getEnemyOffscreenBits_frame1709_test2`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x05u
+            memory[0x0004] = 0x06u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xC7u
+            memory[0x0008] = 0x05u
+            memory[0x0073] = 0x01u
+            memory[0x008C] = 0x7Cu
+            memory[0x00BB] = 0x01u
+            memory[0x00D4] = 0x78u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0x01u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x44u
+            memory[0x071D] = 0x43u
 
             // Execute decompiled function
             getEnemyOffscreenBits(0x05)
@@ -30754,28 +39308,41 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1549
+     * Test case 3 from frame 2765
      * Function: getEnemyOffscreenBits (0xF1AF)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 5, writes: 5
+     * Memory reads: 18, writes: 5
      */
     @Test
-    fun `getEnemyOffscreenBits_frame1549_test2`() {
+    fun `getEnemyOffscreenBits_frame2765_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
+            // Setup: Set input memory (18 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x01u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x2Du
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x03u
+            memory[0x0087] = 0x0Cu
+            memory[0x00B6] = 0x01u
+            memory[0x00CF] = 0xB8u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0xF1u
             memory[0x01F3] = 0x01u
+            memory[0x071B] = 0x03u
+            memory[0x071D] = 0x39u
 
             // Execute decompiled function
-            getEnemyOffscreenBits(0x05)
+            getEnemyOffscreenBits(0x00)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D1], "Memory 0x03D1 mismatch")
@@ -30783,28 +39350,123 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1563
+     * Test case 4 from frame 3219
      * Function: getEnemyOffscreenBits (0xF1AF)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 5, writes: 5
+     * Memory reads: 16, writes: 5
      */
     @Test
-    fun `getEnemyOffscreenBits_frame1563_test3`() {
+    fun `getEnemyOffscreenBits_frame3219_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
+            // Setup: Set input memory (16 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x01u
+            memory[0x0006] = 0x20u
+            memory[0x0007] = 0x47u
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x03u
+            memory[0x0087] = 0x56u
+            memory[0x00B6] = 0x01u
+            memory[0x00CF] = 0xB8u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0xF1u
             memory[0x01F3] = 0x01u
+            memory[0x071B] = 0x03u
+            memory[0x071D] = 0x39u
 
             // Execute decompiled function
-            getEnemyOffscreenBits(0x05)
+            getEnemyOffscreenBits(0x00)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x0Fu, memory[0x03D1], "Memory 0x03D1 mismatch")
+        }
+    }
+
+    /**
+     * Test case 5 from frame 5899
+     * Function: getEnemyOffscreenBits (0xF1AF)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 16, writes: 5
+     */
+    @Test
+    fun `getEnemyOffscreenBits_frame5899_test5`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (16 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x01u
+            memory[0x0006] = 0x20u
+            memory[0x0007] = 0x47u
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x02u
+            memory[0x0087] = 0x8Au
+            memory[0x00B6] = 0x01u
+            memory[0x00CF] = 0xB8u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071D] = 0x79u
+
+            // Execute decompiled function
+            getEnemyOffscreenBits(0x00)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x0Fu, memory[0x03D1], "Memory 0x03D1 mismatch")
+        }
+    }
+
+    /**
+     * Test case 6 from frame 6107
+     * Function: getEnemyOffscreenBits (0xF1AF)
+     * Parameters: X
+     * Call depth: 7
+     * Memory reads: 20, writes: 5
+     */
+    @Test
+    fun `getEnemyOffscreenBits_frame6107_test6`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x01u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x91u
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x02u
+            memory[0x0087] = 0xB1u
+            memory[0x00B6] = 0x01u
+            memory[0x00CF] = 0xB8u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x01F1] = 0xC4u
+            memory[0x01F2] = 0xF1u
+            memory[0x01F3] = 0x01u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
+
+            // Execute decompiled function
+            getEnemyOffscreenBits(0x00)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D1], "Memory 0x03D1 mismatch")
@@ -30812,28 +39474,43 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 4 from frame 1577
+     * Test case 7 from frame 6199
      * Function: getEnemyOffscreenBits (0xF1AF)
      * Parameters: X
-     * Call depth: 8
-     * Memory reads: 5, writes: 5
+     * Call depth: 10
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getEnemyOffscreenBits_frame1577_test4`() {
+    fun `getEnemyOffscreenBits_frame6199_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0004] = 0x02u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x43u
+            memory[0x0008] = 0x01u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x26u
+            memory[0x00B7] = 0x01u
+            memory[0x00D0] = 0xB8u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0xF1u
             memory[0x01F3] = 0x01u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x6Au
+            memory[0x071D] = 0x69u
 
             // Execute decompiled function
-            getEnemyOffscreenBits(0x05)
+            getEnemyOffscreenBits(0x01)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D1], "Memory 0x03D1 mismatch")
@@ -30841,28 +39518,43 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 5 from frame 1591
+     * Test case 8 from frame 6325
      * Function: getEnemyOffscreenBits (0xF1AF)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getEnemyOffscreenBits_frame1591_test5`() {
+    fun `getEnemyOffscreenBits_frame6325_test8`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x01u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xF1u
+            memory[0x0008] = 0x00u
+            memory[0x006E] = 0x02u
+            memory[0x0087] = 0x88u
+            memory[0x00B6] = 0x01u
+            memory[0x00CF] = 0xB8u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0xF1u
             memory[0x01F3] = 0x01u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x7Au
+            memory[0x071D] = 0x79u
 
             // Execute decompiled function
-            getEnemyOffscreenBits(0x05)
+            getEnemyOffscreenBits(0x00)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D1], "Memory 0x03D1 mismatch")
@@ -30870,115 +39562,43 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 6 from frame 1605
+     * Test case 9 from frame 6403
      * Function: getEnemyOffscreenBits (0xF1AF)
      * Parameters: X
-     * Call depth: 8
-     * Memory reads: 5, writes: 5
+     * Call depth: 10
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getEnemyOffscreenBits_frame1605_test6`() {
+    fun `getEnemyOffscreenBits_frame6403_test9`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0004] = 0x02u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA0u
+            memory[0x0008] = 0x01u
+            memory[0x006F] = 0x03u
+            memory[0x0088] = 0x01u
+            memory[0x00B7] = 0x01u
+            memory[0x00D0] = 0xB8u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
             memory[0x01F1] = 0xC4u
             memory[0x01F2] = 0xF1u
             memory[0x01F3] = 0x01u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0xA2u
+            memory[0x071D] = 0xA1u
 
             // Execute decompiled function
-            getEnemyOffscreenBits(0x05)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x03D1], "Memory 0x03D1 mismatch")
-        }
-    }
-
-    /**
-     * Test case 7 from frame 1635
-     * Function: getEnemyOffscreenBits (0xF1AF)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 5, writes: 5
-     */
-    @Test
-    fun `getEnemyOffscreenBits_frame1635_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
-            memory[0x01F1] = 0xC4u
-            memory[0x01F2] = 0xF1u
-            memory[0x01F3] = 0x01u
-
-            // Execute decompiled function
-            getEnemyOffscreenBits(0x05)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x03D1], "Memory 0x03D1 mismatch")
-        }
-    }
-
-    /**
-     * Test case 8 from frame 1677
-     * Function: getEnemyOffscreenBits (0xF1AF)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 5, writes: 5
-     */
-    @Test
-    fun `getEnemyOffscreenBits_frame1677_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
-            memory[0x01F1] = 0xC4u
-            memory[0x01F2] = 0xF1u
-            memory[0x01F3] = 0x01u
-
-            // Execute decompiled function
-            getEnemyOffscreenBits(0x05)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x03D1], "Memory 0x03D1 mismatch")
-        }
-    }
-
-    /**
-     * Test case 9 from frame 1717
-     * Function: getEnemyOffscreenBits (0xF1AF)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 5, writes: 5
-     */
-    @Test
-    fun `getEnemyOffscreenBits_frame1717_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x05u
-            memory[0x0008] = 0x05u
-            memory[0x01F1] = 0xC4u
-            memory[0x01F2] = 0xF1u
-            memory[0x01F3] = 0x01u
-
-            // Execute decompiled function
-            getEnemyOffscreenBits(0x05)
+            getEnemyOffscreenBits(0x01)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D1], "Memory 0x03D1 mismatch")
@@ -30988,7 +39608,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xF1B6: getBlockOffscreenBits
     // Parameters: X
-    // 224 calls, 35 unique inputs
+    // 224 calls, 48 unique inputs
     // =========================================
 
     /**
@@ -30996,7 +39616,7 @@ class GeneratedFunctionTests {
      * Function: getBlockOffscreenBits (0xF1B6)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
     fun `getBlockOffscreenBits_frame1317_test0`() {
@@ -31005,12 +39625,27 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x09u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x91u
             memory[0x0008] = 0x00u
+            memory[0x0076] = 0x01u
+            memory[0x008F] = 0x00u
+            memory[0x00BE] = 0x01u
+            memory[0x00D7] = 0x8Eu
+            memory[0x01EC] = 0x1Du
+            memory[0x01ED] = 0xF2u
+            memory[0x01EE] = 0xD9u
+            memory[0x01EF] = 0xF1u
             memory[0x01F0] = 0xC4u
             memory[0x01F1] = 0xF1u
             memory[0x01F2] = 0x04u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0x92u
+            memory[0x071D] = 0x91u
 
             // Execute decompiled function
             getBlockOffscreenBits(0x00)
@@ -31021,25 +39656,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1323
+     * Test case 1 from frame 1325
      * Function: getBlockOffscreenBits (0xF1B6)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getBlockOffscreenBits_frame1323_test1`() {
+    fun `getBlockOffscreenBits_frame1325_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x09u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x97u
             memory[0x0008] = 0x00u
+            memory[0x0076] = 0x01u
+            memory[0x008F] = 0x00u
+            memory[0x00BE] = 0x01u
+            memory[0x00D7] = 0x89u
+            memory[0x01EC] = 0x1Du
+            memory[0x01ED] = 0xF2u
+            memory[0x01EE] = 0xD9u
+            memory[0x01EF] = 0xF1u
             memory[0x01F0] = 0xC4u
             memory[0x01F1] = 0xF1u
             memory[0x01F2] = 0x04u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0x98u
+            memory[0x071D] = 0x97u
 
             // Execute decompiled function
             getBlockOffscreenBits(0x00)
@@ -31050,25 +39700,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 2 from frame 1331
+     * Test case 2 from frame 1335
      * Function: getBlockOffscreenBits (0xF1B6)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getBlockOffscreenBits_frame1331_test2`() {
+    fun `getBlockOffscreenBits_frame1335_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
+            memory[0x0004] = 0x09u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x9Eu
             memory[0x0008] = 0x00u
+            memory[0x0076] = 0x01u
+            memory[0x008F] = 0x00u
+            memory[0x00BE] = 0x01u
+            memory[0x00D7] = 0x8Au
+            memory[0x01EC] = 0x1Du
+            memory[0x01ED] = 0xF2u
+            memory[0x01EE] = 0xD9u
+            memory[0x01EF] = 0xF1u
             memory[0x01F0] = 0xC4u
             memory[0x01F1] = 0xF1u
             memory[0x01F2] = 0x04u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0x9Fu
+            memory[0x071D] = 0x9Eu
 
             // Execute decompiled function
             getBlockOffscreenBits(0x00)
@@ -31079,54 +39744,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 3 from frame 1337
-     * Function: getBlockOffscreenBits (0xF1B6)
-     * Parameters: X
-     * Call depth: 9
-     * Memory reads: 5, writes: 5
-     */
-    @Test
-    fun `getBlockOffscreenBits_frame1337_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0008] = 0x00u
-            memory[0x01F0] = 0xC4u
-            memory[0x01F1] = 0xF1u
-            memory[0x01F2] = 0x04u
-
-            // Execute decompiled function
-            getBlockOffscreenBits(0x00)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x03D4], "Memory 0x03D4 mismatch")
-        }
-    }
-
-    /**
-     * Test case 4 from frame 1491
+     * Test case 3 from frame 1491
      * Function: getBlockOffscreenBits (0xF1B6)
      * Parameters: X
      * Call depth: 11
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getBlockOffscreenBits_frame1491_test4`() {
+    fun `getBlockOffscreenBits_frame1491_test3`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
+            memory[0x0004] = 0x0Au
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x93u
             memory[0x0008] = 0x01u
+            memory[0x0077] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x00BF] = 0x01u
+            memory[0x00D8] = 0x8Eu
+            memory[0x01EC] = 0x1Du
+            memory[0x01ED] = 0xF2u
+            memory[0x01EE] = 0xD9u
+            memory[0x01EF] = 0xF1u
             memory[0x01F0] = 0xC4u
             memory[0x01F1] = 0xF1u
             memory[0x01F2] = 0x04u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xE4u
+            memory[0x071D] = 0xE3u
 
             // Execute decompiled function
             getBlockOffscreenBits(0x01)
@@ -31137,25 +39788,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 5 from frame 1497
+     * Test case 4 from frame 1501
      * Function: getBlockOffscreenBits (0xF1B6)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getBlockOffscreenBits_frame1497_test5`() {
+    fun `getBlockOffscreenBits_frame1501_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
+            memory[0x0004] = 0x0Au
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x9Cu
             memory[0x0008] = 0x01u
+            memory[0x0077] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x00BF] = 0x01u
+            memory[0x00D8] = 0x88u
+            memory[0x01EC] = 0x1Du
+            memory[0x01ED] = 0xF2u
+            memory[0x01EE] = 0xD9u
+            memory[0x01EF] = 0xF1u
             memory[0x01F0] = 0xC4u
             memory[0x01F1] = 0xF1u
             memory[0x01F2] = 0x04u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xEDu
+            memory[0x071D] = 0xECu
 
             // Execute decompiled function
             getBlockOffscreenBits(0x01)
@@ -31166,25 +39832,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 6 from frame 1505
+     * Test case 5 from frame 1511
      * Function: getBlockOffscreenBits (0xF1B6)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getBlockOffscreenBits_frame1505_test6`() {
+    fun `getBlockOffscreenBits_frame1511_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
+            memory[0x0004] = 0x0Au
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA6u
             memory[0x0008] = 0x01u
+            memory[0x0077] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x00BF] = 0x01u
+            memory[0x00D8] = 0x8Bu
+            memory[0x01EC] = 0x1Du
+            memory[0x01ED] = 0xF2u
+            memory[0x01EE] = 0xD9u
+            memory[0x01EF] = 0xF1u
             memory[0x01F0] = 0xC4u
             memory[0x01F1] = 0xF1u
             memory[0x01F2] = 0x04u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xF7u
+            memory[0x071D] = 0xF6u
 
             // Execute decompiled function
             getBlockOffscreenBits(0x01)
@@ -31195,54 +39876,40 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 7 from frame 1511
-     * Function: getBlockOffscreenBits (0xF1B6)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 5, writes: 5
-     */
-    @Test
-    fun `getBlockOffscreenBits_frame1511_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0000] = 0x01u
-            memory[0x0008] = 0x01u
-            memory[0x01F0] = 0xC4u
-            memory[0x01F1] = 0xF1u
-            memory[0x01F2] = 0x04u
-
-            // Execute decompiled function
-            getBlockOffscreenBits(0x01)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x03D4], "Memory 0x03D4 mismatch")
-        }
-    }
-
-    /**
-     * Test case 8 from frame 5281
+     * Test case 6 from frame 5281
      * Function: getBlockOffscreenBits (0xF1B6)
      * Parameters: X
      * Call depth: 11
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getBlockOffscreenBits_frame5281_test8`() {
+    fun `getBlockOffscreenBits_frame5281_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
+            memory[0x0004] = 0x0Au
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x92u
             memory[0x0008] = 0x01u
+            memory[0x0077] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x00BF] = 0x01u
+            memory[0x00D8] = 0x8Eu
+            memory[0x01EC] = 0x1Du
+            memory[0x01ED] = 0xF2u
+            memory[0x01EE] = 0xD9u
+            memory[0x01EF] = 0xF1u
             memory[0x01F0] = 0xC4u
             memory[0x01F1] = 0xF1u
             memory[0x01F2] = 0x04u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xE3u
+            memory[0x071D] = 0xE2u
 
             // Execute decompiled function
             getBlockOffscreenBits(0x01)
@@ -31253,28 +39920,131 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 9 from frame 5287
+     * Test case 7 from frame 5293
      * Function: getBlockOffscreenBits (0xF1B6)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 5, writes: 5
+     * Memory reads: 20, writes: 5
      */
     @Test
-    fun `getBlockOffscreenBits_frame5287_test9`() {
+    fun `getBlockOffscreenBits_frame5293_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
+            memory[0x0004] = 0x0Au
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x9Du
             memory[0x0008] = 0x01u
+            memory[0x0077] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x00BF] = 0x01u
+            memory[0x00D8] = 0x88u
+            memory[0x01EC] = 0x1Du
+            memory[0x01ED] = 0xF2u
+            memory[0x01EE] = 0xD9u
+            memory[0x01EF] = 0xF1u
             memory[0x01F0] = 0xC4u
             memory[0x01F1] = 0xF1u
             memory[0x01F2] = 0x04u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xEEu
+            memory[0x071D] = 0xEDu
 
             // Execute decompiled function
             getBlockOffscreenBits(0x01)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x03D4], "Memory 0x03D4 mismatch")
+        }
+    }
+
+    /**
+     * Test case 8 from frame 5303
+     * Function: getBlockOffscreenBits (0xF1B6)
+     * Parameters: X
+     * Call depth: 8
+     * Memory reads: 20, writes: 5
+     */
+    @Test
+    fun `getBlockOffscreenBits_frame5303_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x01u
+            memory[0x0004] = 0x0Au
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA6u
+            memory[0x0008] = 0x01u
+            memory[0x0077] = 0x01u
+            memory[0x0090] = 0x50u
+            memory[0x00BF] = 0x01u
+            memory[0x00D8] = 0x8Cu
+            memory[0x01EC] = 0x1Du
+            memory[0x01ED] = 0xF2u
+            memory[0x01EE] = 0xD9u
+            memory[0x01EF] = 0xF1u
+            memory[0x01F0] = 0xC4u
+            memory[0x01F1] = 0xF1u
+            memory[0x01F2] = 0x04u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xF7u
+            memory[0x071D] = 0xF6u
+
+            // Execute decompiled function
+            getBlockOffscreenBits(0x01)
+
+            // Verify: Check output memory (1 addresses)
+            assertEquals(0x00u, memory[0x03D4], "Memory 0x03D4 mismatch")
+        }
+    }
+
+    /**
+     * Test case 9 from frame 5671
+     * Function: getBlockOffscreenBits (0xF1B6)
+     * Parameters: X
+     * Call depth: 7
+     * Memory reads: 20, writes: 5
+     */
+    @Test
+    fun `getBlockOffscreenBits_frame5671_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (20 addresses)
+            memory[0x0000] = 0x00u
+            memory[0x0004] = 0x09u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xE2u
+            memory[0x0008] = 0x00u
+            memory[0x0076] = 0x01u
+            memory[0x008F] = 0x60u
+            memory[0x00BE] = 0x01u
+            memory[0x00D7] = 0x4Bu
+            memory[0x01EC] = 0x1Du
+            memory[0x01ED] = 0xF2u
+            memory[0x01EE] = 0xD9u
+            memory[0x01EF] = 0xF1u
+            memory[0x01F0] = 0xC4u
+            memory[0x01F1] = 0xF1u
+            memory[0x01F2] = 0x04u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
+
+            // Execute decompiled function
+            getBlockOffscreenBits(0x00)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x03D4], "Memory 0x03D4 mismatch")
@@ -31284,7 +40054,7 @@ class GeneratedFunctionTests {
     // =========================================
     // 0xF1D7: runOffscrBitsSubs
     // Parameters: A, X
-    // 25146 calls, 654 unique inputs
+    // 25146 calls, 4015 unique inputs
     // =========================================
 
     /**
@@ -31292,7 +40062,7 @@ class GeneratedFunctionTests {
      * Function: runOffscrBitsSubs (0xF1D7)
      * Parameters: A, X
      * Call depth: 6
-     * Memory reads: 5, writes: 6
+     * Memory reads: 15, writes: 6
      */
     @Test
     fun `runOffscrBitsSubs_frame32_test0`() {
@@ -31301,12 +40071,22 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xD7u
+            memory[0x006D] = 0x00u
+            memory[0x0086] = 0x28u
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0xB0u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
             memory[0x01F1] = 0xD9u
             memory[0x01F2] = 0xF1u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x00u
+            memory[0x071C] = 0x00u
+            memory[0x071D] = 0xFFu
 
             // Execute decompiled function
             runOffscrBitsSubs(0x00, 0x00)
@@ -31319,25 +40099,35 @@ class GeneratedFunctionTests {
     }
 
     /**
-     * Test case 1 from frame 1403
+     * Test case 1 from frame 1327
      * Function: runOffscrBitsSubs (0xF1D7)
      * Parameters: A, X
      * Call depth: 10
-     * Memory reads: 5, writes: 6
+     * Memory reads: 15, writes: 6
      */
     @Test
-    fun `runOffscrBitsSubs_frame1403_test1`() {
+    fun `runOffscrBitsSubs_frame1327_test1`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x15u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x93u
+            memory[0x0082] = 0x01u
+            memory[0x009B] = 0x05u
             memory[0x00CA] = 0x01u
-            memory[0x00E3] = 0x74u
+            memory[0x00E3] = 0x65u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
             memory[0x01EF] = 0xD9u
             memory[0x01F0] = 0xF1u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0x99u
+            memory[0x071D] = 0x98u
 
             // Execute decompiled function
             runOffscrBitsSubs(0x06, 0x15)
@@ -31345,30 +40135,40 @@ class GeneratedFunctionTests {
             // Verify: Check output memory (3 addresses)
             assertEquals(0x15u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x20u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0x8Bu, memory[0x0007], "Memory 0x0007 mismatch")
+            assertEquals(0x9Au, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
 
     /**
-     * Test case 2 from frame 1677
+     * Test case 2 from frame 1567
      * Function: runOffscrBitsSubs (0xF1D7)
      * Parameters: A, X
      * Call depth: 8
-     * Memory reads: 5, writes: 6
+     * Memory reads: 15, writes: 6
      */
     @Test
-    fun `runOffscrBitsSubs_frame1677_test2`() {
+    fun `runOffscrBitsSubs_frame1567_test2`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x91u
             memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x87u
+            memory[0x00CE] = 0xB0u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
             memory[0x01F1] = 0xD9u
             memory[0x01F2] = 0xF1u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x21u
+            memory[0x071D] = 0x20u
 
             // Execute decompiled function
             runOffscrBitsSubs(0x00, 0x00)
@@ -31376,30 +40176,77 @@ class GeneratedFunctionTests {
             // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x20u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0x78u, memory[0x0007], "Memory 0x0007 mismatch")
+            assertEquals(0x4Fu, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
 
     /**
-     * Test case 3 from frame 1895
+     * Test case 3 from frame 2079
+     * Function: runOffscrBitsSubs (0xF1D7)
+     * Parameters: A, X
+     * Call depth: 9
+     * Memory reads: 11, writes: 6
+     */
+    @Test
+    fun `runOffscrBitsSubs_frame2079_test3`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (11 addresses)
+            memory[0x0004] = 0x01u
+            memory[0x0006] = 0x20u
+            memory[0x0007] = 0x47u
+            memory[0x006E] = 0x02u
+            memory[0x0087] = 0x8Eu
+            memory[0x00B6] = 0x01u
+            memory[0x00CF] = 0xB8u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x071B] = 0x02u
+            memory[0x071D] = 0x55u
+
+            // Execute decompiled function
+            runOffscrBitsSubs(0x01, 0x01)
+
+            // Verify: Check output memory (3 addresses)
+            assertEquals(0x01u, memory[0x0004], "Memory 0x0004 mismatch")
+            assertEquals(0x20u, memory[0x0006], "Memory 0x0006 mismatch")
+            assertEquals(0x47u, memory[0x0007], "Memory 0x0007 mismatch")
+        }
+    }
+
+    /**
+     * Test case 4 from frame 2587
      * Function: runOffscrBitsSubs (0xF1D7)
      * Parameters: A, X
      * Call depth: 7
-     * Memory reads: 5, writes: 6
+     * Memory reads: 15, writes: 6
      */
     @Test
-    fun `runOffscrBitsSubs_frame1895_test3`() {
+    fun `runOffscrBitsSubs_frame2587_test4`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Du
+            memory[0x006D] = 0x02u
+            memory[0x0086] = 0x89u
             memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x40u
+            memory[0x00CE] = 0x8Cu
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
             memory[0x01F1] = 0xD9u
             memory[0x01F2] = 0xF1u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x17u
+            memory[0x071D] = 0x16u
 
             // Execute decompiled function
             runOffscrBitsSubs(0x00, 0x00)
@@ -31407,190 +40254,212 @@ class GeneratedFunctionTests {
             // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
             assertEquals(0x20u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0xBFu, memory[0x0007], "Memory 0x0007 mismatch")
+            assertEquals(0x73u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
 
     /**
-     * Test case 4 from frame 2010
-     * Function: runOffscrBitsSubs (0xF1D7)
-     * Parameters: A, X
-     * Call depth: 8
-     * Memory reads: 5, writes: 6
-     */
-    @Test
-    fun `runOffscrBitsSubs_frame2010_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0004] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x84u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0xF1u
-
-            // Execute decompiled function
-            runOffscrBitsSubs(0x00, 0x00)
-
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
-            assertEquals(0x20u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0x7Bu, memory[0x0007], "Memory 0x0007 mismatch")
-        }
-    }
-
-    /**
-     * Test case 5 from frame 5743
-     * Function: runOffscrBitsSubs (0xF1D7)
-     * Parameters: A, X
-     * Call depth: 8
-     * Memory reads: 5, writes: 6
-     */
-    @Test
-    fun `runOffscrBitsSubs_frame5743_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0004] = 0x15u
-            memory[0x00CA] = 0x01u
-            memory[0x00E3] = 0x36u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0xF1u
-
-            // Execute decompiled function
-            runOffscrBitsSubs(0x06, 0x15)
-
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x15u, memory[0x0004], "Memory 0x0004 mismatch")
-            assertEquals(0x20u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0xC9u, memory[0x0007], "Memory 0x0007 mismatch")
-        }
-    }
-
-    /**
-     * Test case 6 from frame 6706
-     * Function: runOffscrBitsSubs (0xF1D7)
-     * Parameters: A, X
-     * Call depth: 8
-     * Memory reads: 5, writes: 6
-     */
-    @Test
-    fun `runOffscrBitsSubs_frame6706_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (5 addresses)
-            memory[0x0004] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xDAu
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0xF1u
-
-            // Execute decompiled function
-            runOffscrBitsSubs(0x00, 0x00)
-
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
-            assertEquals(0x20u, memory[0x0006], "Memory 0x0006 mismatch")
-            assertEquals(0x25u, memory[0x0007], "Memory 0x0007 mismatch")
-        }
-    }
-
-    /**
-     * Test case 7 from frame 6771
+     * Test case 5 from frame 5243
      * Function: runOffscrBitsSubs (0xF1D7)
      * Parameters: A, X
      * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Memory reads: 15, writes: 6
      */
     @Test
-    fun `runOffscrBitsSubs_frame6771_test7`() {
+    fun `runOffscrBitsSubs_frame5243_test5`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x00u
-            memory[0x00B5] = 0x02u
-            memory[0x00CE] = 0x61u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x34u
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x9Au
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
             memory[0x01F1] = 0xD9u
             memory[0x01F2] = 0xF1u
+            memory[0x071A] = 0x00u
+            memory[0x071B] = 0x01u
+            memory[0x071C] = 0xC4u
+            memory[0x071D] = 0xC3u
 
             // Execute decompiled function
             runOffscrBitsSubs(0x00, 0x00)
 
-            // Verify: Check output memory (2 addresses)
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
-            assertEquals(0x9Eu, memory[0x0007], "Memory 0x0007 mismatch")
+            assertEquals(0x20u, memory[0x0006], "Memory 0x0006 mismatch")
+            assertEquals(0x65u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
 
     /**
-     * Test case 8 from frame 6837
+     * Test case 6 from frame 5799
      * Function: runOffscrBitsSubs (0xF1D7)
      * Parameters: A, X
-     * Call depth: 9
-     * Memory reads: 5, writes: 5
+     * Call depth: 7
+     * Memory reads: 15, writes: 6
      */
     @Test
-    fun `runOffscrBitsSubs_frame6837_test8`() {
+    fun `runOffscrBitsSubs_frame5799_test6`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
+            // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x00u
-            memory[0x00B5] = 0x02u
-            memory[0x00CE] = 0xEDu
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xD4u
+            memory[0x006D] = 0x01u
+            memory[0x0086] = 0x6Eu
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x70u
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
             memory[0x01F1] = 0xD9u
             memory[0x01F2] = 0xF1u
+            memory[0x071A] = 0x01u
+            memory[0x071B] = 0x02u
+            memory[0x071C] = 0x43u
+            memory[0x071D] = 0x42u
 
             // Execute decompiled function
             runOffscrBitsSubs(0x00, 0x00)
 
-            // Verify: Check output memory (2 addresses)
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
-            assertEquals(0x12u, memory[0x0007], "Memory 0x0007 mismatch")
+            assertEquals(0x20u, memory[0x0006], "Memory 0x0006 mismatch")
+            assertEquals(0x8Fu, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
 
     /**
-     * Test case 9 from frame 6902
+     * Test case 7 from frame 6103
      * Function: runOffscrBitsSubs (0xF1D7)
      * Parameters: A, X
      * Call depth: 8
-     * Memory reads: 5, writes: 5
+     * Memory reads: 15, writes: 6
      */
     @Test
-    fun `runOffscrBitsSubs_frame6902_test9`() {
+    fun `runOffscrBitsSubs_frame6103_test7`() {
         assertTimeoutPreemptively(Duration.ofMillis(1000)) {
             // Setup: Reset state
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (5 addresses)
-            memory[0x0004] = 0x00u
-            memory[0x00B5] = 0x03u
-            memory[0x00CE] = 0x79u
+            // Setup: Set input memory (15 addresses)
+            memory[0x0004] = 0x01u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
+            memory[0x006E] = 0x02u
+            memory[0x0087] = 0xB1u
+            memory[0x00B6] = 0x01u
+            memory[0x00CF] = 0xB8u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
             memory[0x01EF] = 0xD9u
             memory[0x01F0] = 0xF1u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x41u
+            memory[0x071D] = 0x40u
+
+            // Execute decompiled function
+            runOffscrBitsSubs(0x01, 0x01)
+
+            // Verify: Check output memory (3 addresses)
+            assertEquals(0x01u, memory[0x0004], "Memory 0x0004 mismatch")
+            assertEquals(0x20u, memory[0x0006], "Memory 0x0006 mismatch")
+            assertEquals(0x47u, memory[0x0007], "Memory 0x0007 mismatch")
+        }
+    }
+
+    /**
+     * Test case 8 from frame 6315
+     * Function: runOffscrBitsSubs (0xF1D7)
+     * Parameters: A, X
+     * Call depth: 13
+     * Memory reads: 15, writes: 6
+     */
+    @Test
+    fun `runOffscrBitsSubs_frame6315_test8`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (15 addresses)
+            memory[0x0004] = 0x03u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x55u
+            memory[0x0070] = 0x03u
+            memory[0x0089] = 0x20u
+            memory[0x00B8] = 0x01u
+            memory[0x00D1] = 0xB8u
+            memory[0x01ED] = 0x1Du
+            memory[0x01EE] = 0xF2u
+            memory[0x01EF] = 0xD9u
+            memory[0x01F0] = 0xF1u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0x76u
+            memory[0x071D] = 0x75u
+
+            // Execute decompiled function
+            runOffscrBitsSubs(0x01, 0x03)
+
+            // Verify: Check output memory (3 addresses)
+            assertEquals(0x03u, memory[0x0004], "Memory 0x0004 mismatch")
+            assertEquals(0x20u, memory[0x0006], "Memory 0x0006 mismatch")
+            assertEquals(0x47u, memory[0x0007], "Memory 0x0007 mismatch")
+        }
+    }
+
+    /**
+     * Test case 9 from frame 6513
+     * Function: runOffscrBitsSubs (0xF1D7)
+     * Parameters: A, X
+     * Call depth: 11
+     * Memory reads: 15, writes: 6
+     */
+    @Test
+    fun `runOffscrBitsSubs_frame6513_test9`() {
+        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
+            // Setup: Reset state
+            resetCPU()
+            clearMemory()
+
+            // Setup: Set input memory (15 addresses)
+            memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x9Fu
+            memory[0x006D] = 0x03u
+            memory[0x0086] = 0x1Eu
+            memory[0x00B5] = 0x01u
+            memory[0x00CE] = 0x9Fu
+            memory[0x01EF] = 0x1Du
+            memory[0x01F0] = 0xF2u
+            memory[0x01F1] = 0xD9u
+            memory[0x01F2] = 0xF1u
+            memory[0x071A] = 0x02u
+            memory[0x071B] = 0x03u
+            memory[0x071C] = 0xBEu
+            memory[0x071D] = 0xBDu
 
             // Execute decompiled function
             runOffscrBitsSubs(0x00, 0x00)
 
-            // Verify: Check output memory (2 addresses)
+            // Verify: Check output memory (3 addresses)
             assertEquals(0x00u, memory[0x0004], "Memory 0x0004 mismatch")
-            assertEquals(0x86u, memory[0x0007], "Memory 0x0007 mismatch")
+            assertEquals(0x20u, memory[0x0006], "Memory 0x0006 mismatch")
+            assertEquals(0x60u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
 
@@ -31605,7 +40474,7 @@ class GeneratedFunctionTests {
      * Function: getXOffscreenBits (0xF1F6)
      * Parameters: X
      * Call depth: 7
-     * Memory reads: 9, writes: 5
+     * Memory reads: 11, writes: 5
      */
     @Test
     fun `getXOffscreenBits_frame32_test0`() {
@@ -31614,8 +40483,10 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xD7u
             memory[0x006D] = 0x00u
             memory[0x0086] = 0x28u
             memory[0x01EF] = 0x1Du
@@ -31640,7 +40511,7 @@ class GeneratedFunctionTests {
      * Function: getXOffscreenBits (0xF1F6)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 9, writes: 5
+     * Memory reads: 11, writes: 5
      */
     @Test
     fun `getXOffscreenBits_frame1264_test1`() {
@@ -31649,8 +40520,10 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
             memory[0x006D] = 0x00u
             memory[0x0086] = 0xDBu
             memory[0x01ED] = 0x1Du
@@ -31675,7 +40548,7 @@ class GeneratedFunctionTests {
      * Function: getXOffscreenBits (0xF1F6)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 9, writes: 5
+     * Memory reads: 11, writes: 5
      */
     @Test
     fun `getXOffscreenBits_frame1478_test2`() {
@@ -31684,8 +40557,10 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
             memory[0x006D] = 0x01u
             memory[0x0086] = 0x4Au
             memory[0x01ED] = 0x1Du
@@ -31710,7 +40585,7 @@ class GeneratedFunctionTests {
      * Function: getXOffscreenBits (0xF1F6)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 9, writes: 5
+     * Memory reads: 11, writes: 5
      */
     @Test
     fun `getXOffscreenBits_frame1715_test3`() {
@@ -31719,8 +40594,10 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x06u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xC4u
             memory[0x0073] = 0x01u
             memory[0x008C] = 0x7Fu
             memory[0x01ED] = 0x1Du
@@ -31745,7 +40622,7 @@ class GeneratedFunctionTests {
      * Function: getXOffscreenBits (0xF1F6)
      * Parameters: X
      * Call depth: 8
-     * Memory reads: 9, writes: 5
+     * Memory reads: 11, writes: 5
      */
     @Test
     fun `getXOffscreenBits_frame2341_test4`() {
@@ -31754,8 +40631,10 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
             memory[0x006D] = 0x02u
             memory[0x0086] = 0x13u
             memory[0x01EF] = 0x1Du
@@ -31780,7 +40659,7 @@ class GeneratedFunctionTests {
      * Function: getXOffscreenBits (0xF1F6)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 9, writes: 5
+     * Memory reads: 11, writes: 5
      */
     @Test
     fun `getXOffscreenBits_frame2684_test5`() {
@@ -31789,8 +40668,10 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x98u
             memory[0x006D] = 0x02u
             memory[0x0086] = 0xA1u
             memory[0x01ED] = 0x1Du
@@ -31815,7 +40696,7 @@ class GeneratedFunctionTests {
      * Function: getXOffscreenBits (0xF1F6)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 9, writes: 5
+     * Memory reads: 11, writes: 5
      */
     @Test
     fun `getXOffscreenBits_frame5453_test6`() {
@@ -31824,8 +40705,10 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0xA0u
             memory[0x006D] = 0x01u
             memory[0x0086] = 0xA2u
             memory[0x01EF] = 0x1Du
@@ -31850,7 +40733,7 @@ class GeneratedFunctionTests {
      * Function: getXOffscreenBits (0xF1F6)
      * Parameters: X
      * Call depth: 10
-     * Memory reads: 9, writes: 5
+     * Memory reads: 11, writes: 5
      */
     @Test
     fun `getXOffscreenBits_frame5905_test7`() {
@@ -31859,8 +40742,10 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x8Fu
             memory[0x006D] = 0x01u
             memory[0x0086] = 0xF2u
             memory[0x01EF] = 0x1Du
@@ -31885,7 +40770,7 @@ class GeneratedFunctionTests {
      * Function: getXOffscreenBits (0xF1F6)
      * Parameters: X
      * Call depth: 11
-     * Memory reads: 7, writes: 5
+     * Memory reads: 9, writes: 5
      */
     @Test
     fun `getXOffscreenBits_frame6145_test8`() {
@@ -31894,8 +40779,10 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (7 addresses)
+            // Setup: Set input memory (9 addresses)
             memory[0x0004] = 0x03u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x0Fu
             memory[0x0070] = 0x03u
             memory[0x0089] = 0x46u
             memory[0x01ED] = 0x1Du
@@ -31918,7 +40805,7 @@ class GeneratedFunctionTests {
      * Function: getXOffscreenBits (0xF1F6)
      * Parameters: X
      * Call depth: 9
-     * Memory reads: 9, writes: 5
+     * Memory reads: 11, writes: 5
      */
     @Test
     fun `getXOffscreenBits_frame6362_test9`() {
@@ -31927,8 +40814,10 @@ class GeneratedFunctionTests {
             resetCPU()
             clearMemory()
 
-            // Setup: Set input memory (9 addresses)
+            // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
+            memory[0x0006] = 0x38u
+            memory[0x0007] = 0x98u
             memory[0x006D] = 0x02u
             memory[0x0086] = 0xF4u
             memory[0x01ED] = 0x1Du

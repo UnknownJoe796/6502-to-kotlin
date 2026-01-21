@@ -211,12 +211,18 @@ class FunctionCallTracer(
         val pending = callStack.removeAt(pendingIdx)
 
         // Record nested call in parent (if any)
-        // Note: We intentionally do NOT merge memory accesses up to parent.
-        // Each function's test case should only contain its own direct reads/writes,
-        // not the reads/writes of functions it calls. This keeps test cases small
-        // and focused on the function being tested.
+        // by Claude - Propagate memory READS from child to parent so that parent's
+        // test case includes all the memory setup needed by nested functions.
+        // We do NOT propagate writes - writes should stay local to the function that made them.
         if (callStack.isNotEmpty()) {
-            callStack.last().nestedCalls.add(pending.functionAddress)
+            val parent = callStack.last()
+            parent.nestedCalls.add(pending.functionAddress)
+            // Propagate reads that aren't already in parent's reads
+            for ((addr, value) in pending.memoryReads) {
+                if (addr !in parent.memoryReads) {
+                    parent.memoryReads[addr] = value
+                }
+            }
         }
 
         // Complete the capture
