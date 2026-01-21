@@ -1688,26 +1688,72 @@ fun List<KotlinStmt>.transformReturns(transformer: (KotlinExpr?) -> KReturn): Li
 /**
  * Ensures all paths have proper returns. Keeps existing return values,
  * and adds fallback return if function doesn't end with one.
+ *
+ * CRITICAL FIX by Claude: Only add fallback returns to if branches when the if is the
+ * LAST statement in the block. If there's code after an if statement, control should
+ * flow through to that code, not have returns added to branches that make it unreachable.
  */
 fun List<KotlinStmt>.ensureReturnsPresent(fallbackReturn: KReturn): List<KotlinStmt> {
-    val updated = this.map { stmt ->
+    val updated = this.mapIndexed { index, stmt ->
+        val isLastStatement = index == this.size - 1
         when (stmt) {
             is KReturn -> if (stmt.value == null) fallbackReturn else stmt
-            is KIf -> KIf(
-                condition = stmt.condition,
-                thenBranch = stmt.thenBranch.ensureReturnsPresent(fallbackReturn),
-                elseBranch = stmt.elseBranch.ensureReturnsPresent(fallbackReturn)
-            )
+            is KIf -> {
+                // by Claude - Only add fallback returns to if branches when it's the last statement.
+                // For non-terminal ifs, one or both branches may fall through to subsequent code.
+                if (isLastStatement) {
+                    KIf(
+                        condition = stmt.condition,
+                        thenBranch = stmt.thenBranch.ensureReturnsPresent(fallbackReturn),
+                        elseBranch = stmt.elseBranch.ensureReturnsPresent(fallbackReturn)
+                    )
+                } else {
+                    // Non-terminal if: only process branches that already end with returns
+                    // (to update their return values), don't add new returns
+                    KIf(
+                        condition = stmt.condition,
+                        thenBranch = stmt.thenBranch.updateExistingReturns(fallbackReturn),
+                        elseBranch = stmt.elseBranch.updateExistingReturns(fallbackReturn)
+                    )
+                }
+            }
             is KWhile -> KWhile(stmt.condition, stmt.body.ensureReturnsPresent(fallbackReturn))
             is KDoWhile -> KDoWhile(stmt.body.ensureReturnsPresent(fallbackReturn), stmt.condition)
             is KLoop -> KLoop(stmt.body.ensureReturnsPresent(fallbackReturn))
             else -> stmt
         }
     }
-    return if (updated.lastOrNull() !is KReturn) {
+    // by Claude - Check if last statement provides returns on all paths
+    val lastStmt = updated.lastOrNull()
+    val endsWithReturn = lastStmt is KReturn ||
+        (lastStmt is KIf && lastStmt.thenBranch.lastOrNull() is KReturn && lastStmt.elseBranch.lastOrNull() is KReturn)
+    return if (!endsWithReturn) {
         updated + fallbackReturn
     } else {
         updated
+    }
+}
+
+// by Claude - Update return values in existing returns without adding new returns
+/**
+ * Updates existing return statements to have fallback values if they're empty,
+ * but does NOT add new returns to branches that don't have them.
+ * This preserves fall-through behavior for non-terminal if statements.
+ */
+private fun List<KotlinStmt>.updateExistingReturns(fallbackReturn: KReturn): List<KotlinStmt> {
+    return this.map { stmt ->
+        when (stmt) {
+            is KReturn -> if (stmt.value == null) fallbackReturn else stmt
+            is KIf -> KIf(
+                condition = stmt.condition,
+                thenBranch = stmt.thenBranch.updateExistingReturns(fallbackReturn),
+                elseBranch = stmt.elseBranch.updateExistingReturns(fallbackReturn)
+            )
+            is KWhile -> KWhile(stmt.condition, stmt.body.updateExistingReturns(fallbackReturn))
+            is KDoWhile -> KDoWhile(stmt.body.updateExistingReturns(fallbackReturn), stmt.condition)
+            is KLoop -> KLoop(stmt.body.updateExistingReturns(fallbackReturn))
+            else -> stmt
+        }
     }
 }
 
