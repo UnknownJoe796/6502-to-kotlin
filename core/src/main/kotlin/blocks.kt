@@ -955,6 +955,22 @@ fun List<AssemblyBlock>.functionify(
                     else -> {}
                 }
 
+                // by Claude - JMP to a function = that function's inputs are implicitly read
+                // When we see `jsr Helper; jmp Target`, the JMP "uses" Target's inputs
+                // because control transfers to Target with whatever register values exist
+                // Example: jsr GetProperObjOffset; jmp GetOffScreenBitsSet
+                // GetOffScreenBitsSet uses X, so GetProperObjOffset's X modification is an output
+                if (op == AssemblyOp.JMP) {
+                    val targetLabel = (instruction.address as? AssemblyAddressing.Direct)?.label
+                    val targetFunction = if (targetLabel != null) labelToFunction[targetLabel] else null
+                    if (targetFunction != null) {
+                        val targetInputs = targetFunction.inputs ?: emptySet()
+                        for (input in targetInputs) {
+                            trackUse(input, killed)  // Treat JMP target's inputs as uses
+                        }
+                    }
+                }
+
                 op.modifies(instruction.address?.let { it::class })
                     .mapNotNull { it.toTrackedAsIo(instruction.address, labelIsVirtualRegister) }
                     .forEach { state ->
@@ -993,6 +1009,19 @@ fun List<AssemblyBlock>.functionify(
                             trackUse(TrackedAsIo.Y, killed)
                         }
                         else -> {}
+                    }
+
+                    // by Claude - JMP to a function = that function's inputs are implicitly read
+                    // (Same fix as above, for fall-through blocks)
+                    if (op == AssemblyOp.JMP) {
+                        val targetLabel = (instruction.address as? AssemblyAddressing.Direct)?.label
+                        val targetFunction = if (targetLabel != null) labelToFunction[targetLabel] else null
+                        if (targetFunction != null) {
+                            val targetInputs = targetFunction.inputs ?: emptySet()
+                            for (input in targetInputs) {
+                                trackUse(input, killed)  // Treat JMP target's inputs as uses
+                            }
+                        }
                     }
 
                     op.modifies(instruction.address?.let { it::class })

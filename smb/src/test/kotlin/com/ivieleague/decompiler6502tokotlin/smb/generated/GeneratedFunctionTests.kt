@@ -14,7 +14,7 @@ import java.io.File
 
 /**
  * Auto-generated tests from TAS capture: smb-tas
- * Captured at: 2026-01-21T21:47:53.046432Z
+ * Captured at: 2026-01-22T04:23:15.042022Z
  * Total frames: 17868
  * Total captures: 1019846
  * Functions with tests: 157
@@ -27226,14 +27226,14 @@ class GeneratedFunctionTests {
 
     // =========================================
     // 0xDFC1: enemyToBGCollisionDet
-    // Parameters: X
+    // Parameters: X, Y
     // 6603 calls, 1027 unique inputs
     // =========================================
 
     /**
      * Test case 0 from frame 1181
      * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
+     * Parameters: X, Y
      * Call depth: 8
      * Memory reads: 23, writes: 3
      */
@@ -27270,7 +27270,7 @@ class GeneratedFunctionTests {
             memory[0x0686] = 0x54u
 
             // Execute decompiled function
-            enemyToBGCollisionDet(0x00)
+            enemyToBGCollisionDet(0x00, 0x00)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
@@ -27280,7 +27280,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 1 from frame 1439
      * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
+     * Parameters: X, Y
      * Call depth: 8
      * Memory reads: 20, writes: 2
      */
@@ -27314,7 +27314,7 @@ class GeneratedFunctionTests {
             memory[0x0682] = 0x54u
 
             // Execute decompiled function
-            enemyToBGCollisionDet(0x00)
+            enemyToBGCollisionDet(0x00, 0x04)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -27324,7 +27324,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 2 from frame 2123
      * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
+     * Parameters: X, Y
      * Call depth: 8
      * Memory reads: 23, writes: 3
      */
@@ -27361,7 +27361,7 @@ class GeneratedFunctionTests {
             memory[0x05BA] = 0x54u
 
             // Execute decompiled function
-            enemyToBGCollisionDet(0x00)
+            enemyToBGCollisionDet(0x00, 0x00)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
@@ -27371,7 +27371,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 3 from frame 2815
      * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
+     * Parameters: X, Y
      * Call depth: 10
      * Memory reads: 23, writes: 3
      */
@@ -27408,7 +27408,7 @@ class GeneratedFunctionTests {
             memory[0x0681] = 0x54u
 
             // Execute decompiled function
-            enemyToBGCollisionDet(0x01)
+            enemyToBGCollisionDet(0x01, 0x08)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
@@ -27418,7 +27418,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 4 from frame 3045
      * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
+     * Parameters: X, Y
      * Call depth: 10
      * Memory reads: 23, writes: 3
      */
@@ -27455,7 +27455,7 @@ class GeneratedFunctionTests {
             memory[0x0684] = 0x54u
 
             // Execute decompiled function
-            enemyToBGCollisionDet(0x01)
+            enemyToBGCollisionDet(0x01, 0x04)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
@@ -27465,7 +27465,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 5 from frame 5241
      * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
+     * Parameters: X, Y
      * Call depth: 8
      * Memory reads: 20, writes: 2
      */
@@ -27499,7 +27499,7 @@ class GeneratedFunctionTests {
             memory[0x0682] = 0x54u
 
             // Execute decompiled function
-            enemyToBGCollisionDet(0x00)
+            enemyToBGCollisionDet(0x00, 0x04)
 
             // Verify: Check output memory (0 addresses)
             // No memory outputs to verify (or only stack writes)
@@ -27509,7 +27509,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 6 from frame 6101
      * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
+     * Parameters: X, Y
      * Call depth: 8
      * Memory reads: 23, writes: 3
      */
@@ -27546,7 +27546,7 @@ class GeneratedFunctionTests {
             memory[0x0683] = 0x54u
 
             // Execute decompiled function
-            enemyToBGCollisionDet(0x01)
+            enemyToBGCollisionDet(0x01, 0x08)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
@@ -27556,7 +27556,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 7 from frame 6197
      * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
+     * Parameters: X, Y
      * Call depth: 8
      * Memory reads: 23, writes: 3
      */
@@ -27593,7 +27593,7 @@ class GeneratedFunctionTests {
             memory[0x05BB] = 0x54u
 
             // Execute decompiled function
-            enemyToBGCollisionDet(0x00)
+            enemyToBGCollisionDet(0x00, 0x04)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
@@ -27603,7 +27603,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 8 from frame 6309
      * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
+     * Parameters: X, Y
      * Call depth: 10
      * Memory reads: 23, writes: 3
      */
@@ -27640,7 +27640,7 @@ class GeneratedFunctionTests {
             memory[0x0681] = 0x54u
 
             // Execute decompiled function
-            enemyToBGCollisionDet(0x01)
+            enemyToBGCollisionDet(0x01, 0x08)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")
@@ -27650,7 +27650,7 @@ class GeneratedFunctionTests {
     /**
      * Test case 9 from frame 6395
      * Function: enemyToBGCollisionDet (0xDFC1)
-     * Parameters: X
+     * Parameters: X, Y
      * Call depth: 10
      * Memory reads: 23, writes: 3
      */
@@ -27687,7 +27687,7 @@ class GeneratedFunctionTests {
             memory[0x0680] = 0x54u
 
             // Execute decompiled function
-            enemyToBGCollisionDet(0x01)
+            enemyToBGCollisionDet(0x01, 0x08)
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0x00u, memory[0x00EB], "Memory 0x00EB mismatch")

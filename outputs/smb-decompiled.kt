@@ -3295,7 +3295,7 @@ fun writeBlockMetatile(A: Int, X: Int): Int {
 }
 
 // Decompiled from MoveVOffset
-fun moveVOffset(Y: Int) {
+fun moveVOffset(Y: Int): Int {
     var A: Int = 0
     var Y: Int = Y
     var temp0: Int = 0
@@ -3308,7 +3308,7 @@ fun moveVOffset(Y: Int) {
     temp0 = A + 0x0A
     //> jmp SetVRAMOffset       ;branch to store as new vram buffer offset
     setVRAMOffset(temp0 and 0xFF)
-    return
+    return Y
 }
 
 // Decompiled from PutBlockMetatile
@@ -4657,6 +4657,7 @@ fun playerLoseLife() {
     var A: Int = 0
     var X: Int = 0
     var Y: Int = 0
+    var temp0: Int = 0
     var disableScreenFlag by MemoryByte(DisableScreenFlag)
     var eventMusicQueue by MemoryByte(EventMusicQueue)
     var halfwayPage by MemoryByte(HalfwayPage)
@@ -4750,9 +4751,9 @@ fun playerLoseLife() {
     //> SetHalfway:  sta HalfwayPage          ;store as halfway page for player
     halfwayPage = A
     //> jsr TransposePlayers     ;switch players around if 2-player game
-    val flag6: Boolean = transposePlayers()
+    temp0 = transposePlayers()
     //> jmp ContinueGame         ;continue the game
-    continueGame(A)
+    continueGame(temp0)
     return
 }
 
@@ -4845,6 +4846,7 @@ fun runGameOver() {
 // Decompiled from TerminateGame
 fun terminateGame() {
     var A: Int = 0
+    var temp0: Int = 0
     var continueWorld by MemoryByte(ContinueWorld)
     var eventMusicQueue by MemoryByte(EventMusicQueue)
     var operMode by MemoryByte(OperMode)
@@ -4857,11 +4859,11 @@ fun terminateGame() {
     //> sta EventMusicQueue
     eventMusicQueue = A
     //> jsr TransposePlayers  ;check if other player can keep
-    val flag0: Boolean = transposePlayers()
+    temp0 = transposePlayers()
     //> bcc ContinueGame      ;going, and do so if possible
-    if (!(flag0)) {
+    if (!(flagC)) {
         //  goto ContinueGame -> continueGame
-        continueGame(A)
+        continueGame(temp0)
         return
     } else {
         //> lda WorldNumber       ;otherwise put world number of current
@@ -4871,8 +4873,8 @@ fun terminateGame() {
         //> lda #$00
         A = 0x00
         //> asl                   ;residual ASL instruction
-        val orig1: Int = A
-        A = (orig1 shl 1) and 0xFF
+        val orig0: Int = A
+        A = (orig0 shl 1) and 0xFF
         //> sta OperMode_Task     ;reset all modes to title screen and
         opermodeTask = A
         //> sta ScreenTimer       ;leave
@@ -4923,7 +4925,7 @@ fun continueGame(A: Int) {
 }
 
 // Decompiled from TransposePlayers
-fun transposePlayers(): Boolean {
+fun transposePlayers(): Int {
     var A: Int = 0
     var X: Int = 0
     var currentPlayer by MemoryByte(CurrentPlayer)
@@ -4970,7 +4972,7 @@ fun transposePlayers(): Boolean {
         }
     }
     //> ExTrans:   rts
-    return false
+    return A
 }
 
 // Decompiled from DoNothing1
@@ -6507,6 +6509,7 @@ fun renderSidewaysPipe(X: Int, Y: Int): Boolean {
     var X: Int = X
     var Y: Int = Y
     var temp0: Int = 0
+    var temp1: Int = 0
     val areaObjectLength by MemoryByteIndexed(AreaObjectLength)
     val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
     val sidePipeBottomPart by MemoryByteIndexed(SidePipeBottomPart)
@@ -6537,7 +6540,9 @@ fun renderSidewaysPipe(X: Int, Y: Int): Boolean {
         //> ldy $05                   ;init buffer offset and get vertical length
         Y = memory[0x5].toInt()
         //> jsr RenderUnderPart       ;and render vertical shaft using tile number in A
-        temp0 = renderUnderPart(A, X, Y)
+        val pair0 = renderUnderPart(A, X, Y)
+        temp0 = pair0.first
+        temp1 = pair0.second
         X = temp0
         //> clc                       ;clear carry flag to be used by IntroPipe
     }
@@ -6913,6 +6918,7 @@ fun flagpoleObject(): Int {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
     var currentPageLoc by MemoryByte(CurrentPageLoc)
     var flagpolefnumYPos by MemoryByte(FlagpoleFNum_Y_Pos)
     val enemyFlag by MemoryByteIndexed(Enemy_Flag)
@@ -6933,25 +6939,27 @@ fun flagpoleObject(): Int {
     //> lda #$25
     A = 0x25
     //> jsr RenderUnderPart
-    temp0 = renderUnderPart(A, X, Y)
+    val pair0 = renderUnderPart(A, X, Y)
+    temp0 = pair0.first
+    temp1 = pair0.second
     X = temp0
     //> lda #$61                 ;render solid block at the bottom
     A = 0x61
     //> sta MetatileBuffer+10
     metatileBuffer[10] = A
     //> jsr GetAreaObjXPosition
-    temp1 = getAreaObjXPosition()
+    temp2 = getAreaObjXPosition()
     //> sec                      ;get pixel coordinate of where the flagpole is,
     //> sbc #$08                 ;subtract eight pixels and use as horizontal
-    temp2 = temp1 - 0x08
-    A = temp2 and 0xFF
+    temp3 = temp2 - 0x08
+    A = temp3 and 0xFF
     //> sta Enemy_X_Position+5   ;coordinate for the flag
     enemyXPosition[5] = A
     //> lda CurrentPageLoc
     A = currentPageLoc
     //> sbc #$00                 ;subtract borrow from page location and use as
-    temp3 = A - if (temp2 >= 0) 0 else 1
-    A = temp3 and 0xFF
+    temp4 = A - if (temp3 >= 0) 0 else 1
+    A = temp4 and 0xFF
     //> sta Enemy_PageLoc+5      ;page location for the flag
     enemyPageloc[5] = A
     //> lda #$30
@@ -6994,6 +7002,7 @@ fun balancePlatRope(X: Int): Int {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
     //> BalancePlatRope:
     //> txa                 ;save object buffer offset for now
     A = X
@@ -7006,20 +7015,22 @@ fun balancePlatRope(X: Int): Int {
     //> lda #$44
     A = 0x44
     //> jsr RenderUnderPart
-    temp0 = renderUnderPart(A, X, Y)
+    val pair0 = renderUnderPart(A, X, Y)
+    temp0 = pair0.first
+    temp1 = pair0.second
     X = temp0
     //> pla                 ;get back object buffer offset
     A = pull()
     //> tax
     X = A
     //> jsr GetLrgObjAttrib ;get vertical length from lower nybble
-    val pair0 = getLrgObjAttrib(X)
-    temp1 = pair0.first
-    temp2 = pair0.second
+    val pair1 = getLrgObjAttrib(X)
+    temp2 = pair1.first
+    temp3 = pair1.second
     //> ldx #$01
     X = 0x01
     //  Fall-through tail call to drawRope
-    drawRope(X, temp2)
+    drawRope(X, temp3)
     return X
 }
 
@@ -7258,6 +7269,7 @@ fun bulletBillCannon(X: Int, Y: Int): Int {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
     var cannonOffset by MemoryByte(Cannon_Offset)
     var currentPageLoc by MemoryByte(CurrentPageLoc)
     val cannonPageloc by MemoryByteIndexed(Cannon_PageLoc)
@@ -7295,29 +7307,31 @@ fun bulletBillCannon(X: Int, Y: Int): Int {
             //> lda #$66                 ;if not, render bottom until length expires
             A = 0x66
             //> jsr RenderUnderPart
-            temp2 = renderUnderPart(A, X, Y)
+            val pair1 = renderUnderPart(A, X, Y)
+            temp2 = pair1.first
+            temp3 = pair1.second
             X = temp2
         }
     }
     //> SetupCannon: ldx Cannon_Offset        ;get offset for data used by cannons and whirlpools
     X = cannonOffset
     //> jsr GetAreaObjYPosition  ;get proper vertical coordinate for cannon
-    temp3 = getAreaObjYPosition()
+    temp4 = getAreaObjYPosition()
     //> sta Cannon_Y_Position,x  ;and store it here
-    cannonYPosition[X] = temp3
+    cannonYPosition[X] = temp4
     //> lda CurrentPageLoc
     A = currentPageLoc
     //> sta Cannon_PageLoc,x     ;store page number for cannon here
     cannonPageloc[X] = A
     //> jsr GetAreaObjXPosition  ;get proper horizontal coordinate for cannon
-    temp4 = getAreaObjXPosition()
+    temp5 = getAreaObjXPosition()
     //> sta Cannon_X_Position,x  ;and store it here
-    cannonXPosition[X] = temp4
+    cannonXPosition[X] = temp5
     //> inx
     X = (X + 1) and 0xFF
     //> cpx #$06                 ;increment and check offset
     //> bcc StrCOffset           ;if not yet reached sixth cannon, branch to save offset
-    A = temp4
+    A = temp5
     if (X >= 0x06) {
         //> ldx #$00                 ;otherwise initialize it
         X = 0x00
@@ -7649,7 +7663,7 @@ fun holeEmpty(X: Int, Y: Int): Int {
 }
 
 // Decompiled from RenderUnderPart
-fun renderUnderPart(A: Int, X: Int, Y: Int): Int {
+fun renderUnderPart(A: Int, X: Int, Y: Int): Pair<Int, Int> {
     var A: Int = A
     var X: Int = X
     var Y: Int = Y
@@ -7706,7 +7720,7 @@ fun renderUnderPart(A: Int, X: Int, Y: Int): Int {
         }
     } while ((Y and 0x80) == 0)
     //> ExitUPartR:  rts
-    return X
+    return Pair(X, Y)
 }
 
 // Decompiled from ChkLrgObjLength
@@ -8654,6 +8668,7 @@ fun gameRoutines() {
 fun playerEntrance() {
     var A: Int = 0
     var Y: Int = 0
+    var temp0: Int = 0
     var altEntranceControl by MemoryByte(AltEntranceControl)
     var changeAreaTimer by MemoryByte(ChangeAreaTimer)
     var disableCollisionDet by MemoryByte(DisableCollisionDet)
@@ -8704,10 +8719,11 @@ fun playerEntrance() {
             return
         }
         //> IntroEntr:  jsr EnterSidePipe         ;execute sub to move player to the right
-        enterSidePipe()
+        temp0 = enterSidePipe()
         //> dec ChangeAreaTimer       ;decrement timer for change of area
         changeAreaTimer = (changeAreaTimer - 1) and 0xFF
         //> bne ExitEntr              ;branch to exit if not yet expired
+        A = temp0
         if (changeAreaTimer == 0) {
             //> inc DisableIntermediate   ;set flag to skip world and lives display
             disableIntermediate = (disableIntermediate + 1) and 0xFF
@@ -8806,6 +8822,8 @@ fun playerCtrlRoutine() {
     var A: Int = 0
     var X: Int = 0
     var Y: Int = 0
+    var temp0: Int = 0
+    var temp1: Int = 0
     var aBButtons by MemoryByte(A_B_Buttons)
     var altEntranceControl by MemoryByte(AltEntranceControl)
     var areaType by MemoryByte(AreaType)
@@ -8939,13 +8957,18 @@ fun playerCtrlRoutine() {
     //> ldx #$00                    ;set offset for player object
     X = 0x00
     //> jsr BoundingBoxCore         ;get player's bounding box coordinates
-    boundingBoxCore(X, Y)
+    val pair0 = boundingBoxCore(X, Y)
+    temp0 = pair0.first
+    temp1 = pair0.second
+    X = temp0
     //> jsr PlayerBGCollision       ;do collision detection and process
     playerBGCollision()
     //> lda Player_Y_Position
     A = playerYPosition
     //> cmp #$40                    ;check to see if player is higher than 64th pixel
     //> bcc PlayerHole              ;if so, branch ahead
+    X = temp0
+    Y = temp1
     if (A >= 0x40) {
         //> lda GameEngineSubroutine
         A = gameEngineSubroutine
@@ -9157,9 +9180,10 @@ fun movePlayerYAxis(A: Int) {
 // Decompiled from SideExitPipeEntry
 fun sideExitPipeEntry() {
     var Y: Int = 0
+    var temp0: Int = 0
     //> SideExitPipeEntry:
     //> jsr EnterSidePipe         ;execute sub to move player to the right
-    enterSidePipe()
+    temp0 = enterSidePipe()
     //> ldy #$02
     Y = 0x02
     //  Fall-through tail call to chgAreaPipe
@@ -9209,7 +9233,7 @@ fun chgAreaMode(): Int {
 }
 
 // Decompiled from EnterSidePipe
-fun enterSidePipe() {
+fun enterSidePipe(): Int {
     var A: Int = 0
     var Y: Int = 0
     var playerXPosition by MemoryByte(Player_X_Position)
@@ -9237,7 +9261,7 @@ fun enterSidePipe() {
     //> jsr AutoControlPlayer  ;execute player control routine with ctrl bits nulled
     autoControlPlayer(A)
     //> rts
-    return
+    return A
 }
 
 // Decompiled from PlayerChangeSize
@@ -10654,6 +10678,12 @@ fun fireballObjCore(X: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
     var fballOffscreenbits by MemoryByte(FBall_OffscreenBits)
     var objectOffset by MemoryByte(ObjectOffset)
     var playerFacingDir by MemoryByte(PlayerFacingDir)
@@ -10754,23 +10784,29 @@ fun fireballObjCore(X: Int) {
             //> ldx ObjectOffset             ;return fireball offset to X
             X = objectOffset
             //> jsr RelativeFireballPosition ;get relative coordinates
-            relativeFireballPosition(X)
+            temp3 = relativeFireballPosition(X)
+            X = temp3
             //> jsr GetFireballOffscreenBits ;get offscreen information
-            getFireballOffscreenBits(X)
+            temp4 = getFireballOffscreenBits(temp3)
+            X = temp4
             //> jsr GetFireballBoundBox      ;get bounding box coordinates
-            getFireballBoundBox(X)
+            temp5 = getFireballBoundBox(temp4)
+            X = temp5
             //> jsr FireballBGCollision      ;do fireball to background collision detection
-            fireballBGCollision(X)
+            temp6 = fireballBGCollision(temp5)
+            X = temp6
             //> lda FBall_OffscreenBits      ;get fireball offscreen bits
             A = fballOffscreenbits
             //> and #%11001100               ;mask out certain bits
             A = A and 0xCC
             //> bne EraseFB                  ;if any bits still set, branch to kill fireball
+            X = temp6
             if (A == 0) {
                 //> jsr FireballEnemyCollision   ;do fireball to enemy collision detection and deal with collisions
-                fireballEnemyCollision(X)
+                temp7 = fireballEnemyCollision(X)
+                X = temp7
                 //> jmp DrawFireball             ;draw fireball appropriately and leave
-                drawFireball(X)
+                drawFireball(temp7)
                 return
             }
             //> EraseFB: lda #$00                     ;erase fireball state
@@ -10783,9 +10819,10 @@ fun fireballObjCore(X: Int) {
     } else {
         //> FireballExplosion:
         //> jsr RelativeFireballPosition
-        relativeFireballPosition(X)
+        temp8 = relativeFireballPosition(X)
+        X = temp8
         //> jmp DrawExplosion_Fireball
-        drawexplosionFireball(X)
+        drawexplosionFireball(temp8)
         return
     }
 }
@@ -11402,6 +11439,7 @@ fun jumpspringHandler(X: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
     var jumpspringAnimCtrl by MemoryByte(JumpspringAnimCtrl)
     var jumpspringTimer by MemoryByte(JumpspringTimer)
     var playerYPosition by MemoryByte(Player_Y_Position)
@@ -11452,7 +11490,9 @@ fun jumpspringHandler(X: Int) {
     temp2 = relativeEnemyPosition(X)
     X = temp2
     //> jsr EnemyGfxHandler         ;draw jumpspring
-    temp3 = enemyGfxHandler(temp2)
+    val pair1 = enemyGfxHandler(temp2)
+    temp3 = pair1.first
+    temp4 = pair1.second
     X = temp3
     //> jsr OffscreenBoundsCheck    ;check to see if we need to kill it
     offscreenBoundsCheck(temp3)
@@ -11460,6 +11500,7 @@ fun jumpspringHandler(X: Int) {
     A = jumpspringAnimCtrl
     //> beq ExJSpring               ;trying to animate it, just leave
     X = temp3
+    Y = temp4
     if (A != 0) {
         //> lda JumpspringTimer
         A = jumpspringTimer
@@ -11486,6 +11527,7 @@ fun posJSpr(X: Int, Y: Int) {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
     var aBButtons by MemoryByte(A_B_Buttons)
     var jumpspringAnimCtrl by MemoryByte(JumpspringAnimCtrl)
     var jumpspringForce by MemoryByte(JumpspringForce)
@@ -11543,7 +11585,9 @@ fun posJSpr(X: Int, Y: Int) {
         temp1 = relativeEnemyPosition(X)
         X = temp1
         //> jsr EnemyGfxHandler         ;draw jumpspring
-        temp2 = enemyGfxHandler(temp1)
+        val pair0 = enemyGfxHandler(temp1)
+        temp2 = pair0.first
+        temp3 = pair0.second
         X = temp2
         //> jsr OffscreenBoundsCheck    ;check to see if we need to kill it
         offscreenBoundsCheck(temp2)
@@ -11553,6 +11597,7 @@ fun posJSpr(X: Int, Y: Int) {
         //  SKIPPED: Fall-through to jumpspringHandler would create mutual recursion cycle
         return
         X = temp2
+        Y = temp3
         if (A != 0) {
             //> lda JumpspringTimer
             A = jumpspringTimer
@@ -11939,6 +11984,8 @@ fun bulletBillHandler(X: Int, Y: Int): Int {
     var temp4: Int = 0
     var temp5: Int = 0
     var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
     var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
     var square2SoundQueue by MemoryByte(Square2SoundQueue)
     var timerControl by MemoryByte(TimerControl)
@@ -12029,12 +12076,15 @@ fun bulletBillHandler(X: Int, Y: Int): Int {
     temp5 = relativeEnemyPosition(temp3)
     X = temp5
     //> jsr GetEnemyBoundBox      ;get bounding box coordinates
-    getEnemyBoundBox(temp5)
-    //> jsr PlayerEnemyCollision  ;handle player to enemy collisions
-    temp6 = playerEnemyCollision(temp5, temp4)
+    val pair2 = getEnemyBoundBox(temp5)
+    temp6 = pair2.first
+    temp7 = pair2.second
     X = temp6
+    //> jsr PlayerEnemyCollision  ;handle player to enemy collisions
+    temp8 = playerEnemyCollision(temp6, temp7)
+    X = temp8
     //> jmp EnemyGfxHandler       ;draw the bullet bill and leave
-    enemyGfxHandler(temp6)
+    enemyGfxHandler(temp8)
     return X
 }
 
@@ -12259,7 +12309,7 @@ fun runAllH(X: Int) {
 }
 
 // Decompiled from CoinBlock
-fun coinBlock(X: Int, Y: Int) {
+fun coinBlock(X: Int, Y: Int): Int {
     var A: Int = 0
     var temp0: Int = 0
     var temp1: Int = 0
@@ -12291,7 +12341,7 @@ fun coinBlock(X: Int, Y: Int) {
     miscYPosition[temp0] = A
     //> jmp JCoinC              ;jump to rest of code as applies to this misc object
     jCoinC(X, temp0)
-    return
+    return X
 }
 
 // Decompiled from SetupJumpCoin
@@ -12341,7 +12391,7 @@ fun setupJumpCoin(X: Int, Y: Int) {
 }
 
 // Decompiled from JCoinC
-fun jCoinC(X: Int, Y: Int) {
+fun jCoinC(X: Int, Y: Int): Int {
     var A: Int = 0
     var coinTallyFor1Ups by MemoryByte(CoinTallyFor1Ups)
     var objectOffset by MemoryByte(ObjectOffset)
@@ -12368,7 +12418,7 @@ fun jCoinC(X: Int, Y: Int) {
     //> inc CoinTallyFor1Ups   ;increment coin tally used to activate 1-up block flag
     coinTallyFor1Ups = (coinTallyFor1Ups + 1) and 0xFF
     //> rts
-    return
+    return X
 }
 
 // Decompiled from FindEmptyMiscSlot
@@ -12735,6 +12785,14 @@ fun powerUpObjHandler(Y: Int) {
     var A: Int = 0
     var X: Int = 0
     var Y: Int = Y
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
     var frameCounter by MemoryByte(FrameCounter)
     var objectOffset by MemoryByte(ObjectOffset)
     var powerUpType by MemoryByte(PowerUpType)
@@ -12782,20 +12840,32 @@ fun powerUpObjHandler(Y: Int) {
                         return
                     }
                     //> jsr MoveJumpingEnemy       ;otherwise impose gravity on star power-up and make it jump
-                    moveJumpingEnemy(X)
+                    val pair0 = moveJumpingEnemy(X, Y)
+                    temp0 = pair0.first
+                    temp1 = pair0.second
+                    X = temp0
                     //> jsr EnemyJump              ;note that green paratroopa shares the same code here
-                    enemyJump(X)
+                    val pair1 = enemyJump(temp0, temp1)
+                    temp2 = pair1.first
+                    temp3 = pair1.second
+                    X = temp2
                     //> jmp RunPUSubs              ;then jump to other power-up subroutines
-                    runPUSubs(X, Y)
+                    runPUSubs(temp2, temp3)
                     return
                 }
             }
             //> ShroomM: jsr MoveNormalEnemy        ;do sub to make mushrooms move
-            moveNormalEnemy(X)
+            val pair2 = moveNormalEnemy(X)
+            temp4 = pair2.first
+            temp5 = pair2.second
+            X = temp4
             //> jsr EnemyToBGCollisionDet  ;deal with collisions
-            enemyToBGCollisionDet(X)
+            val pair3 = enemyToBGCollisionDet(temp4, temp5)
+            temp6 = pair3.first
+            temp7 = pair3.second
+            X = temp6
             //> jmp RunPUSubs              ;run the other subroutines
-            runPUSubs(X, Y)
+            runPUSubs(temp6, temp7)
             return
         }
         //> GrowThePowerUp:
@@ -12858,6 +12928,8 @@ fun runPUSubs(X: Int, Y: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     //> RunPUSubs: jsr RelativeEnemyPosition  ;get coordinates relative to screen
     temp0 = relativeEnemyPosition(X)
     X = temp0
@@ -12867,20 +12939,23 @@ fun runPUSubs(X: Int, Y: Int) {
     temp2 = pair0.second
     X = temp1
     //> jsr GetEnemyBoundBox       ;get bounding box coordinates
-    getEnemyBoundBox(temp1)
+    val pair1 = getEnemyBoundBox(temp1)
+    temp3 = pair1.first
+    temp4 = pair1.second
+    X = temp3
     //> jsr DrawPowerUp            ;draw the power-up object
     drawPowerUp()
     //> jsr PlayerEnemyCollision   ;check for collision with player
-    temp3 = playerEnemyCollision(temp1, temp2)
-    X = temp3
+    temp5 = playerEnemyCollision(temp3, temp4)
+    X = temp5
     //> jsr OffscreenBoundsCheck   ;check to see if it went offscreen
-    offscreenBoundsCheck(temp3)
+    offscreenBoundsCheck(temp5)
     //> ExitPUp:   rts                        ;and we're done
     return
 }
 
 // Decompiled from PlayerHeadCollision
-fun playerHeadCollision(A: Int) {
+fun playerHeadCollision(A: Int): Int {
     var A: Int = A
     var X: Int = 0
     var Y: Int = 0
@@ -13028,13 +13103,13 @@ fun playerHeadCollision(A: Int) {
         brickShatter(X)
         //> jmp InvOBit              ;skip subroutine to do last part of code here
         invOBit()
-        return
+        return X
     } else {
         //> Unbreak:   jsr BumpBlock            ;execute code for unbreakable brick or question block
         bumpBlock(X, Y)
         //  Fall-through tail call to invOBit
         invOBit()
-        return
+        return X
     }
 }
 
@@ -13237,7 +13312,7 @@ fun extraLifeMushBlock(X: Int) {
 }
 
 // Decompiled from VineBlock
-fun vineBlock() {
+fun vineBlock(): Int {
     var X: Int = 0
     var Y: Int = 0
     var sprdataoffsetCtrl by MemoryByte(SprDataOffset_Ctrl)
@@ -13250,7 +13325,7 @@ fun vineBlock() {
     setupVine(X, Y)
     //> ExitBlockChk:
     //> rts                     ;leave
-    return
+    return X
 }
 
 // Decompiled from BlockBumpedChk
@@ -13613,6 +13688,7 @@ fun blockobjmtUpdater() {
 // Decompiled from MoveEnemyHorizontally
 fun moveEnemyHorizontally(A: Int, X: Int): Pair<Int, Int> {
     var X: Int = X
+    var Y: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     //> MoveEnemyHorizontally:
     //> inx                         ;increment offset for enemy offset
@@ -13622,7 +13698,7 @@ fun moveEnemyHorizontally(A: Int, X: Int): Pair<Int, Int> {
     //> ldx ObjectOffset            ;counters, return with saved value in A,
     X = objectOffset
     //> rts                         ;put enemy offset back in X and leave
-    return Pair(A, X)
+    return Pair(A, Y)
 }
 
 // Decompiled from MovePlayerHorizontally
@@ -13880,7 +13956,7 @@ fun moveDropPlatform(X: Int) {
 }
 
 // Decompiled from MoveEnemySlowVert
-fun moveEnemySlowVert(X: Int) {
+fun moveEnemySlowVert(X: Int): Int {
     var A: Int = 0
     var Y: Int = 0
     //> MoveEnemySlowVert:
@@ -13892,12 +13968,12 @@ fun moveEnemySlowVert(X: Int) {
     if (!(A == 0)) {
         //  goto SetXMoveAmt -> setXMoveAmt
         setXMoveAmt(A, X, Y)
-        return
+        return Y
     } else {
         //> ;--------------------------------
         //  Fall-through tail call to movejEnemyvertically
         movejEnemyvertically(X)
-        return
+        return Y
     }
 }
 
@@ -14018,7 +14094,7 @@ fun movePlatformDown(X: Int): Int {
 }
 
 // Decompiled from MovePlatformUp
-fun movePlatformUp(X: Int) {
+fun movePlatformUp(X: Int): Int {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
@@ -14038,14 +14114,14 @@ fun movePlatformUp(X: Int) {
     //> bne SetDplSpd   ;this code, thus unconditional branch here
     //  Fall-through tail call to movePlatformDown
     movePlatformDown(X)
-    return
+    return X
     X = X
     if (Y == 0x29) {
         //> lda #$09        ;residual code
         A = 0x09
         //  Fall-through tail call to movePlatformDown
         movePlatformDown(X)
-        return
+        return X
     } else {
         //> SetDplSpd: sta $00         ;save downward movement amount here
         memory[0x0] = A.toUByte()
@@ -14063,7 +14139,7 @@ fun movePlatformUp(X: Int) {
         Y = A
         //  Fall-through tail call to redPTroopaGrav
         redPTroopaGrav(A, X)
-        return
+        return X
     }
 }
 
@@ -17047,7 +17123,7 @@ fun runEnemyObjectsCore(): Int {
             warpZoneObject(X)
         }
         33 -> {
-            runRetainerObj(X)
+            runRetainerObj(X, Y)
         }
         else -> {
             // Unknown JumpEngine index
@@ -17064,7 +17140,7 @@ fun noRunCode() {
 }
 
 // Decompiled from RunRetainerObj
-fun runRetainerObj(X: Int): Int {
+fun runRetainerObj(X: Int, Y: Int): Pair<Int, Int> {
     var X: Int = X
     var temp0: Int = 0
     var temp1: Int = 0
@@ -17080,7 +17156,7 @@ fun runRetainerObj(X: Int): Int {
     X = temp2
     //> jmp EnemyGfxHandler
     enemyGfxHandler(temp2)
-    return X
+    return Pair(X, Y)
 }
 
 // Decompiled from RunNormalEnemies
@@ -17090,9 +17166,15 @@ fun runNormalEnemies(X: Int, Y: Int) {
     var Y: Int = Y
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp10: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var timerControl by MemoryByte(TimerControl)
     val enemySprattrib by MemoryByteIndexed(Enemy_SprAttrib)
     //> RunNormalEnemies:
@@ -17109,21 +17191,30 @@ fun runNormalEnemies(X: Int, Y: Int) {
     temp2 = relativeEnemyPosition(temp0)
     X = temp2
     //> jsr EnemyGfxHandler
-    temp3 = enemyGfxHandler(temp2)
+    val pair1 = enemyGfxHandler(temp2)
+    temp3 = pair1.first
+    temp4 = pair1.second
     X = temp3
     //> jsr GetEnemyBoundBox
-    getEnemyBoundBox(temp3)
+    val pair2 = getEnemyBoundBox(temp3)
+    temp5 = pair2.first
+    temp6 = pair2.second
+    X = temp5
     //> jsr EnemyToBGCollisionDet
-    enemyToBGCollisionDet(temp3)
+    val pair3 = enemyToBGCollisionDet(temp5, temp6)
+    temp7 = pair3.first
+    temp8 = pair3.second
+    X = temp7
     //> jsr EnemiesCollision
-    enemiesCollision(temp3, temp1)
+    temp9 = enemiesCollision(temp7, temp8)
+    X = temp9
     //> jsr PlayerEnemyCollision
-    temp4 = playerEnemyCollision(temp3, temp1)
-    X = temp4
+    temp10 = playerEnemyCollision(temp9, temp8)
+    X = temp10
     //> ldy TimerControl          ;if master timer control set, skip to last routine
     Y = timerControl
     //> bne SkipMove
-    X = temp4
+    X = temp10
     if (Y == 0) {
         //> jsr EnemyMovementSubs
         enemyMovementSubs(X)
@@ -17185,7 +17276,7 @@ fun enemyMovementSubs(X: Int) {
             movePiranhaPlant(X)
         }
         14 -> {
-            moveJumpingEnemy(X)
+            moveJumpingEnemy(X, 0)
         }
         15 -> {
             procMoveRedPTroopa(X)
@@ -17226,34 +17317,44 @@ fun runBowserFlame(X: Int, Y: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     //> RunBowserFlame:
     //> jsr ProcBowserFlame
-    procBowserFlame(X)
-    //> jsr GetEnemyOffscreenBits
-    val pair0 = getEnemyOffscreenBits(X)
-    temp0 = pair0.first
-    temp1 = pair0.second
+    temp0 = procBowserFlame(X)
     X = temp0
+    //> jsr GetEnemyOffscreenBits
+    val pair0 = getEnemyOffscreenBits(temp0)
+    temp1 = pair0.first
+    temp2 = pair0.second
+    X = temp1
     //> jsr RelativeEnemyPosition
-    temp2 = relativeEnemyPosition(temp0)
-    X = temp2
-    //> jsr GetEnemyBoundBox
-    getEnemyBoundBox(temp2)
-    //> jsr PlayerEnemyCollision
-    temp3 = playerEnemyCollision(temp2, temp1)
+    temp3 = relativeEnemyPosition(temp1)
     X = temp3
+    //> jsr GetEnemyBoundBox
+    val pair1 = getEnemyBoundBox(temp3)
+    temp4 = pair1.first
+    temp5 = pair1.second
+    X = temp4
+    //> jsr PlayerEnemyCollision
+    temp6 = playerEnemyCollision(temp4, temp5)
+    X = temp6
     //> jmp OffscreenBoundsCheck
-    offscreenBoundsCheck(temp3)
+    offscreenBoundsCheck(temp6)
     return
 }
 
 // Decompiled from RunFirebarObj
 fun runFirebarObj(X: Int) {
+    var X: Int = X
+    var temp0: Int = 0
     //> RunFirebarObj:
     //> jsr ProcFirebar
-    procFirebar(X)
+    temp0 = procFirebar(X)
+    X = temp0
     //> jmp OffscreenBoundsCheck
-    offscreenBoundsCheck(X)
+    offscreenBoundsCheck(temp0)
     return
 }
 
@@ -17264,6 +17365,8 @@ fun runSmallPlatform(X: Int, Y: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     //> RunSmallPlatform:
     //> jsr GetEnemyOffscreenBits
     val pair0 = getEnemyOffscreenBits(X)
@@ -17276,16 +17379,18 @@ fun runSmallPlatform(X: Int, Y: Int) {
     //> jsr SmallPlatformBoundBox
     smallPlatformBoundBox(temp2)
     //> jsr SmallPlatformCollision
-    smallPlatformCollision(temp2, temp1)
-    //> jsr RelativeEnemyPosition
-    temp3 = relativeEnemyPosition(temp2)
+    temp3 = smallPlatformCollision(temp2, temp1)
     X = temp3
+    //> jsr RelativeEnemyPosition
+    temp4 = relativeEnemyPosition(temp3)
+    X = temp4
     //> jsr DrawSmallPlatform
-    drawSmallPlatform(temp3)
+    temp5 = drawSmallPlatform(temp4)
+    X = temp5
     //> jsr MoveSmallPlatform
-    moveSmallPlatform(temp3)
+    moveSmallPlatform(temp5)
     //> jmp OffscreenBoundsCheck
-    offscreenBoundsCheck(temp3)
+    offscreenBoundsCheck(temp5)
     return
 }
 
@@ -17298,6 +17403,9 @@ fun runLargePlatform(A: Int, X: Int, Y: Int) {
     var temp1: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
     var timerControl by MemoryByte(TimerControl)
     //> RunLargePlatform:
     //> jsr GetEnemyOffscreenBits
@@ -17309,25 +17417,28 @@ fun runLargePlatform(A: Int, X: Int, Y: Int) {
     temp2 = relativeEnemyPosition(temp0)
     X = temp2
     //> jsr LargePlatformBoundBox
-    largePlatformBoundBox(A, temp2)
+    temp3 = largePlatformBoundBox(A, temp2)
+    X = temp3
     //> jsr LargePlatformCollision
-    largePlatformCollision(temp2, temp1)
+    temp4 = largePlatformCollision(temp3, temp1)
+    X = temp4
     //> lda TimerControl             ;if master timer control set,
     A = timerControl
     //> bne SkipPT                   ;skip subroutine tree
-    X = temp2
+    X = temp4
     Y = temp1
     if (A == 0) {
         //> jsr LargePlatformSubroutines
         largePlatformSubroutines(X)
     }
     //> SkipPT: jsr RelativeEnemyPosition
-    temp3 = relativeEnemyPosition(X)
-    X = temp3
+    temp5 = relativeEnemyPosition(X)
+    X = temp5
     //> jsr DrawLargePlatform
-    drawLargePlatform(temp3)
+    temp6 = drawLargePlatform(temp5)
+    X = temp6
     //> jmp OffscreenBoundsCheck
-    offscreenBoundsCheck(temp3)
+    offscreenBoundsCheck(temp6)
     return
 }
 
@@ -17679,7 +17790,7 @@ fun moveHammerBroXDir(X: Int) {
 }
 
 // Decompiled from MoveNormalEnemy
-fun moveNormalEnemy(X: Int) {
+fun moveNormalEnemy(X: Int): Pair<Int, Int> {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
@@ -17718,7 +17829,7 @@ fun moveNormalEnemy(X: Int) {
             if (!(A == 0)) {
                 //  goto MoveDefeatedEnemy -> moveDefeatedEnemy
                 moveDefeatedEnemy(X)
-                return
+                return Pair(X, Y)
             }
             //> lda Enemy_State,x
             A = enemyState[X]
@@ -17761,7 +17872,7 @@ fun moveNormalEnemy(X: Int) {
     } else {
         //> MEHor: jmp MoveEnemyHorizontally  ;jump here to move enemy horizontally for <> $2e and d6 set
         moveEnemyHorizontally(A, X)
-        return
+        return Pair(X, Y)
     }
     //> SteadM: lda Enemy_X_Speed,x       ;get current horizontal speed
     A = enemyXSpeed[X]
@@ -17790,7 +17901,7 @@ fun moveNormalEnemy(X: Int) {
     //> sta Enemy_X_Speed,x       ;get old horizontal speed from stack and return to
     enemyXSpeed[X] = A
     //> rts                       ;original memory location, then leave
-    return
+    return Pair(X, temp2)
 }
 
 // Decompiled from MoveDefeatedEnemy
@@ -17804,13 +17915,13 @@ fun moveDefeatedEnemy(X: Int) {
 }
 
 // Decompiled from MoveJumpingEnemy
-fun moveJumpingEnemy(X: Int) {
+fun moveJumpingEnemy(X: Int, Y: Int): Pair<Int, Int> {
     //> MoveJumpingEnemy:
     //> jsr MoveJ_EnemyVertically  ;do a sub to impose gravity on green paratroopa
     movejEnemyvertically(X)
     //> jmp MoveEnemyHorizontally  ;jump to move enemy horizontally
     moveEnemyHorizontally(0, X)
-    return
+    return Pair(X, Y)
 }
 
 // Decompiled from ProcMoveRedPTroopa
@@ -18496,7 +18607,7 @@ fun chkSwimYPos(A: Int, X: Int) {
 }
 
 // Decompiled from ProcFirebar
-fun procFirebar(X: Int) {
+fun procFirebar(X: Int): Int {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
@@ -18637,7 +18748,7 @@ fun procFirebar(X: Int) {
         } while (!(A >= memory[0xED].toInt()))
     }
     //> SkipFBar: rts
-    return
+    return X
 }
 
 // Decompiled from DrawFirebar_Collision
@@ -19404,6 +19515,8 @@ fun bridgeCollapse() {
     var X: Int = 0
     var Y: Int = 0
     var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
     var bowserBodyControls by MemoryByte(BowserBodyControls)
     var bowserFeetCounter by MemoryByte(BowserFeetCounter)
     var bowserfrontOffset by MemoryByte(BowserFront_Offset)
@@ -19447,9 +19560,9 @@ fun bridgeCollapse() {
                 }
                 //> MoveD_Bowser:
                 //> jsr MoveEnemySlowVert     ;do a sub to move bowser downwards
-                moveEnemySlowVert(X)
+                temp0 = moveEnemySlowVert(X)
                 //> jmp BowserGfxHandler      ;jump to draw bowser's front and rear, then leave
-                bowserGfxHandler(X, 0)
+                bowserGfxHandler(X, temp0)
                 return
             } else {
                 //> SetM2: lda #Silence              ;silence music
@@ -19510,7 +19623,7 @@ fun bridgeCollapse() {
         //> ldx ObjectOffset          ;get enemy offset
         X = objectOffset
         //> jsr MoveVOffset           ;set new vram buffer offset
-        moveVOffset(Y)
+        temp1 = moveVOffset(Y)
         //> lda #Sfx_Blast            ;load the fireworks/gunfire sound into the square 2 sfx
         A = Sfx_Blast
         //> sta Square2SoundQueue     ;queue while at the same time loading the brick
@@ -19525,9 +19638,10 @@ fun bridgeCollapse() {
         A = bridgeCollapseOffset
         //> cmp #$0f                  ;if bridge collapse offset has not yet reached
         //> bne NoBFall               ;the end, go ahead and skip this part
+        Y = temp1
         if (A == 0x0F) {
             //> jsr InitVStf              ;initialize whatever vertical speed bowser has
-            temp0 = initVStf(X)
+            temp2 = initVStf(X)
             //> lda #%01000000
             A = 0x40
             //> sta Enemy_State,x         ;set bowser's state to one of defeated states (d6 set)
@@ -19546,6 +19660,7 @@ fun bridgeCollapse() {
 // Decompiled from RunBowser
 fun runBowser(X: Int, Y: Int) {
     var A: Int = 0
+    var temp0: Int = 0
     val enemyFrameTimer by MemoryByteIndexed(EnemyFrameTimer)
     val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
     val enemyState by MemoryByteIndexed(Enemy_State)
@@ -19561,9 +19676,9 @@ fun runBowser(X: Int, Y: Int) {
     //> beq BowserControl
     //> MoveD_Bowser:
     //> jsr MoveEnemySlowVert     ;do a sub to move bowser downwards
-    moveEnemySlowVert(X)
+    temp0 = moveEnemySlowVert(X)
     //> jmp BowserGfxHandler      ;jump to draw bowser's front and rear, then leave
-    bowserGfxHandler(X, Y)
+    bowserGfxHandler(X, temp0)
     return
 }
 
@@ -19598,6 +19713,7 @@ fun hammerChk(X: Int) {
     var Y: Int = 0
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
     var frameCounter by MemoryByte(FrameCounter)
     var worldNumber by MemoryByte(WorldNumber)
     val enemyFrameTimer by MemoryByteIndexed(EnemyFrameTimer)
@@ -19611,11 +19727,12 @@ fun hammerChk(X: Int) {
     X = X
     if (A == 0) {
         //> jsr MoveEnemySlowVert      ;otherwise start by moving bowser downwards
-        moveEnemySlowVert(X)
+        temp0 = moveEnemySlowVert(X)
         //> lda WorldNumber            ;check world number
         A = worldNumber
         //> cmp #World6
         //> bcc SetHmrTmr              ;if world 1-5, skip this part (not time to throw hammers yet)
+        Y = temp0
         if (A >= World6) {
             //> lda FrameCounter
             A = frameCounter
@@ -19624,8 +19741,8 @@ fun hammerChk(X: Int) {
             //> bne SetHmrTmr              ;if not, skip sub, otherwise
             if (A == 0) {
                 //> jsr SpawnHammerObj         ;execute sub on every fourth frame to spawn misc object (hammer)
-                temp0 = spawnHammerObj()
-                X = temp0
+                temp1 = spawnHammerObj()
+                X = temp1
             }
         }
         //> SetHmrTmr: lda Enemy_Y_Position,x     ;get current vertical position
@@ -19662,7 +19779,7 @@ fun hammerChk(X: Int) {
     //> dec Enemy_Y_Position,x     ;otherwise decrement vertical coordinate
     enemyYPosition[X] = (enemyYPosition[X] - 1) and 0xFF
     //> jsr InitVStf               ;initialize movement amount
-    temp1 = initVStf(X)
+    temp2 = initVStf(X)
     //> lda #$fe
     A = 0xFE
     //> sta Enemy_Y_Speed,x        ;set vertical speed to move bowser upwards
@@ -19844,6 +19961,9 @@ fun processBowserHalf(X: Int, Y: Int): Int {
     var X: Int = X
     var Y: Int = Y
     var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
     var bowserGfxFlag by MemoryByte(BowserGfxFlag)
     val enemyBoundboxctrl by MemoryByteIndexed(Enemy_BoundBoxCtrl)
     val enemyState by MemoryByteIndexed(Enemy_State)
@@ -19851,13 +19971,15 @@ fun processBowserHalf(X: Int, Y: Int): Int {
     //> inc BowserGfxFlag         ;increment bowser's graphics flag, then run subroutines
     bowserGfxFlag = (bowserGfxFlag + 1) and 0xFF
     //> jsr RunRetainerObj        ;to get offscreen bits, relative position and draw bowser (finally!)
-    temp0 = runRetainerObj(X)
+    val pair0 = runRetainerObj(X, Y)
+    temp0 = pair0.first
+    temp1 = pair0.second
     X = temp0
     //> lda Enemy_State,x
     A = enemyState[temp0]
     //> bne ExBGfxH               ;if either enemy object not in normal state, branch to leave
     X = temp0
-    Y = Y
+    Y = temp1
     if (A != 0) {
         //> ExBGfxH:  rts                      ;leave!
         return X
@@ -19867,9 +19989,12 @@ fun processBowserHalf(X: Int, Y: Int): Int {
         //> sta Enemy_BoundBoxCtrl,x  ;set bounding box size control
         enemyBoundboxctrl[X] = A
         //> jsr GetEnemyBoundBox      ;get bounding box coordinates
-        getEnemyBoundBox(X)
+        val pair1 = getEnemyBoundBox(X)
+        temp2 = pair1.first
+        temp3 = pair1.second
+        X = temp2
         //> jmp PlayerEnemyCollision  ;do player-to-enemy collision detection
-        playerEnemyCollision(X, Y)
+        playerEnemyCollision(temp2, temp3)
         return X
     }
 }
@@ -19899,7 +20024,7 @@ fun setFlameTimer(): Int {
 }
 
 // Decompiled from ProcBowserFlame
-fun procBowserFlame(X: Int) {
+fun procBowserFlame(X: Int): Int {
     var A: Int = 0
     var timerControl by MemoryByte(TimerControl)
     val bowserFlamePRandomOfs by MemoryByteIndexed(BowserFlamePRandomOfs)
@@ -19920,7 +20045,7 @@ fun procBowserFlame(X: Int) {
     A = timerControl
     //> bne SetGfxF                 ;skip all of this
     //> ExFl: rts
-    return
+    return X
 }
 
 // Decompiled from RunFireworks
@@ -20499,6 +20624,7 @@ fun balancePlatform(X: Int): Int {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
     val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
     val enemyState by MemoryByteIndexed(Enemy_State)
@@ -20632,16 +20758,17 @@ fun balancePlatform(X: Int): Int {
     //> beq PlatDn                  ;current enemy object offset, branch
     if (A != objectOffset) {
         //> PlatUp: jsr MovePlatformUp          ;do a sub to move upwards
-        movePlatformUp(X)
+        temp4 = movePlatformUp(X)
+        X = temp4
         //> jmp DoOtherPlatform         ;jump ahead to remaining code
-        doOtherPlatform(X)
+        doOtherPlatform(temp4)
         return X
     } else {
         //> PlatDn: jsr MovePlatformDown        ;do a sub to move downwards
-        temp4 = movePlatformDown(X)
-        X = temp4
+        temp5 = movePlatformDown(X)
+        X = temp5
         //  Fall-through tail call to doOtherPlatform
-        doOtherPlatform(temp4)
+        doOtherPlatform(temp5)
         return X
     }
 }
@@ -21080,6 +21207,7 @@ fun yMovingPlatform(X: Int): Int {
     var A: Int = 0
     var X: Int = X
     var temp0: Int = 0
+    var temp1: Int = 0
     var frameCounter by MemoryByte(FrameCounter)
     val enemyYmfDummy by MemoryByteIndexed(Enemy_YMF_Dummy)
     val enemyYMoveforce by MemoryByteIndexed(Enemy_Y_MoveForce)
@@ -21123,16 +21251,17 @@ fun yMovingPlatform(X: Int): Int {
     //> bcc YMDown
     if (A >= yPlatformCenterYPos[X]) {
         //> jsr MovePlatformUp           ;otherwise start slowing descent/moving upwards
-        movePlatformUp(X)
+        temp0 = movePlatformUp(X)
+        X = temp0
         //> jmp ChkYPCollision
-        chkYPCollision(X)
+        chkYPCollision(temp0)
         return X
     } else {
         //> YMDown: jsr MovePlatformDown         ;start slowing ascent/moving downwards
-        temp0 = movePlatformDown(X)
-        X = temp0
+        temp1 = movePlatformDown(X)
+        X = temp1
         //  Fall-through tail call to chkYPCollision
-        chkYPCollision(temp0)
+        chkYPCollision(temp1)
         return X
     }
 }
@@ -21491,7 +21620,7 @@ fun offscreenBoundsCheck(X: Int) {
 }
 
 // Decompiled from FireballEnemyCollision
-fun fireballEnemyCollision(X: Int) {
+fun fireballEnemyCollision(X: Int): Int {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
@@ -21626,7 +21755,7 @@ fun fireballEnemyCollision(X: Int) {
     //> ldx ObjectOffset                 ;get original fireball offset and leave
     X = objectOffset
     //> rts
-    return
+    return X
 }
 
 // Decompiled from HandleEnemyFBallCol
@@ -22301,7 +22430,7 @@ fun setupFloateyNumber(A: Int, X: Int): Int {
 }
 
 // Decompiled from EnemiesCollision
-fun enemiesCollision(X: Int, Y: Int) {
+fun enemiesCollision(X: Int, Y: Int): Int {
     var A: Int = 0
     var X: Int = X
     var Y: Int = Y
@@ -22328,7 +22457,7 @@ fun enemiesCollision(X: Int, Y: Int) {
     Y = Y
     if ((orig0 and 0x01) == 0) {
         //> ExSFN: rts
-        return
+        return X
     } else {
         //> lda AreaType
         A = areaType
@@ -22466,7 +22595,7 @@ fun enemiesCollision(X: Int, Y: Int) {
     //> ldx ObjectOffset ;get enemy object buffer offset
     X = objectOffset
     //> rts              ;leave
-    return
+    return X
 }
 
 // Decompiled from ProcEnemyCollisions
@@ -22621,7 +22750,7 @@ fun rXSpd(X: Int) {
 }
 
 // Decompiled from LargePlatformCollision
-fun largePlatformCollision(X: Int, Y: Int) {
+fun largePlatformCollision(X: Int, Y: Int): Int {
     var A: Int = 0
     var X: Int = X
     var Y: Int = Y
@@ -22652,7 +22781,7 @@ fun largePlatformCollision(X: Int, Y: Int) {
             if (!(A == 0x24)) {
                 //  goto ChkForPlayerC_LargeP -> chkforplayercLargep
                 chkforplayercLargep(X, Y)
-                return
+                return X
             }
             //> lda Enemy_State,x
             A = enemyState[X]
@@ -22661,14 +22790,15 @@ fun largePlatformCollision(X: Int, Y: Int) {
             //> jsr ChkForPlayerC_LargeP     ;perform code with state offset, then original offset, in X
             val flag0: Boolean = chkforplayercLargep(X, Y)
             //  SKIPPED: Fall-through to chkforplayercLargep would create mutual recursion cycle
-            return
+            return X
         }
     }
     //> ExLPC: ldx ObjectOffset             ;get enemy object buffer offset and leave
     X = objectOffset
     //> rts
-    return
+    return X
     // SKIPPED: Fall-through to chkforplayercLargep would create mutual recursion cycle
+    return X
 }
 
 // Decompiled from ChkForPlayerC_LargeP
@@ -22720,7 +22850,7 @@ fun chkforplayercLargep(X: Int, Y: Int): Boolean {
 }
 
 // Decompiled from SmallPlatformCollision
-fun smallPlatformCollision(X: Int, Y: Int) {
+fun smallPlatformCollision(X: Int, Y: Int): Int {
     var A: Int = 0
     var X: Int = X
     var Y: Int = Y
@@ -22788,7 +22918,7 @@ fun smallPlatformCollision(X: Int, Y: Int) {
     //> ExSPC: ldx ObjectOffset           ;get enemy object buffer offset, then leave
     X = objectOffset
     //> rts
-    return
+    return X
 }
 
 // Decompiled from ProcLPlatCollisions
@@ -23106,6 +23236,7 @@ fun playerBGCollision() {
     var X: Int = 0
     var Y: Int = 0
     var temp0: Int = 0
+    var temp1: Int = 0
     var areaType by MemoryByte(AreaType)
     var blockBounceTimer by MemoryByte(BlockBounceTimer)
     var crouchingFlag by MemoryByte(CrouchingFlag)
@@ -23262,9 +23393,10 @@ fun playerBGCollision() {
                     //> bne NYSpd                   ;branch ahead, do not process collision
                     if (Y == 0) {
                         //> jsr PlayerHeadCollision     ;otherwise do a sub to process collision
-                        playerHeadCollision(A)
+                        temp1 = playerHeadCollision(A)
+                        X = temp1
                         //> jmp DoFootCheck             ;jump ahead to skip these other parts here
-                        doFootCheck(X)
+                        doFootCheck(temp1)
                         return
                     }
                 }
@@ -23307,6 +23439,9 @@ fun doFootCheck(X: Int) {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
     var changeAreaTimer by MemoryByte(ChangeAreaTimer)
     var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
     var jumpspringAnimCtrl by MemoryByte(JumpspringAnimCtrl)
@@ -23369,9 +23504,10 @@ fun doFootCheck(X: Int) {
         return
         //> ChkFootMTile:
         //> jsr CheckForClimbMTiles    ;check to see if player landed on climbable metatiles
-        val flag0: Boolean = checkForClimbMTiles(A, X)
+        temp2 = checkForClimbMTiles(A, X)
         //> bcs DoPlayerSideCheck      ;if so, branch
-        if (!flag0) {
+        A = temp2
+        if (!(A >= 0xCF)) {
             //> ldy Player_Y_Speed         ;check player's vertical speed
             Y = playerYSpeed
             //> bmi DoPlayerSideCheck      ;if player moving upwards, branch
@@ -23384,7 +23520,7 @@ fun doFootCheck(X: Int) {
                     return
                 }
                 //> ContChk:  jsr ChkInvisibleMTiles     ;do sub to check for hidden coin or 1-up blocks
-                val flag1: Boolean = chkInvisibleMTiles(A)
+                val flag0: Boolean = chkInvisibleMTiles(A)
                 //> beq DoPlayerSideCheck      ;if either found, branch
                 if (A != 0xC5) {
                     //> ldy JumpspringAnimCtrl     ;if jumpspring animating right now,
@@ -23457,9 +23593,9 @@ fun doFootCheck(X: Int) {
             //> bcs ExSCH                 ;branch to leave if player is too far down
             if (!(A >= 0xE4)) {
                 //> jsr BlockBufferColli_Side ;do player-to-bg collision detection on one half of player
-                temp2 = blockbuffercolliSide(Y)
+                temp3 = blockbuffercolliSide(Y)
                 //> beq BHalf                 ;branch ahead if nothing found
-                A = temp2
+                A = temp3
                 if (A != 0xE4) {
                     //> cmp #$1c                  ;otherwise check for pipe metatiles
                     //> beq BHalf                 ;if collided with sideways pipe (top), branch ahead
@@ -23468,9 +23604,9 @@ fun doFootCheck(X: Int) {
                         //> beq BHalf                 ;if collided with water pipe (top), branch ahead
                         if (A != 0x6B) {
                             //> jsr CheckForClimbMTiles   ;do sub to see if player bumped into anything climbable
-                            val flag2: Boolean = checkForClimbMTiles(A, X)
+                            temp4 = checkForClimbMTiles(A, X)
                             //> bcc CheckSideMTiles       ;if not, branch to alternate section of code
-                            if (!(flag2)) {
+                            if (!(A >= 0x6B)) {
                                 //  goto CheckSideMTiles
                                 break@loop0
                             }
@@ -23496,7 +23632,7 @@ fun doFootCheck(X: Int) {
                     break@loop0
                 }
                 //> jsr BlockBufferColli_Side ;do player-to-bg collision detection on other half of player
-                temp3 = blockbuffercolliSide(Y)
+                temp5 = blockbuffercolliSide(Y)
                 //> bne CheckSideMTiles       ;if something found, branch
                 if (!(A == 0xD0)) {
                     //  goto CheckSideMTiles
@@ -23507,7 +23643,7 @@ fun doFootCheck(X: Int) {
                 //> bne SideCheckLoop         ;run code until both sides of player are checked
                 //> CheckSideMTiles:
                 //> jsr ChkInvisibleMTiles     ;check for hidden or coin 1-up blocks
-                val flag3: Boolean = chkInvisibleMTiles(temp3)
+                val flag1: Boolean = chkInvisibleMTiles(temp5)
                 //> beq ExCSM                  ;branch to leave if either found
             } else {
                 //> ExSCH: rts                       ;leave
@@ -23529,26 +23665,27 @@ fun doFootCheck(X: Int) {
     } while (A != 0)
     if (A != 0) {
         //> jsr CheckForClimbMTiles    ;check for climbable metatiles
-        val flag4: Boolean = checkForClimbMTiles(A, X)
+        temp6 = checkForClimbMTiles(A, X)
         //> bcc ContSChk               ;if not found, skip and continue with code
-        if (flag4) {
+        A = temp6
+        if (flagC) {
             //> jmp HandleClimbing         ;otherwise jump to handle climbing
             handleClimbing(A)
             return
         }
         //> ContSChk: jsr CheckForCoinMTiles     ;check to see if player touched coin
-        temp4 = checkForCoinMTiles(A)
+        temp7 = checkForCoinMTiles(A)
         //> bcs HandleCoinMetatile     ;if so, execute code to erase coin and award to player 1 coin
-        if (flag4) {
+        if (flagC) {
             //  goto HandleCoinMetatile -> handleCoinMetatile
             handleCoinMetatile()
             return
         }
         //> jsr ChkJumpspringMetatiles ;check for jumpspring metatiles
-        val flag5: Boolean = chkJumpspringMetatiles(temp4)
+        val flag2: Boolean = chkJumpspringMetatiles(temp7)
         //> bcc ChkPBtm                ;if not found, branch ahead to continue cude
-        A = temp4
-        if (flag5) {
+        A = temp7
+        if (flag2) {
             //> lda JumpspringAnimCtrl     ;otherwise check jumpspring animation control
             A = jumpspringAnimCtrl
             //> bne ExCSM                  ;branch to leave if set
@@ -24219,7 +24356,7 @@ fun checkForSolidMTiles(A: Int, X: Int): Boolean {
 }
 
 // Decompiled from CheckForClimbMTiles
-fun checkForClimbMTiles(A: Int, X: Int): Boolean {
+fun checkForClimbMTiles(A: Int, X: Int): Int {
     var X: Int = X
     var temp0: Int = 0
     var temp1: Int = 0
@@ -24232,7 +24369,7 @@ fun checkForClimbMTiles(A: Int, X: Int): Boolean {
     X = temp1
     //> cmp ClimbMTileUpperExt,x  ;compare current metatile with climbable metatiles
     //> rts
-    return temp0 >= climbMTileUpperExt[X]
+    return temp0
 }
 
 // Decompiled from CheckForCoinMTiles
@@ -24284,18 +24421,19 @@ fun getMTileAttrib(A: Int): Pair<Int, Int> {
     //> tya            ;get original metatile value back
     A = Y
     //  Fall-through tail call to enemyToBGCollisionDet
-    enemyToBGCollisionDet(X)
+    enemyToBGCollisionDet(X, Y)
     return Pair(A, X)
 }
 
 // Decompiled from EnemyToBGCollisionDet
-fun enemyToBGCollisionDet(X: Int) {
+fun enemyToBGCollisionDet(X: Int, Y: Int): Pair<Int, Int> {
     var A: Int = 0
     var X: Int = X
-    var Y: Int = 0
+    var Y: Int = Y
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
     var frameCounter by MemoryByte(FrameCounter)
     val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
     val enemyId by MemoryByteIndexed(Enemy_ID)
@@ -24310,9 +24448,10 @@ fun enemyToBGCollisionDet(X: Int) {
     A = A and 0x20
     //> bne ExEBG                ;if set, branch to leave
     X = X
+    Y = Y
     if (A != 0) {
         //> ExEBG: rts            ;leave
-        return
+        return Pair(X, Y)
     } else {
         //> jsr SubtEnemyYPos        ;otherwise, do a subroutine here
         val flag0: Boolean = subtEnemyYPos(X)
@@ -24337,15 +24476,15 @@ fun enemyToBGCollisionDet(X: Int) {
     //> bne HBChk                ;branch if not found
     if (Y == GreenParatroopaJump) {
         //> jmp EnemyJump            ;otherwise jump elsewhere
-        enemyJump(X)
-        return
+        enemyJump(X, Y)
+        return Pair(X, Y)
     } else {
         //> HBChk: cpy #HammerBro           ;check for hammer bro
         //> bne CInvu                ;branch if not found
         if (Y == HammerBro) {
             //> jmp HammerBroBGColl      ;otherwise jump elsewhere
             hammerBroBGColl(A, X)
-            return
+            return Pair(X, Y)
         }
     }
     //> CInvu: cpy #Spiny               ;if enemy object is spiny, branch
@@ -24358,19 +24497,23 @@ fun enemyToBGCollisionDet(X: Int) {
             //> bcs ExEBGChk
             if (Y >= 0x07) {
                 //  goto ExEBGChk
-                return
+                return Pair(X, Y)
             }
         }
     }
     //> YesIn: jsr ChkUnderEnemy        ;if enemy object < $07, or = $12 or $2e, do this sub
-    temp0 = chkUnderEnemy(X)
+    val pair0 = chkUnderEnemy(X)
+    temp0 = pair0.first
+    temp1 = pair0.second
+    X = temp1
     //> bne HandleEToBGCollision ;if block underneath enemy, branch
     A = temp0
+    Y = temp1
     if (A == 0) {
         //> NoEToBGCollision:
         //> jmp ChkForRedKoopa       ;otherwise skip and do something else
         chkForRedKoopa(X)
-        return
+        return Pair(X, Y)
     } else {
         //> HandleEToBGCollision:
         //> jsr ChkForNonSolids       ;if something is underneath enemy, find out what
@@ -24395,7 +24538,7 @@ fun enemyToBGCollisionDet(X: Int) {
         if (A >= 0x15) {
             //  goto ChkToStunEnemies -> chkToStunEnemies
             chkToStunEnemies(A, X)
-            return
+            return Pair(X, Y)
         }
         //> cmp #Goomba               ;if enemy object not goomba, branch ahead of this routine
         //> bne GiveOEPoints
@@ -24407,26 +24550,26 @@ fun enemyToBGCollisionDet(X: Int) {
         //> lda #$01                  ;award 100 points for hitting block beneath enemy
         A = 0x01
         //> jsr SetupFloateyNumber
-        temp1 = setupFloateyNumber(A, X)
+        temp2 = setupFloateyNumber(A, X)
         //  Fall-through tail call to chkToStunEnemies
-        chkToStunEnemies(temp1, X)
-        return
+        chkToStunEnemies(temp2, X)
+        return Pair(X, Y)
         //> ExEBGChk: rts
-        return
+        return Pair(X, Y)
     } else {
         //> LandEnemyProperly:
         //> lda $04                 ;check lower nybble of vertical coordinate saved earlier
         A = memory[0x4].toInt()
         //> sec
         //> sbc #$08                ;subtract eight pixels
-        temp2 = A - 0x08
-        A = temp2 and 0xFF
+        temp3 = A - 0x08
+        A = temp3 and 0xFF
         //> cmp #$05                ;used to determine whether enemy landed from falling
         //> bcs ChkForRedKoopa      ;branch if lower nybble in range of $0d-$0f before subtract
         if (A >= 0x05) {
             //  goto ChkForRedKoopa -> chkForRedKoopa
             chkForRedKoopa(X)
-            return
+            return Pair(X, Y)
         }
     }
     //> lda Enemy_State,x
@@ -24444,7 +24587,7 @@ fun enemyToBGCollisionDet(X: Int) {
         if ((orig1 and 0x80) != 0) {
             //> SChkA: jmp DoEnemySideCheck    ;if lower nybble < $0d, d7 set but d6 not set, jump here
             doEnemySideCheck(X)
-            return
+            return Pair(X, Y)
         }
         //> ChkLandedEnemyState:
         //> lda Enemy_State,x         ;if enemy in normal state, branch back to jump here
@@ -24484,7 +24627,7 @@ fun enemyToBGCollisionDet(X: Int) {
                 }
             }
             //> ExSteChk:  rts                       ;then leave
-            return
+            return Pair(X, Y)
         }
         //> ProcEnemyDirection:
         //> lda Enemy_ID,x            ;check enemy identifier for goomba
@@ -24542,7 +24685,7 @@ fun enemyToBGCollisionDet(X: Int) {
         //> sta Enemy_State,x      ;note this will also turn spiny's egg into spiny
         enemyState[X] = A
         //> rts
-        return
+        return Pair(X, Y)
     } else {
         //> NMovShellFallBit:
         //> lda Enemy_State,x   ;nullify d6 of enemy state, save other bits
@@ -24552,7 +24695,7 @@ fun enemyToBGCollisionDet(X: Int) {
         //> sta Enemy_State,x
         enemyState[X] = A
         //> rts
-        return
+        return Pair(X, Y)
     }
 }
 
@@ -24672,7 +24815,7 @@ fun setStun(X: Int) {
 }
 
 // Decompiled from ChkForRedKoopa
-fun chkForRedKoopa(X: Int) {
+fun chkForRedKoopa(X: Int): Int {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
@@ -24692,7 +24835,7 @@ fun chkForRedKoopa(X: Int) {
         if (A == 0) {
             //  goto ChkForBump_HammerBroJ -> chkforbumpHammerbroj
             chkforbumpHammerbroj(X)
-            return
+            return Y
         }
     }
     //> Chk2MSBSt:   lda Enemy_State,x         ;save enemy state into Y
@@ -24711,13 +24854,13 @@ fun chkForRedKoopa(X: Int) {
         A = A or 0x40
         //> jmp SetD6Ste              ;jump ahead of this part
         setD6Ste(A, X)
-        return
+        return Y
     } else {
         //> GetSteFromD: lda EnemyBGCStateData,y   ;load new enemy state with old as offset
         A = enemyBGCStateData[Y]
         //  Fall-through tail call to setD6Ste
         setD6Ste(A, X)
-        return
+        return Y
     }
 }
 
@@ -24735,11 +24878,12 @@ fun setD6Ste(A: Int, X: Int) {
 }
 
 // Decompiled from DoEnemySideCheck
-fun doEnemySideCheck(X: Int) {
+fun doEnemySideCheck(X: Int): Pair<Int, Int> {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
     var temp0: Int = 0
+    var temp1: Int = 0
     val enemyMovingdir by MemoryByteIndexed(Enemy_MovingDir)
     val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
     //> DoEnemySideCheck:
@@ -24764,9 +24908,13 @@ fun doEnemySideCheck(X: Int) {
                 //> lda #$01                   ;set flag in A for save horizontal coordinate
                 A = 0x01
                 //> jsr BlockBufferChk_Enemy   ;find block to left or right of enemy object
-                temp0 = blockbufferchkEnemy(A, X, Y)
+                val pair0 = blockbufferchkEnemy(A, X, Y)
+                temp0 = pair0.first
+                temp1 = pair0.second
+                X = temp1
                 //> beq NextSdeC               ;if nothing found, branch
                 A = temp0
+                Y = temp1
                 if (A != 0) {
                     //> jsr ChkForNonSolids        ;check for non-solid blocks
                     chkForNonSolids(A)
@@ -24786,7 +24934,7 @@ fun doEnemySideCheck(X: Int) {
         } while (!(Y >= 0x18))
     }
     //> ExESdeC:  rts
-    return
+    return Pair(X, Y)
 }
 
 // Decompiled from ChkForBump_HammerBroJ
@@ -24902,17 +25050,20 @@ fun subtEnemyYPos(X: Int): Boolean {
 }
 
 // Decompiled from EnemyJump
-fun enemyJump(X: Int) {
+fun enemyJump(X: Int, Y: Int): Pair<Int, Int> {
     var A: Int = 0
     var X: Int = X
+    var Y: Int = Y
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
     val enemyYSpeed by MemoryByteIndexed(Enemy_Y_Speed)
     //> EnemyJump:
     //> jsr SubtEnemyYPos     ;do a sub here
     val flag0: Boolean = subtEnemyYPos(X)
     //> bcc DoSide            ;if enemy vertical coord + 62 < 68, branch to leave
     X = X
+    Y = Y
     if (flag0) {
         //> lda Enemy_Y_Speed,x
         A = enemyYSpeed[X]
@@ -24924,9 +25075,13 @@ fun enemyJump(X: Int) {
         //> bcc DoSide
         if (A >= 0x03) {
             //> jsr ChkUnderEnemy     ;otherwise, check to see if green paratroopa is
-            temp1 = chkUnderEnemy(X)
+            val pair0 = chkUnderEnemy(X)
+            temp1 = pair0.first
+            temp2 = pair0.second
+            X = temp2
             //> beq DoSide            ;standing on anything, then branch to same place if not
             A = temp1
+            Y = temp2
             if (A != 0x03) {
                 //> jsr ChkForNonSolids   ;check for non-solid blocks
                 chkForNonSolids(A)
@@ -24944,29 +25099,34 @@ fun enemyJump(X: Int) {
     }
     //> DoSide: jmp DoEnemySideCheck  ;check for horizontal blockage, then leave
     doEnemySideCheck(X)
-    return
+    return Pair(X, Y)
 }
 
 // Decompiled from HammerBroBGColl
-fun hammerBroBGColl(A: Int, X: Int) {
+fun hammerBroBGColl(A: Int, X: Int): Pair<Int, Int> {
     var A: Int = A
     var X: Int = X
+    var Y: Int = 0
     var temp0: Int = 0
+    var temp1: Int = 0
     val enemyFrameTimer by MemoryByteIndexed(EnemyFrameTimer)
     val enemyState by MemoryByteIndexed(Enemy_State)
     //> HammerBroBGColl:
     //> jsr ChkUnderEnemy    ;check to see if hammer bro is standing on anything
-    temp0 = chkUnderEnemy(X)
+    val pair0 = chkUnderEnemy(X)
+    temp0 = pair0.first
+    temp1 = pair0.second
+    X = temp1
     //> beq NoUnderHammerBro
     A = temp0
-    X = X
+    Y = temp1
     if (A != 0) {
         //> cmp #$23             ;check for blank metatile $23 and branch if not found
         //> bne UnderHammerBro
         if (A == 0x23) {
             //  Fall-through tail call to killEnemyAboveBlock
             killEnemyAboveBlock(X)
-            return
+            return Pair(X, Y)
         }
         //> UnderHammerBro:
         //> lda EnemyFrameTimer,x ;check timer used by hammer bro
@@ -24983,7 +25143,7 @@ fun hammerBroBGColl(A: Int, X: Int) {
             enemyLanding(X)
             //> jmp DoEnemySideCheck  ;then check for horizontal blockage and leave
             doEnemySideCheck(X)
-            return
+            return Pair(X, Y)
         }
     }
     //> NoUnderHammerBro:
@@ -24994,7 +25154,7 @@ fun hammerBroBGColl(A: Int, X: Int) {
     //> sta Enemy_State,x
     enemyState[X] = A
     //> rts
-    return
+    return Pair(X, Y)
 }
 
 // Decompiled from KillEnemyAboveBlock
@@ -25013,7 +25173,7 @@ fun killEnemyAboveBlock(X: Int) {
 }
 
 // Decompiled from ChkUnderEnemy
-fun chkUnderEnemy(X: Int): Int {
+fun chkUnderEnemy(X: Int): Pair<Int, Int> {
     var A: Int = 0
     var Y: Int = 0
     //> ChkUnderEnemy:
@@ -25052,7 +25212,7 @@ fun chkForNonSolids(A: Int) {
 }
 
 // Decompiled from FireballBGCollision
-fun fireballBGCollision(X: Int) {
+fun fireballBGCollision(X: Int): Int {
     var A: Int = 0
     var X: Int = X
     val fireballBouncingFlag by MemoryByteIndexed(FireballBouncingFlag)
@@ -25097,7 +25257,7 @@ fun fireballBGCollision(X: Int) {
                         //> sta Fireball_Y_Position,x   ;store as new vertical coordinate
                         fireballYPosition[X] = A
                         //> rts                         ;leave
-                        return
+                        return X
                     }
                 }
             }
@@ -25109,15 +25269,17 @@ fun fireballBGCollision(X: Int) {
     //> sta FireballBouncingFlag,x  ;clear bouncing flag by default
     fireballBouncingFlag[X] = A
     //> rts                         ;leave
-    return
+    return X
 }
 
 // Decompiled from GetFireballBoundBox
-fun getFireballBoundBox(X: Int) {
+fun getFireballBoundBox(X: Int): Int {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
     var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
     //> GetFireballBoundBox:
     //> txa         ;add seven bytes to offset
     A = X
@@ -25134,13 +25296,16 @@ fun getFireballBoundBox(X: Int) {
     if (Y == 0) {
         //  Fall-through tail call to getMiscBoundBox
         getMiscBoundBox(X)
-        return
+        return X
     } else {
         //> FBallB: jsr BoundingBoxCore       ;get bounding box coordinates
-        boundingBoxCore(X, Y)
+        val pair0 = boundingBoxCore(X, Y)
+        temp1 = pair0.first
+        temp2 = pair0.second
+        X = temp1
         //> jmp CheckRightScreenBBox  ;jump to handle any offscreen coordinates
-        checkRightScreenBBox(X, Y)
-        return
+        checkRightScreenBBox(temp1, temp2)
+        return X
     }
 }
 
@@ -25150,6 +25315,8 @@ fun getMiscBoundBox(X: Int): Int {
     var X: Int = X
     var Y: Int = 0
     var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
     //> GetMiscBoundBox:
     //> txa                       ;add nine bytes to offset
     A = X
@@ -25161,14 +25328,17 @@ fun getMiscBoundBox(X: Int): Int {
     //> ldy #$06                  ;set offset for relative coordinates
     Y = 0x06
     //> FBallB: jsr BoundingBoxCore       ;get bounding box coordinates
-    boundingBoxCore(X, Y)
+    val pair0 = boundingBoxCore(X, Y)
+    temp1 = pair0.first
+    temp2 = pair0.second
+    X = temp1
     //> jmp CheckRightScreenBBox  ;jump to handle any offscreen coordinates
-    checkRightScreenBBox(X, Y)
+    checkRightScreenBBox(temp1, temp2)
     return X
 }
 
 // Decompiled from GetEnemyBoundBox
-fun getEnemyBoundBox(X: Int) {
+fun getEnemyBoundBox(X: Int): Pair<Int, Int> {
     var Y: Int = 0
     //> GetEnemyBoundBox:
     //> ldy #$48                 ;store bitmask here for now
@@ -25179,7 +25349,7 @@ fun getEnemyBoundBox(X: Int) {
     Y = 0x44
     //> jmp GetMaskedOffScrBits
     getMaskedOffScrBits(X, Y)
-    return
+    return Pair(X, Y)
 }
 
 // Decompiled from SmallPlatformBoundBox
@@ -25198,7 +25368,7 @@ fun smallPlatformBoundBox(X: Int) {
 }
 
 // Decompiled from GetMaskedOffScrBits
-fun getMaskedOffScrBits(X: Int, Y: Int) {
+fun getMaskedOffScrBits(X: Int, Y: Int): Pair<Int, Int> {
     var A: Int = 0
     var X: Int = X
     var Y: Int = Y
@@ -25247,7 +25417,7 @@ fun getMaskedOffScrBits(X: Int, Y: Int) {
     if (A == 0) {
         //> jmp SetupEOffsetFBBox       ;otherwise, do something else
         setupEOffsetFBBox(X)
-        return
+        return Pair(X, Y)
     } else {
         //> MoveBoundBoxOffscreen:
         //> txa                            ;multiply offset by 4
@@ -25271,12 +25441,12 @@ fun getMaskedOffScrBits(X: Int, Y: Int) {
         //> sta EnemyBoundingBoxCoord+3,y
         enemyBoundingBoxCoord[3 + Y] = A
         //> rts
-        return
+        return Pair(X, Y)
     }
 }
 
 // Decompiled from LargePlatformBoundBox
-fun largePlatformBoundBox(A: Int, X: Int) {
+fun largePlatformBoundBox(A: Int, X: Int): Int {
     var A: Int = A
     var X: Int = X
     var Y: Int = 0
@@ -25300,7 +25470,7 @@ fun largePlatformBoundBox(A: Int, X: Int) {
     if (!(temp0 >= 0xFE)) {
         //  Fall-through tail call to setupEOffsetFBBox
         setupEOffsetFBBox(X)
-        return
+        return X
     } else {
         //> MoveBoundBoxOffscreen:
         //> txa                            ;multiply offset by 4
@@ -25324,16 +25494,18 @@ fun largePlatformBoundBox(A: Int, X: Int) {
         //> sta EnemyBoundingBoxCoord+3,y
         enemyBoundingBoxCoord[3 + Y] = A
         //> rts
-        return
+        return X
     }
 }
 
 // Decompiled from SetupEOffsetFBBox
-fun setupEOffsetFBBox(X: Int) {
+fun setupEOffsetFBBox(X: Int): Pair<Int, Int> {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
     var temp0: Int = 0
+    var temp1: Int = 0
+    var temp2: Int = 0
     //> SetupEOffsetFBBox:
     //> txa                        ;add 1 to offset to properly address
     A = X
@@ -25345,14 +25517,17 @@ fun setupEOffsetFBBox(X: Int) {
     //> ldy #$01                   ;load 1 as offset here, same reason
     Y = 0x01
     //> jsr BoundingBoxCore        ;do a sub to get the coordinates of the bounding box
-    boundingBoxCore(X, Y)
+    val pair0 = boundingBoxCore(X, Y)
+    temp1 = pair0.first
+    temp2 = pair0.second
+    X = temp1
     //> jmp CheckRightScreenBBox   ;jump to handle offscreen coordinates of bounding box
-    checkRightScreenBBox(X, Y)
-    return
+    checkRightScreenBBox(temp1, temp2)
+    return Pair(X, Y)
 }
 
 // Decompiled from BoundingBoxCore
-fun boundingBoxCore(X: Int, Y: Int) {
+fun boundingBoxCore(X: Int, Y: Int): Pair<Int, Int> {
     var A: Int = 0
     var X: Int = X
     var Y: Int = Y
@@ -25442,7 +25617,7 @@ fun boundingBoxCore(X: Int, Y: Int) {
     //> ldx $00                     ;get original offset and use as X again
     X = memory[0x0].toInt()
     //> rts
-    return
+    return Pair(X, Y)
 }
 
 // Decompiled from CheckRightScreenBBox
@@ -25662,7 +25837,7 @@ fun sprObjectCollisionCore(X: Int, Y: Int): Boolean {
 }
 
 // Decompiled from BlockBufferChk_Enemy
-fun blockbufferchkEnemy(A: Int, X: Int, Y: Int): Int {
+fun blockbufferchkEnemy(A: Int, X: Int, Y: Int): Pair<Int, Int> {
     var A: Int = A
     var X: Int = X
     var temp0: Int = 0
@@ -25715,7 +25890,7 @@ fun resJmpM(X: Int, Y: Int) {
 }
 
 // Decompiled from BBChk_E
-fun bbchkE(A: Int, X: Int, Y: Int): Int {
+fun bbchkE(A: Int, X: Int, Y: Int): Pair<Int, Int> {
     var X: Int = X
     var temp0: Int = 0
     var objectOffset by MemoryByte(ObjectOffset)
@@ -25725,7 +25900,7 @@ fun bbchkE(A: Int, X: Int, Y: Int): Int {
     X = objectOffset
     //> cmp #$00                  ;check to see if object bumped into anything
     //> rts
-    return temp0
+    return Pair(temp0, X)
 }
 
 // Decompiled from BlockBufferColli_Feet
@@ -26364,7 +26539,7 @@ fun dumpTwoSpr(A: Int, Y: Int) {
 }
 
 // Decompiled from DrawLargePlatform
-fun drawLargePlatform(X: Int) {
+fun drawLargePlatform(X: Int): Int {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
@@ -26547,7 +26722,7 @@ fun drawLargePlatform(X: Int) {
         moveSixSpritesOffscreen(Y)
     }
     //> ExDLPl: rts
-    return
+    return X
 }
 
 // Decompiled from JCoinGfxHandler
@@ -26753,7 +26928,7 @@ fun drawPowerUp() {
 }
 
 // Decompiled from EnemyGfxHandler
-fun enemyGfxHandler(X: Int): Int {
+fun enemyGfxHandler(X: Int): Pair<Int, Int> {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
@@ -26819,7 +26994,7 @@ fun enemyGfxHandler(X: Int): Int {
             //> beq CheckForRetainerObj     ;if timer for movement expired, branch
             if (Y != 0) {
                 //> rts                         ;if all conditions fail, leave
-                return X
+                return Pair(X, Y)
             }
         }
     }
@@ -26987,12 +27162,12 @@ fun enemyGfxHandler(X: Int): Int {
             if (A != 0) {
                 //  Fall-through tail call to flipBowserOver
                 flipBowserOver(X)
-                return X
+                return Pair(X, Y)
             }
             //> DrawBowser:
             //> jmp DrawEnemyObject   ;draw bowser's graphics now
             drawEnemyObject(X)
-            return X
+            return Pair(X, Y)
         }
         //> CheckBowserRear:
         //> lda BowserBodyControls  ;check bowser's body control bits
@@ -27021,7 +27196,7 @@ fun enemyGfxHandler(X: Int): Int {
         memory[0x2] = A.toUByte()
         //> jmp FlipBowserOver      ;jump to set vertical flip flag
         flipBowserOver(X)
-        return X
+        return Pair(X, Y)
     } else {
         //> CheckForSpiny:
         //> cpx #$24               ;check if value loaded is for spiny
@@ -27043,7 +27218,7 @@ fun enemyGfxHandler(X: Int): Int {
             }
             //> NotEgg: jmp CheckForHammerBro  ;skip a big chunk of this if we found spiny but not in egg
             checkForHammerBro(X)
-            return X
+            return Pair(X, Y)
         }
     }
     //> CheckForLakitu:
@@ -27067,7 +27242,7 @@ fun enemyGfxHandler(X: Int): Int {
         }
         //> NoLAFr: jmp CheckDefeatedState    ;skip this next part if we found lakitu but alt frame not needed
         checkDefeatedState(X)
-        return X
+        return Pair(X, Y)
     } else {
         //> CheckUpsideDownShell:
         //> lda $ef                    ;check for enemy object => $04
@@ -27101,7 +27276,7 @@ fun enemyGfxHandler(X: Int): Int {
     if (!(A == 0x04)) {
         //  goto CheckForHammerBro -> checkForHammerBro
         checkForHammerBro(X)
-        return X
+        return Pair(X, Y)
     } else {
         //> ldx #$72               ;set right-side up buzzy beetle shell by default
         X = 0x72
@@ -27124,7 +27299,7 @@ fun enemyGfxHandler(X: Int): Int {
     if (!(Y == Goomba)) {
         //  goto CheckForHammerBro -> checkForHammerBro
         checkForHammerBro(X)
-        return X
+        return Pair(X, Y)
     } else {
         //> ldx #$54               ;load for regular goomba
         X = 0x54
@@ -27136,7 +27311,7 @@ fun enemyGfxHandler(X: Int): Int {
         if (!(A == 0)) {
             //  goto CheckForHammerBro -> checkForHammerBro
             checkForHammerBro(X)
-            return X
+            return Pair(X, Y)
         }
     }
     //> ldx #$8a               ;load offset for defeated goomba
@@ -27145,11 +27320,12 @@ fun enemyGfxHandler(X: Int): Int {
     memory[0x2] = ((memory[0x2].toInt() - 1) and 0xFF).toUByte()
     //  Fall-through tail call to checkForHammerBro
     checkForHammerBro(X)
-    return X
+    return Pair(X, Y)
 }
 
 // Decompiled from FlipBowserOver
-fun flipBowserOver(X: Int): Int {
+fun flipBowserOver(X: Int): Pair<Int, Int> {
+    var Y: Int = 0
     var verticalFlipFlag by MemoryByte(VerticalFlipFlag)
     //> FlipBowserOver:
     //> stx VerticalFlipFlag  ;set vertical flip flag to nonzero
@@ -27157,11 +27333,11 @@ fun flipBowserOver(X: Int): Int {
     //> DrawBowser:
     //> jmp DrawEnemyObject   ;draw bowser's graphics now
     drawEnemyObject(X)
-    return X
+    return Pair(X, Y)
 }
 
 // Decompiled from CheckForHammerBro
-fun checkForHammerBro(X: Int): Int {
+fun checkForHammerBro(X: Int): Pair<Int, Int> {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
@@ -27189,7 +27365,7 @@ fun checkForHammerBro(X: Int): Int {
             if (A == 0) {
                 //  goto CheckDefeatedState -> checkDefeatedState
                 checkDefeatedState(X)
-                return X
+                return Pair(X, Y)
             }
             //> ldx #$b4                 ;otherwise load offset for different frame
             X = 0xB4
@@ -27209,7 +27385,7 @@ fun checkForHammerBro(X: Int): Int {
         if (A >= 0x05) {
             //  goto CheckDefeatedState -> checkDefeatedState
             checkDefeatedState(X)
-            return X
+            return Pair(X, Y)
         }
         //> cpx #$3c                 ;check for bloober offset loaded
         //> bne CheckToAnimateEnemy  ;branch if not found this time
@@ -27219,7 +27395,7 @@ fun checkForHammerBro(X: Int): Int {
             if (A == 0x01) {
                 //  goto CheckDefeatedState -> checkDefeatedState
                 checkDefeatedState(X)
-                return X
+                return Pair(X, Y)
             }
             //> inc $02                  ;increment saved vertical coordinate three pixels
             memory[0x2] = ((memory[0x2].toInt() + 1) and 0xFF).toUByte()
@@ -27229,7 +27405,7 @@ fun checkForHammerBro(X: Int): Int {
             memory[0x2] = ((memory[0x2].toInt() + 1) and 0xFF).toUByte()
             //> jmp CheckAnimationStop   ;and do something else
             checkAnimationStop(X)
-            return X
+            return Pair(X, Y)
         }
     }
     //> CheckToAnimateEnemy:
@@ -27240,14 +27416,14 @@ fun checkForHammerBro(X: Int): Int {
     if (A == Goomba) {
         //  goto CheckDefeatedState -> checkDefeatedState
         checkDefeatedState(X)
-        return X
+        return Pair(X, Y)
     } else {
         //> cmp #$08
         //> beq CheckDefeatedState   ;branch if bullet bill (note both variants use $08 here)
         if (A == 0x08) {
             //  goto CheckDefeatedState -> checkDefeatedState
             checkDefeatedState(X)
-            return X
+            return Pair(X, Y)
         }
     }
     //> cmp #Podoboo
@@ -27255,14 +27431,14 @@ fun checkForHammerBro(X: Int): Int {
     if (A == Podoboo) {
         //  goto CheckDefeatedState -> checkDefeatedState
         checkDefeatedState(X)
-        return X
+        return Pair(X, Y)
     } else {
         //> cmp #$18                 ;branch if => $18
         //> bcs CheckDefeatedState
         if (A >= 0x18) {
             //  goto CheckDefeatedState -> checkDefeatedState
             checkDefeatedState(X)
-            return X
+            return Pair(X, Y)
         }
     }
     //> ldy #$00
@@ -27279,7 +27455,7 @@ fun checkForHammerBro(X: Int): Int {
         if (A >= World8) {
             //  goto CheckDefeatedState -> checkDefeatedState
             checkDefeatedState(X)
-            return X
+            return Pair(X, Y)
         }
         //> ldx #$a2                 ;otherwise, set for mushroom retainer object instead
         X = 0xA2
@@ -27291,7 +27467,7 @@ fun checkForHammerBro(X: Int): Int {
         if (!(A == 0)) {
             //  goto CheckDefeatedState -> checkDefeatedState
             checkDefeatedState(X)
-            return X
+            return Pair(X, Y)
         }
     }
     //> CheckForSecondFrame:
@@ -27303,11 +27479,11 @@ fun checkForHammerBro(X: Int): Int {
     if (!(A == 0)) {
         //  goto CheckDefeatedState -> checkDefeatedState
         checkDefeatedState(X)
-        return X
+        return Pair(X, Y)
     } else {
         //  Fall-through tail call to checkAnimationStop
         checkAnimationStop(X)
-        return X
+        return Pair(X, Y)
     }
 }
 
@@ -27345,7 +27521,7 @@ fun checkAnimationStop(X: Int): Int {
 }
 
 // Decompiled from CheckDefeatedState
-fun checkDefeatedState(X: Int) {
+fun checkDefeatedState(X: Int): Int {
     var A: Int = 0
     var Y: Int = 0
     var verticalFlipFlag by MemoryByte(VerticalFlipFlag)
@@ -27358,7 +27534,7 @@ fun checkDefeatedState(X: Int) {
     if (A == 0) {
         //  goto DrawEnemyObject -> drawEnemyObject
         drawEnemyObject(X)
-        return
+        return Y
     } else {
         //> lda $ef
         A = memory[0xEF].toInt()
@@ -27367,7 +27543,7 @@ fun checkDefeatedState(X: Int) {
         if (!(A >= 0x04)) {
             //  goto DrawEnemyObject -> drawEnemyObject
             drawEnemyObject(X)
-            return
+            return Y
         }
     }
     //> ldy #$01
@@ -27380,11 +27556,11 @@ fun checkDefeatedState(X: Int) {
     memory[0xEC] = Y.toUByte()
     //  Fall-through tail call to drawEnemyObject
     drawEnemyObject(X)
-    return
+    return Y
 }
 
 // Decompiled from DrawEnemyObject
-fun drawEnemyObject(X: Int): Int {
+fun drawEnemyObject(X: Int): Pair<Int, Int> {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
@@ -27417,7 +27593,7 @@ fun drawEnemyObject(X: Int): Int {
         //> SkipToOffScrChk:
         //> jmp SprObjectOffscrChk     ;jump if found
         sprObjectOffscrChk()
-        return X
+        return Pair(X, Y)
     } else {
         //> CheckForVerticalFlip:
         //> lda VerticalFlipFlag       ;check if vertical flip flag is set here
@@ -27506,7 +27682,7 @@ fun drawEnemyObject(X: Int): Int {
     if (A == 0x05) {
         //> jmp SprObjectOffscrChk      ;jump if found
         sprObjectOffscrChk()
-        return X
+        return Pair(X, Y)
     } else {
         //> ContES: cmp #Bloober                ;check for bloober object
         //> beq MirrorEnemyGfx
@@ -27616,7 +27792,7 @@ fun drawEnemyObject(X: Int): Int {
             if (X >= 0x10) {
                 //  goto SprObjectOffscrChk -> sprObjectOffscrChk
                 sprObjectOffscrChk()
-                return X
+                return Pair(X, Y)
             }
             //> sta Sprite_Attributes+12,y  ;otherwise set same for second row right sprite
             spriteAttributes[12 + Y] = A
@@ -27628,7 +27804,7 @@ fun drawEnemyObject(X: Int): Int {
             if (!(X >= 0x10)) {
                 //  goto SprObjectOffscrChk -> sprObjectOffscrChk
                 sprObjectOffscrChk()
-                return X
+                return Pair(X, Y)
             }
         }
         //> NVFLak: lda Sprite_Attributes,y     ;get first row left sprite attributes
@@ -27652,7 +27828,7 @@ fun drawEnemyObject(X: Int): Int {
     if (!(A >= 0x18)) {
         //  goto SprObjectOffscrChk -> sprObjectOffscrChk
         sprObjectOffscrChk()
-        return X
+        return Pair(X, Y)
     } else {
         //> lda #$82
         A = 0x82
@@ -27668,14 +27844,15 @@ fun drawEnemyObject(X: Int): Int {
         spriteAttributes[20 + Y] = A
         //  Fall-through tail call to sprObjectOffscrChk
         sprObjectOffscrChk()
-        return X
+        return Pair(X, Y)
     }
 }
 
 // Decompiled from SprObjectOffscrChk
-fun sprObjectOffscrChk(): Int {
+fun sprObjectOffscrChk(): Pair<Int, Int> {
     var A: Int = 0
     var X: Int = 0
+    var Y: Int = 0
     var temp0: Int = 0
     var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
     var objectOffset by MemoryByte(ObjectOffset)
@@ -27775,7 +27952,7 @@ fun sprObjectOffscrChk(): Int {
     }
     //> ExEGHandler:
     //> rts
-    return X
+    return Pair(X, Y)
 }
 
 // Decompiled from DrawEnemyObjRow
@@ -28369,7 +28546,7 @@ fun drawexplosionFireworks(A: Int, Y: Int) {
 }
 
 // Decompiled from DrawSmallPlatform
-fun drawSmallPlatform(X: Int) {
+fun drawSmallPlatform(X: Int): Int {
     var A: Int = 0
     var X: Int = X
     var Y: Int = 0
@@ -28505,7 +28682,7 @@ fun drawSmallPlatform(X: Int) {
     //> ExSPl: ldx ObjectOffset            ;get enemy object offset and leave
     X = objectOffset
     //> rts
-    return
+    return X
 }
 
 // Decompiled from DrawBubble
@@ -28565,6 +28742,7 @@ fun playerGfxHandler() {
     var A: Int = 0
     var X: Int = 0
     var Y: Int = 0
+    var temp0: Int = 0
     var frameCounter by MemoryByte(FrameCounter)
     var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
     var injuryTimer by MemoryByte(InjuryTimer)
@@ -28668,9 +28846,9 @@ fun playerGfxHandler() {
         } else {
             //> DoChangeSize:
             //> jsr HandleChangeSize          ;find proper offset to graphics table for grow/shrink
-            handleChangeSize()
+            temp0 = handleChangeSize()
             //> jmp PlayerGfxProcessing       ;draw player, then process for fireball throwing
-            playerGfxProcessing(A)
+            playerGfxProcessing(temp0)
             return
         }
     }
@@ -28686,11 +28864,12 @@ fun playerGfxHandler() {
 
 // Decompiled from FindPlayerAction
 fun findPlayerAction(A: Int) {
+    var temp0: Int = 0
     //> FindPlayerAction:
     //> jsr ProcessPlayerAction       ;find proper offset to graphics table by player's actions
-    processPlayerAction()
+    temp0 = processPlayerAction()
     //> jmp PlayerGfxProcessing       ;draw player, then process for fireball throwing
-    playerGfxProcessing(A)
+    playerGfxProcessing(temp0)
     return
 }
 
@@ -28915,7 +29094,7 @@ fun drawPlayerLoop(X: Int, Y: Int) {
 }
 
 // Decompiled from ProcessPlayerAction
-fun processPlayerAction() {
+fun processPlayerAction(): Int {
     var A: Int = 0
     var Y: Int = 0
     var temp0: Int = 0
@@ -28957,13 +29136,12 @@ fun processPlayerAction() {
                     if (!(A == 0)) {
                         //  goto NonAnimatedActs -> nonAnimatedActs
                         nonAnimatedActs(Y)
-                        return
+                        return A
                     }
                     //> ldy #$00              ;otherwise load offset for jumping
                     Y = 0x00
                     //> jmp NonAnimatedActs   ;go to get offset to graphics table
-                    nonAnimatedActs(Y)
-                    return
+                    return nonAnimatedActs(Y)
                 }
             }
             //> ProcOnGroundActs:
@@ -28975,7 +29153,7 @@ fun processPlayerAction() {
             if (!(A == 0)) {
                 //  goto NonAnimatedActs -> nonAnimatedActs
                 nonAnimatedActs(Y)
-                return
+                return A
             }
             //> ldy #$02                   ;load offset for standing
             Y = 0x02
@@ -28987,7 +29165,7 @@ fun processPlayerAction() {
             if (A == 0) {
                 //  goto NonAnimatedActs -> nonAnimatedActs
                 nonAnimatedActs(Y)
-                return
+                return A
             }
             //> lda Player_XSpeedAbsolute  ;load walking/running speed
             A = playerXspeedabsolute
@@ -29004,7 +29182,7 @@ fun processPlayerAction() {
                     Y = (Y + 1) and 0xFF
                     //  Fall-through tail call to nonAnimatedActs
                     nonAnimatedActs(Y)
-                    return
+                    return A
                 }
             }
         } else {
@@ -29014,16 +29192,14 @@ fun processPlayerAction() {
             //> jsr GetGfxOffsetAdder     ;get offset to graphics table
             temp0 = getGfxOffsetAdder(Y)
             //> jmp GetCurrentAnimOffset  ;execute instructions for falling state
-            getCurrentAnimOffset(temp0)
-            return
+            return getCurrentAnimOffset(temp0)
             //> ActionWalkRun:
             //> ldy #$04               ;load offset for walking/running
             Y = 0x04
             //> jsr GetGfxOffsetAdder  ;get offset to graphics table
             temp1 = getGfxOffsetAdder(Y)
             //> jmp FourFrameExtent    ;execute instructions for normal state
-            fourFrameExtent(temp1)
-            return
+            return fourFrameExtent(temp1)
         }
     }
     //> ActionClimbing:
@@ -29043,18 +29219,17 @@ fun processPlayerAction() {
         //> lda PlayerGfxTblOffsets,y  ;load offset to graphics table using size as offset
         A = playerGfxTblOffsets[temp2]
         //> rts
-        return
+        return A
     } else {
         //> jsr GetGfxOffsetAdder  ;otherwise get offset for graphics table
         temp3 = getGfxOffsetAdder(Y)
         //> jmp ThreeFrameExtent   ;then skip ahead to more code
-        threeFrameExtent(temp3)
-        return
+        return threeFrameExtent(temp3)
     }
 }
 
 // Decompiled from NonAnimatedActs
-fun nonAnimatedActs(Y: Int) {
+fun nonAnimatedActs(Y: Int): Int {
     var A: Int = 0
     var temp0: Int = 0
     var playerAnimCtrl by MemoryByte(PlayerAnimCtrl)
@@ -29069,7 +29244,7 @@ fun nonAnimatedActs(Y: Int) {
     //> lda PlayerGfxTblOffsets,y  ;load offset to graphics table using size as offset
     A = playerGfxTblOffsets[temp0]
     //> rts
-    return
+    return A
 }
 
 // Decompiled from GetCurrentAnimOffset
@@ -29084,29 +29259,28 @@ fun getCurrentAnimOffset(Y: Int): Int {
 }
 
 // Decompiled from FourFrameExtent
-fun fourFrameExtent(Y: Int) {
+fun fourFrameExtent(Y: Int): Int {
     var A: Int = 0
     //> FourFrameExtent:
     //> lda #$03              ;load upper extent for frame control
     A = 0x03
     //> jmp AnimationControl  ;jump to get offset and animate player object
-    animationControl(A, Y)
-    return
+    return animationControl(A, Y)
 }
 
 // Decompiled from ThreeFrameExtent
-fun threeFrameExtent(Y: Int) {
+fun threeFrameExtent(Y: Int): Int {
     var A: Int = 0
     //> ThreeFrameExtent:
     //> lda #$02              ;load upper extent for frame control for climbing
     A = 0x02
     //  Fall-through tail call to animationControl
     animationControl(A, Y)
-    return
+    return A
 }
 
 // Decompiled from AnimationControl
-fun animationControl(A: Int, Y: Int) {
+fun animationControl(A: Int, Y: Int): Int {
     var A: Int = A
     var Y: Int = Y
     var temp0: Int = 0
@@ -29148,7 +29322,7 @@ fun animationControl(A: Int, Y: Int) {
     //> ExAnimC:  pla                       ;get offset to graphics table from stack and leave
     A = pull()
     //> rts
-    return
+    return A
 }
 
 // Decompiled from GetGfxOffsetAdder
@@ -29177,7 +29351,7 @@ fun getGfxOffsetAdder(Y: Int): Int {
 }
 
 // Decompiled from HandleChangeSize
-fun handleChangeSize() {
+fun handleChangeSize(): Int {
     var A: Int = 0
     var X: Int = 0
     var Y: Int = 0
@@ -29220,7 +29394,7 @@ fun handleChangeSize() {
         Y = 0x0F
         //  Fall-through tail call to getOffsetFromAnimCtrl
         getOffsetFromAnimCtrl(A, Y)
-        return
+        return A
     } else {
         //> ShrinkPlayer:
         //> tya                          ;add ten bytes to frame control as offset
@@ -29245,7 +29419,7 @@ fun handleChangeSize() {
     //> ShrPlF: lda PlayerGfxTblOffsets,y    ;get offset to graphics table based on offset loaded
     A = playerGfxTblOffsets[Y]
     //> rts                          ;and leave
-    return
+    return A
 }
 
 // Decompiled from GetOffsetFromAnimCtrl
@@ -29350,32 +29524,38 @@ fun relativePlayerPosition() {
 
 // Decompiled from RelativeBubblePosition
 fun relativeBubblePosition(X: Int): Int {
+    var X: Int = X
     var Y: Int = 0
+    var temp0: Int = 0
     //> RelativeBubblePosition:
     //> ldy #$01                ;set for air bubble offsets
     Y = 0x01
     //> jsr GetProperObjOffset  ;modify X to get proper air bubble offset
-    getProperObjOffset(X, Y)
+    temp0 = getProperObjOffset(X, Y)
+    X = temp0
     //> ldy #$03
     Y = 0x03
     //> jmp RelWOfs             ;get the coordinates
-    relWOfs(X, Y)
+    relWOfs(temp0, Y)
     return X
 }
 
 // Decompiled from RelativeFireballPosition
-fun relativeFireballPosition(X: Int) {
+fun relativeFireballPosition(X: Int): Int {
+    var X: Int = X
     var Y: Int = 0
+    var temp0: Int = 0
     //> RelativeFireballPosition:
     //> ldy #$00                    ;set for fireball offsets
     Y = 0x00
     //> jsr GetProperObjOffset      ;modify X to get proper fireball offset
-    getProperObjOffset(X, Y)
+    temp0 = getProperObjOffset(X, Y)
+    X = temp0
     //> ldy #$02
     Y = 0x02
     //  Fall-through tail call to relWOfs
-    relWOfs(X, Y)
-    return
+    relWOfs(temp0, Y)
+    return X
 }
 
 // Decompiled from RelWOfs
@@ -29392,16 +29572,19 @@ fun relWOfs(X: Int, Y: Int): Int {
 
 // Decompiled from RelativeMiscPosition
 fun relativeMiscPosition(X: Int): Int {
+    var X: Int = X
     var Y: Int = 0
+    var temp0: Int = 0
     //> RelativeMiscPosition:
     //> ldy #$02                ;set for misc object offsets
     Y = 0x02
     //> jsr GetProperObjOffset  ;modify X to get proper misc object offset
-    getProperObjOffset(X, Y)
+    temp0 = getProperObjOffset(X, Y)
+    X = temp0
     //> ldy #$06
     Y = 0x06
     //> jmp RelWOfs             ;get the coordinates
-    relWOfs(X, Y)
+    relWOfs(temp0, Y)
     return X
 }
 
@@ -29508,52 +29691,61 @@ fun getPlayerOffscreenBits() {
 }
 
 // Decompiled from GetFireballOffscreenBits
-fun getFireballOffscreenBits(X: Int) {
+fun getFireballOffscreenBits(X: Int): Int {
+    var X: Int = X
     var Y: Int = 0
+    var temp0: Int = 0
     //> GetFireballOffscreenBits:
     //> ldy #$00                 ;set for fireball offsets
     Y = 0x00
     //> jsr GetProperObjOffset   ;modify X to get proper fireball offset
-    getProperObjOffset(X, Y)
+    temp0 = getProperObjOffset(X, Y)
+    X = temp0
     //> ldy #$02                 ;set other offset for fireball's offscreen bits
     Y = 0x02
     //> jmp GetOffScreenBitsSet  ;and get offscreen information about fireball
-    getOffScreenBitsSet(X, Y)
-    return
+    getOffScreenBitsSet(temp0, Y)
+    return X
 }
 
 // Decompiled from GetBubbleOffscreenBits
 fun getBubbleOffscreenBits(X: Int): Int {
+    var X: Int = X
     var Y: Int = 0
+    var temp0: Int = 0
     //> GetBubbleOffscreenBits:
     //> ldy #$01                 ;set for air bubble offsets
     Y = 0x01
     //> jsr GetProperObjOffset   ;modify X to get proper air bubble offset
-    getProperObjOffset(X, Y)
+    temp0 = getProperObjOffset(X, Y)
+    X = temp0
     //> ldy #$03                 ;set other offset for airbubble's offscreen bits
     Y = 0x03
     //> jmp GetOffScreenBitsSet  ;and get offscreen information about air bubble
-    getOffScreenBitsSet(X, Y)
+    getOffScreenBitsSet(temp0, Y)
     return X
 }
 
 // Decompiled from GetMiscOffscreenBits
 fun getMiscOffscreenBits(X: Int): Int {
+    var X: Int = X
     var Y: Int = 0
+    var temp0: Int = 0
     //> GetMiscOffscreenBits:
     //> ldy #$02                 ;set for misc object offsets
     Y = 0x02
     //> jsr GetProperObjOffset   ;modify X to get proper misc object offset
-    getProperObjOffset(X, Y)
+    temp0 = getProperObjOffset(X, Y)
+    X = temp0
     //> ldy #$06                 ;set other offset for misc object's offscreen bits
     Y = 0x06
     //> jmp GetOffScreenBitsSet  ;and get offscreen information about misc object
-    getOffScreenBitsSet(X, Y)
+    getOffScreenBitsSet(temp0, Y)
     return X
 }
 
 // Decompiled from GetProperObjOffset
-fun getProperObjOffset(X: Int, Y: Int) {
+fun getProperObjOffset(X: Int, Y: Int): Int {
     var A: Int = 0
     var X: Int = X
     var temp0: Int = 0
@@ -29567,7 +29759,7 @@ fun getProperObjOffset(X: Int, Y: Int) {
     //> tax                  ;put back in X and leave
     X = temp0 and 0xFF
     //> rts
-    return
+    return X
 }
 
 // Decompiled from GetEnemyOffscreenBits
