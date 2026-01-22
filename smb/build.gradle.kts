@@ -19,4 +19,12 @@ tasks.withType<Test> {
         showStandardStreams = true
         events("passed", "skipped", "failed")
     }
+
+    // by Claude - Disable parallel test execution within JUnit 5
+    // This ensures tests run sequentially, preventing race conditions
+    // on the shared global memory array
+    systemProperty("junit.jupiter.execution.parallel.enabled", "false")
+
+    // by Claude - Removed forkEvery since non-determinism was from timeout timing,
+    // not shared state. The @BeforeEach reset is sufficient for isolation.
 }

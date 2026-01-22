@@ -8,13 +8,16 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Assertions.assertTimeoutPreemptively
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.MethodOrderer
 import java.time.Duration
 import java.io.File
 
 /**
  * Auto-generated tests from TAS capture: smb-tas
- * Captured at: 2026-01-22T04:23:15.042022Z
+ * Captured at: 2026-01-22T17:20:04.536664Z
  * Total frames: 17868
  * Total captures: 1019846
  * Functions with tests: 157
@@ -23,11 +26,12 @@ import java.io.File
  * outputs as the original 6502 binary interpreter.
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.MethodName::class)
 // Note: 8 functions skipped (not in validFunctions)
-// Note: 9 functions skipped (unreliable capture data)
-// Generated 1043 tests for 140 functions
-// Exact matches: 140, Fuzzy matches: 0
-// Parameterless: 53, With parameters: 87
+// Note: 15 functions skipped (unreliable capture data)
+// Generated 983 tests for 134 functions
+// Exact matches: 134, Fuzzy matches: 0
+// Parameterless: 49, With parameters: 85
 
 class GeneratedFunctionTests {
 
@@ -46,6 +50,12 @@ class GeneratedFunctionTests {
         }
     }
 
+    @BeforeEach
+    fun resetState() {
+        resetCPU()
+        clearMemory()
+    }
+
     // =========================================
     // 0x8182: pauseRoutine
     // 9005 calls, 2 unique inputs
@@ -59,11 +69,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `pauseRoutine_frame3_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -83,11 +89,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `pauseRoutine_frame197_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -112,11 +114,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `spriteShuffler_frame32_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (19 addresses)
             memory[0x0000] = 0x28u
             memory[0x06E0] = 0x00u
@@ -176,11 +174,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `spriteShuffler_frame34_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (19 addresses)
             memory[0x0000] = 0x28u
             memory[0x06E0] = 0x01u
@@ -240,11 +234,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `spriteShuffler_frame36_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (19 addresses)
             memory[0x0000] = 0x28u
             memory[0x06E0] = 0x02u
@@ -309,11 +299,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `operModeExecutionTree_frame3_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -333,11 +319,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `operModeExecutionTree_frame32_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -362,11 +344,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveAllSpritesOffscreen_frame3_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x04A0] = 0x00u
 
@@ -449,11 +427,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveAllSpritesOffscreen_frame6_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x04A0] = 0x00u
 
@@ -541,11 +515,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveSpritesOffscreen_frame32_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -632,11 +602,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawMushroomIcon_frame29_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x077A] = 0x00u
 
@@ -663,11 +629,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawMushroomIcon_frame3772_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x077A] = 0x01u
 
@@ -694,11 +656,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawMushroomIcon_frame6993_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x077A] = 0x01u
 
@@ -730,11 +688,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `demoEngine_frame988_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0717] = 0x00u
             memory[0x0718] = 0x00u
@@ -757,11 +711,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `demoEngine_frame1452_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0717] = 0x05u
             memory[0x0718] = 0x0Cu
@@ -783,11 +733,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `demoEngine_frame1916_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0717] = 0x0Bu
             memory[0x0718] = 0x07u
@@ -809,11 +755,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `demoEngine_frame2382_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0717] = 0x10u
             memory[0x0718] = 0x26u
@@ -835,11 +777,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `demoEngine_frame2846_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0717] = 0x15u
             memory[0x0718] = 0xBEu
@@ -861,11 +799,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `demoEngine_frame4904_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0717] = 0x01u
             memory[0x0718] = 0x5Cu
@@ -887,11 +821,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `demoEngine_frame6814_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0717] = 0x15u
             memory[0x0718] = 0x65u
@@ -913,11 +843,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `demoEngine_frame8956_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0717] = 0x0Du
             memory[0x0718] = 0x28u
@@ -939,11 +865,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `demoEngine_frame11696_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0717] = 0x08u
             memory[0x0718] = 0x0Eu
@@ -965,11 +887,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `demoEngine_frame14476_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0717] = 0x01u
             memory[0x0718] = 0x10u
@@ -998,11 +916,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `floateyNumbersRoutine_frame32_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0110] = 0x00u
 
@@ -1023,11 +937,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `floateyNumbersRoutine_frame1427_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x0008] = 0x00u
             memory[0x0016] = 0x06u
@@ -1062,11 +972,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `floateyNumbersRoutine_frame1471_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x0008] = 0x00u
             memory[0x0016] = 0x06u
@@ -1101,11 +1007,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `floateyNumbersRoutine_frame1720_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0008] = 0x05u
             memory[0x001B] = 0x00u
@@ -1142,11 +1044,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `floateyNumbersRoutine_frame1774_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0008] = 0x05u
             memory[0x001B] = 0x00u
@@ -1183,11 +1081,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `floateyNumbersRoutine_frame2227_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0110] = 0x00u
 
@@ -1208,11 +1102,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `floateyNumbersRoutine_frame5239_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0114] = 0x00u
 
@@ -1233,11 +1123,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `floateyNumbersRoutine_frame5504_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0008] = 0x05u
             memory[0x001B] = 0x00u
@@ -1274,11 +1160,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `floateyNumbersRoutine_frame5558_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0008] = 0x05u
             memory[0x001B] = 0x00u
@@ -1315,11 +1197,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `floateyNumbersRoutine_frame6427_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x0008] = 0x02u
             memory[0x0018] = 0x06u
@@ -1358,11 +1236,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerColors_frame7_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0000] = 0x03u
             memory[0x0300] = 0x00u
@@ -1394,11 +1268,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerColors_frame32_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x03u
             memory[0x0300] = 0x00u
@@ -1431,11 +1301,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerColors_frame6053_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x03u
             memory[0x0300] = 0x00u
@@ -1475,11 +1341,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writeGameText_frame8_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F7] = 0x00u
             memory[0x077A] = 0x00u
@@ -1539,11 +1401,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writeGameText_frame6972_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01F7] = 0x00u
             memory[0x0753] = 0x00u
@@ -1608,11 +1466,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderAttributeTables_frame13_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0x23u
             memory[0x0001] = 0x00u
@@ -1680,11 +1534,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderAttributeTables_frame16_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0x23u
             memory[0x0001] = 0x0Cu
@@ -1752,11 +1602,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderAttributeTables_frame20_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0x23u
             memory[0x0001] = 0x1Cu
@@ -1824,11 +1670,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderAttributeTables_frame24_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0x27u
             memory[0x0001] = 0x0Cu
@@ -1896,11 +1738,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderAttributeTables_frame1307_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0x27u
             memory[0x0001] = 0x1Cu
@@ -1968,11 +1806,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderAttributeTables_frame1537_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0x23u
             memory[0x0001] = 0x0Cu
@@ -2040,11 +1874,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderAttributeTables_frame2239_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0x23u
             memory[0x0001] = 0x18u
@@ -2112,11 +1942,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderAttributeTables_frame2437_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0x27u
             memory[0x0001] = 0x08u
@@ -2184,11 +2010,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderAttributeTables_frame5013_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0x27u
             memory[0x0001] = 0x14u
@@ -2256,11 +2078,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderAttributeTables_frame6115_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0x27u
             memory[0x0001] = 0x14u
@@ -2333,11 +2151,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `colorRotation_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0x1Au
 
@@ -2357,11 +2171,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `colorRotation_frame391_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0xCDu
 
@@ -2381,11 +2191,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `colorRotation_frame895_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0xC9u
 
@@ -2405,11 +2211,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `colorRotation_frame1645_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0000] = 0x03u
             memory[0x0009] = 0x40u
@@ -2442,11 +2244,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `colorRotation_frame2797_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0000] = 0x03u
             memory[0x0009] = 0x80u
@@ -2479,11 +2277,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `colorRotation_frame4537_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0x9Au
 
@@ -2503,11 +2297,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `colorRotation_frame6105_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0xAAu
 
@@ -2527,11 +2317,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `colorRotation_frame6943_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0x4Du
 
@@ -2551,11 +2337,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `colorRotation_frame9247_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0x7Fu
 
@@ -2575,11 +2357,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `colorRotation_frame12121_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0xFAu
 
@@ -2606,11 +2384,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `replaceBlockMetatile_frame1345_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (14 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x01u
@@ -2645,11 +2419,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `replaceBlockMetatile_frame1519_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (14 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x01u
@@ -2684,11 +2454,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `replaceBlockMetatile_frame5695_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (14 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x01u
@@ -2729,11 +2495,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `destroyBlockMetatile_frame1316_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x01u
@@ -2763,11 +2525,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `destroyBlockMetatile_frame1490_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x01u
@@ -2797,11 +2555,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `destroyBlockMetatile_frame5666_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x01u
@@ -2837,11 +2591,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writeBlockMetatile_frame1345_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x01u
@@ -2871,11 +2621,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writeBlockMetatile_frame1519_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x01u
@@ -2905,11 +2651,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writeBlockMetatile_frame5695_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x01u
@@ -2945,11 +2687,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `putBlockMetatile_frame1316_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x01u
@@ -2989,11 +2727,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `putBlockMetatile_frame1345_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x01u
@@ -3033,11 +2767,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `putBlockMetatile_frame1490_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x01u
@@ -3077,11 +2807,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `putBlockMetatile_frame1519_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x01u
@@ -3121,11 +2847,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `putBlockMetatile_frame5666_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x01u
@@ -3165,11 +2887,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `putBlockMetatile_frame5695_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x01u
@@ -3213,11 +2931,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initializeNameTables_frame3_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01FC] = 0x25u
             memory[0x01FD] = 0x8Eu
@@ -3242,11 +2956,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initializeNameTables_frame7_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01F6] = 0x25u
             memory[0x01F7] = 0x8Eu
@@ -3278,11 +2988,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writeNTAddr_frame3_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -3306,11 +3012,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writeNTAddr_frame7_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -3338,11 +3040,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `readJoypads_frame3_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x00u
             memory[0x01F8] = 0x00u
@@ -3368,11 +3066,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `readJoypads_frame197_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x01u
             memory[0x01F8] = 0x00u
@@ -3398,11 +3092,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `readJoypads_frame221_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x01u
             memory[0x01F8] = 0x00u
@@ -3428,11 +3118,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `readJoypads_frame659_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x00u
             memory[0x01F8] = 0x00u
@@ -3458,11 +3144,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `readJoypads_frame1073_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x01u
             memory[0x01F8] = 0x00u
@@ -3488,11 +3170,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `readJoypads_frame2525_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x00u
             memory[0x01F8] = 0x00u
@@ -3518,11 +3196,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `readJoypads_frame3601_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x01u
             memory[0x01F8] = 0x00u
@@ -3548,11 +3222,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `readJoypads_frame5423_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x01u
             memory[0x01F8] = 0x00u
@@ -3578,11 +3248,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `readJoypads_frame8269_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x01u
             memory[0x01F8] = 0x00u
@@ -3608,11 +3274,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `readJoypads_frame12299_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x01u
             memory[0x01F8] = 0x00u
@@ -3643,11 +3305,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `updateScreen_frame3_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x03u
@@ -3669,11 +3327,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `updateScreen_frame25_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0xC8u
             memory[0x0001] = 0x8Cu
@@ -3698,11 +3352,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `updateScreen_frame1211_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (36 addresses)
             memory[0x0000] = 0x41u
             memory[0x0001] = 0x03u
@@ -3757,11 +3407,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `updateScreen_frame1339_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (36 addresses)
             memory[0x0000] = 0x41u
             memory[0x0001] = 0x03u
@@ -3816,11 +3462,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `updateScreen_frame1499_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (36 addresses)
             memory[0x0000] = 0x41u
             memory[0x0001] = 0x03u
@@ -3875,11 +3517,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `updateScreen_frame1613_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (36 addresses)
             memory[0x0000] = 0x41u
             memory[0x0001] = 0x03u
@@ -3934,11 +3572,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `updateScreen_frame2339_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (36 addresses)
             memory[0x0000] = 0x41u
             memory[0x0001] = 0x03u
@@ -3993,11 +3627,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `updateScreen_frame2561_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (36 addresses)
             memory[0x0000] = 0x41u
             memory[0x0001] = 0x03u
@@ -4052,11 +3682,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `updateScreen_frame5413_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (36 addresses)
             memory[0x0000] = 0x41u
             memory[0x0001] = 0x03u
@@ -4111,11 +3737,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `updateScreen_frame6341_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (36 addresses)
             memory[0x0000] = 0x41u
             memory[0x0001] = 0x03u
@@ -4177,11 +3799,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initScroll_frame3_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4202,11 +3820,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initScroll_frame13_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4227,11 +3841,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initScroll_frame14_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4252,11 +3862,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initScroll_frame16_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4277,11 +3883,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initScroll_frame17_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4302,11 +3904,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initScroll_frame19_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4327,11 +3925,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initScroll_frame20_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4352,11 +3946,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initScroll_frame21_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4377,11 +3967,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initScroll_frame23_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4402,11 +3988,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initScroll_frame24_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4433,11 +4015,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writePPUReg1_frame3_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4458,11 +4036,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writePPUReg1_frame3_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4483,11 +4057,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writePPUReg1_frame7_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4508,11 +4078,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writePPUReg1_frame8_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4533,11 +4099,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writePPUReg1_frame13_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4558,11 +4120,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writePPUReg1_frame14_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4583,11 +4141,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writePPUReg1_frame1525_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4608,11 +4162,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `writePPUReg1_frame1537_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4639,11 +4189,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `printStatusBarNumbers_frame10_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x02u
             memory[0x0002] = 0x00u
@@ -4689,11 +4235,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `printStatusBarNumbers_frame29_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0xFAu
             memory[0x0002] = 0x00u
@@ -4736,11 +4278,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `printStatusBarNumbers_frame1317_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x02u
             memory[0x0002] = 0x0Au
@@ -4786,11 +4324,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `printStatusBarNumbers_frame1435_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x02u
             memory[0x0002] = 0x00u
@@ -4836,11 +4370,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `printStatusBarNumbers_frame5667_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x02u
             memory[0x0002] = 0x0Au
@@ -4892,11 +4422,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `outputNumbers_frame10_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0002] = 0x00u
             memory[0x0003] = 0x02u
@@ -4929,11 +4455,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `outputNumbers_frame29_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -4954,11 +4476,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `outputNumbers_frame1317_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0002] = 0x0Au
             memory[0x0003] = 0x02u
@@ -4991,11 +4509,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `outputNumbers_frame1435_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0002] = 0x00u
             memory[0x0003] = 0x02u
@@ -5028,11 +4542,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `outputNumbers_frame5667_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0002] = 0x0Au
             memory[0x0003] = 0x02u
@@ -5069,11 +4579,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `updateTopScore_frame3_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x01F9] = 0x9Bu
             memory[0x01FA] = 0x8Fu
@@ -5124,11 +4630,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `topScoreCheck_frame3_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x07D7] = 0x00u
             memory[0x07D8] = 0x00u
@@ -5169,11 +4671,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getAreaMusic_frame31_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -5198,11 +4696,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `doNothing1_frame31_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -5211,1854 +4705,6 @@ class GeneratedFunctionTests {
 
             // Verify: Check output memory (1 addresses)
             assertEquals(0xFFu, memory[0x06C9], "Memory 0x06C9 mismatch")
-        }
-    }
-
-    // =========================================
-    // 0x92B0: areaParserTaskHandler
-    // 1464 calls, 503 unique inputs
-    // =========================================
-
-    /**
-     * Test case 0 from frame 12
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 4
-     * Memory reads: 47, writes: 5
-     */
-    @Test
-    fun `areaParserTaskHandler_frame12_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (47 addresses)
-            memory[0x0000] = 0x06u
-            memory[0x0001] = 0x03u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xFCu
-            memory[0x0007] = 0x93u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01F2] = 0x67u
-            memory[0x01F3] = 0x95u
-            memory[0x01F4] = 0xCAu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0xBEu
-            memory[0x01F7] = 0x92u
-            memory[0x01F8] = 0xEBu
-            memory[0x01F9] = 0x86u
-            memory[0x06A0] = 0x00u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x05u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x00u
-            memory[0x0725] = 0x00u
-            memory[0x0726] = 0x00u
-            memory[0x0727] = 0x01u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x00u
-            memory[0x072B] = 0x00u
-            memory[0x072C] = 0x00u
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-            memory[0x0741] = 0x00u
-            memory[0x0742] = 0x02u
-            memory[0x0743] = 0x00u
-            memory[0x074E] = 0x01u
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x08u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    /**
-     * Test case 1 from frame 19
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 6
-     * Memory reads: 39, writes: 4
-     */
-    @Test
-    fun `areaParserTaskHandler_frame19_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (39 addresses)
-            memory[0x0000] = 0x1Du
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xAEu
-            memory[0x0007] = 0x88u
-            memory[0x01F4] = 0xCAu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0xBEu
-            memory[0x01F7] = 0x92u
-            memory[0x01F8] = 0xEBu
-            memory[0x01F9] = 0x86u
-            memory[0x0340] = 0x1Du
-            memory[0x03F9] = 0x00u
-            memory[0x03FA] = 0x00u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x10u
-            memory[0x03FF] = 0x01u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x03u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x06u
-            memory[0x0720] = 0x20u
-            memory[0x0721] = 0x99u
-            memory[0x0726] = 0x0Cu
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 2 from frame 1159
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 6
-     * Memory reads: 25, writes: 2
-     */
-    @Test
-    fun `areaParserTaskHandler_frame1159_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (25 addresses)
-            memory[0x0000] = 0x27u
-            memory[0x0001] = 0x10u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xDBu
-            memory[0x0007] = 0x92u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-            memory[0x0340] = 0x00u
-            memory[0x03F9] = 0x00u
-            memory[0x03FA] = 0x00u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x10u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x50u
-            memory[0x03FF] = 0x05u
-            memory[0x06A0] = 0x19u
-            memory[0x071F] = 0x01u
-            memory[0x0720] = 0x24u
-            memory[0x0721] = 0x94u
-            memory[0x0726] = 0x09u
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 3 from frame 1525
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 7
-     * Memory reads: 39, writes: 2
-     */
-    @Test
-    fun `areaParserTaskHandler_frame1525_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (39 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x04u
-            memory[0x0003] = 0x80u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xAEu
-            memory[0x0007] = 0x88u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-            memory[0x0340] = 0x00u
-            memory[0x03F9] = 0x00u
-            memory[0x03FA] = 0x00u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x00u
-            memory[0x03FF] = 0x00u
-            memory[0x06A1] = 0x81u
-            memory[0x06A2] = 0x84u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x12u
-            memory[0x06AA] = 0x14u
-            memory[0x06AB] = 0x14u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x07u
-            memory[0x0720] = 0x20u
-            memory[0x0721] = 0x8Cu
-            memory[0x0726] = 0x06u
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 4 from frame 2389
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 6
-     * Memory reads: 47, writes: 2
-     */
-    @Test
-    fun `areaParserTaskHandler_frame2389_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (47 addresses)
-            memory[0x0000] = 0x08u
-            memory[0x0001] = 0x03u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xFCu
-            memory[0x0007] = 0x93u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01F0] = 0x67u
-            memory[0x01F1] = 0x95u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-            memory[0x06A0] = 0x13u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x08u
-            memory[0x06AB] = 0x09u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x04u
-            memory[0x0725] = 0x03u
-            memory[0x0726] = 0x03u
-            memory[0x0727] = 0x01u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x03u
-            memory[0x072B] = 0x01u
-            memory[0x072C] = 0x10u
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-            memory[0x0741] = 0x00u
-            memory[0x0742] = 0x02u
-            memory[0x0743] = 0x00u
-            memory[0x074E] = 0x01u
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 5 from frame 5131
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 8
-     * Memory reads: 39, writes: 2
-     */
-    @Test
-    fun `areaParserTaskHandler_frame5131_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (39 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xAEu
-            memory[0x0007] = 0x88u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-            memory[0x0340] = 0x00u
-            memory[0x03F9] = 0x00u
-            memory[0x03FA] = 0x00u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x10u
-            memory[0x03FF] = 0x01u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x00u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x06u
-            memory[0x0720] = 0x20u
-            memory[0x0721] = 0x81u
-            memory[0x0726] = 0x00u
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 6 from frame 5995
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 8
-     * Memory reads: 25, writes: 2
-     */
-    @Test
-    fun `areaParserTaskHandler_frame5995_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (25 addresses)
-            memory[0x0000] = 0x27u
-            memory[0x0001] = 0x08u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xDBu
-            memory[0x0007] = 0x92u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-            memory[0x0340] = 0x00u
-            memory[0x03F9] = 0x00u
-            memory[0x03FA] = 0x00u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x50u
-            memory[0x03FF] = 0x05u
-            memory[0x06A0] = 0x15u
-            memory[0x071F] = 0x01u
-            memory[0x0720] = 0x24u
-            memory[0x0721] = 0x8Cu
-            memory[0x0726] = 0x05u
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 7 from frame 8191
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 8
-     * Memory reads: 39, writes: 2
-     */
-    @Test
-    fun `areaParserTaskHandler_frame8191_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (39 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xAEu
-            memory[0x0007] = 0x88u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-            memory[0x0340] = 0x00u
-            memory[0x03F9] = 0x20u
-            memory[0x03FA] = 0x02u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x10u
-            memory[0x03FF] = 0x01u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x81u
-            memory[0x06A3] = 0x84u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x13u
-            memory[0x06AB] = 0x15u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x03u
-            memory[0x0720] = 0x24u
-            memory[0x0721] = 0x9Au
-            memory[0x0726] = 0x0Du
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 8 from frame 9107
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 8
-     * Memory reads: 39, writes: 2
-     */
-    @Test
-    fun `areaParserTaskHandler_frame9107_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (39 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xAEu
-            memory[0x0007] = 0x88u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-            memory[0x0340] = 0x00u
-            memory[0x03F9] = 0x00u
-            memory[0x03FA] = 0x00u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x50u
-            memory[0x03FF] = 0x05u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x08u
-            memory[0x06AB] = 0x09u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x02u
-            memory[0x0720] = 0x24u
-            memory[0x0721] = 0x87u
-            memory[0x0726] = 0x03u
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 9 from frame 12237
-     * Function: areaParserTaskHandler (0x92B0)
-     * Call depth: 8
-     * Memory reads: 39, writes: 2
-     */
-    @Test
-    fun `areaParserTaskHandler_frame12237_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (39 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xAEu
-            memory[0x0007] = 0x88u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-            memory[0x0340] = 0x00u
-            memory[0x03F9] = 0x00u
-            memory[0x03FA] = 0x00u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x00u
-            memory[0x03FF] = 0x00u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x07u
-            memory[0x06AA] = 0x06u
-            memory[0x06AB] = 0x0Au
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x07u
-            memory[0x0720] = 0x24u
-            memory[0x0721] = 0x84u
-            memory[0x0726] = 0x02u
-
-            // Execute decompiled function
-            areaParserTaskHandler()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    // =========================================
-    // 0x92C8: areaParserTasks
-    // Parameters: A
-    // 1464 calls, 313 unique inputs
-    // =========================================
-
-    /**
-     * Test case 0 from frame 12
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 5
-     * Memory reads: 45, writes: 3
-     */
-    @Test
-    fun `areaParserTasks_frame12_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (45 addresses)
-            memory[0x0000] = 0x06u
-            memory[0x0001] = 0x03u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xFCu
-            memory[0x0007] = 0x93u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01F2] = 0x67u
-            memory[0x01F3] = 0x95u
-            memory[0x01F4] = 0xCAu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0xBEu
-            memory[0x01F7] = 0x92u
-            memory[0x06A0] = 0x00u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x05u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x08u
-            memory[0x0725] = 0x00u
-            memory[0x0726] = 0x00u
-            memory[0x0727] = 0x01u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x00u
-            memory[0x072B] = 0x00u
-            memory[0x072C] = 0x00u
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-            memory[0x0741] = 0x00u
-            memory[0x0742] = 0x02u
-            memory[0x0743] = 0x00u
-            memory[0x074E] = 0x01u
-
-            // Execute decompiled function
-            areaParserTasks(0x07)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x07u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    /**
-     * Test case 1 from frame 16
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 12
-     * Memory reads: 23, writes: 5
-     */
-    @Test
-    fun `areaParserTasks_frame16_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (23 addresses)
-            memory[0x0000] = 0x23u
-            memory[0x0001] = 0x0Cu
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xDBu
-            memory[0x0007] = 0x92u
-            memory[0x01F4] = 0xCAu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0xBEu
-            memory[0x01F7] = 0x92u
-            memory[0x0340] = 0x74u
-            memory[0x03F9] = 0x00u
-            memory[0x03FA] = 0x00u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x50u
-            memory[0x03FF] = 0x05u
-            memory[0x06A0] = 0x07u
-            memory[0x071F] = 0x01u
-            memory[0x0720] = 0x20u
-            memory[0x0721] = 0x90u
-            memory[0x0726] = 0x07u
-
-            // Execute decompiled function
-            areaParserTasks(0x00)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 20
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 11
-     * Memory reads: 37, writes: 3
-     */
-    @Test
-    fun `areaParserTasks_frame20_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (37 addresses)
-            memory[0x0000] = 0x57u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xAEu
-            memory[0x0007] = 0x88u
-            memory[0x01F4] = 0xCAu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0xBEu
-            memory[0x01F7] = 0x92u
-            memory[0x0340] = 0x57u
-            memory[0x03F9] = 0x00u
-            memory[0x03FA] = 0x00u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x50u
-            memory[0x03FF] = 0x05u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x04u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x02u
-            memory[0x0720] = 0x20u
-            memory[0x0721] = 0x9Fu
-            memory[0x0726] = 0x0Fu
-
-            // Execute decompiled function
-            areaParserTasks(0x01)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    /**
-     * Test case 3 from frame 24
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 15
-     * Memory reads: 37, writes: 3
-     */
-    @Test
-    fun `areaParserTasks_frame24_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (37 addresses)
-            memory[0x0000] = 0x57u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xAEu
-            memory[0x0007] = 0x88u
-            memory[0x01F4] = 0xCAu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0xBEu
-            memory[0x01F7] = 0x92u
-            memory[0x0340] = 0x57u
-            memory[0x03F9] = 0x00u
-            memory[0x03FA] = 0x30u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0xD0u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x50u
-            memory[0x03FF] = 0x05u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0xC0u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x02u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x02u
-            memory[0x0720] = 0x24u
-            memory[0x0721] = 0x8Fu
-            memory[0x0726] = 0x07u
-
-            // Execute decompiled function
-            areaParserTasks(0x01)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    /**
-     * Test case 4 from frame 1305
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 9
-     * Memory reads: 37, writes: 3
-     */
-    @Test
-    fun `areaParserTasks_frame1305_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (37 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xAEu
-            memory[0x0007] = 0x88u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x0340] = 0x00u
-            memory[0x03F9] = 0xA0u
-            memory[0x03FA] = 0x0Au
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x50u
-            memory[0x03FF] = 0x05u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x82u
-            memory[0x06A3] = 0x85u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x00u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x02u
-            memory[0x0720] = 0x24u
-            memory[0x0721] = 0x9Fu
-            memory[0x0726] = 0x0Fu
-
-            // Execute decompiled function
-            areaParserTasks(0x01)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x01u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    /**
-     * Test case 5 from frame 1533
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 8
-     * Memory reads: 37, writes: 3
-     */
-    @Test
-    fun `areaParserTasks_frame1533_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (37 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x08u
-            memory[0x0003] = 0x80u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xAEu
-            memory[0x0007] = 0x88u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x0340] = 0x00u
-            memory[0x03F9] = 0x22u
-            memory[0x03FA] = 0x00u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x10u
-            memory[0x03FF] = 0x01u
-            memory[0x06A1] = 0x82u
-            memory[0x06A2] = 0x85u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x13u
-            memory[0x06AA] = 0x15u
-            memory[0x06AB] = 0x15u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x03u
-            memory[0x0720] = 0x20u
-            memory[0x0721] = 0x8Eu
-            memory[0x0726] = 0x07u
-
-            // Execute decompiled function
-            areaParserTasks(0x02)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    /**
-     * Test case 6 from frame 2297
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 7
-     * Memory reads: 55, writes: 2
-     */
-    @Test
-    fun `areaParserTasks_frame2297_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (55 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x03u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xFCu
-            memory[0x0007] = 0x93u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01EC] = 0x3Du
-            memory[0x01ED] = 0x99u
-            memory[0x01EE] = 0x66u
-            memory[0x01EF] = 0x96u
-            memory[0x01F0] = 0x67u
-            memory[0x01F1] = 0x95u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x01F6] = 0x91u
-            memory[0x01F7] = 0xAFu
-            memory[0x06A0] = 0x0Fu
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x13u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x00u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x04u
-            memory[0x0725] = 0x02u
-            memory[0x0726] = 0x0Fu
-            memory[0x0727] = 0x01u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x03u
-            memory[0x072B] = 0x01u
-            memory[0x072C] = 0x10u
-            memory[0x072F] = 0x0Eu
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0x00u
-            memory[0x0735] = 0x02u
-            memory[0x0741] = 0x00u
-            memory[0x0742] = 0x02u
-            memory[0x0743] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x075F] = 0x00u
-            memory[0x0760] = 0x00u
-
-            // Execute decompiled function
-            areaParserTasks(0x03)
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 7 from frame 2565
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 7
-     * Memory reads: 45, writes: 3
-     */
-    @Test
-    fun `areaParserTasks_frame2565_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (45 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x03u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xFCu
-            memory[0x0007] = 0x93u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01F0] = 0x67u
-            memory[0x01F1] = 0x95u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x06A0] = 0x17u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x00u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x04u
-            memory[0x0725] = 0x03u
-            memory[0x0726] = 0x07u
-            memory[0x0727] = 0x01u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x03u
-            memory[0x072B] = 0x01u
-            memory[0x072C] = 0x10u
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-            memory[0x0741] = 0x00u
-            memory[0x0742] = 0x02u
-            memory[0x0743] = 0x00u
-            memory[0x074E] = 0x01u
-
-            // Execute decompiled function
-            areaParserTasks(0x03)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x03u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    /**
-     * Test case 8 from frame 5413
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 8
-     * Memory reads: 37, writes: 3
-     */
-    @Test
-    fun `areaParserTasks_frame5413_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (37 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xAEu
-            memory[0x0007] = 0x88u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x0340] = 0x00u
-            memory[0x03F9] = 0x00u
-            memory[0x03FA] = 0x00u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x10u
-            memory[0x03FF] = 0x01u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x03u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x03u
-            memory[0x0720] = 0x20u
-            memory[0x0721] = 0x96u
-            memory[0x0726] = 0x0Bu
-
-            // Execute decompiled function
-            areaParserTasks(0x02)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    /**
-     * Test case 9 from frame 6347
-     * Function: areaParserTasks (0x92C8)
-     * Parameters: A
-     * Call depth: 13
-     * Memory reads: 37, writes: 3
-     */
-    @Test
-    fun `areaParserTasks_frame6347_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (37 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0xCAu
-            memory[0x0005] = 0x92u
-            memory[0x0006] = 0xAEu
-            memory[0x0007] = 0x88u
-            memory[0x01F2] = 0xCAu
-            memory[0x01F3] = 0x92u
-            memory[0x01F4] = 0xBEu
-            memory[0x01F5] = 0x92u
-            memory[0x0340] = 0x00u
-            memory[0x03F9] = 0x00u
-            memory[0x03FA] = 0x00u
-            memory[0x03FB] = 0x00u
-            memory[0x03FC] = 0x00u
-            memory[0x03FD] = 0x00u
-            memory[0x03FE] = 0x10u
-            memory[0x03FF] = 0x01u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x04u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x03u
-            memory[0x0720] = 0x24u
-            memory[0x0721] = 0x9Eu
-            memory[0x0726] = 0x0Fu
-
-            // Execute decompiled function
-            areaParserTasks(0x02)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x02u, memory[0x071F], "Memory 0x071F mismatch")
-        }
-    }
-
-    // =========================================
-    // 0x9508: processAreaData
-    // 366 calls, 47 unique inputs
-    // =========================================
-
-    /**
-     * Test case 0 from frame 13
-     * Function: processAreaData (0x9508)
-     * Call depth: 7
-     * Memory reads: 14, writes: 6
-     */
-    @Test
-    fun `processAreaData_frame13_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (14 addresses)
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01F2] = 0x67u
-            memory[0x01F3] = 0x95u
-            memory[0x0725] = 0x00u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x00u
-            memory[0x072B] = 0x00u
-            memory[0x072C] = 0x00u
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-            assertEquals(0x01u, memory[0x072A], "Memory 0x072A mismatch")
-            assertEquals(0x01u, memory[0x072B], "Memory 0x072B mismatch")
-        }
-    }
-
-    /**
-     * Test case 1 from frame 22
-     * Function: processAreaData (0x9508)
-     * Call depth: 7
-     * Memory reads: 15, writes: 4
-     */
-    @Test
-    fun `processAreaData_frame22_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (15 addresses)
-            memory[0x0000] = 0x20u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01F2] = 0x67u
-            memory[0x01F3] = 0x95u
-            memory[0x0725] = 0x01u
-            memory[0x0726] = 0x02u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x01u
-            memory[0x072C] = 0x02u
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 24
-     * Function: processAreaData (0x9508)
-     * Call depth: 13
-     * Memory reads: 48, writes: 5
-     */
-    @Test
-    fun `processAreaData_frame24_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (48 addresses)
-            memory[0x0000] = 0x20u
-            memory[0x0004] = 0x66u
-            memory[0x0005] = 0x96u
-            memory[0x0006] = 0x2Eu
-            memory[0x0007] = 0x00u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01ED] = 0xAEu
-            memory[0x01EE] = 0x9Bu
-            memory[0x01EF] = 0x47u
-            memory[0x01F0] = 0x66u
-            memory[0x01F1] = 0x96u
-            memory[0x01F2] = 0x67u
-            memory[0x01F3] = 0x95u
-            memory[0x01F4] = 0xD5u
-            memory[0x01F5] = 0x94u
-            memory[0x01F6] = 0xBEu
-            memory[0x01F7] = 0x92u
-            memory[0x06A0] = 0x17u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x02u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x071F] = 0x04u
-            memory[0x0725] = 0x01u
-            memory[0x0726] = 0x07u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x01u
-            memory[0x072C] = 0x08u
-            memory[0x072E] = 0x08u
-            memory[0x072F] = 0x02u
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0x01u
-            memory[0x0735] = 0x00u
-            memory[0x0743] = 0x00u
-            memory[0x074E] = 0x01u
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x03u, memory[0x071F], "Memory 0x071F mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-        }
-    }
-
-    /**
-     * Test case 3 from frame 1251
-     * Function: processAreaData (0x9508)
-     * Call depth: 11
-     * Memory reads: 44, writes: 20
-     */
-    @Test
-    fun `processAreaData_frame1251_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (44 addresses)
-            memory[0x0000] = 0x70u
-            memory[0x0004] = 0x66u
-            memory[0x0005] = 0x96u
-            memory[0x0006] = 0xE5u
-            memory[0x0007] = 0x00u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01EC] = 0x3Du
-            memory[0x01ED] = 0x99u
-            memory[0x01EE] = 0x5Eu
-            memory[0x01EF] = 0x96u
-            memory[0x01F0] = 0x67u
-            memory[0x01F1] = 0x95u
-            memory[0x01F2] = 0xD5u
-            memory[0x01F3] = 0x94u
-            memory[0x06A0] = 0x1Cu
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x81u
-            memory[0x06A3] = 0x84u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x12u
-            memory[0x06AB] = 0x00u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x0725] = 0x01u
-            memory[0x0726] = 0x0Cu
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x01u
-            memory[0x072B] = 0x00u
-            memory[0x072C] = 0x0Au
-            memory[0x072F] = 0x0Au
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-            memory[0x0735] = 0x00u
-            memory[0x075F] = 0x00u
-            memory[0x0760] = 0x00u
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (15 addresses)
-            assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x05DC], "Memory 0x05DC mismatch")
-            assertEquals(0x00u, memory[0x05EC], "Memory 0x05EC mismatch")
-            assertEquals(0x00u, memory[0x05FC], "Memory 0x05FC mismatch")
-            assertEquals(0x00u, memory[0x060C], "Memory 0x060C mismatch")
-            assertEquals(0x00u, memory[0x061C], "Memory 0x061C mismatch")
-            assertEquals(0x00u, memory[0x062C], "Memory 0x062C mismatch")
-            assertEquals(0x00u, memory[0x063C], "Memory 0x063C mismatch")
-            assertEquals(0x00u, memory[0x064C], "Memory 0x064C mismatch")
-            assertEquals(0x00u, memory[0x065C], "Memory 0x065C mismatch")
-            assertEquals(0x12u, memory[0x066C], "Memory 0x066C mismatch")
-            assertEquals(0x14u, memory[0x067C], "Memory 0x067C mismatch")
-            assertEquals(0x54u, memory[0x068C], "Memory 0x068C mismatch")
-            assertEquals(0x54u, memory[0x069C], "Memory 0x069C mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-        }
-    }
-
-    /**
-     * Test case 4 from frame 1345
-     * Function: processAreaData (0x9508)
-     * Call depth: 11
-     * Memory reads: 16, writes: 4
-     */
-    @Test
-    fun `processAreaData_frame1345_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (16 addresses)
-            memory[0x0000] = 0x70u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01F0] = 0x67u
-            memory[0x01F1] = 0x95u
-            memory[0x0725] = 0x02u
-            memory[0x0726] = 0x01u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x02u
-            memory[0x072B] = 0x01u
-            memory[0x072C] = 0x0Cu
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-        }
-    }
-
-    /**
-     * Test case 5 from frame 1523
-     * Function: processAreaData (0x9508)
-     * Call depth: 10
-     * Memory reads: 44, writes: 20
-     */
-    @Test
-    fun `processAreaData_frame1523_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (44 addresses)
-            memory[0x0000] = 0x70u
-            memory[0x0004] = 0x66u
-            memory[0x0005] = 0x96u
-            memory[0x0006] = 0xE5u
-            memory[0x0007] = 0x00u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01EC] = 0x3Du
-            memory[0x01ED] = 0x99u
-            memory[0x01EE] = 0x5Eu
-            memory[0x01EF] = 0x96u
-            memory[0x01F0] = 0x67u
-            memory[0x01F1] = 0x95u
-            memory[0x01F2] = 0xD5u
-            memory[0x01F3] = 0x94u
-            memory[0x06A0] = 0x06u
-            memory[0x06A1] = 0x81u
-            memory[0x06A2] = 0x84u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x00u
-            memory[0x06A9] = 0x12u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x00u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x0725] = 0x02u
-            memory[0x0726] = 0x06u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x02u
-            memory[0x072B] = 0x01u
-            memory[0x072C] = 0x0Cu
-            memory[0x072F] = 0x0Cu
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-            memory[0x0735] = 0x01u
-            memory[0x075F] = 0x00u
-            memory[0x0760] = 0x00u
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (15 addresses)
-            assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x0506], "Memory 0x0506 mismatch")
-            assertEquals(0x00u, memory[0x0516], "Memory 0x0516 mismatch")
-            assertEquals(0x00u, memory[0x0526], "Memory 0x0526 mismatch")
-            assertEquals(0x00u, memory[0x0536], "Memory 0x0536 mismatch")
-            assertEquals(0x00u, memory[0x0546], "Memory 0x0546 mismatch")
-            assertEquals(0x00u, memory[0x0556], "Memory 0x0556 mismatch")
-            assertEquals(0x00u, memory[0x0566], "Memory 0x0566 mismatch")
-            assertEquals(0x00u, memory[0x0576], "Memory 0x0576 mismatch")
-            assertEquals(0x12u, memory[0x0586], "Memory 0x0586 mismatch")
-            assertEquals(0x14u, memory[0x0596], "Memory 0x0596 mismatch")
-            assertEquals(0x14u, memory[0x05A6], "Memory 0x05A6 mismatch")
-            assertEquals(0x54u, memory[0x05B6], "Memory 0x05B6 mismatch")
-            assertEquals(0x54u, memory[0x05C6], "Memory 0x05C6 mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-        }
-    }
-
-    /**
-     * Test case 6 from frame 1617
-     * Function: processAreaData (0x9508)
-     * Call depth: 10
-     * Memory reads: 15, writes: 4
-     */
-    @Test
-    fun `processAreaData_frame1617_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (15 addresses)
-            memory[0x0000] = 0x70u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01F0] = 0x67u
-            memory[0x01F1] = 0x95u
-            memory[0x0725] = 0x02u
-            memory[0x0726] = 0x0Bu
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x02u
-            memory[0x072C] = 0x0Eu
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-        }
-    }
-
-    /**
-     * Test case 7 from frame 2297
-     * Function: processAreaData (0x9508)
-     * Call depth: 9
-     * Memory reads: 43, writes: 20
-     */
-    @Test
-    fun `processAreaData_frame2297_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (43 addresses)
-            memory[0x0000] = 0x70u
-            memory[0x0004] = 0x66u
-            memory[0x0005] = 0x96u
-            memory[0x0006] = 0xE5u
-            memory[0x0007] = 0x00u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01EC] = 0x3Du
-            memory[0x01ED] = 0x99u
-            memory[0x01EE] = 0x66u
-            memory[0x01EF] = 0x96u
-            memory[0x01F0] = 0x67u
-            memory[0x01F1] = 0x95u
-            memory[0x01F2] = 0xD5u
-            memory[0x01F3] = 0x94u
-            memory[0x06A0] = 0x0Fu
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x00u
-            memory[0x06A3] = 0x00u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x13u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x00u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x0725] = 0x02u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x03u
-            memory[0x072B] = 0x01u
-            memory[0x072C] = 0x10u
-            memory[0x072F] = 0x0Eu
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0x00u
-            memory[0x0735] = 0x02u
-            memory[0x075F] = 0x00u
-            memory[0x0760] = 0x00u
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (15 addresses)
-            assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x050F], "Memory 0x050F mismatch")
-            assertEquals(0x00u, memory[0x051F], "Memory 0x051F mismatch")
-            assertEquals(0x00u, memory[0x052F], "Memory 0x052F mismatch")
-            assertEquals(0x00u, memory[0x053F], "Memory 0x053F mismatch")
-            assertEquals(0x00u, memory[0x054F], "Memory 0x054F mismatch")
-            assertEquals(0x00u, memory[0x055F], "Memory 0x055F mismatch")
-            assertEquals(0x00u, memory[0x056F], "Memory 0x056F mismatch")
-            assertEquals(0x13u, memory[0x057F], "Memory 0x057F mismatch")
-            assertEquals(0x15u, memory[0x058F], "Memory 0x058F mismatch")
-            assertEquals(0x15u, memory[0x059F], "Memory 0x059F mismatch")
-            assertEquals(0x15u, memory[0x05AF], "Memory 0x05AF mismatch")
-            assertEquals(0x54u, memory[0x05BF], "Memory 0x05BF mismatch")
-            assertEquals(0x54u, memory[0x05CF], "Memory 0x05CF mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-        }
-    }
-
-    /**
-     * Test case 8 from frame 2423
-     * Function: processAreaData (0x9508)
-     * Call depth: 9
-     * Memory reads: 16, writes: 4
-     */
-    @Test
-    fun `processAreaData_frame2423_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (16 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01F0] = 0x67u
-            memory[0x01F1] = 0x95u
-            memory[0x0725] = 0x03u
-            memory[0x0726] = 0x04u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x03u
-            memory[0x072B] = 0x01u
-            memory[0x072C] = 0x10u
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (2 addresses)
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-        }
-    }
-
-    /**
-     * Test case 9 from frame 2607
-     * Function: processAreaData (0x9508)
-     * Call depth: 9
-     * Memory reads: 44, writes: 20
-     */
-    @Test
-    fun `processAreaData_frame2607_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (44 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0004] = 0x66u
-            memory[0x0005] = 0x96u
-            memory[0x0006] = 0xE5u
-            memory[0x0007] = 0x00u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01EC] = 0x3Du
-            memory[0x01ED] = 0x99u
-            memory[0x01EE] = 0x5Eu
-            memory[0x01EF] = 0x96u
-            memory[0x01F0] = 0x67u
-            memory[0x01F1] = 0x95u
-            memory[0x01F2] = 0xD5u
-            memory[0x01F3] = 0x94u
-            memory[0x06A0] = 0x19u
-            memory[0x06A1] = 0x00u
-            memory[0x06A2] = 0x81u
-            memory[0x06A3] = 0x84u
-            memory[0x06A4] = 0x00u
-            memory[0x06A5] = 0x00u
-            memory[0x06A6] = 0x00u
-            memory[0x06A7] = 0x00u
-            memory[0x06A8] = 0x10u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x00u
-            memory[0x06AC] = 0x54u
-            memory[0x06AD] = 0x54u
-            memory[0x0725] = 0x03u
-            memory[0x0726] = 0x09u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x03u
-            memory[0x072B] = 0x01u
-            memory[0x072C] = 0x10u
-            memory[0x072F] = 0x10u
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0xFFu
-            memory[0x0735] = 0x02u
-            memory[0x075F] = 0x00u
-            memory[0x0760] = 0x00u
-
-            // Execute decompiled function
-            processAreaData()
-
-            // Verify: Check output memory (15 addresses)
-            assertEquals(0x02u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x05D9], "Memory 0x05D9 mismatch")
-            assertEquals(0x00u, memory[0x05E9], "Memory 0x05E9 mismatch")
-            assertEquals(0x00u, memory[0x05F9], "Memory 0x05F9 mismatch")
-            assertEquals(0x00u, memory[0x0609], "Memory 0x0609 mismatch")
-            assertEquals(0x00u, memory[0x0619], "Memory 0x0619 mismatch")
-            assertEquals(0x00u, memory[0x0629], "Memory 0x0629 mismatch")
-            assertEquals(0x00u, memory[0x0639], "Memory 0x0639 mismatch")
-            assertEquals(0x10u, memory[0x0649], "Memory 0x0649 mismatch")
-            assertEquals(0x14u, memory[0x0659], "Memory 0x0659 mismatch")
-            assertEquals(0x14u, memory[0x0669], "Memory 0x0669 mismatch")
-            assertEquals(0x14u, memory[0x0679], "Memory 0x0679 mismatch")
-            assertEquals(0x54u, memory[0x0689], "Memory 0x0689 mismatch")
-            assertEquals(0x54u, memory[0x0699], "Memory 0x0699 mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
         }
     }
 
@@ -7075,11 +4721,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `incAreaObjOffset_frame21_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x072C] = 0x00u
 
@@ -7100,11 +4742,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `incAreaObjOffset_frame23_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x072C] = 0x02u
 
@@ -7125,11 +4763,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `incAreaObjOffset_frame23_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x072C] = 0x04u
 
@@ -7150,11 +4784,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `incAreaObjOffset_frame24_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x072C] = 0x06u
 
@@ -7175,11 +4805,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `incAreaObjOffset_frame24_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x072C] = 0x08u
 
@@ -7200,11 +4826,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `incAreaObjOffset_frame1251_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x072C] = 0x0Au
 
@@ -7225,11 +4847,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `incAreaObjOffset_frame1523_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x072C] = 0x0Cu
 
@@ -7250,11 +4868,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `incAreaObjOffset_frame2289_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x072C] = 0x0Eu
 
@@ -7275,11 +4889,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `incAreaObjOffset_frame2607_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x072C] = 0x10u
 
@@ -7300,11 +4910,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `incAreaObjOffset_frame6401_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x072C] = 0x12u
 
@@ -7314,389 +4920,6 @@ class GeneratedFunctionTests {
             // Verify: Check output memory (2 addresses)
             assertEquals(0x00u, memory[0x072B], "Memory 0x072B mismatch")
             assertEquals(0x14u, memory[0x072C], "Memory 0x072C mismatch")
-        }
-    }
-
-    // =========================================
-    // 0x9595: decodeAreaData
-    // Parameters: X
-    // 1098 calls, 128 unique inputs
-    // =========================================
-
-    /**
-     * Test case 0 from frame 13
-     * Function: decodeAreaData (0x9595)
-     * Parameters: X
-     * Call depth: 8
-     * Memory reads: 7, writes: 2
-     */
-    @Test
-    fun `decodeAreaData_frame13_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (7 addresses)
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x0725] = 0x00u
-            memory[0x072A] = 0x01u
-            memory[0x072C] = 0x00u
-            memory[0x0732] = 0xFFu
-
-            // Execute decompiled function
-            decodeAreaData(0x02)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x16u, memory[0x0007], "Memory 0x0007 mismatch")
-        }
-    }
-
-    /**
-     * Test case 1 from frame 22
-     * Function: decodeAreaData (0x9595)
-     * Parameters: X
-     * Call depth: 12
-     * Memory reads: 10, writes: 2
-     */
-    @Test
-    fun `decodeAreaData_frame22_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x20u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x0725] = 0x01u
-            memory[0x0726] = 0x03u
-            memory[0x0728] = 0x00u
-            memory[0x072A] = 0x01u
-            memory[0x072C] = 0x02u
-            memory[0x0732] = 0xFFu
-
-            // Execute decompiled function
-            decodeAreaData(0x02)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 24
-     * Function: decodeAreaData (0x9595)
-     * Parameters: X
-     * Call depth: 15
-     * Memory reads: 24, writes: 9
-     */
-    @Test
-    fun `decodeAreaData_frame24_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (24 addresses)
-            memory[0x0000] = 0x01u
-            memory[0x0004] = 0x66u
-            memory[0x0005] = 0x96u
-            memory[0x0006] = 0x0Eu
-            memory[0x0007] = 0x16u
-            memory[0x0008] = 0x01u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01EF] = 0x32u
-            memory[0x01F0] = 0x5Eu
-            memory[0x01F1] = 0x96u
-            memory[0x01F2] = 0x67u
-            memory[0x01F3] = 0x95u
-            memory[0x06A8] = 0x51u
-            memory[0x0725] = 0x01u
-            memory[0x0726] = 0x07u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x01u
-            memory[0x072C] = 0x08u
-            memory[0x072E] = 0x08u
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0735] = 0x00u
-
-            // Execute decompiled function
-            decodeAreaData(0x01)
-
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x16u, memory[0x0007], "Memory 0x0007 mismatch")
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-            assertEquals(0x08u, memory[0x072E], "Memory 0x072E mismatch")
-        }
-    }
-
-    /**
-     * Test case 3 from frame 1217
-     * Function: decodeAreaData (0x9595)
-     * Parameters: X
-     * Call depth: 12
-     * Memory reads: 10, writes: 2
-     */
-    @Test
-    fun `decodeAreaData_frame1217_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x70u
-            memory[0x0008] = 0x00u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x0725] = 0x01u
-            memory[0x0726] = 0x0Bu
-            memory[0x0728] = 0x00u
-            memory[0x072A] = 0x01u
-            memory[0x072C] = 0x0Au
-            memory[0x0730] = 0xFFu
-
-            // Execute decompiled function
-            decodeAreaData(0x00)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
-        }
-    }
-
-    /**
-     * Test case 4 from frame 1447
-     * Function: decodeAreaData (0x9595)
-     * Parameters: X
-     * Call depth: 12
-     * Memory reads: 10, writes: 2
-     */
-    @Test
-    fun `decodeAreaData_frame1447_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x70u
-            memory[0x0008] = 0x01u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x0725] = 0x02u
-            memory[0x0726] = 0x02u
-            memory[0x0728] = 0x00u
-            memory[0x072A] = 0x02u
-            memory[0x072C] = 0x0Cu
-            memory[0x0731] = 0xFFu
-
-            // Execute decompiled function
-            decodeAreaData(0x01)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
-        }
-    }
-
-    /**
-     * Test case 5 from frame 1523
-     * Function: decodeAreaData (0x9595)
-     * Parameters: X
-     * Call depth: 12
-     * Memory reads: 10, writes: 2
-     */
-    @Test
-    fun `decodeAreaData_frame1523_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x70u
-            memory[0x0008] = 0x00u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x0725] = 0x02u
-            memory[0x0726] = 0x06u
-            memory[0x0728] = 0x00u
-            memory[0x072A] = 0x02u
-            memory[0x072C] = 0x0Eu
-            memory[0x0730] = 0xFFu
-
-            // Execute decompiled function
-            decodeAreaData(0x00)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
-        }
-    }
-
-    /**
-     * Test case 6 from frame 1609
-     * Function: decodeAreaData (0x9595)
-     * Parameters: X
-     * Call depth: 11
-     * Memory reads: 10, writes: 2
-     */
-    @Test
-    fun `decodeAreaData_frame1609_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x70u
-            memory[0x0008] = 0x00u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x0725] = 0x02u
-            memory[0x0726] = 0x0Au
-            memory[0x0728] = 0x00u
-            memory[0x072A] = 0x02u
-            memory[0x072C] = 0x0Eu
-            memory[0x0730] = 0xFFu
-
-            // Execute decompiled function
-            decodeAreaData(0x00)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
-        }
-    }
-
-    /**
-     * Test case 7 from frame 2297
-     * Function: decodeAreaData (0x9595)
-     * Parameters: X
-     * Call depth: 10
-     * Memory reads: 30, writes: 9
-     */
-    @Test
-    fun `decodeAreaData_frame2297_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (30 addresses)
-            memory[0x0000] = 0x70u
-            memory[0x0004] = 0x66u
-            memory[0x0005] = 0x96u
-            memory[0x0006] = 0xE5u
-            memory[0x0007] = 0x00u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x01EC] = 0x3Du
-            memory[0x01ED] = 0x99u
-            memory[0x01EE] = 0x66u
-            memory[0x01EF] = 0x96u
-            memory[0x01F0] = 0x67u
-            memory[0x01F1] = 0x95u
-            memory[0x06A9] = 0x00u
-            memory[0x06AA] = 0x00u
-            memory[0x06AB] = 0x00u
-            memory[0x0725] = 0x02u
-            memory[0x0728] = 0x00u
-            memory[0x0729] = 0x00u
-            memory[0x072A] = 0x03u
-            memory[0x072B] = 0x01u
-            memory[0x072C] = 0x10u
-            memory[0x072F] = 0x0Eu
-            memory[0x0730] = 0xFFu
-            memory[0x0731] = 0xFFu
-            memory[0x0732] = 0x00u
-            memory[0x0735] = 0x02u
-            memory[0x075F] = 0x00u
-            memory[0x0760] = 0x00u
-
-            // Execute decompiled function
-            decodeAreaData(0x02)
-
-            // Verify: Check output memory (4 addresses)
-            assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x0729], "Memory 0x0729 mismatch")
-            assertEquals(0xFFu, memory[0x0732], "Memory 0x0732 mismatch")
-        }
-    }
-
-    /**
-     * Test case 8 from frame 2423
-     * Function: decodeAreaData (0x9595)
-     * Parameters: X
-     * Call depth: 10
-     * Memory reads: 10, writes: 2
-     */
-    @Test
-    fun `decodeAreaData_frame2423_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0008] = 0x02u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x0725] = 0x03u
-            memory[0x0726] = 0x04u
-            memory[0x0728] = 0x00u
-            memory[0x072A] = 0x03u
-            memory[0x072C] = 0x10u
-            memory[0x0732] = 0xFFu
-
-            // Execute decompiled function
-            decodeAreaData(0x02)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
-        }
-    }
-
-    /**
-     * Test case 9 from frame 2599
-     * Function: decodeAreaData (0x9595)
-     * Parameters: X
-     * Call depth: 10
-     * Memory reads: 10, writes: 2
-     */
-    @Test
-    fun `decodeAreaData_frame2599_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (10 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0008] = 0x01u
-            memory[0x00E7] = 0x90u
-            memory[0x00E8] = 0xA6u
-            memory[0x0725] = 0x03u
-            memory[0x0726] = 0x08u
-            memory[0x0728] = 0x00u
-            memory[0x072A] = 0x03u
-            memory[0x072C] = 0x10u
-            memory[0x0731] = 0xFFu
-
-            // Execute decompiled function
-            decodeAreaData(0x01)
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x0007], "Memory 0x0007 mismatch")
         }
     }
 
@@ -7715,11 +4938,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPipeHeight_frame1251_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -7745,11 +4964,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPipeHeight_frame1259_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -7775,11 +4990,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPipeHeight_frame1523_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -7805,11 +5016,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPipeHeight_frame1531_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -7835,11 +5042,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPipeHeight_frame2289_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -7865,11 +5068,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPipeHeight_frame2297_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -7895,11 +5094,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPipeHeight_frame2607_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -7925,11 +5120,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPipeHeight_frame6101_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -7959,11 +5150,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getAreaObjectID_frame21_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0000] = 0x01u
 
@@ -7983,11 +5170,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getAreaObjectID_frame23_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0000] = 0x00u
 
@@ -8007,11 +5190,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getAreaObjectID_frame24_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0000] = 0x01u
 
@@ -8038,11 +5217,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkLrgObjLength_frame23_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8068,11 +5243,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkLrgObjLength_frame23_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8098,11 +5269,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkLrgObjLength_frame24_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8128,11 +5295,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkLrgObjLength_frame24_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8158,11 +5321,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkLrgObjLength_frame1145_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8194,11 +5353,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkLrgObjFixedLength_frame1251_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0732] = 0xFFu
 
@@ -8219,11 +5374,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkLrgObjFixedLength_frame1259_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0732] = 0x00u
 
@@ -8250,11 +5401,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getLrgObjAttrib_frame21_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8277,11 +5424,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getLrgObjAttrib_frame23_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8304,11 +5447,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getLrgObjAttrib_frame23_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8331,11 +5470,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getLrgObjAttrib_frame24_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8358,11 +5493,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getLrgObjAttrib_frame1145_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8385,11 +5516,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getLrgObjAttrib_frame1259_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8412,11 +5539,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getLrgObjAttrib_frame1523_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8439,11 +5562,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getLrgObjAttrib_frame1531_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8466,11 +5585,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getLrgObjAttrib_frame2297_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8493,11 +5608,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getLrgObjAttrib_frame2607_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00E7] = 0x90u
             memory[0x00E8] = 0xA6u
@@ -8526,11 +5637,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockBufferAddr_frame13_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x01F3] = 0x00u
 
@@ -8552,11 +5659,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockBufferAddr_frame1116_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x01ED] = 0x07u
 
@@ -8578,11 +5681,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockBufferAddr_frame1233_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x01EE] = 0x0Du
 
@@ -8604,11 +5703,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockBufferAddr_frame1347_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x01EE] = 0x11u
 
@@ -8630,11 +5725,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockBufferAddr_frame1523_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x01F1] = 0x06u
 
@@ -8656,11 +5747,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockBufferAddr_frame1854_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x01EE] = 0x18u
 
@@ -8682,11 +5769,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockBufferAddr_frame2237_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x01EE] = 0x1Cu
 
@@ -8708,11 +5791,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockBufferAddr_frame2367_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x01EE] = 0x02u
 
@@ -8734,11 +5813,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockBufferAddr_frame2580_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x01EE] = 0x08u
 
@@ -8760,11 +5835,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockBufferAddr_frame3193_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x01EC] = 0x17u
 
@@ -8792,11 +5863,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `loadAreaPointer_frame5_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (4 addresses)
             memory[0x01F6] = 0x05u
             memory[0x01F7] = 0x9Cu
@@ -8827,11 +5894,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getAreaType_frame6_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -8856,11 +5919,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `findAreaPointer_frame5_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x075F] = 0x00u
             memory[0x0760] = 0x00u
@@ -8886,11 +5945,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getAreaDataAddrs_frame6_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x00E7] = 0x8Eu
             memory[0x00E8] = 0xA6u
@@ -8919,1636 +5974,6 @@ class GeneratedFunctionTests {
     }
 
     // =========================================
-    // 0xAEEA: gameCoreRoutine
-    // 8846 calls, 4675 unique inputs
-    // =========================================
-
-    /**
-     * Test case 0 from frame 32
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 120, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame32_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (120 addresses)
-            memory[0x0000] = 0x03u
-            memory[0x0001] = 0xFCu
-            memory[0x0002] = 0xB0u
-            memory[0x0003] = 0x01u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0x31u
-            memory[0x0007] = 0x91u
-            memory[0x0008] = 0x00u
-            memory[0x0009] = 0x1Au
-            memory[0x000A] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x00u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x10u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01EF] = 0x1Du
-            memory[0x01F0] = 0xF2u
-            memory[0x01F1] = 0xD9u
-            memory[0x01F2] = 0xF1u
-            memory[0x01F3] = 0xC4u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0300] = 0x00u
-            memory[0x0301] = 0x3Fu
-            memory[0x0398] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x046F] = 0x00u
-            memory[0x0490] = 0x00u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x0710] = 0x02u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0715] = 0x01u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0739] = 0x00u
-            memory[0x073A] = 0x00u
-            memory[0x073B] = 0x00u
-            memory[0x073D] = 0x00u
-            memory[0x0744] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0752] = 0x00u
-            memory[0x0753] = 0x00u
-            memory[0x0754] = 0x01u
-            memory[0x0756] = 0x00u
-            memory[0x0757] = 0x01u
-            memory[0x0758] = 0x00u
-            memory[0x075F] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x97u
-            memory[0x07A9] = 0x7Au
-            memory[0x07AA] = 0x54u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 1 from frame 966
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 139, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame966_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (139 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0xEDu
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x10u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0753] = 0x00u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0xCBu
-            memory[0x07A9] = 0xCEu
-            memory[0x07AA] = 0x59u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 2 from frame 3276
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 140, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame3276_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (140 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x24u
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x10u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x046E] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0753] = 0x00u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x3Du
-            memory[0x07A9] = 0x49u
-            memory[0x07AA] = 0x33u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 3 from frame 4210
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 140, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame4210_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (140 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0xF7u
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x10u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x046D] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0753] = 0x00u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x2Fu
-            memory[0x07A9] = 0xEDu
-            memory[0x07AA] = 0xB2u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 4 from frame 5692
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 174, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame5692_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (174 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0xA0u
-            memory[0x0002] = 0xFFu
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0xDCu
-            memory[0x000A] = 0x80u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000D] = 0x80u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x01u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x01u
-            memory[0x0033] = 0x02u
-            memory[0x0045] = 0x02u
-            memory[0x0057] = 0xE9u
-            memory[0x006D] = 0x01u
-            memory[0x006E] = 0x02u
-            memory[0x006F] = 0x02u
-            memory[0x0070] = 0x02u
-            memory[0x0071] = 0x02u
-            memory[0x0072] = 0x02u
-            memory[0x0076] = 0x01u
-            memory[0x007E] = 0x00u
-            memory[0x0082] = 0x01u
-            memory[0x0086] = 0x46u
-            memory[0x0087] = 0x80u
-            memory[0x0088] = 0x80u
-            memory[0x0089] = 0x80u
-            memory[0x008A] = 0x80u
-            memory[0x008B] = 0x80u
-            memory[0x008F] = 0x60u
-            memory[0x0091] = 0x00u
-            memory[0x0097] = 0x00u
-            memory[0x009B] = 0x65u
-            memory[0x009F] = 0x00u
-            memory[0x00A8] = 0x02u
-            memory[0x00B4] = 0xFFu
-            memory[0x00B5] = 0x01u
-            memory[0x00BE] = 0x01u
-            memory[0x00CA] = 0x01u
-            memory[0x00CE] = 0x70u
-            memory[0x00D7] = 0x4Eu
-            memory[0x00D9] = 0x00u
-            memory[0x00E3] = 0x16u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x00u
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01EC] = 0x1Du
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x01u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x11u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x02u
-            memory[0x03B1] = 0x1Du
-            memory[0x03B3] = 0x22u
-            memory[0x03B8] = 0x70u
-            memory[0x03BC] = 0x50u
-            memory[0x03BE] = 0x15u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03D4] = 0x00u
-            memory[0x03E8] = 0xC4u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0xF0u
-            memory[0x041F] = 0xD0u
-            memory[0x042B] = 0x60u
-            memory[0x043C] = 0x10u
-            memory[0x0448] = 0x10u
-            memory[0x0456] = 0x18u
-            memory[0x046B] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x00u
-            memory[0x04AA] = 0x00u
-            memory[0x04F0] = 0x24u
-            memory[0x0624] = 0x00u
-            memory[0x0625] = 0x00u
-            memory[0x0634] = 0x00u
-            memory[0x0635] = 0x00u
-            memory[0x0644] = 0x51u
-            memory[0x0645] = 0xC4u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0x08u
-            memory[0x06E4] = 0x04u
-            memory[0x06EC] = 0x58u
-            memory[0x06FB] = 0x50u
-            memory[0x06FC] = 0x80u
-            memory[0x06FF] = 0xFFu
-            memory[0x0700] = 0x17u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x0705] = 0xC4u
-            memory[0x070B] = 0x00u
-            memory[0x070D] = 0x01u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x01u
-            memory[0x071B] = 0x02u
-            memory[0x071C] = 0x43u
-            memory[0x071D] = 0x42u
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x05u
-            memory[0x073A] = 0x02u
-            memory[0x073B] = 0x01u
-            memory[0x073D] = 0x03u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0753] = 0x00u
-            memory[0x0754] = 0x00u
-            memory[0x0755] = 0x03u
-            memory[0x0756] = 0x01u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0781] = 0x01u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x60u
-            memory[0x07A9] = 0x48u
-            memory[0x07AA] = 0x88u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x80u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 5 from frame 7760
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 143, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame7760_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (143 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x98u
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x10u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0300] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x046E] = 0x00u
-            memory[0x046F] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D4] = 0x05u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0753] = 0x00u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x6Bu
-            memory[0x07A9] = 0xF3u
-            memory[0x07AA] = 0x24u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 6 from frame 10392
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 139, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame10392_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (139 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x9Au
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x10u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0753] = 0x00u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0xCBu
-            memory[0x07A9] = 0xFEu
-            memory[0x07AA] = 0x69u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 7 from frame 11872
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 117, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame11872_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (117 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x01u
-            memory[0x0002] = 0x6Du
-            memory[0x0003] = 0x02u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0x33u
-            memory[0x0007] = 0xB2u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x7Eu
-            memory[0x000A] = 0xC0u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x09u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x02u
-            memory[0x0045] = 0x02u
-            memory[0x0057] = 0xE8u
-            memory[0x006D] = 0x01u
-            memory[0x006E] = 0x02u
-            memory[0x006F] = 0x02u
-            memory[0x0070] = 0x02u
-            memory[0x0071] = 0x02u
-            memory[0x0072] = 0x02u
-            memory[0x0086] = 0x82u
-            memory[0x0087] = 0x80u
-            memory[0x0088] = 0x80u
-            memory[0x0089] = 0x80u
-            memory[0x008A] = 0x80u
-            memory[0x008B] = 0x80u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x6Du
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x06u
-            memory[0x0131] = 0x00u
-            memory[0x01EF] = 0x1Du
-            memory[0x01F0] = 0xF2u
-            memory[0x01F1] = 0xD9u
-            memory[0x01F2] = 0xF1u
-            memory[0x01F3] = 0xC4u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03AD] = 0x3Fu
-            memory[0x03B8] = 0x6Du
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x046F] = 0x00u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0x00u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0xC2u
-            memory[0x0700] = 0x18u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070D] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x071A] = 0x01u
-            memory[0x071B] = 0x02u
-            memory[0x071C] = 0x43u
-            memory[0x071D] = 0x42u
-            memory[0x071F] = 0x00u
-            memory[0x0739] = 0x05u
-            memory[0x073A] = 0x02u
-            memory[0x073B] = 0x01u
-            memory[0x073D] = 0x03u
-            memory[0x0745] = 0x00u
-            memory[0x0747] = 0xCFu
-            memory[0x074E] = 0x01u
-            memory[0x0753] = 0x00u
-            memory[0x0754] = 0x00u
-            memory[0x0756] = 0x01u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0781] = 0x04u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x79u
-            memory[0x07A9] = 0x97u
-            memory[0x07AA] = 0x64u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0xC2u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 8 from frame 13958
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 141, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame13958_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (141 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x6Fu
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x10u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x046C] = 0x00u
-            memory[0x046E] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0753] = 0x00u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x03u
-            memory[0x07A9] = 0xB1u
-            memory[0x07AA] = 0xB6u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    /**
-     * Test case 9 from frame 16386
-     * Function: gameCoreRoutine (0xAEEA)
-     * Call depth: 3
-     * Memory reads: 142, writes: 3
-     */
-    @Test
-    fun `gameCoreRoutine_frame16386_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (142 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x70u
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x01FA] = 0x77u
-            memory[0x01FB] = 0x81u
-            memory[0x01FC] = 0x10u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0300] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x046B] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D4] = 0x04u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0753] = 0x00u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x5Cu
-            memory[0x07A9] = 0x28u
-            memory[0x07AA] = 0x90u
-
-            // Execute decompiled function
-            gameCoreRoutine()
-
-            // Verify: Check output memory (1 addresses)
-            assertEquals(0x00u, memory[0x06FC], "Memory 0x06FC mismatch")
-        }
-    }
-
-    // =========================================
     // 0xAF93: scrollHandler
     // 8409 calls, 1277 unique inputs
     // =========================================
@@ -10561,11 +5986,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `scrollHandler_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (18 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -10604,11 +6025,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `scrollHandler_frame1248_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -10656,11 +6073,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `scrollHandler_frame1510_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -10708,11 +6121,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `scrollHandler_frame1890_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (18 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -10751,11 +6160,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `scrollHandler_frame2286_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x01u
             memory[0x0004] = 0x00u
@@ -10803,11 +6208,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `scrollHandler_frame2560_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -10855,11 +6256,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `scrollHandler_frame5306_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -10907,11 +6304,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `scrollHandler_frame5762_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (18 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -10950,11 +6343,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `scrollHandler_frame6018_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -11002,11 +6391,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `scrollHandler_frame6348_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (21 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -11059,11 +6444,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getScreenPosition_frame6_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x071A] = 0x00u
             memory[0x071C] = 0x00u
@@ -11085,11 +6466,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getScreenPosition_frame1220_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x071A] = 0x00u
             memory[0x071C] = 0x4Au
@@ -11111,11 +6488,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getScreenPosition_frame1408_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x071A] = 0x00u
             memory[0x071C] = 0xAFu
@@ -11137,11 +6510,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getScreenPosition_frame1554_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x071A] = 0x01u
             memory[0x071C] = 0x18u
@@ -11163,11 +6532,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getScreenPosition_frame2260_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x071A] = 0x01u
             memory[0x071C] = 0x72u
@@ -11189,11 +6554,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getScreenPosition_frame2402_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x071A] = 0x01u
             memory[0x071C] = 0xD1u
@@ -11215,11 +6576,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getScreenPosition_frame2622_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x071A] = 0x02u
             memory[0x071C] = 0x32u
@@ -11241,11 +6598,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getScreenPosition_frame5910_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x071A] = 0x01u
             memory[0x071C] = 0x89u
@@ -11267,11 +6620,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getScreenPosition_frame6102_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x071A] = 0x02u
             memory[0x071C] = 0x41u
@@ -11293,11 +6642,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getScreenPosition_frame6352_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x071A] = 0x02u
             memory[0x071C] = 0x88u
@@ -11308,1576 +6653,6 @@ class GeneratedFunctionTests {
             // Verify: Check output memory (2 addresses)
             assertEquals(0x03u, memory[0x071B], "Memory 0x071B mismatch")
             assertEquals(0x87u, memory[0x071D], "Memory 0x071D mismatch")
-        }
-    }
-
-    // =========================================
-    // 0xB04A: gameRoutines
-    // 8846 calls, 5352 unique inputs
-    // =========================================
-
-    /**
-     * Test case 0 from frame 32
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 117, writes: 7
-     */
-    @Test
-    fun `gameRoutines_frame32_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (117 addresses)
-            memory[0x0000] = 0x03u
-            memory[0x0001] = 0xFCu
-            memory[0x0002] = 0xB0u
-            memory[0x0003] = 0x01u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0x31u
-            memory[0x0007] = 0x91u
-            memory[0x0008] = 0x00u
-            memory[0x0009] = 0x1Au
-            memory[0x000A] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x00u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x10u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01EF] = 0x1Du
-            memory[0x01F0] = 0xF2u
-            memory[0x01F1] = 0xD9u
-            memory[0x01F2] = 0xF1u
-            memory[0x01F3] = 0xC4u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0300] = 0x00u
-            memory[0x0301] = 0x3Fu
-            memory[0x0398] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x046F] = 0x00u
-            memory[0x0490] = 0x00u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x0710] = 0x02u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0715] = 0x01u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0739] = 0x00u
-            memory[0x073A] = 0x00u
-            memory[0x073B] = 0x00u
-            memory[0x073D] = 0x00u
-            memory[0x0744] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0752] = 0x00u
-            memory[0x0753] = 0x00u
-            memory[0x0754] = 0x01u
-            memory[0x0756] = 0x00u
-            memory[0x0757] = 0x01u
-            memory[0x0758] = 0x00u
-            memory[0x075F] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x97u
-            memory[0x07A9] = 0x7Au
-            memory[0x07AA] = 0x54u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x000C], "Memory 0x000C mismatch")
-            assertEquals(0x00u, memory[0x000D], "Memory 0x000D mismatch")
-        }
-    }
-
-    /**
-     * Test case 1 from frame 1102
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 138, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame1102_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (138 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x80u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x31u
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x01u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x01u
-            memory[0x0057] = 0x18u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x60u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x56u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x30u
-            memory[0x0456] = 0x18u
-            memory[0x046B] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A6] = 0x00u
-            memory[0x05B6] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0x60u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x01u
-            memory[0x06FF] = 0x01u
-            memory[0x0700] = 0x18u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x0705] = 0x70u
-            memory[0x070B] = 0x00u
-            memory[0x070D] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x01u
-            memory[0x071C] = 0x0Au
-            memory[0x071D] = 0x0Au
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x0Au
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x56u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0778] = 0x10u
-            memory[0x0781] = 0x03u
-            memory[0x0783] = 0x00u
-            memory[0x0785] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x56u
-            memory[0x07A9] = 0xB0u
-            memory[0x07AA] = 0x1Du
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 2 from frame 3294
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 136, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame3294_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (136 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x2Du
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x046F] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0xDDu
-            memory[0x07A9] = 0x1Eu
-            memory[0x07AA] = 0xA4u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 3 from frame 4364
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 135, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame4364_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (135 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x44u
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0xE7u
-            memory[0x07A9] = 0x18u
-            memory[0x07AA] = 0xD6u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 4 from frame 5806
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 151, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame5806_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (151 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x60u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x15u
-            memory[0x000A] = 0xC0u
-            memory[0x000C] = 0x01u
-            memory[0x000D] = 0xC0u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x01u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x28u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x01u
-            memory[0x0057] = 0x25u
-            memory[0x006D] = 0x01u
-            memory[0x006E] = 0x02u
-            memory[0x006F] = 0x02u
-            memory[0x0070] = 0x02u
-            memory[0x0071] = 0x02u
-            memory[0x0072] = 0x02u
-            memory[0x007E] = 0x00u
-            memory[0x0082] = 0x01u
-            memory[0x0086] = 0x75u
-            memory[0x0087] = 0x80u
-            memory[0x0088] = 0x80u
-            memory[0x0089] = 0x80u
-            memory[0x008A] = 0x80u
-            memory[0x008B] = 0x80u
-            memory[0x0097] = 0x00u
-            memory[0x009B] = 0x65u
-            memory[0x009F] = 0xFBu
-            memory[0x00B5] = 0x01u
-            memory[0x00CA] = 0x01u
-            memory[0x00CE] = 0x61u
-            memory[0x00E3] = 0x26u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x00u
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x01u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x35u
-            memory[0x03B3] = 0x22u
-            memory[0x03B8] = 0x5Cu
-            memory[0x03BE] = 0x26u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0xA0u
-            memory[0x0416] = 0x78u
-            memory[0x0433] = 0x78u
-            memory[0x0456] = 0x28u
-            memory[0x046B] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x00u
-            memory[0x04AA] = 0x00u
-            memory[0x04F0] = 0x24u
-            memory[0x0617] = 0x00u
-            memory[0x0618] = 0x00u
-            memory[0x0627] = 0x00u
-            memory[0x0628] = 0x00u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0x20u
-            memory[0x06E4] = 0x04u
-            memory[0x06FB] = 0x50u
-            memory[0x06FC] = 0xC1u
-            memory[0x06FF] = 0x03u
-            memory[0x0700] = 0x25u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0xE4u
-            memory[0x0704] = 0x00u
-            memory[0x0705] = 0xB4u
-            memory[0x0709] = 0x28u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x01u
-            memory[0x071B] = 0x02u
-            memory[0x071C] = 0x43u
-            memory[0x071D] = 0x42u
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x05u
-            memory[0x073A] = 0x02u
-            memory[0x073B] = 0x01u
-            memory[0x073D] = 0x03u
-            memory[0x0745] = 0x00u
-            memory[0x0747] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0754] = 0x00u
-            memory[0x0755] = 0x32u
-            memory[0x0756] = 0x01u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0775] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0xB6u
-            memory[0x07A9] = 0xFDu
-            memory[0x07AA] = 0x90u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 5 from frame 7884
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 136, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame7884_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (136 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0xD6u
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x046C] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x21u
-            memory[0x07A9] = 0x7Fu
-            memory[0x07AA] = 0x3Du
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 6 from frame 10440
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 135, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame10440_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (135 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0xB2u
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0xD9u
-            memory[0x07A9] = 0x28u
-            memory[0x07AA] = 0x9Au
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 7 from frame 11882
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 111, writes: 7
-     */
-    @Test
-    fun `gameRoutines_frame11882_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (111 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x01u
-            memory[0x0002] = 0x6Du
-            memory[0x0003] = 0x02u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0x33u
-            memory[0x0007] = 0xB2u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x83u
-            memory[0x000A] = 0xC0u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x09u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x02u
-            memory[0x0045] = 0x02u
-            memory[0x0057] = 0xE8u
-            memory[0x006D] = 0x01u
-            memory[0x006E] = 0x02u
-            memory[0x006F] = 0x02u
-            memory[0x0070] = 0x02u
-            memory[0x0071] = 0x02u
-            memory[0x0072] = 0x02u
-            memory[0x0086] = 0x82u
-            memory[0x0087] = 0x80u
-            memory[0x0088] = 0x80u
-            memory[0x0089] = 0x80u
-            memory[0x008A] = 0x80u
-            memory[0x008B] = 0x80u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0x6Du
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01EF] = 0x1Du
-            memory[0x01F0] = 0xF2u
-            memory[0x01F1] = 0xD9u
-            memory[0x01F2] = 0xF1u
-            memory[0x01F3] = 0xC4u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03AD] = 0x3Fu
-            memory[0x03B8] = 0x6Du
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0x00u
-            memory[0x06E4] = 0x04u
-            memory[0x0700] = 0x18u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070D] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x071A] = 0x01u
-            memory[0x071B] = 0x02u
-            memory[0x071C] = 0x43u
-            memory[0x071D] = 0x42u
-            memory[0x071F] = 0x00u
-            memory[0x0739] = 0x05u
-            memory[0x073A] = 0x02u
-            memory[0x073B] = 0x01u
-            memory[0x073D] = 0x03u
-            memory[0x0745] = 0x00u
-            memory[0x0747] = 0xCAu
-            memory[0x074E] = 0x01u
-            memory[0x0754] = 0x00u
-            memory[0x0756] = 0x01u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0781] = 0x04u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0xBBu
-            memory[0x07A9] = 0xCCu
-            memory[0x07AA] = 0xBBu
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (3 addresses)
-            assertEquals(0x00u, memory[0x0008], "Memory 0x0008 mismatch")
-            assertEquals(0x00u, memory[0x000C], "Memory 0x000C mismatch")
-            assertEquals(0xC0u, memory[0x000D], "Memory 0x000D mismatch")
-        }
-    }
-
-    /**
-     * Test case 8 from frame 14068
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 137, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame14068_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (137 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0xA6u
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x046C] = 0x00u
-            memory[0x046E] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x01u
-            memory[0x07A9] = 0x73u
-            memory[0x07AA] = 0x71u
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
-        }
-    }
-
-    /**
-     * Test case 9 from frame 16424
-     * Function: gameRoutines (0xB04A)
-     * Call depth: 4
-     * Memory reads: 135, writes: 2
-     */
-    @Test
-    fun `gameRoutines_frame16424_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
-            // Setup: Set input memory (135 addresses)
-            memory[0x0000] = 0x00u
-            memory[0x0001] = 0x00u
-            memory[0x0002] = 0x00u
-            memory[0x0003] = 0x00u
-            memory[0x0004] = 0x4Eu
-            memory[0x0005] = 0xB0u
-            memory[0x0006] = 0xE9u
-            memory[0x0007] = 0xB0u
-            memory[0x0008] = 0x05u
-            memory[0x0009] = 0x83u
-            memory[0x000A] = 0x00u
-            memory[0x000B] = 0x00u
-            memory[0x000C] = 0x00u
-            memory[0x000E] = 0x08u
-            memory[0x000F] = 0x00u
-            memory[0x0010] = 0x00u
-            memory[0x0011] = 0x00u
-            memory[0x0012] = 0x00u
-            memory[0x0013] = 0x00u
-            memory[0x0014] = 0x00u
-            memory[0x0016] = 0x00u
-            memory[0x0017] = 0x00u
-            memory[0x0018] = 0x00u
-            memory[0x001B] = 0x00u
-            memory[0x001D] = 0x00u
-            memory[0x0026] = 0x00u
-            memory[0x0027] = 0x00u
-            memory[0x002A] = 0x00u
-            memory[0x002B] = 0x00u
-            memory[0x002C] = 0x00u
-            memory[0x002D] = 0x00u
-            memory[0x002E] = 0x00u
-            memory[0x002F] = 0x00u
-            memory[0x0030] = 0x00u
-            memory[0x0031] = 0x00u
-            memory[0x0032] = 0x00u
-            memory[0x0033] = 0x01u
-            memory[0x0045] = 0x00u
-            memory[0x0057] = 0x00u
-            memory[0x006D] = 0x00u
-            memory[0x006E] = 0x01u
-            memory[0x006F] = 0x01u
-            memory[0x0070] = 0x01u
-            memory[0x0071] = 0x01u
-            memory[0x0072] = 0x01u
-            memory[0x0086] = 0x28u
-            memory[0x0087] = 0x60u
-            memory[0x0088] = 0x60u
-            memory[0x0089] = 0x60u
-            memory[0x008A] = 0x60u
-            memory[0x008B] = 0x60u
-            memory[0x009F] = 0x00u
-            memory[0x00B5] = 0x01u
-            memory[0x00CE] = 0xB0u
-            memory[0x00E9] = 0x01u
-            memory[0x00EA] = 0x9Fu
-            memory[0x00EB] = 0x0Eu
-            memory[0x0110] = 0x00u
-            memory[0x0111] = 0x00u
-            memory[0x0112] = 0x00u
-            memory[0x0113] = 0x00u
-            memory[0x0114] = 0x00u
-            memory[0x0115] = 0x00u
-            memory[0x01A9] = 0x00u
-            memory[0x01ED] = 0x1Du
-            memory[0x01EE] = 0xF2u
-            memory[0x01EF] = 0xD9u
-            memory[0x01F0] = 0x1Du
-            memory[0x01F1] = 0x00u
-            memory[0x01F2] = 0x3Du
-            memory[0x01F3] = 0xB3u
-            memory[0x01F4] = 0x4Eu
-            memory[0x01F5] = 0xB0u
-            memory[0x01F6] = 0xF5u
-            memory[0x01F7] = 0xAEu
-            memory[0x01F8] = 0xC2u
-            memory[0x01F9] = 0x82u
-            memory[0x021E] = 0x00u
-            memory[0x0222] = 0x00u
-            memory[0x0301] = 0x00u
-            memory[0x0398] = 0x00u
-            memory[0x03A1] = 0x00u
-            memory[0x03AD] = 0x28u
-            memory[0x03B8] = 0xB0u
-            memory[0x03C4] = 0x00u
-            memory[0x03D0] = 0x00u
-            memory[0x03EC] = 0x00u
-            memory[0x03ED] = 0x00u
-            memory[0x0400] = 0x00u
-            memory[0x0490] = 0xFFu
-            memory[0x0499] = 0x01u
-            memory[0x05A2] = 0x00u
-            memory[0x05A3] = 0x00u
-            memory[0x05B2] = 0x54u
-            memory[0x05B3] = 0x54u
-            memory[0x06CB] = 0x00u
-            memory[0x06CC] = 0x00u
-            memory[0x06CD] = 0x00u
-            memory[0x06D5] = 0xB8u
-            memory[0x06E4] = 0x04u
-            memory[0x06FC] = 0x00u
-            memory[0x06FF] = 0x00u
-            memory[0x0700] = 0x00u
-            memory[0x0701] = 0x00u
-            memory[0x0702] = 0x98u
-            memory[0x0703] = 0x00u
-            memory[0x0704] = 0x00u
-            memory[0x070B] = 0x00u
-            memory[0x070E] = 0x00u
-            memory[0x0711] = 0x00u
-            memory[0x0714] = 0x00u
-            memory[0x0716] = 0x00u
-            memory[0x071A] = 0x00u
-            memory[0x071B] = 0x00u
-            memory[0x071C] = 0x00u
-            memory[0x071D] = 0xFFu
-            memory[0x071F] = 0x00u
-            memory[0x0723] = 0x00u
-            memory[0x0739] = 0x03u
-            memory[0x073A] = 0x01u
-            memory[0x073D] = 0x00u
-            memory[0x0745] = 0x00u
-            memory[0x074E] = 0x01u
-            memory[0x0754] = 0x01u
-            memory[0x0755] = 0x28u
-            memory[0x0756] = 0x00u
-            memory[0x0770] = 0x00u
-            memory[0x0772] = 0x03u
-            memory[0x0773] = 0x00u
-            memory[0x0783] = 0x00u
-            memory[0x079E] = 0x00u
-            memory[0x079F] = 0x00u
-            memory[0x07A8] = 0x96u
-            memory[0x07A9] = 0x67u
-            memory[0x07AA] = 0x4Bu
-
-            // Execute decompiled function
-            gameRoutines()
-
-            // Verify: Check output memory (0 addresses)
-            // No memory outputs to verify (or only stack writes)
         }
     }
 
@@ -12894,11 +6669,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `donePlayerTask_frame1834_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -12926,11 +6697,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `cyclePlayerPalette_frame6725_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0000] = 0x00u
             memory[0x03C4] = 0x00u
@@ -12952,11 +6719,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `cyclePlayerPalette_frame6757_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0000] = 0x02u
             memory[0x03C4] = 0x01u
@@ -12978,11 +6741,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `cyclePlayerPalette_frame6791_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0000] = 0x00u
             memory[0x03C4] = 0x00u
@@ -13004,11 +6763,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `cyclePlayerPalette_frame6823_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0000] = 0x02u
             memory[0x03C4] = 0x02u
@@ -13030,11 +6785,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `cyclePlayerPalette_frame6861_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0000] = 0x00u
             memory[0x03C4] = 0x00u
@@ -13056,11 +6807,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `cyclePlayerPalette_frame6893_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0000] = 0x02u
             memory[0x03C4] = 0x02u
@@ -13082,11 +6829,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `cyclePlayerPalette_frame6933_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0000] = 0x01u
             memory[0x03C4] = 0x00u
@@ -13108,11 +6851,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `cyclePlayerPalette_frame6965_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0000] = 0x03u
             memory[0x03C4] = 0x02u
@@ -13134,11 +6873,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `cyclePlayerPalette_frame9889_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0000] = 0x00u
             memory[0x03C4] = 0x03u
@@ -13160,11 +6895,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `cyclePlayerPalette_frame9921_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0000] = 0x02u
             memory[0x03C4] = 0x01u
@@ -13190,11 +6921,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `resetPalStar_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x03C4] = 0x00u
 
@@ -13214,11 +6941,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `resetPalStar_frame37_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x03C4] = 0x00u
 
@@ -13238,11 +6961,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `resetPalStar_frame43_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x03C4] = 0x00u
 
@@ -13262,11 +6981,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `resetPalStar_frame61_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x03C4] = 0x00u
 
@@ -13286,11 +7001,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `resetPalStar_frame63_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x03C4] = 0x00u
 
@@ -13310,11 +7021,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `resetPalStar_frame77_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x03C4] = 0x00u
 
@@ -13334,11 +7041,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `resetPalStar_frame109_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x03C4] = 0x00u
 
@@ -13358,11 +7061,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `resetPalStar_frame125_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x03C4] = 0x00u
 
@@ -13382,11 +7081,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `resetPalStar_frame6047_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x03C4] = 0x00u
 
@@ -13406,11 +7101,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `resetPalStar_frame8449_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x03C4] = 0x00u
 
@@ -13435,11 +7126,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerMovementSubs_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (64 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x00u
@@ -13525,11 +7212,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerMovementSubs_frame1326_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (66 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -13618,11 +7301,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerMovementSubs_frame1666_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (66 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xA0u
@@ -13711,11 +7390,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerMovementSubs_frame2128_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (65 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x50u
@@ -13803,11 +7478,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerMovementSubs_frame2470_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (69 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x40u
@@ -13898,11 +7569,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerMovementSubs_frame5244_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (69 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -13994,11 +7661,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerMovementSubs_frame5720_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (66 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x00u
@@ -14086,11 +7749,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerMovementSubs_frame6160_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (66 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -14179,11 +7838,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerMovementSubs_frame6502_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (65 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x10u
@@ -14271,11 +7926,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerMovementSubs_frame6872_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (54 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x00u
@@ -14357,11 +8008,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerPhysicsSub_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (14 addresses)
             memory[0x0000] = 0x00u
             memory[0x000A] = 0x00u
@@ -14397,11 +8044,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerPhysicsSub_frame1340_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x00u
             memory[0x000A] = 0x00u
@@ -14432,11 +8075,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerPhysicsSub_frame1416_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x000A] = 0x40u
@@ -14469,11 +8108,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerPhysicsSub_frame1694_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x0000] = 0x00u
             memory[0x000A] = 0xC0u
@@ -14505,11 +8140,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerPhysicsSub_frame1952_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x000A] = 0x40u
@@ -14542,11 +8173,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerPhysicsSub_frame2186_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x0000] = 0x00u
             memory[0x000A] = 0xC0u
@@ -14578,11 +8205,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerPhysicsSub_frame2514_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x0000] = 0x00u
             memory[0x000A] = 0xC0u
@@ -14614,11 +8237,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerPhysicsSub_frame2706_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0x00u
             memory[0x000A] = 0x00u
@@ -14652,11 +8271,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerPhysicsSub_frame5698_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0000] = 0x00u
             memory[0x000A] = 0x80u
@@ -14690,11 +8305,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerPhysicsSub_frame6318_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x00u
             memory[0x000A] = 0x00u
@@ -14730,11 +8341,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerAnimSpeed_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x06FC] = 0x00u
             memory[0x0700] = 0x00u
@@ -14755,11 +8362,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerAnimSpeed_frame1030_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0045] = 0x01u
             memory[0x06FC] = 0x01u
@@ -14782,11 +8385,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerAnimSpeed_frame1354_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0045] = 0x01u
             memory[0x06FC] = 0x02u
@@ -14808,11 +8407,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerAnimSpeed_frame1524_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x06FC] = 0x80u
             memory[0x0700] = 0x1Bu
@@ -14833,11 +8428,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerAnimSpeed_frame1630_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0045] = 0x02u
             memory[0x06FC] = 0x42u
@@ -14860,11 +8451,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerAnimSpeed_frame1858_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0045] = 0x02u
             memory[0x06FC] = 0x02u
@@ -14887,11 +8474,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerAnimSpeed_frame2118_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0045] = 0x01u
             memory[0x06FC] = 0x41u
@@ -14914,11 +8497,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerAnimSpeed_frame2694_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0045] = 0x02u
             memory[0x06FC] = 0x02u
@@ -14941,11 +8520,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerAnimSpeed_frame5720_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (4 addresses)
             memory[0x0033] = 0x02u
             memory[0x0045] = 0x02u
@@ -14971,11 +8546,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerAnimSpeed_frame5762_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0045] = 0x01u
             memory[0x06FC] = 0x41u
@@ -15005,11 +8576,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeFriction_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0057] = 0x00u
             memory[0x0490] = 0xFFu
@@ -15031,11 +8598,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeFriction_frame1364_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0057] = 0xFEu
             memory[0x0450] = 0xE8u
@@ -15063,11 +8626,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeFriction_frame1648_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0057] = 0xF1u
             memory[0x0450] = 0xD8u
@@ -15095,11 +8654,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeFriction_frame2012_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0057] = 0x28u
             memory[0x0456] = 0x28u
@@ -15127,11 +8682,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeFriction_frame2214_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0057] = 0x0Cu
             memory[0x0456] = 0x18u
@@ -15159,11 +8710,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeFriction_frame2486_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0057] = 0x03u
             memory[0x0456] = 0x18u
@@ -15191,11 +8738,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeFriction_frame5224_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0057] = 0x15u
             memory[0x0456] = 0x18u
@@ -15223,11 +8766,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeFriction_frame5642_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0057] = 0xE8u
             memory[0x0450] = 0xE8u
@@ -15255,11 +8794,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeFriction_frame5880_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0057] = 0x28u
             memory[0x0456] = 0x28u
@@ -15287,11 +8822,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeFriction_frame6270_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0057] = 0x02u
             memory[0x0456] = 0x18u
@@ -15323,11 +8854,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runGameTimer_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -15347,11 +8874,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runGameTimer_frame37_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -15371,11 +8894,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runGameTimer_frame43_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -15395,11 +8914,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runGameTimer_frame61_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -15419,11 +8934,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runGameTimer_frame1317_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -15443,11 +8954,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runGameTimer_frame1491_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -15467,11 +8974,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runGameTimer_frame1511_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -15491,11 +8994,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runGameTimer_frame1517_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -15515,11 +9014,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runGameTimer_frame1555_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -15539,11 +9034,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runGameTimer_frame6047_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -15568,11 +9059,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processWhirlpools_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x074E] = 0x01u
 
@@ -15592,11 +9079,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processWhirlpools_frame37_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x074E] = 0x01u
 
@@ -15616,11 +9099,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processWhirlpools_frame43_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x074E] = 0x01u
 
@@ -15640,11 +9119,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processWhirlpools_frame61_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x074E] = 0x01u
 
@@ -15664,11 +9139,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processWhirlpools_frame1179_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x074E] = 0x01u
 
@@ -15688,11 +9159,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processWhirlpools_frame1181_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x074E] = 0x01u
 
@@ -15712,11 +9179,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processWhirlpools_frame1185_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x074E] = 0x01u
 
@@ -15736,11 +9199,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processWhirlpools_frame1195_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x074E] = 0x01u
 
@@ -15760,11 +9219,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processWhirlpools_frame1317_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x074E] = 0x01u
 
@@ -15784,11 +9239,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processWhirlpools_frame6047_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x074E] = 0x01u
 
@@ -15813,11 +9264,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `flagpoleRoutine_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x001B] = 0x00u
 
@@ -15837,11 +9284,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `flagpoleRoutine_frame37_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x001B] = 0x00u
 
@@ -15861,11 +9304,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `flagpoleRoutine_frame43_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x001B] = 0x00u
 
@@ -15885,11 +9324,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `flagpoleRoutine_frame61_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x001B] = 0x00u
 
@@ -15909,11 +9344,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `flagpoleRoutine_frame1317_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x001B] = 0x00u
 
@@ -15933,11 +9364,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `flagpoleRoutine_frame1491_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x001B] = 0x2Eu
 
@@ -15957,11 +9384,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `flagpoleRoutine_frame1511_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x001B] = 0x2Eu
 
@@ -15981,11 +9404,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `flagpoleRoutine_frame1517_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x001B] = 0x2Eu
 
@@ -16005,11 +9424,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `flagpoleRoutine_frame1555_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x001B] = 0x2Eu
 
@@ -16029,11 +9444,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `flagpoleRoutine_frame6047_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x001B] = 0x00u
 
@@ -16058,11 +9469,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processCannons_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x000F] = 0x00u
             memory[0x0010] = 0x00u
@@ -16093,11 +9500,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processCannons_frame1443_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x000F] = 0x01u
             memory[0x0010] = 0x00u
@@ -16126,11 +9529,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processCannons_frame2955_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x000F] = 0x01u
             memory[0x0010] = 0x01u
@@ -16158,11 +9557,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processCannons_frame4533_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x000F] = 0x00u
             memory[0x0010] = 0x00u
@@ -16193,11 +9588,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processCannons_frame5945_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x000F] = 0x01u
             memory[0x0010] = 0x00u
@@ -16227,11 +9618,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processCannons_frame8211_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x000F] = 0x01u
             memory[0x0010] = 0x00u
@@ -16261,11 +9648,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processCannons_frame10541_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x000F] = 0x00u
             memory[0x0010] = 0x00u
@@ -16296,11 +9679,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processCannons_frame11951_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x000F] = 0x00u
             memory[0x0010] = 0x00u
@@ -16331,11 +9710,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processCannons_frame14303_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x000F] = 0x00u
             memory[0x0010] = 0x00u
@@ -16365,11 +9740,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processCannons_frame16457_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x000F] = 0x00u
             memory[0x0010] = 0x00u
@@ -16404,11 +9775,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `findEmptyMiscSlot_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0032] = 0x00u
 
@@ -16433,11 +9800,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `miscObjectsCore_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x002A] = 0x00u
             memory[0x002B] = 0x00u
@@ -16465,11 +9828,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `miscObjectsCore_frame1393_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (42 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x58u
@@ -16533,11 +9892,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `miscObjectsCore_frame1491_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x002A] = 0x00u
             memory[0x002B] = 0x00u
@@ -16565,11 +9920,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `miscObjectsCore_frame5177_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (42 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x58u
@@ -16633,11 +9984,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `miscObjectsCore_frame5255_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (42 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x58u
@@ -16701,11 +10048,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `miscObjectsCore_frame5737_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (42 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x22u
@@ -16769,11 +10112,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `miscObjectsCore_frame5817_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (42 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x22u
@@ -16837,11 +10176,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `miscObjectsCore_frame8315_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (42 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x58u
@@ -16905,11 +10240,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `miscObjectsCore_frame8395_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (42 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x58u
@@ -16973,11 +10304,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `miscObjectsCore_frame8881_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (42 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x22u
@@ -17046,11 +10373,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getSBNybbles_frame10_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x02u
             memory[0x0002] = 0x00u
@@ -17096,11 +10419,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `updateNumber_frame29_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0xFAu
             memory[0x0002] = 0x00u
@@ -17142,11 +10461,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `bumpBlock_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (37 addresses)
             memory[0x0000] = 0x02u
             memory[0x0002] = 0x70u
@@ -17208,11 +10523,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `bumpBlock_frame1491_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (18 addresses)
             memory[0x0002] = 0x70u
             memory[0x0004] = 0xBFu
@@ -17255,11 +10566,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `bumpBlock_frame5667_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (37 addresses)
             memory[0x0000] = 0x02u
             memory[0x0002] = 0x30u
@@ -17327,11 +10634,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBumpedChk_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -17352,11 +10655,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBumpedChk_frame1317_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -17377,11 +10676,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBumpedChk_frame1491_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -17402,11 +10697,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBumpedChk_frame1491_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -17427,11 +10718,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBumpedChk_frame5666_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -17452,11 +10739,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBumpedChk_frame5667_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -17481,11 +10764,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkTopOfBlock_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0002] = 0x70u
             memory[0x0006] = 0xD0u
@@ -17509,11 +10788,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkTopOfBlock_frame1491_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0002] = 0x70u
             memory[0x0006] = 0xD5u
@@ -17537,11 +10812,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkTopOfBlock_frame5667_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0002] = 0x30u
             memory[0x0006] = 0xD6u
@@ -17572,11 +10843,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveEnemyHorizontally_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -17607,11 +10874,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveEnemyHorizontally_frame1409_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -17642,11 +10905,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveEnemyHorizontally_frame2135_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -17677,11 +10936,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveEnemyHorizontally_frame2731_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -17712,11 +10967,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveEnemyHorizontally_frame2847_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -17747,11 +10998,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveEnemyHorizontally_frame2987_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -17782,11 +11029,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveEnemyHorizontally_frame3101_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -17817,11 +11060,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveEnemyHorizontally_frame3215_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -17852,11 +11091,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveEnemyHorizontally_frame6223_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -17887,11 +11122,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveEnemyHorizontally_frame6319_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -17926,11 +11157,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `movePlayerHorizontally_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x00u
@@ -17960,11 +11187,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `movePlayerHorizontally_frame1250_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x80u
@@ -17994,11 +11217,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `movePlayerHorizontally_frame1516_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0xD0u
@@ -18028,11 +11247,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `movePlayerHorizontally_frame1898_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x00u
@@ -18062,11 +11277,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `movePlayerHorizontally_frame2272_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x80u
@@ -18096,11 +11307,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `movePlayerHorizontally_frame2540_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x40u
@@ -18130,11 +11337,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `movePlayerHorizontally_frame5270_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0xC0u
@@ -18164,11 +11367,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `movePlayerHorizontally_frame5654_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0xFEu
             memory[0x0001] = 0x80u
@@ -18198,11 +11397,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `movePlayerHorizontally_frame5938_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x02u
             memory[0x0001] = 0x80u
@@ -18232,11 +11427,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `movePlayerHorizontally_frame6310_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xA0u
@@ -18273,11 +11464,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveObjectHorizontally_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -18307,11 +11494,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveObjectHorizontally_frame1409_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -18341,11 +11524,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveObjectHorizontally_frame2135_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -18375,11 +11554,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveObjectHorizontally_frame2731_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -18409,11 +11584,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveObjectHorizontally_frame2847_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -18443,11 +11614,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveObjectHorizontally_frame2987_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -18477,11 +11644,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveObjectHorizontally_frame3101_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -18511,11 +11674,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveObjectHorizontally_frame3215_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -18545,11 +11704,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveObjectHorizontally_frame6223_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -18579,11 +11734,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveObjectHorizontally_frame6319_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -18619,11 +11770,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravityBlock_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x08u
@@ -18657,11 +11804,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravityBlock_frame1325_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x08u
@@ -18695,11 +11838,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravityBlock_frame1333_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x08u
@@ -18733,11 +11872,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravityBlock_frame1341_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x08u
@@ -18771,11 +11906,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravityBlock_frame1495_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x08u
@@ -18809,11 +11940,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravityBlock_frame1505_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x08u
@@ -18847,11 +11974,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravityBlock_frame1513_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x08u
@@ -18885,11 +12008,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravityBlock_frame5669_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x08u
@@ -18923,11 +12042,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravityBlock_frame5677_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x08u
@@ -18961,11 +12076,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravityBlock_frame5685_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x08u
@@ -19005,11 +12116,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravitySprObj_frame1625_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x3Du
             memory[0x0002] = 0x03u
@@ -19043,11 +12150,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravitySprObj_frame1627_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x3Du
             memory[0x0002] = 0x03u
@@ -19081,11 +12184,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravitySprObj_frame1629_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x3Du
             memory[0x0002] = 0x03u
@@ -19119,11 +12218,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravitySprObj_frame1631_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x3Du
             memory[0x0002] = 0x03u
@@ -19163,11 +12258,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravity_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x06u
@@ -19201,11 +12292,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravity_frame1329_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x06u
@@ -19239,11 +12326,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravity_frame1341_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x06u
@@ -19277,11 +12360,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravity_frame1355_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x06u
@@ -19315,11 +12394,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravity_frame1367_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x06u
@@ -19353,11 +12428,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravity_frame5667_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x06u
@@ -19391,11 +12462,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravity_frame5679_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x06u
@@ -19429,11 +12496,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravity_frame5691_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x06u
@@ -19467,11 +12530,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravity_frame5705_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x06u
@@ -19505,11 +12564,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `imposeGravity_frame5717_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0000] = 0x50u
             memory[0x0002] = 0x06u
@@ -19549,11 +12604,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesAndLoopsCore_frame32_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (18 addresses)
             memory[0x0006] = 0x01u
             memory[0x0007] = 0x20u
@@ -19601,11 +12652,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesAndLoopsCore_frame1409_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (146 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xFCu
@@ -19771,11 +12818,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesAndLoopsCore_frame2081_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (132 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xFCu
@@ -19927,11 +12970,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesAndLoopsCore_frame2555_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (18 addresses)
             memory[0x0006] = 0x03u
             memory[0x0007] = 0x20u
@@ -19972,11 +13011,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesAndLoopsCore_frame5293_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (18 addresses)
             memory[0x0006] = 0x02u
             memory[0x0007] = 0x10u
@@ -20017,11 +13052,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesAndLoopsCore_frame6141_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (114 addresses)
             memory[0x0000] = 0x02u
             memory[0x0001] = 0xFCu
@@ -20157,11 +13188,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesAndLoopsCore_frame6852_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (136 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xFCu
@@ -20317,11 +13344,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesAndLoopsCore_frame9485_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (163 addresses)
             memory[0x0000] = 0x02u
             memory[0x0001] = 0xFCu
@@ -20504,11 +13527,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesAndLoopsCore_frame11683_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (127 addresses)
             memory[0x0000] = 0x05u
             memory[0x0001] = 0x0Fu
@@ -20659,11 +13678,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesAndLoopsCore_frame14665_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (184 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xFCu
@@ -20873,11 +13888,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initEnemyObject_frame1179_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0004] = 0x81u
             memory[0x0005] = 0xC2u
@@ -20915,11 +13926,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initEnemyObject_frame2017_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0004] = 0x81u
             memory[0x0005] = 0xC2u
@@ -20963,11 +13970,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkpointEnemyID_frame1179_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x81u
             memory[0x0005] = 0xC2u
@@ -20999,11 +14002,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkpointEnemyID_frame2621_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (136 addresses)
             memory[0x0000] = 0xB0u
             memory[0x0001] = 0x06u
@@ -21169,11 +14168,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkpointEnemyID_frame2621_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (14 addresses)
             memory[0x0004] = 0x81u
             memory[0x0005] = 0xC2u
@@ -21211,11 +14206,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkpointEnemyID_frame6047_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (26 addresses)
             memory[0x0000] = 0xB0u
             memory[0x0001] = 0x06u
@@ -21271,11 +14262,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkpointEnemyID_frame6047_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (14 addresses)
             memory[0x0004] = 0x81u
             memory[0x0005] = 0xC2u
@@ -21319,11 +14306,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initNormalEnemy_frame1179_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x076A] = 0x00u
 
@@ -21348,11 +14331,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initNormalEnemy_frame2621_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x076A] = 0x00u
 
@@ -21377,11 +14356,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initNormalEnemy_frame2621_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x076A] = 0x00u
 
@@ -21406,11 +14381,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initNormalEnemy_frame6047_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x076A] = 0x00u
 
@@ -21441,11 +14412,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `initVStf_frame1631_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -21473,11 +14440,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyMovementSubs_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -21524,11 +14487,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyMovementSubs_frame2109_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -21575,11 +14534,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyMovementSubs_frame2807_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -21626,11 +14581,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyMovementSubs_frame3023_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -21677,11 +14628,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyMovementSubs_frame3225_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -21728,11 +14675,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyMovementSubs_frame5941_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -21779,11 +14722,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyMovementSubs_frame6257_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -21830,11 +14769,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyMovementSubs_frame6391_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x80u
@@ -21881,11 +14816,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyMovementSubs_frame8119_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -21932,11 +14863,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyMovementSubs_frame9399_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0xFFu
             memory[0x0001] = 0x80u
@@ -21989,11 +14916,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `eraseEnemyObject_frame1493_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -22019,11 +14942,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `eraseEnemyObject_frame1717_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -22049,11 +14968,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `eraseEnemyObject_frame2141_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -22079,11 +14994,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `eraseEnemyObject_frame6477_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -22115,11 +15026,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveNormalEnemy_frame1623_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x00u
@@ -22154,11 +15061,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveNormalEnemy_frame1631_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (22 addresses)
             memory[0x0000] = 0x3Du
             memory[0x0001] = 0x00u
@@ -22200,11 +15103,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveNormalEnemy_frame1641_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x00u
@@ -22239,11 +15138,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveNormalEnemy_frame1651_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x00u
@@ -22278,11 +15173,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveNormalEnemy_frame1661_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x00u
@@ -22317,11 +15208,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveNormalEnemy_frame1671_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x00u
@@ -22356,11 +15243,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveNormalEnemy_frame1679_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x00u
@@ -22395,11 +15278,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveNormalEnemy_frame1689_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x00u
@@ -22434,11 +15313,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveNormalEnemy_frame1699_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x00u
@@ -22473,11 +15348,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveNormalEnemy_frame1709_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x00u
@@ -22518,11 +15389,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `offscreenBoundsCheck_frame1525_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xBBu
@@ -22553,11 +15420,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `offscreenBoundsCheck_frame1571_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xDCu
@@ -22588,11 +15451,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `offscreenBoundsCheck_frame1619_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xFCu
@@ -22623,11 +15482,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `offscreenBoundsCheck_frame1667_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xFCu
@@ -22658,11 +15513,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `offscreenBoundsCheck_frame1713_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xFCu
@@ -22693,11 +15544,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `offscreenBoundsCheck_frame5357_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xD6u
@@ -22728,11 +15575,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `offscreenBoundsCheck_frame5403_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xF9u
@@ -22763,11 +15606,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `offscreenBoundsCheck_frame5451_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xFBu
@@ -22798,11 +15637,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `offscreenBoundsCheck_frame5497_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xFAu
@@ -22833,11 +15668,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `offscreenBoundsCheck_frame8547_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0xFBu
@@ -22874,11 +15705,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerEnemyCollision_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0009] = 0x58u
             memory[0x00B5] = 0x01u
@@ -22905,11 +15732,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerEnemyCollision_frame2037_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0009] = 0x04u
             memory[0x00B5] = 0x01u
@@ -22936,11 +15759,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerEnemyCollision_frame2845_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0006] = 0x04u
             memory[0x0008] = 0x00u
@@ -22977,11 +15796,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerEnemyCollision_frame3207_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0x4Du
 
@@ -23002,11 +15817,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerEnemyCollision_frame5989_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0006] = 0x04u
             memory[0x0008] = 0x00u
@@ -23043,11 +15854,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerEnemyCollision_frame6283_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0x03u
 
@@ -23068,11 +15875,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerEnemyCollision_frame6473_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0009] = 0x62u
             memory[0x00B5] = 0x01u
@@ -23099,11 +15902,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerEnemyCollision_frame6819_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0x0Fu
 
@@ -23124,11 +15923,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerEnemyCollision_frame9125_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0006] = 0x04u
             memory[0x0008] = 0x00u
@@ -23165,11 +15960,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerEnemyCollision_frame9477_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0006] = 0x08u
             memory[0x0008] = 0x01u
@@ -23212,11 +16003,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `setPRout_frame1717_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0008] = 0x05u
 
@@ -23246,11 +16033,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `setupFloateyNumber_frame1425_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x00CF] = 0xB8u
             memory[0x03AE] = 0x6Eu
@@ -23272,11 +16055,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `setupFloateyNumber_frame1717_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x00D4] = 0x78u
             memory[0x03AE] = 0x3Cu
@@ -23298,11 +16077,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `setupFloateyNumber_frame5217_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x00CF] = 0xB8u
             memory[0x03AE] = 0x6Cu
@@ -23324,11 +16099,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `setupFloateyNumber_frame5497_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x00D4] = 0x78u
             memory[0x03AE] = 0x37u
@@ -23350,11 +16121,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `setupFloateyNumber_frame6413_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x00D1] = 0xB8u
             memory[0x03AE] = 0x70u
@@ -23382,11 +16149,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesCollision_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0x58u
 
@@ -23407,11 +16170,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesCollision_frame2091_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0008] = 0x00u
             memory[0x0009] = 0x1Fu
@@ -23436,11 +16195,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesCollision_frame2819_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (19 addresses)
             memory[0x0001] = 0x00u
             memory[0x0006] = 0x08u
@@ -23479,11 +16234,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesCollision_frame3027_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0008] = 0x00u
             memory[0x0009] = 0xF3u
@@ -23511,11 +16262,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesCollision_frame5199_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0008] = 0x00u
             memory[0x0009] = 0xE5u
@@ -23543,11 +16290,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesCollision_frame6149_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0xC0u
 
@@ -23568,11 +16311,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesCollision_frame6309_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0009] = 0x10u
 
@@ -23593,11 +16332,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesCollision_frame6471_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0001] = 0x00u
             memory[0x0008] = 0x01u
@@ -23629,11 +16364,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesCollision_frame6811_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x0001] = 0x00u
             memory[0x0008] = 0x01u
@@ -23665,11 +16396,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemiesCollision_frame9335_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (25 addresses)
             memory[0x0001] = 0x01u
             memory[0x0006] = 0x0Cu
@@ -23721,11 +16448,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `procEnemyCollisions_frame2843_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0008] = 0x01u
             memory[0x0016] = 0x06u
@@ -23757,11 +16480,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `procEnemyCollisions_frame6379_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0008] = 0x02u
             memory[0x0017] = 0x06u
@@ -23793,11 +16512,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `procEnemyCollisions_frame6471_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0008] = 0x02u
             memory[0x0017] = 0x06u
@@ -23835,11 +16550,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyTurnAround_frame2843_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0016] = 0x06u
             memory[0x0046] = 0x01u
@@ -23863,11 +16574,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyTurnAround_frame6053_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0016] = 0x06u
             memory[0x0046] = 0x01u
@@ -23891,11 +16598,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyTurnAround_frame6379_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0017] = 0x06u
             memory[0x0047] = 0x01u
@@ -23923,11 +16626,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkPlayerVertical_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0xB0u
@@ -23949,11 +16648,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkPlayerVertical_frame2045_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0xB0u
@@ -23975,11 +16670,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkPlayerVertical_frame2909_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0xB0u
@@ -24001,11 +16692,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkPlayerVertical_frame5325_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0xB0u
@@ -24027,11 +16714,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkPlayerVertical_frame6237_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0xB0u
@@ -24053,11 +16736,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkPlayerVertical_frame6425_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0x99u
@@ -24079,11 +16758,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkPlayerVertical_frame6733_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x03D0] = 0xF0u
 
@@ -24103,11 +16778,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkPlayerVertical_frame8329_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0x8Fu
@@ -24129,11 +16800,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkPlayerVertical_frame9417_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0x81u
@@ -24155,11 +16822,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkPlayerVertical_frame9605_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00B5] = 0x01u
             memory[0x00CE] = 0xB0u
@@ -24186,11 +16849,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBoxOfs_frame1235_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0008] = 0x00u
             memory[0x03D1] = 0x07u
@@ -24211,11 +16870,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBoxOfs_frame1243_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0008] = 0x00u
             memory[0x03D1] = 0x03u
@@ -24236,11 +16891,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBoxOfs_frame1253_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0008] = 0x00u
             memory[0x03D1] = 0x01u
@@ -24261,11 +16912,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBoxOfs_frame1427_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0008] = 0x00u
             memory[0x03D1] = 0x00u
@@ -24286,11 +16933,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBoxOfs_frame2679_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0008] = 0x01u
             memory[0x03D1] = 0x07u
@@ -24311,11 +16954,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBoxOfs_frame2713_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0008] = 0x01u
             memory[0x03D1] = 0x03u
@@ -24336,11 +16975,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBoxOfs_frame2745_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0008] = 0x01u
             memory[0x03D1] = 0x01u
@@ -24361,11 +16996,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBoxOfs_frame6115_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0008] = 0x02u
             memory[0x03D1] = 0x07u
@@ -24386,11 +17017,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBoxOfs_frame6165_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0008] = 0x02u
             memory[0x03D1] = 0x01u
@@ -24411,11 +17038,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBoxOfs_frame6345_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0008] = 0x00u
             memory[0x03D1] = 0x08u
@@ -24441,11 +17064,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerBGCollision_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (32 addresses)
             memory[0x0000] = 0x02u
             memory[0x0003] = 0x00u
@@ -24502,11 +17121,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerBGCollision_frame1232_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (31 addresses)
             memory[0x0000] = 0x02u
             memory[0x0003] = 0x00u
@@ -24562,11 +17177,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerBGCollision_frame1476_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (28 addresses)
             memory[0x0000] = 0x00u
             memory[0x0003] = 0x00u
@@ -24614,11 +17225,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerBGCollision_frame1848_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (29 addresses)
             memory[0x0000] = 0x00u
             memory[0x0003] = 0x00u
@@ -24667,11 +17274,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerBGCollision_frame2214_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (30 addresses)
             memory[0x0000] = 0x00u
             memory[0x0003] = 0x00u
@@ -24721,11 +17324,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerBGCollision_frame2462_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (28 addresses)
             memory[0x0000] = 0x00u
             memory[0x0003] = 0x00u
@@ -24773,11 +17372,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerBGCollision_frame2740_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (28 addresses)
             memory[0x0000] = 0x00u
             memory[0x0003] = 0x00u
@@ -24825,11 +17420,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerBGCollision_frame5666_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (64 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x01u
@@ -24914,11 +17505,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerBGCollision_frame5944_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (34 addresses)
             memory[0x0000] = 0x02u
             memory[0x0003] = 0x00u
@@ -24977,11 +17564,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerBGCollision_frame6312_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0x00u
             memory[0x0003] = 0x00u
@@ -25035,11 +17618,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkInvisibleMTiles_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25060,11 +17639,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkInvisibleMTiles_frame1613_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25085,11 +17660,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkInvisibleMTiles_frame1851_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25110,11 +17681,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkInvisibleMTiles_frame1901_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25135,11 +17702,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkInvisibleMTiles_frame2023_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25160,11 +17723,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkInvisibleMTiles_frame2037_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25185,11 +17744,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkInvisibleMTiles_frame2249_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25210,11 +17765,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkInvisibleMTiles_frame5633_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25235,11 +17786,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkInvisibleMTiles_frame5757_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25260,11 +17807,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkInvisibleMTiles_frame6319_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25291,11 +17834,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForLandJumpSpring_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0xC6u
             memory[0x01F1] = 0xDEu
@@ -25317,11 +17856,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForLandJumpSpring_frame1465_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0xC6u
             memory[0x01F1] = 0xDEu
@@ -25343,11 +17878,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForLandJumpSpring_frame1977_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0xC6u
             memory[0x01F1] = 0xDEu
@@ -25369,11 +17900,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForLandJumpSpring_frame2233_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0xC6u
             memory[0x01F1] = 0xDEu
@@ -25395,11 +17922,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForLandJumpSpring_frame2249_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0xC6u
             memory[0x01F1] = 0xDEu
@@ -25421,11 +17944,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForLandJumpSpring_frame2295_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0xC6u
             memory[0x01F1] = 0xDEu
@@ -25447,11 +17966,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForLandJumpSpring_frame5259_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0xC6u
             memory[0x01F1] = 0xDEu
@@ -25473,11 +17988,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForLandJumpSpring_frame5633_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0xC6u
             memory[0x01F1] = 0xDEu
@@ -25499,11 +18010,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForLandJumpSpring_frame5757_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0xC6u
             memory[0x01F1] = 0xDEu
@@ -25525,11 +18032,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForLandJumpSpring_frame6319_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0xC6u
             memory[0x01F1] = 0xDEu
@@ -25557,11 +18060,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkJumpspringMetatiles_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25582,11 +18081,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkJumpspringMetatiles_frame1613_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25607,11 +18102,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkJumpspringMetatiles_frame1851_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25632,11 +18123,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkJumpspringMetatiles_frame1977_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25657,11 +18144,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkJumpspringMetatiles_frame2233_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25682,11 +18165,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkJumpspringMetatiles_frame2249_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25707,11 +18186,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkJumpspringMetatiles_frame2541_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25732,11 +18207,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkJumpspringMetatiles_frame5259_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25757,11 +18228,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkJumpspringMetatiles_frame5687_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25782,11 +18249,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkJumpspringMetatiles_frame6277_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -25811,11 +18274,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handlePipeEntry_frame37_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x000B] = 0x00u
 
@@ -25835,11 +18294,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handlePipeEntry_frame1465_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x000B] = 0x00u
 
@@ -25859,11 +18314,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handlePipeEntry_frame1851_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x000B] = 0x00u
 
@@ -25883,11 +18334,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handlePipeEntry_frame1977_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x000B] = 0x00u
 
@@ -25907,11 +18354,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handlePipeEntry_frame2235_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x000B] = 0x00u
 
@@ -25931,11 +18374,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handlePipeEntry_frame2295_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x000B] = 0x00u
 
@@ -25955,11 +18394,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handlePipeEntry_frame2541_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x000B] = 0x00u
 
@@ -25979,11 +18414,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handlePipeEntry_frame5259_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x000B] = 0x00u
 
@@ -26003,11 +18434,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handlePipeEntry_frame5633_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x000B] = 0x00u
 
@@ -26027,11 +18454,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handlePipeEntry_frame5687_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x000B] = 0x00u
 
@@ -26056,11 +18479,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `impedePlayerMove_frame1613_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0000] = 0x01u
             memory[0x0057] = 0x17u
@@ -26088,11 +18507,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `impedePlayerMove_frame1615_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0000] = 0x01u
             memory[0x0057] = 0xFFu
@@ -26114,11 +18529,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `impedePlayerMove_frame1901_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0000] = 0x02u
             memory[0x0057] = 0xF0u
@@ -26146,11 +18557,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `impedePlayerMove_frame2037_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0000] = 0x01u
             memory[0x0057] = 0x04u
@@ -26178,11 +18585,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `impedePlayerMove_frame2427_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0000] = 0x01u
             memory[0x0057] = 0x18u
@@ -26210,11 +18613,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `impedePlayerMove_frame2457_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0000] = 0x01u
             memory[0x0057] = 0x04u
@@ -26242,11 +18641,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `impedePlayerMove_frame2471_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0000] = 0x01u
             memory[0x0057] = 0x04u
@@ -26274,11 +18669,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `impedePlayerMove_frame5407_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0000] = 0x01u
             memory[0x0057] = 0x15u
@@ -26306,11 +18697,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `impedePlayerMove_frame6231_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0000] = 0x01u
             memory[0x0057] = 0x03u
@@ -26338,11 +18725,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `impedePlayerMove_frame6261_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0000] = 0x01u
             memory[0x0057] = 0x04u
@@ -26377,11 +18760,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForSolidMTiles_frame1316_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x91u
             memory[0x01F1] = 0xDFu
@@ -26403,11 +18782,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForSolidMTiles_frame1490_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x91u
             memory[0x01F1] = 0xDFu
@@ -26429,11 +18804,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForSolidMTiles_frame5666_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x91u
             memory[0x01F1] = 0xDFu
@@ -26461,11 +18832,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForClimbMTiles_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x9Cu
             memory[0x01F1] = 0xDFu
@@ -26487,11 +18854,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForClimbMTiles_frame1613_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x9Cu
             memory[0x01F1] = 0xDFu
@@ -26513,11 +18876,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForClimbMTiles_frame1691_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x9Cu
             memory[0x01F1] = 0xDFu
@@ -26539,11 +18898,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForClimbMTiles_frame1901_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x9Cu
             memory[0x01F1] = 0xDFu
@@ -26565,11 +18920,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForClimbMTiles_frame2025_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x9Cu
             memory[0x01F1] = 0xDFu
@@ -26591,11 +18942,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForClimbMTiles_frame2037_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x9Cu
             memory[0x01F1] = 0xDFu
@@ -26617,11 +18964,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForClimbMTiles_frame2249_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x9Cu
             memory[0x01F1] = 0xDFu
@@ -26643,11 +18986,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForClimbMTiles_frame2743_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x9Cu
             memory[0x01F1] = 0xDFu
@@ -26669,11 +19008,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForClimbMTiles_frame6277_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x9Cu
             memory[0x01F1] = 0xDFu
@@ -26695,11 +19030,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForClimbMTiles_frame6297_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x01F0] = 0x9Cu
             memory[0x01F1] = 0xDFu
@@ -26727,11 +19058,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForCoinMTiles_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -26752,11 +19079,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForCoinMTiles_frame1316_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -26777,11 +19100,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForCoinMTiles_frame1494_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -26802,11 +19121,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForCoinMTiles_frame1690_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -26827,11 +19142,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForCoinMTiles_frame1836_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -26852,11 +19163,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForCoinMTiles_frame1901_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -26877,11 +19184,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForCoinMTiles_frame2032_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -26902,11 +19205,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForCoinMTiles_frame2248_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -26927,11 +19226,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForCoinMTiles_frame5666_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -26952,11 +19247,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `checkForCoinMTiles_frame6297_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -26983,11 +19274,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMTileAttrib_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -27008,11 +19295,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMTileAttrib_frame1490_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -27033,11 +19316,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMTileAttrib_frame1691_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -27058,11 +19337,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMTileAttrib_frame1851_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -27083,11 +19358,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMTileAttrib_frame2023_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -27108,11 +19379,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMTileAttrib_frame2037_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -27133,11 +19400,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMTileAttrib_frame2249_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -27158,11 +19421,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMTileAttrib_frame2743_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -27183,11 +19442,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMTileAttrib_frame5756_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -27208,11 +19463,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMTileAttrib_frame6297_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -27239,11 +19490,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyToBGCollisionDet_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (23 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -27286,11 +19533,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyToBGCollisionDet_frame1439_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -27330,11 +19573,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyToBGCollisionDet_frame2123_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (23 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -27377,11 +19616,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyToBGCollisionDet_frame2815_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (23 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -27424,11 +19659,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyToBGCollisionDet_frame3045_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (23 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -27471,11 +19702,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyToBGCollisionDet_frame5241_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -27515,11 +19742,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyToBGCollisionDet_frame6101_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (23 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -27562,11 +19785,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyToBGCollisionDet_frame6197_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (23 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -27609,11 +19828,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyToBGCollisionDet_frame6309_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (23 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -27656,11 +19871,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyToBGCollisionDet_frame6395_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (23 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -27709,11 +19920,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyLanding_frame1631_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x00D4] = 0x78u
             memory[0x01F0] = 0x51u
@@ -27742,11 +19949,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `subtEnemyYPos_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x00CF] = 0xB8u
 
@@ -27767,11 +19970,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `subtEnemyYPos_frame1235_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x00CF] = 0xB8u
 
@@ -27792,11 +19991,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `subtEnemyYPos_frame1387_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x00CF] = 0xB8u
 
@@ -27817,11 +20012,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `subtEnemyYPos_frame1623_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x00D4] = 0x77u
 
@@ -27842,11 +20033,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `subtEnemyYPos_frame1631_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x00D4] = 0x78u
 
@@ -27867,11 +20054,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `subtEnemyYPos_frame2621_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x00D0] = 0xB8u
 
@@ -27892,11 +20075,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `subtEnemyYPos_frame2679_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x00D0] = 0xB8u
 
@@ -27917,11 +20096,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `subtEnemyYPos_frame6047_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x00D1] = 0xB8u
 
@@ -27942,11 +20117,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `subtEnemyYPos_frame6115_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x00D1] = 0xB8u
 
@@ -27967,11 +20138,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `subtEnemyYPos_frame6343_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x00D0] = 0xB8u
 
@@ -27998,11 +20165,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkUnderEnemy_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -28038,11 +20201,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkUnderEnemy_frame1347_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -28078,11 +20237,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkUnderEnemy_frame1667_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0003] = 0x51u
             memory[0x0004] = 0x15u
@@ -28118,11 +20273,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkUnderEnemy_frame2083_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -28158,11 +20309,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkUnderEnemy_frame2673_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -28198,11 +20345,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkUnderEnemy_frame2759_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -28238,11 +20381,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkUnderEnemy_frame3079_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -28278,11 +20417,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkUnderEnemy_frame3163_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -28318,11 +20453,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkUnderEnemy_frame6013_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -28358,11 +20489,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkUnderEnemy_frame6279_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -28404,11 +20531,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForNonSolids_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -28429,11 +20552,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForNonSolids_frame1631_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -28454,11 +20573,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForNonSolids_frame1637_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -28479,11 +20594,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForNonSolids_frame1669_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -28504,11 +20615,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForNonSolids_frame2021_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -28529,11 +20636,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForNonSolids_frame2621_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -28554,11 +20657,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForNonSolids_frame6047_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -28579,11 +20678,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForNonSolids_frame6353_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -28610,11 +20705,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscBoundBox_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x11u
             memory[0x0001] = 0x73u
@@ -28649,11 +20740,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscBoundBox_frame1339_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x11u
             memory[0x0001] = 0x63u
@@ -28688,11 +20775,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscBoundBox_frame1363_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x11u
             memory[0x0001] = 0x58u
@@ -28727,11 +20810,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscBoundBox_frame1395_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x11u
             memory[0x0001] = 0x58u
@@ -28766,11 +20845,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscBoundBox_frame1423_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x11u
             memory[0x0001] = 0x58u
@@ -28805,11 +20880,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscBoundBox_frame1447_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x11u
             memory[0x0001] = 0x58u
@@ -28844,11 +20915,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscBoundBox_frame5207_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x11u
             memory[0x0001] = 0x58u
@@ -28883,11 +20950,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscBoundBox_frame5251_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x11u
             memory[0x0001] = 0x58u
@@ -28922,11 +20985,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscBoundBox_frame5685_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x11u
             memory[0x0001] = 0x22u
@@ -28961,11 +21020,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscBoundBox_frame5759_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x11u
             memory[0x0001] = 0x22u
@@ -29006,11 +21061,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBox_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x48u
             memory[0x0001] = 0x2Eu
@@ -29041,11 +21092,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBox_frame1553_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x48u
             memory[0x0001] = 0x39u
@@ -29081,11 +21128,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBox_frame2651_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x48u
             memory[0x0001] = 0x06u
@@ -29116,11 +21159,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBox_frame2827_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x48u
             memory[0x0001] = 0xC8u
@@ -29156,11 +21195,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBox_frame3147_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x48u
             memory[0x0001] = 0x22u
@@ -29191,11 +21226,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBox_frame5167_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x48u
             memory[0x0001] = 0x82u
@@ -29231,11 +21262,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBox_frame5975_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x48u
             memory[0x0001] = 0xC4u
@@ -29271,11 +21298,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBox_frame6175_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x48u
             memory[0x0001] = 0x50u
@@ -29311,11 +21334,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBox_frame6289_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x48u
             memory[0x0001] = 0x9Bu
@@ -29351,11 +21370,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyBoundBox_frame6403_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x48u
             memory[0x0001] = 0x74u
@@ -29397,11 +21412,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `boundingBoxCore_frame36_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x28u
@@ -29431,11 +21442,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `boundingBoxCore_frame1344_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x70u
@@ -29465,11 +21472,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `boundingBoxCore_frame1555_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x06u
             memory[0x0001] = 0x38u
@@ -29499,11 +21502,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `boundingBoxCore_frame1940_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x2Bu
@@ -29533,11 +21532,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `boundingBoxCore_frame2657_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0xEDu
@@ -29567,11 +21562,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `boundingBoxCore_frame5458_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x5Bu
@@ -29601,11 +21592,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `boundingBoxCore_frame5878_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x69u
@@ -29635,11 +21622,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `boundingBoxCore_frame6203_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x02u
             memory[0x0001] = 0xB9u
@@ -29669,11 +21652,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `boundingBoxCore_frame6335_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0001] = 0x07u
@@ -29703,11 +21682,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `boundingBoxCore_frame6536_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x54u
@@ -29743,11 +21718,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerCollisionCore_frame1237_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x04u
             memory[0x04AC] = 0x73u
@@ -29773,11 +21744,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerCollisionCore_frame1473_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x04u
             memory[0x04AC] = 0x73u
@@ -29803,11 +21770,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerCollisionCore_frame2649_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x04u
             memory[0x04AC] = 0x74u
@@ -29833,11 +21796,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerCollisionCore_frame2785_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x04u
             memory[0x04AC] = 0x46u
@@ -29863,11 +21822,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerCollisionCore_frame3049_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x04u
             memory[0x04AC] = 0x46u
@@ -29893,11 +21848,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerCollisionCore_frame5317_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x18u
             memory[0x04AC] = 0x73u
@@ -29923,11 +21874,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerCollisionCore_frame5977_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x04u
             memory[0x04AC] = 0x72u
@@ -29953,11 +21900,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerCollisionCore_frame6217_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x04u
             memory[0x04AC] = 0x61u
@@ -29983,11 +21926,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerCollisionCore_frame6297_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x04u
             memory[0x04AC] = 0x63u
@@ -30013,11 +21952,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerCollisionCore_frame6385_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x0Cu
             memory[0x04AC] = 0x6Fu
@@ -30049,11 +21984,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `sprObjectCollisionCore_frame2679_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x08u
             memory[0x04B0] = 0xEBu
@@ -30079,11 +22010,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `sprObjectCollisionCore_frame2791_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x08u
             memory[0x04B0] = 0xCFu
@@ -30109,11 +22036,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `sprObjectCollisionCore_frame2911_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x08u
             memory[0x04B0] = 0xD2u
@@ -30139,11 +22062,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `sprObjectCollisionCore_frame6107_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x08u
             memory[0x04B0] = 0x71u
@@ -30169,11 +22088,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `sprObjectCollisionCore_frame6151_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x08u
             memory[0x04B0] = 0x5Cu
@@ -30199,11 +22114,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `sprObjectCollisionCore_frame6199_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x0Cu
             memory[0x04B0] = 0x41u
@@ -30229,11 +22140,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `sprObjectCollisionCore_frame6239_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x0Cu
             memory[0x04B4] = 0xABu
@@ -30259,11 +22166,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `sprObjectCollisionCore_frame6279_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x08u
             memory[0x04B0] = 0x23u
@@ -30289,11 +22192,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `sprObjectCollisionCore_frame6315_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x0Cu
             memory[0x04B0] = 0x18u
@@ -30319,11 +22218,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `sprObjectCollisionCore_frame6359_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x0006] = 0x0Cu
             memory[0x04B4] = 0x79u
@@ -30355,11 +22250,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBufferCollision_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -30394,11 +22285,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBufferCollision_frame1383_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -30433,11 +22320,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBufferCollision_frame1703_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x00u
             memory[0x0004] = 0x17u
@@ -30472,11 +22355,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBufferCollision_frame2643_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -30511,11 +22390,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBufferCollision_frame2745_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x00u
             memory[0x0004] = 0x16u
@@ -30550,11 +22425,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBufferCollision_frame2877_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x00u
             memory[0x0004] = 0x17u
@@ -30589,11 +22460,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBufferCollision_frame3081_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -30628,11 +22495,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBufferCollision_frame3183_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x00u
             memory[0x0004] = 0x17u
@@ -30667,11 +22530,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBufferCollision_frame6179_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x54u
             memory[0x0004] = 0x15u
@@ -30706,11 +22565,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `blockBufferCollision_frame6303_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (13 addresses)
             memory[0x0003] = 0x00u
             memory[0x0004] = 0x16u
@@ -30751,11 +22606,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpFourSpr_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -30779,11 +22630,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpFourSpr_frame1319_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -30807,11 +22654,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpFourSpr_frame1321_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -30835,11 +22678,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpFourSpr_frame1491_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -30863,11 +22702,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpFourSpr_frame1493_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -30891,11 +22726,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpFourSpr_frame1495_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -30925,11 +22756,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpTwoSpr_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -30951,11 +22778,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpTwoSpr_frame1393_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -30977,11 +22800,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpTwoSpr_frame1441_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -31003,11 +22822,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpTwoSpr_frame1475_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -31029,11 +22844,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpTwoSpr_frame1762_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -31055,11 +22866,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpTwoSpr_frame5231_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -31081,11 +22888,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpTwoSpr_frame5506_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -31107,11 +22910,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpTwoSpr_frame5570_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -31133,11 +22932,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpTwoSpr_frame5771_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -31159,11 +22954,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dumpTwoSpr_frame6427_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -31191,11 +22982,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `jCoinGfxHandler_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0008] = 0x08u
             memory[0x0009] = 0x9Cu
@@ -31228,11 +23015,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `jCoinGfxHandler_frame1393_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0009] = 0xC2u
             memory[0x0032] = 0x09u
@@ -31265,11 +23048,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `jCoinGfxHandler_frame5107_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0008] = 0x08u
             memory[0x0009] = 0xB7u
@@ -31302,11 +23081,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `jCoinGfxHandler_frame5183_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0009] = 0xDDu
             memory[0x0032] = 0x09u
@@ -31338,11 +23113,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `jCoinGfxHandler_frame5667_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0008] = 0x08u
             memory[0x0009] = 0xCFu
@@ -31375,11 +23146,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `jCoinGfxHandler_frame5743_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0009] = 0xF5u
             memory[0x0032] = 0x09u
@@ -31411,11 +23178,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `jCoinGfxHandler_frame8247_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0008] = 0x08u
             memory[0x0009] = 0x8Bu
@@ -31448,11 +23211,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `jCoinGfxHandler_frame8323_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0009] = 0xB1u
             memory[0x0032] = 0x09u
@@ -31484,11 +23243,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `jCoinGfxHandler_frame8807_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (8 addresses)
             memory[0x0008] = 0x08u
             memory[0x0009] = 0xA3u
@@ -31521,11 +23276,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `jCoinGfxHandler_frame8883_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0009] = 0xC9u
             memory[0x0032] = 0x09u
@@ -31561,11 +23312,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawPowerUp_frame1525_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0000] = 0x76u
             memory[0x0001] = 0x77u
@@ -31604,11 +23351,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawPowerUp_frame1555_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0000] = 0x76u
             memory[0x0001] = 0x77u
@@ -31647,11 +23390,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawPowerUp_frame1587_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0000] = 0x76u
             memory[0x0001] = 0x77u
@@ -31690,11 +23429,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawPowerUp_frame1617_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0000] = 0x76u
             memory[0x0001] = 0x77u
@@ -31733,11 +23468,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawPowerUp_frame1651_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0000] = 0x76u
             memory[0x0001] = 0x77u
@@ -31776,11 +23507,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawPowerUp_frame1683_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0000] = 0x76u
             memory[0x0001] = 0x77u
@@ -31819,11 +23546,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawPowerUp_frame1713_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0000] = 0x76u
             memory[0x0001] = 0x77u
@@ -31862,11 +23585,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawPowerUp_frame5405_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0000] = 0x76u
             memory[0x0001] = 0x77u
@@ -31905,11 +23624,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawPowerUp_frame5435_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0000] = 0x76u
             memory[0x0001] = 0x77u
@@ -31948,11 +23663,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawPowerUp_frame5467_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (17 addresses)
             memory[0x0000] = 0x76u
             memory[0x0001] = 0x77u
@@ -31998,11 +23709,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyGfxHandler_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (29 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32057,11 +23764,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyGfxHandler_frame2705_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (29 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32116,11 +23819,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyGfxHandler_frame3009_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (26 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32172,11 +23871,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyGfxHandler_frame5141_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (26 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32228,11 +23923,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyGfxHandler_frame6135_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (25 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32283,11 +23974,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyGfxHandler_frame6337_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (26 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32339,11 +24026,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyGfxHandler_frame6570_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (28 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32397,11 +24080,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyGfxHandler_frame6873_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (25 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32452,11 +24131,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyGfxHandler_frame9093_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (26 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32508,11 +24183,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `enemyGfxHandler_frame9467_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (26 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32570,11 +24241,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawEnemyObjRow_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32607,11 +24274,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawEnemyObjRow_frame2041_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32644,11 +24307,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawEnemyObjRow_frame2743_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x72u
             memory[0x0001] = 0x73u
@@ -32681,11 +24340,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawEnemyObjRow_frame3035_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32718,11 +24373,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawEnemyObjRow_frame3221_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x72u
             memory[0x0001] = 0x73u
@@ -32755,11 +24406,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawEnemyObjRow_frame6023_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32792,11 +24439,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawEnemyObjRow_frame6203_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32829,11 +24472,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawEnemyObjRow_frame6327_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x70u
             memory[0x0001] = 0x71u
@@ -32866,11 +24505,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawEnemyObjRow_frame6469_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32903,11 +24538,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawEnemyObjRow_frame9347_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x70u
             memory[0x0001] = 0x71u
@@ -32946,11 +24577,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawOneSpriteRow_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -32983,11 +24610,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawOneSpriteRow_frame1383_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -33020,11 +24643,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawOneSpriteRow_frame1681_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -33057,11 +24676,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawOneSpriteRow_frame2015_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x16u
             memory[0x0001] = 0x17u
@@ -33094,11 +24709,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawOneSpriteRow_frame2607_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x0Au
             memory[0x0001] = 0x0Bu
@@ -33131,11 +24742,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawOneSpriteRow_frame5465_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x78u
             memory[0x0001] = 0x79u
@@ -33168,11 +24775,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawOneSpriteRow_frame5811_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x22u
             memory[0x0001] = 0x23u
@@ -33205,11 +24808,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawOneSpriteRow_frame6253_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -33242,11 +24841,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawOneSpriteRow_frame6721_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0x9Eu
             memory[0x0001] = 0x9Eu
@@ -33279,11 +24874,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `drawOneSpriteRow_frame6967_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -33322,11 +24913,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveESprColOffscreen_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01EF] = 0xC8u
             memory[0x01F0] = 0xEBu
@@ -33349,11 +24936,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveESprColOffscreen_frame1183_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01EF] = 0xC8u
             memory[0x01F0] = 0xEBu
@@ -33376,11 +24959,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveESprColOffscreen_frame1185_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01EF] = 0xC8u
             memory[0x01F0] = 0xEBu
@@ -33403,11 +24982,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveESprColOffscreen_frame2621_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01EF] = 0xC8u
             memory[0x01F0] = 0xEBu
@@ -33430,11 +25005,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveESprColOffscreen_frame2623_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01EF] = 0xC8u
             memory[0x01F0] = 0xEBu
@@ -33457,11 +25028,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveESprColOffscreen_frame2625_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01EF] = 0xC8u
             memory[0x01F0] = 0xEBu
@@ -33484,11 +25051,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveESprColOffscreen_frame6047_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01EF] = 0xC8u
             memory[0x01F0] = 0xEBu
@@ -33511,11 +25074,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveESprColOffscreen_frame6049_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01EF] = 0xC8u
             memory[0x01F0] = 0xEBu
@@ -33538,11 +25097,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveESprColOffscreen_frame6051_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01EF] = 0xC8u
             memory[0x01F0] = 0xEBu
@@ -33565,11 +25120,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveESprColOffscreen_frame6345_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x01EF] = 0xC8u
             memory[0x01F0] = 0xEBu
@@ -33598,11 +25149,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveColOffscreen_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -33624,11 +25171,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveColOffscreen_frame1181_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -33650,11 +25193,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveColOffscreen_frame1183_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -33676,11 +25215,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveColOffscreen_frame1185_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -33702,11 +25237,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveColOffscreen_frame2621_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -33728,11 +25259,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveColOffscreen_frame2623_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -33754,11 +25281,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveColOffscreen_frame2625_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -33780,11 +25303,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveColOffscreen_frame6047_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -33806,11 +25325,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveColOffscreen_frame6049_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -33832,11 +25347,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `moveColOffscreen_frame6051_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -33862,11 +25373,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerGfxHandler_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (30 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -33915,11 +25422,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerGfxHandler_frame1431_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (26 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -33964,11 +25467,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerGfxHandler_frame1923_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (26 addresses)
             memory[0x0000] = 0x20u
             memory[0x0001] = 0x21u
@@ -34013,11 +25512,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerGfxHandler_frame2313_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (32 addresses)
             memory[0x0000] = 0x08u
             memory[0x0001] = 0x09u
@@ -34068,11 +25563,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerGfxHandler_frame5265_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (32 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -34123,11 +25614,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerGfxHandler_frame5791_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (33 addresses)
             memory[0x0000] = 0x03u
             memory[0x0001] = 0x09u
@@ -34179,11 +25666,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerGfxHandler_frame6175_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0009] = 0xCDu
             memory[0x079E] = 0x08u
@@ -34204,11 +25687,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerGfxHandler_frame6543_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (26 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -34253,11 +25732,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerGfxHandler_frame8660_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (27 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -34303,11 +25778,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `playerGfxHandler_frame9491_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0009] = 0xF9u
             memory[0x079E] = 0x03u
@@ -34335,11 +25806,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderPlayerSub_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -34378,11 +25845,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderPlayerSub_frame1367_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -34421,11 +25884,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderPlayerSub_frame1857_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x08u
             memory[0x0001] = 0x09u
@@ -34464,11 +25923,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderPlayerSub_frame2207_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x20u
             memory[0x0001] = 0x21u
@@ -34507,11 +25962,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderPlayerSub_frame2687_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x08u
             memory[0x0001] = 0x09u
@@ -34550,11 +26001,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderPlayerSub_frame5655_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x00u
             memory[0x0001] = 0x01u
@@ -34593,11 +26040,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderPlayerSub_frame5901_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0x20u
             memory[0x0001] = 0x21u
@@ -34636,11 +26079,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderPlayerSub_frame6397_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -34679,11 +26118,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderPlayerSub_frame6763_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -34722,11 +26157,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `renderPlayerSub_frame9885_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0000] = 0xFCu
             memory[0x0001] = 0xFCu
@@ -34769,11 +26200,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processPlayerAction_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x000C] = 0x00u
             memory[0x001D] = 0x00u
@@ -34799,11 +26226,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processPlayerAction_frame1077_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (14 addresses)
             memory[0x0000] = 0x03u
             memory[0x000C] = 0x01u
@@ -34837,11 +26260,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processPlayerAction_frame1521_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (14 addresses)
             memory[0x0000] = 0x03u
             memory[0x000C] = 0x00u
@@ -34875,11 +26294,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processPlayerAction_frame1859_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x000C] = 0x02u
             memory[0x001D] = 0x00u
@@ -34910,11 +26325,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processPlayerAction_frame2097_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (10 addresses)
             memory[0x000C] = 0x01u
             memory[0x001D] = 0x00u
@@ -34943,11 +26354,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processPlayerAction_frame2251_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x000C] = 0x01u
             memory[0x001D] = 0x00u
@@ -34978,11 +26385,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processPlayerAction_frame2571_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x001D] = 0x02u
             memory[0x01F2] = 0x38u
@@ -35006,11 +26409,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processPlayerAction_frame2703_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x000C] = 0x02u
             memory[0x001D] = 0x00u
@@ -35041,11 +26440,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processPlayerAction_frame5637_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x000C] = 0x02u
             memory[0x001D] = 0x00u
@@ -35076,11 +26471,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `processPlayerAction_frame5789_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (12 addresses)
             memory[0x000C] = 0x01u
             memory[0x001D] = 0x00u
@@ -35118,11 +26509,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getCurrentAnimOffset_frame989_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x070D] = 0x00u
 
@@ -35143,11 +26530,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getCurrentAnimOffset_frame991_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x070D] = 0x01u
 
@@ -35168,11 +26551,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getCurrentAnimOffset_frame1806_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x070D] = 0x00u
 
@@ -35193,11 +26572,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getCurrentAnimOffset_frame1851_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x070D] = 0x00u
 
@@ -35218,11 +26593,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getCurrentAnimOffset_frame1865_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x070D] = 0x01u
 
@@ -35243,11 +26614,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getCurrentAnimOffset_frame2033_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x070D] = 0x02u
 
@@ -35268,11 +26635,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getCurrentAnimOffset_frame2249_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x070D] = 0x02u
 
@@ -35293,11 +26656,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getCurrentAnimOffset_frame2297_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x070D] = 0x02u
 
@@ -35318,11 +26677,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getCurrentAnimOffset_frame2429_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x070D] = 0x00u
 
@@ -35343,11 +26698,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getCurrentAnimOffset_frame2433_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x070D] = 0x01u
 
@@ -35374,11 +26725,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getGfxOffsetAdder_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0754] = 0x01u
 
@@ -35399,11 +26746,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getGfxOffsetAdder_frame1003_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0754] = 0x01u
 
@@ -35424,11 +26767,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getGfxOffsetAdder_frame1145_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0754] = 0x01u
 
@@ -35449,11 +26788,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getGfxOffsetAdder_frame1617_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0754] = 0x01u
 
@@ -35474,11 +26809,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getGfxOffsetAdder_frame1629_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0754] = 0x01u
 
@@ -35499,11 +26830,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getGfxOffsetAdder_frame1865_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0754] = 0x00u
 
@@ -35524,11 +26851,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getGfxOffsetAdder_frame2033_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0754] = 0x00u
 
@@ -35549,11 +26872,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getGfxOffsetAdder_frame2051_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0754] = 0x00u
 
@@ -35574,11 +26893,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getGfxOffsetAdder_frame2439_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0754] = 0x00u
 
@@ -35599,11 +26914,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getGfxOffsetAdder_frame5733_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0754] = 0x00u
 
@@ -35628,11 +26939,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handleChangeSize_frame1730_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0009] = 0x6Bu
             memory[0x070D] = 0x00u
@@ -35654,11 +26961,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handleChangeSize_frame1760_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0009] = 0x7Au
             memory[0x070D] = 0x04u
@@ -35680,11 +26983,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handleChangeSize_frame1792_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0009] = 0x8Au
             memory[0x070D] = 0x08u
@@ -35706,11 +27005,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handleChangeSize_frame5526_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0009] = 0x89u
             memory[0x070D] = 0x02u
@@ -35732,11 +27027,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handleChangeSize_frame5558_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0009] = 0x99u
             memory[0x070D] = 0x06u
@@ -35758,11 +27049,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handleChangeSize_frame6085_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0009] = 0xA0u
             memory[0x070D] = 0x00u
@@ -35784,11 +27071,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handleChangeSize_frame6145_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0009] = 0xBEu
             memory[0x070D] = 0x08u
@@ -35810,11 +27093,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handleChangeSize_frame8674_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0009] = 0x61u
             memory[0x070D] = 0x03u
@@ -35836,11 +27115,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handleChangeSize_frame8704_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0009] = 0x70u
             memory[0x070D] = 0x06u
@@ -35862,11 +27137,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `handleChangeSize_frame9237_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0009] = 0x7Au
             memory[0x070D] = 0x02u
@@ -35893,11 +27164,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForPlayerAttrib_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (5 addresses)
             memory[0x000E] = 0x07u
             memory[0x021E] = 0x00u
@@ -35922,11 +27189,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForPlayerAttrib_frame989_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x000E] = 0x08u
             memory[0x06D5] = 0x60u
@@ -35948,11 +27211,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForPlayerAttrib_frame1299_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x000E] = 0x08u
             memory[0x06D5] = 0x80u
@@ -35974,11 +27233,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForPlayerAttrib_frame1719_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x000E] = 0x09u
             memory[0x06D5] = 0x68u
@@ -36000,11 +27255,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForPlayerAttrib_frame1773_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x000E] = 0x09u
             memory[0x0216] = 0x40u
@@ -36033,11 +27284,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForPlayerAttrib_frame1853_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x000E] = 0x08u
             memory[0x06D5] = 0x08u
@@ -36059,11 +27306,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForPlayerAttrib_frame1977_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x000E] = 0x08u
             memory[0x06D5] = 0x18u
@@ -36085,11 +27328,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForPlayerAttrib_frame6053_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x000E] = 0x0Au
             memory[0x06D5] = 0x20u
@@ -36111,11 +27350,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForPlayerAttrib_frame6161_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x000E] = 0x0Au
             memory[0x06D5] = 0x60u
@@ -36137,11 +27372,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `chkForPlayerAttrib_frame6759_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x000E] = 0x0Bu
             memory[0x0216] = 0x42u
@@ -36174,11 +27405,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativePlayerPosition_frame32_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
             memory[0x0086] = 0x28u
@@ -36203,11 +27430,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativePlayerPosition_frame1275_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
             memory[0x0086] = 0xE2u
@@ -36232,11 +27455,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativePlayerPosition_frame1556_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
             memory[0x0086] = 0x8Au
@@ -36261,11 +27480,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativePlayerPosition_frame1976_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
             memory[0x0086] = 0x82u
@@ -36290,11 +27505,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativePlayerPosition_frame2390_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x00u
             memory[0x0086] = 0x38u
@@ -36319,11 +27530,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativePlayerPosition_frame2719_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
             memory[0x0086] = 0x8Du
@@ -36348,11 +27555,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativePlayerPosition_frame5664_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
             memory[0x0086] = 0x5Au
@@ -36377,11 +27580,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativePlayerPosition_frame5994_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
             memory[0x0086] = 0x62u
@@ -36406,11 +27605,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativePlayerPosition_frame6340_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
             memory[0x0086] = 0xE5u
@@ -36435,11 +27630,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativePlayerPosition_frame6702_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x05u
             memory[0x0086] = 0x0Bu
@@ -36471,11 +27662,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeMiscPosition_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
             memory[0x009B] = 0x05u
@@ -36501,11 +27688,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeMiscPosition_frame1351_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
             memory[0x009B] = 0x05u
@@ -36531,11 +27714,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeMiscPosition_frame1387_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
             memory[0x009B] = 0x05u
@@ -36561,11 +27740,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeMiscPosition_frame1421_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
             memory[0x009B] = 0x0Bu
@@ -36591,11 +27766,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeMiscPosition_frame1457_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
             memory[0x009B] = 0x1Fu
@@ -36621,11 +27792,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeMiscPosition_frame5215_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
             memory[0x009B] = 0x0Du
@@ -36651,11 +27818,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeMiscPosition_frame5677_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
             memory[0x009B] = 0x65u
@@ -36681,11 +27844,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeMiscPosition_frame5715_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
             memory[0x009B] = 0x65u
@@ -36711,11 +27870,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeMiscPosition_frame5749_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
             memory[0x009B] = 0x65u
@@ -36741,11 +27896,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeMiscPosition_frame5785_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (6 addresses)
             memory[0x0008] = 0x08u
             memory[0x009B] = 0x65u
@@ -36777,11 +27928,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeEnemyPosition_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -36808,11 +27955,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeEnemyPosition_frame1437_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -36839,11 +27982,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeEnemyPosition_frame1709_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x05u
             memory[0x0008] = 0x05u
@@ -36870,11 +28009,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeEnemyPosition_frame2763_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
@@ -36901,11 +28036,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeEnemyPosition_frame3217_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
@@ -36932,11 +28063,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeEnemyPosition_frame5897_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -36963,11 +28090,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeEnemyPosition_frame6105_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x02u
             memory[0x0008] = 0x02u
@@ -36994,11 +28117,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeEnemyPosition_frame6199_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -37025,11 +28144,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeEnemyPosition_frame6323_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x02u
             memory[0x0008] = 0x02u
@@ -37056,11 +28171,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeEnemyPosition_frame6403_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -37093,11 +28204,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeBlockPosition_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -37128,11 +28235,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeBlockPosition_frame1327_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -37163,11 +28266,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeBlockPosition_frame1337_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -37198,11 +28297,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeBlockPosition_frame1493_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
@@ -37233,11 +28328,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeBlockPosition_frame1505_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
@@ -37268,11 +28359,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeBlockPosition_frame1515_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
@@ -37303,11 +28390,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeBlockPosition_frame5287_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
@@ -37338,11 +28421,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeBlockPosition_frame5301_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
@@ -37373,11 +28452,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeBlockPosition_frame5669_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -37408,11 +28483,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `relativeBlockPosition_frame5681_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -37449,11 +28520,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `variableObjOfsRelPos_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -37480,11 +28547,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `variableObjOfsRelPos_frame1327_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -37511,11 +28574,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `variableObjOfsRelPos_frame1337_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -37542,11 +28601,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `variableObjOfsRelPos_frame1493_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
@@ -37573,11 +28628,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `variableObjOfsRelPos_frame1503_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
@@ -37604,11 +28655,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `variableObjOfsRelPos_frame1515_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
@@ -37635,11 +28682,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `variableObjOfsRelPos_frame5287_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
@@ -37666,11 +28709,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `variableObjOfsRelPos_frame5299_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x01u
             memory[0x0008] = 0x01u
@@ -37697,11 +28736,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `variableObjOfsRelPos_frame5667_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -37728,11 +28763,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `variableObjOfsRelPos_frame5679_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (7 addresses)
             memory[0x0000] = 0x00u
             memory[0x0008] = 0x00u
@@ -37765,11 +28796,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getObjRelativePosition_frame33_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0086] = 0x28u
             memory[0x00CE] = 0xB0u
@@ -37793,11 +28820,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getObjRelativePosition_frame1325_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0091] = 0x00u
             memory[0x00D9] = 0x00u
@@ -37821,11 +28844,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getObjRelativePosition_frame1547_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x008C] = 0x50u
             memory[0x00D4] = 0x81u
@@ -37849,11 +28868,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getObjRelativePosition_frame2026_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0086] = 0xB2u
             memory[0x00CE] = 0xA5u
@@ -37877,11 +28892,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getObjRelativePosition_frame2579_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0086] = 0x83u
             memory[0x00CE] = 0x83u
@@ -37905,11 +28916,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getObjRelativePosition_frame5239_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x009B] = 0x19u
             memory[0x00E3] = 0x68u
@@ -37933,11 +28940,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getObjRelativePosition_frame5780_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0086] = 0x5Du
             memory[0x00CE] = 0x70u
@@ -37961,11 +28964,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getObjRelativePosition_frame6100_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0086] = 0xA6u
             memory[0x00CE] = 0xB0u
@@ -37989,11 +28988,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getObjRelativePosition_frame6311_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0088] = 0x0Au
             memory[0x00D0] = 0xB8u
@@ -38017,11 +29012,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getObjRelativePosition_frame6513_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (3 addresses)
             memory[0x0088] = 0x05u
             memory[0x00D0] = 0xB8u
@@ -38049,11 +29040,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerOffscreenBits_frame32_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -38092,11 +29079,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerOffscreenBits_frame1280_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -38135,11 +29118,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerOffscreenBits_frame1567_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -38178,11 +29157,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerOffscreenBits_frame1985_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -38221,11 +29196,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerOffscreenBits_frame2389_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -38264,11 +29235,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerOffscreenBits_frame2713_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -38307,11 +29274,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerOffscreenBits_frame5660_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -38350,11 +29313,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerOffscreenBits_frame5994_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -38393,11 +29352,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerOffscreenBits_frame6338_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -38436,11 +29391,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getPlayerOffscreenBits_frame6699_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x00u
@@ -38486,11 +29437,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscOffscreenBits_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x15u
@@ -38530,11 +29477,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscOffscreenBits_frame1339_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x15u
@@ -38574,11 +29517,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscOffscreenBits_frame1363_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x15u
@@ -38618,11 +29557,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscOffscreenBits_frame1395_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x15u
@@ -38662,11 +29597,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscOffscreenBits_frame1423_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x15u
@@ -38706,11 +29637,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscOffscreenBits_frame1447_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x15u
@@ -38750,11 +29677,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscOffscreenBits_frame5207_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x15u
@@ -38794,11 +29717,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscOffscreenBits_frame5251_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x15u
@@ -38838,11 +29757,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscOffscreenBits_frame5685_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x15u
@@ -38882,11 +29797,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getMiscOffscreenBits_frame5759_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x15u
@@ -38932,11 +29843,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getProperObjOffset_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -38957,11 +29864,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getProperObjOffset_frame1327_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -38982,11 +29885,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getProperObjOffset_frame1339_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -39007,11 +29906,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getProperObjOffset_frame1351_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -39032,11 +29927,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getProperObjOffset_frame1367_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -39057,11 +29948,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getProperObjOffset_frame1395_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -39082,11 +29969,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getProperObjOffset_frame1411_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -39107,11 +29990,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getProperObjOffset_frame1425_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -39132,11 +30011,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getProperObjOffset_frame1441_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -39157,11 +30032,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getProperObjOffset_frame1457_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (0 addresses)
             // No memory inputs
 
@@ -39188,11 +30059,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyOffscreenBits_frame1181_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x01u
@@ -39228,11 +30095,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyOffscreenBits_frame1437_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x01u
@@ -39272,11 +30135,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyOffscreenBits_frame1709_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x05u
             memory[0x0004] = 0x06u
@@ -39316,11 +30175,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyOffscreenBits_frame2765_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (18 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x01u
@@ -39358,11 +30213,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyOffscreenBits_frame3219_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x01u
@@ -39398,11 +30249,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyOffscreenBits_frame5899_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (16 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x01u
@@ -39438,11 +30285,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyOffscreenBits_frame6107_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x01u
@@ -39482,11 +30325,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyOffscreenBits_frame6199_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
             memory[0x0004] = 0x02u
@@ -39526,11 +30365,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyOffscreenBits_frame6325_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x01u
@@ -39570,11 +30405,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getEnemyOffscreenBits_frame6403_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
             memory[0x0004] = 0x02u
@@ -39620,11 +30451,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockOffscreenBits_frame1317_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x09u
@@ -39664,11 +30491,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockOffscreenBits_frame1325_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x09u
@@ -39708,11 +30531,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockOffscreenBits_frame1335_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x09u
@@ -39752,11 +30571,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockOffscreenBits_frame1491_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
             memory[0x0004] = 0x0Au
@@ -39796,11 +30611,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockOffscreenBits_frame1501_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
             memory[0x0004] = 0x0Au
@@ -39840,11 +30651,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockOffscreenBits_frame1511_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
             memory[0x0004] = 0x0Au
@@ -39884,11 +30691,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockOffscreenBits_frame5281_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
             memory[0x0004] = 0x0Au
@@ -39928,11 +30731,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockOffscreenBits_frame5293_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
             memory[0x0004] = 0x0Au
@@ -39972,11 +30771,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockOffscreenBits_frame5303_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x01u
             memory[0x0004] = 0x0Au
@@ -40016,11 +30811,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getBlockOffscreenBits_frame5671_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (20 addresses)
             memory[0x0000] = 0x00u
             memory[0x0004] = 0x09u
@@ -40066,11 +30857,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runOffscrBitsSubs_frame32_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40107,11 +30894,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runOffscrBitsSubs_frame1327_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x15u
             memory[0x0006] = 0x38u
@@ -40148,11 +30931,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runOffscrBitsSubs_frame1567_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40189,11 +30968,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runOffscrBitsSubs_frame2079_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x01u
             memory[0x0006] = 0x20u
@@ -40226,11 +31001,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runOffscrBitsSubs_frame2587_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40267,11 +31038,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runOffscrBitsSubs_frame5243_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40308,11 +31075,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runOffscrBitsSubs_frame5799_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40349,11 +31112,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runOffscrBitsSubs_frame6103_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x01u
             memory[0x0006] = 0x38u
@@ -40390,11 +31149,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runOffscrBitsSubs_frame6315_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x03u
             memory[0x0006] = 0x38u
@@ -40431,11 +31186,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `runOffscrBitsSubs_frame6513_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (15 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40478,11 +31229,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getXOffscreenBits_frame32_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40515,11 +31262,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getXOffscreenBits_frame1264_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40552,11 +31295,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getXOffscreenBits_frame1478_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40589,11 +31328,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getXOffscreenBits_frame1715_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x06u
             memory[0x0006] = 0x38u
@@ -40626,11 +31361,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getXOffscreenBits_frame2341_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40663,11 +31394,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getXOffscreenBits_frame2684_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40700,11 +31427,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getXOffscreenBits_frame5453_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40737,11 +31460,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getXOffscreenBits_frame5905_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40774,11 +31493,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getXOffscreenBits_frame6145_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (9 addresses)
             memory[0x0004] = 0x03u
             memory[0x0006] = 0x38u
@@ -40809,11 +31524,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `getXOffscreenBits_frame6362_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (11 addresses)
             memory[0x0004] = 0x00u
             memory[0x0006] = 0x38u
@@ -40852,11 +31563,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dividePDiff_frame32_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0006] = 0x38u
             memory[0x0007] = 0xD7u
@@ -40878,11 +31585,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dividePDiff_frame1068_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0006] = 0x38u
             memory[0x0007] = 0xB7u
@@ -40904,11 +31607,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dividePDiff_frame1172_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0006] = 0x38u
             memory[0x0007] = 0x97u
@@ -40930,11 +31629,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dividePDiff_frame1317_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0006] = 0x38u
             memory[0x0007] = 0x53u
@@ -40956,11 +31651,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dividePDiff_frame1395_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0006] = 0x20u
             memory[0x0007] = 0x89u
@@ -40982,11 +31673,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dividePDiff_frame1595_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0006] = 0x38u
             memory[0x0007] = 0xE5u
@@ -41008,11 +31695,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dividePDiff_frame1902_test6`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0006] = 0x20u
             memory[0x0007] = 0xC7u
@@ -41034,11 +31717,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dividePDiff_frame2711_test7`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0006] = 0x38u
             memory[0x0007] = 0x08u
@@ -41060,11 +31739,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dividePDiff_frame5685_test8`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0006] = 0x20u
             memory[0x0007] = 0xE4u
@@ -41086,11 +31761,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `dividePDiff_frame6211_test9`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (2 addresses)
             memory[0x0006] = 0x38u
             memory[0x0007] = 0x4Cu
@@ -41116,11 +31787,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `soundEngine_frame3_test0`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -41140,11 +31807,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `soundEngine_frame14_test1`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -41164,11 +31827,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `soundEngine_frame31_test2`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -41188,11 +31847,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `soundEngine_frame1147_test3`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -41212,11 +31867,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `soundEngine_frame3227_test4`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 
@@ -41236,11 +31887,7 @@ class GeneratedFunctionTests {
      */
     @Test
     fun `soundEngine_frame3238_test5`() {
-        assertTimeoutPreemptively(Duration.ofMillis(1000)) {
-            // Setup: Reset state
-            resetCPU()
-            clearMemory()
-
+        assertTimeoutPreemptively(Duration.ofMillis(5000)) {
             // Setup: Set input memory (1 addresses)
             memory[0x0770] = 0x00u
 

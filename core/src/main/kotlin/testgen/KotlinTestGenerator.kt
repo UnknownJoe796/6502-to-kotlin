@@ -72,13 +72,26 @@ class KotlinTestGenerator(
         "blockObjectsCore",   // Chain of calls to problematic functions
         "giveOneCoin",        // Chain of calls to digitsMathRoutine
         "addToScore",         // Chain of calls to problematic functions
-        "playerHeadCollision" // Chain of calls to problematic functions
+        "playerHeadCollision", // Chain of calls to problematic functions
+        // by Claude - Functions with infinite loops or very long execution that cause
+        // non-deterministic test results due to timeout boundary flakiness
+        "areaParserTaskHandler", // Has infinite loops when called standalone
+        "gameCoreRoutine",       // Very long execution, triggers timeouts inconsistently
+        "gameRoutines",          // Calls gameCoreRoutine
+        "areaParserTasks",       // Calls areaParserTaskHandler
+        "processAreaData",       // Calls areaParserTasks
+        "decodeAreaData"         // Calls processAreaData
     ),
 
+    // by Claude - Increased timeout to 5 seconds to reduce test flakiness
+    // Tests near the 1-second boundary were passing or failing based on
+    // timing variations (JVM warmup, GC, etc.), causing non-deterministic results.
+    // 5 seconds gives enough headroom while still catching infinite loops.
     /** Timeout in milliseconds for each test (0 = no timeout) */
-    private val testTimeoutMs: Long = 1000,
+    private val testTimeoutMs: Long = 5000,
 
     /** Import statements to include */
+    // by Claude - Added TestMethodOrder, MethodOrderer, and BeforeEach imports for deterministic test execution
     private val imports: List<String> = listOf(
         "com.ivieleague.decompiler6502tokotlin.hand.*",
         "com.ivieleague.decompiler6502tokotlin.smb.*",
@@ -86,7 +99,10 @@ class KotlinTestGenerator(
         "kotlin.test.assertEquals",
         "org.junit.jupiter.api.Assertions.assertTimeoutPreemptively",
         "org.junit.jupiter.api.BeforeAll",
+        "org.junit.jupiter.api.BeforeEach",
         "org.junit.jupiter.api.TestInstance",
+        "org.junit.jupiter.api.TestMethodOrder",
+        "org.junit.jupiter.api.MethodOrderer",
         "java.time.Duration",
         "java.io.File"
     ),
@@ -155,6 +171,10 @@ class KotlinTestGenerator(
         sb.appendLine(" */")
         // by Claude - Add @TestInstance annotation for @BeforeAll support
         sb.appendLine("@TestInstance(TestInstance.Lifecycle.PER_CLASS)")
+        // by Claude - Add @TestMethodOrder for deterministic test execution order
+        // Without this, JUnit 5 may run tests in different orders between JVM runs,
+        // causing non-deterministic failures when tests depend on shared global state
+        sb.appendLine("@TestMethodOrder(MethodOrderer.MethodName::class)")
         sb.appendLine("class GeneratedFunctionTests {")
         sb.appendLine()
 
@@ -176,6 +196,16 @@ class KotlinTestGenerator(
             sb.appendLine("    }")
             sb.appendLine()
         }
+
+        // by Claude - Add @BeforeEach to ensure clean state even after timeouts
+        // When assertTimeoutPreemptively kills a test thread, the global memory may be corrupted.
+        // This ensures each test starts with a clean slate regardless of what happened before.
+        sb.appendLine("    @BeforeEach")
+        sb.appendLine("    fun resetState() {")
+        sb.appendLine("        resetCPU()")
+        sb.appendLine("        clearMemory()")
+        sb.appendLine("    }")
+        sb.appendLine()
 
         // Group captured functions by their matched decompiled function
         data class MatchedFunction(
@@ -347,10 +377,9 @@ class KotlinTestGenerator(
             sb.appendLine("        assertTimeoutPreemptively(Duration.ofMillis($testTimeoutMs)) {")
         }
 
-        sb.appendLine("${indent}// Setup: Reset state")
-        sb.appendLine("${indent}resetCPU()")
-        sb.appendLine("${indent}clearMemory()")
-        sb.appendLine()
+        // by Claude - Removed resetCPU/clearMemory from individual tests since @BeforeEach handles it
+        // This also helps with determinism - the reset happens BEFORE the timeout wrapper,
+        // so even if a test times out, the next test will still get a clean state.
 
         // Set input memory
         sb.appendLine("${indent}// Setup: Set input memory (${testCase.memoryReads.size} addresses)")

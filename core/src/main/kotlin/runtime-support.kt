@@ -350,6 +350,11 @@ fun resetCPU() {
     flagC = false
     flagI = true  // Interrupts disabled on reset
     flagD = false
+    // by Claude - Clear intercepts and callbacks to ensure clean state for tests
+    // This prevents state leaking between tests, especially after timeouts
+    memoryReadIntercept = null
+    memoryWriteIntercept = null
+    loopCheckCallback = null
 }
 
 /**
