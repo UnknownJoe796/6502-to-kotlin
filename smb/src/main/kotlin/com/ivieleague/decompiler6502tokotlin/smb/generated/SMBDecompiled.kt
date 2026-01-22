@@ -1805,16 +1805,33 @@ fun floateyNumbersRoutine(X: Int): Int {
                             A = enemyState[X]
                             //> cmp #$02                     ;if enemy state defeated or otherwise
                             //> bcs FloateyPart              ;$02 or greater, branch beyond this part
+                            // by Claude: Added missing branch condition - if Enemy_State >= 2, skip GetAltOffset
+                            if (A < 0x02) {
+                                //> GetAltOffset: ldx SprDataOffset_Ctrl       ;load some kind of control bit
+                                X = sprdataoffsetCtrl
+                                //> ldy Alt_SprDataOffset,x      ;get alternate OAM data offset
+                                Y = altSprdataoffset[X]
+                                //> ldx ObjectOffset             ;get enemy object offset again
+                                X = objectOffset
+                            }
+                        } else {
+                            //> GetAltOffset: ldx SprDataOffset_Ctrl       ;load some kind of control bit
+                            X = sprdataoffsetCtrl
+                            //> ldy Alt_SprDataOffset,x      ;get alternate OAM data offset
+                            Y = altSprdataoffset[X]
+                            //> ldx ObjectOffset             ;get enemy object offset again
+                            X = objectOffset
                         }
                     }
                 }
+            } else {
+                //> GetAltOffset: ldx SprDataOffset_Ctrl       ;load some kind of control bit
+                X = sprdataoffsetCtrl
+                //> ldy Alt_SprDataOffset,x      ;get alternate OAM data offset
+                Y = altSprdataoffset[X]
+                //> ldx ObjectOffset             ;get enemy object offset again
+                X = objectOffset
             }
-            //> GetAltOffset: ldx SprDataOffset_Ctrl       ;load some kind of control bit
-            X = sprdataoffsetCtrl
-            //> ldy Alt_SprDataOffset,x      ;get alternate OAM data offset
-            Y = altSprdataoffset[X]
-            //> ldx ObjectOffset             ;get enemy object offset again
-            X = objectOffset
         }
     }
     //> FloateyPart:  lda FloateyNum_Y_Pos,x       ;get vertical coordinate for
