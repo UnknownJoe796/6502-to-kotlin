@@ -961,9 +961,6 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
         }
     }
 
-    // by Claude - Track whether fall-through was handled in the orphaned branch else-branch
-    var fallThroughHandled = false
-
     // Handle orphaned conditional branches - branches that weren't picked up by control flow analysis
     // This happens when the branch target is outside the function or leads to an immediate exit (like JMP to another function)
     // by Claude - Skip if this block's branch is already handled by a structured control flow (IfNode/LoopNode)
@@ -987,34 +984,11 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
         // just skips some code within the loop and we shouldn't generate return.
         val targetIsBreakTarget = branchTarget != null && ctx.isBreakTarget(branchTarget)
 
-        // by Claude - Check if fall-through goes to external function
-        // This is important for handling cases like: bcs ExTA (internal) with fall-through to RXSpd (external)
-        val fallThroughIsExternal = fallthrough != null &&
-            fallthrough.function != this.function &&
-            fallthrough.function != null
-
-        // by Claude - Check if internal branch target is a simple return block (just RTS)
-        // This is important for the pattern: branch to internal RTS, fall-through to external function
-        // We only want to generate fall-through handling when the branch target is basically just a return
-        // The block must: (1) only have RTS/RTI instructions (or no instructions), AND
-        // (2) actually have an RTS or RTI instruction (not just comments)
-        val targetIsSimpleReturn = !targetIsExit && branchTarget != null &&
-            branchTarget.function == this.function &&
-            branchTarget.lines.all { line ->
-                val instr = line.instruction
-                instr == null || instr.op == AssemblyOp.RTS || instr.op == AssemblyOp.RTI
-            } &&
-            branchTarget.lines.any { line ->
-                val instr = line.instruction
-                instr?.op == AssemblyOp.RTS || instr?.op == AssemblyOp.RTI
-            }
-
         // Only generate orphaned branch handling if:
         // 1. Target is outside the function (exit), or
-        // 2. Target is a break target for an enclosing loop, or
-        // 3. Fall-through goes to an external function AND the branch target is a simple return block
+        // 2. Target is a break target for an enclosing loop
         // Skip handling for internal forward branches that just skip code within a loop
-        if ((targetIsExit || targetIsBreakTarget || (fallThroughIsExternal && targetIsSimpleReturn)) && branchTarget != null) {
+        if ((targetIsExit || targetIsBreakTarget) && branchTarget != null) {
             // Generate an if-statement for this orphaned branch
             // The condition is based on the branch type
             val condition = buildOrphanedBranchCondition(lastInstr, ctx)
@@ -1087,38 +1061,10 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                     )
                 }
 
-                // by Claude - Build else-branch for external fall-through case
-                // When the branch is internal but fall-through is external, we need to
-                // generate the tail call in the else-branch (not after the if)
-                val elseBranch = if (fallThroughIsExternal && fallthrough != null) {
-                    fallThroughHandled = true  // Mark as handled so we don't duplicate it later
-                    val ftFunc = fallthrough.function!!
-                    val ftName = ftFunc.startingBlock.label?.let { assemblyLabelToKotlinName(it) }
-                        ?: "func_${ftFunc.startingBlock.originalLineIndex}"
-                    val ftInputs = ftFunc.inputs ?: emptySet()
-                    val ftArgs = mutableListOf<KotlinExpr>()
-                    if (TrackedAsIo.A in ftInputs) {
-                        ftArgs.add(getRegisterValueOrDefault("A", ctx))
-                    }
-                    if (TrackedAsIo.X in ftInputs) {
-                        ftArgs.add(getRegisterValueOrDefault("X", ctx))
-                    }
-                    if (TrackedAsIo.Y in ftInputs) {
-                        ftArgs.add(getRegisterValueOrDefault("Y", ctx))
-                    }
-                    listOf(
-                        KComment("Fall-through to $ftName", commentTypeIndicator = " "),
-                        KExprStmt(KCall(ftName, ftArgs)),
-                        KReturn()
-                    )
-                } else {
-                    emptyList()
-                }
-
                 stmts.add(KIf(
                     condition = condition,
                     thenBranch = thenBody,
-                    elseBranch = elseBranch
+                    elseBranch = emptyList()
                 ))
             }
         }
@@ -1127,13 +1073,8 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
     // by Claude - Handle fall-through to external function (different from current function)
     // This happens when a block like SetBehind just increments a flag and falls through
     // to NextAObj which is a separate function. We need to generate a tail call.
-    // Skip if already handled in the orphaned branch else-branch above.
-    // Also skip if the block already ends with a return (e.g., from JumpEngine handling).
-    // Also skip if the block has no actual instructions (data-only blocks like JumpEngine dispatch tables).
-    val blockEndsWithReturn = stmts.lastOrNull() is KReturn
-    val blockHasInstructions = this.lines.any { it.instruction != null }
     val fallThroughBlock = this.fallThroughExit
-    if (!fallThroughHandled && !blockEndsWithReturn && blockHasInstructions && fallThroughBlock != null && fallThroughBlock.function != ctx.currentFunction && fallThroughBlock.function != null) {
+    if (fallThroughBlock != null && fallThroughBlock.function != ctx.currentFunction && fallThroughBlock.function != null) {
         // This block falls through to another function - generate tail call
         val targetFunction = fallThroughBlock.function!!
         val targetName = targetFunction.startingBlock.label?.let { assemblyLabelToKotlinName(it) }
@@ -1615,10 +1556,7 @@ fun AssemblyFunction.toKotlinFunction(
         // Find exit blocks that fall through to another function
         for (block in functionBlocks) {
             val fallThrough = block.fallThroughExit
-            // by Claude - Skip data-only blocks (like JumpEngine dispatch tables)
-            // These blocks have no instructions and shouldn't generate fall-through calls
-            val blockHasInstructions = block.lines.any { it.instruction != null }
-            if (blockHasInstructions && fallThrough != null && fallThrough.function != this && fallThrough.function != null) {
+            if (fallThrough != null && fallThrough.function != this && fallThrough.function != null) {
                 // This block falls through to another function - generate tail call
                 val targetFunction = fallThrough.function!!
                 val targetName = targetFunction.startingBlock.label?.let { assemblyLabelToKotlinName(it) }
