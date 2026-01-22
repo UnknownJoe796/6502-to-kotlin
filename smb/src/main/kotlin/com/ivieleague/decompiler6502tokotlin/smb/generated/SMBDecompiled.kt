@@ -10492,29 +10492,31 @@ fun imposeFriction(A: Int): Int {
             setAbsSpd(A)
             return A
         }
-    }
-    //> RghtFrict: lda Player_X_MoveForce    ;load value set here
-    A = playerXMoveforce
-    //> sec
-    //> sbc FrictionAdderLow      ;subtract from it another value set here
-    temp2 = A - frictionAdderLow
-    A = temp2 and 0xFF
-    //> sta Player_X_MoveForce    ;store here
-    playerXMoveforce = A
-    //> lda Player_X_Speed
-    A = playerXSpeed
-    //> sbc FrictionAdderHigh     ;subtract value plus borrow from horizontal speed
-    temp3 = A - frictionAdderHigh - if (temp2 >= 0) 0 else 1
-    A = temp3 and 0xFF
-    //> sta Player_X_Speed        ;set as new horizontal speed
-    playerXSpeed = A
-    //> cmp MaximumLeftSpeed      ;compare against maximum value for left movement
-    //> bpl XSpdSign              ;if horizontal speed greater positively, branch
-    if (((A - maximumLeftSpeed) and 0xFF and 0x80) != 0) {
-        //> lda MaximumLeftSpeed      ;otherwise set preset value as horizontal speed
-        A = maximumLeftSpeed
-        //> sta Player_X_Speed        ;thus slowing the player's right movement down
+        // by Claude: BMI XSpdSign taken - jump past RghtFrict to XSpdSign
+    } else {
+        //> RghtFrict: lda Player_X_MoveForce    ;load value set here
+        A = playerXMoveforce
+        //> sec
+        //> sbc FrictionAdderLow      ;subtract from it another value set here
+        temp2 = A - frictionAdderLow
+        A = temp2 and 0xFF
+        //> sta Player_X_MoveForce    ;store here
+        playerXMoveforce = A
+        //> lda Player_X_Speed
+        A = playerXSpeed
+        //> sbc FrictionAdderHigh     ;subtract value plus borrow from horizontal speed
+        temp3 = A - frictionAdderHigh - if (temp2 >= 0) 0 else 1
+        A = temp3 and 0xFF
+        //> sta Player_X_Speed        ;set as new horizontal speed
         playerXSpeed = A
+        //> cmp MaximumLeftSpeed      ;compare against maximum value for left movement
+        //> bpl XSpdSign              ;if horizontal speed greater positively, branch
+        if (((A - maximumLeftSpeed) and 0xFF and 0x80) != 0) {
+            //> lda MaximumLeftSpeed      ;otherwise set preset value as horizontal speed
+            A = maximumLeftSpeed
+            //> sta Player_X_Speed        ;thus slowing the player's right movement down
+            playerXSpeed = A
+        }
     }
     //> XSpdSign:  cmp #$00                  ;if player not moving or moving to the right,
     //> bpl SetAbsSpd             ;branch and leave horizontal speed value unmodified
