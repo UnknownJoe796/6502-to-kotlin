@@ -1805,33 +1805,16 @@ fun floateyNumbersRoutine(X: Int): Int {
                             A = enemyState[X]
                             //> cmp #$02                     ;if enemy state defeated or otherwise
                             //> bcs FloateyPart              ;$02 or greater, branch beyond this part
-                            // by Claude: Added missing branch condition - if Enemy_State >= 2, skip GetAltOffset
-                            if (A < 0x02) {
-                                //> GetAltOffset: ldx SprDataOffset_Ctrl       ;load some kind of control bit
-                                X = sprdataoffsetCtrl
-                                //> ldy Alt_SprDataOffset,x      ;get alternate OAM data offset
-                                Y = altSprdataoffset[X]
-                                //> ldx ObjectOffset             ;get enemy object offset again
-                                X = objectOffset
-                            }
-                        } else {
-                            //> GetAltOffset: ldx SprDataOffset_Ctrl       ;load some kind of control bit
-                            X = sprdataoffsetCtrl
-                            //> ldy Alt_SprDataOffset,x      ;get alternate OAM data offset
-                            Y = altSprdataoffset[X]
-                            //> ldx ObjectOffset             ;get enemy object offset again
-                            X = objectOffset
                         }
                     }
                 }
-            } else {
-                //> GetAltOffset: ldx SprDataOffset_Ctrl       ;load some kind of control bit
-                X = sprdataoffsetCtrl
-                //> ldy Alt_SprDataOffset,x      ;get alternate OAM data offset
-                Y = altSprdataoffset[X]
-                //> ldx ObjectOffset             ;get enemy object offset again
-                X = objectOffset
             }
+            //> GetAltOffset: ldx SprDataOffset_Ctrl       ;load some kind of control bit
+            X = sprdataoffsetCtrl
+            //> ldy Alt_SprDataOffset,x      ;get alternate OAM data offset
+            Y = altSprdataoffset[X]
+            //> ldx ObjectOffset             ;get enemy object offset again
+            X = objectOffset
         }
     }
     //> FloateyPart:  lda FloateyNum_Y_Pos,x       ;get vertical coordinate for
@@ -4853,11 +4836,14 @@ fun runGameOver() {
         if (!(A == 0)) {
             //  goto GameIsOn
             return
+        } else {
+            //  Fall-through to terminateGame
+            terminateGame()
+            return
         }
-        //  Fall-through tail call to terminateGame
-        terminateGame()
-        return
     }
+    //> GameIsOn:  rts
+    return
 }
 
 // Decompiled from TerminateGame
@@ -9329,13 +9315,10 @@ fun playerInjuryBlink() {
     } else {
         //> ExitBlink: bne ExitBoth           ;do unconditional branch to leave
         if (A == 0xF0) {
-            //  SKIPPED: Fall-through to initChangeSize would create mutual recursion cycle
-            return
         }
     }
     //> ExitBoth: rts                       ;leave
     return
-    // SKIPPED: Fall-through to initChangeSize would create mutual recursion cycle
 }
 
 // Decompiled from InitChangeSize
@@ -10509,31 +10492,29 @@ fun imposeFriction(A: Int): Int {
             setAbsSpd(A)
             return A
         }
-        // by Claude: BMI XSpdSign taken - jump past RghtFrict to XSpdSign
-    } else {
-        //> RghtFrict: lda Player_X_MoveForce    ;load value set here
-        A = playerXMoveforce
-        //> sec
-        //> sbc FrictionAdderLow      ;subtract from it another value set here
-        temp2 = A - frictionAdderLow
-        A = temp2 and 0xFF
-        //> sta Player_X_MoveForce    ;store here
-        playerXMoveforce = A
-        //> lda Player_X_Speed
-        A = playerXSpeed
-        //> sbc FrictionAdderHigh     ;subtract value plus borrow from horizontal speed
-        temp3 = A - frictionAdderHigh - if (temp2 >= 0) 0 else 1
-        A = temp3 and 0xFF
-        //> sta Player_X_Speed        ;set as new horizontal speed
+    }
+    //> RghtFrict: lda Player_X_MoveForce    ;load value set here
+    A = playerXMoveforce
+    //> sec
+    //> sbc FrictionAdderLow      ;subtract from it another value set here
+    temp2 = A - frictionAdderLow
+    A = temp2 and 0xFF
+    //> sta Player_X_MoveForce    ;store here
+    playerXMoveforce = A
+    //> lda Player_X_Speed
+    A = playerXSpeed
+    //> sbc FrictionAdderHigh     ;subtract value plus borrow from horizontal speed
+    temp3 = A - frictionAdderHigh - if (temp2 >= 0) 0 else 1
+    A = temp3 and 0xFF
+    //> sta Player_X_Speed        ;set as new horizontal speed
+    playerXSpeed = A
+    //> cmp MaximumLeftSpeed      ;compare against maximum value for left movement
+    //> bpl XSpdSign              ;if horizontal speed greater positively, branch
+    if (((A - maximumLeftSpeed) and 0xFF and 0x80) != 0) {
+        //> lda MaximumLeftSpeed      ;otherwise set preset value as horizontal speed
+        A = maximumLeftSpeed
+        //> sta Player_X_Speed        ;thus slowing the player's right movement down
         playerXSpeed = A
-        //> cmp MaximumLeftSpeed      ;compare against maximum value for left movement
-        //> bpl XSpdSign              ;if horizontal speed greater positively, branch
-        if (((A - maximumLeftSpeed) and 0xFF and 0x80) != 0) {
-            //> lda MaximumLeftSpeed      ;otherwise set preset value as horizontal speed
-            A = maximumLeftSpeed
-            //> sta Player_X_Speed        ;thus slowing the player's right movement down
-            playerXSpeed = A
-        }
     }
     //> XSpdSign:  cmp #$00                  ;if player not moving or moving to the right,
     //> bpl SetAbsSpd             ;branch and leave horizontal speed value unmodified
@@ -10875,8 +10856,6 @@ fun bubbleCheck(X: Int) {
         A = airBubbleTimer
         //> bne ExitBubl                ;branch to leave, otherwise create new air bubble
         if (A == 0) {
-            //  SKIPPED: Fall-through to setupBubble would create mutual recursion cycle
-            return
         }
     }
     //> MoveBubl: ldy $07                  ;get pseudorandom bit again, use as offset
@@ -10904,7 +10883,6 @@ fun bubbleCheck(X: Int) {
     bubbleYPosition[X] = A
     //> ExitBubl: rts                      ;leave
     return
-    // SKIPPED: Fall-through to setupBubble would create mutual recursion cycle
 }
 
 // Decompiled from SetupBubble
@@ -12930,14 +12908,14 @@ fun powerUpObjHandler(Y: Int) {
         if (!(A >= 0x06)) {
             //  goto ExitPUp
             return
+        } else {
+            //  Fall-through to runPUSubs
+            runPUSubs(X, Y)
+            return
         }
-        //  Fall-through tail call to runPUSubs
-        runPUSubs(X, Y)
-        return
-    } else {
-        //> ExitPUp:   rts                        ;and we're done
-        return
     }
+    //> ExitPUp:   rts                        ;and we're done
+    return
 }
 
 // Decompiled from RunPUSubs
@@ -13283,9 +13261,6 @@ fun bumpBlock(X: Int, Y: Int) {
         //> .dw CoinBlock
         //> .dw ExtraLifeMushBlock
         //> ;--------------------------------
-        //  Fall-through tail call to mushFlowerBlock
-        mushFlowerBlock(X)
-        return
     } else {
         //> ExitBlockChk:
         //> rts                     ;leave
@@ -13876,14 +13851,10 @@ fun movedEnemyvertically(X: Int) {
     //> bne ContVMove      ;and use, otherwise set different movement amount, continue on
     X = X
     if (A == 0x05) {
-        //  Fall-through tail call to moveFallingPlatform
-        moveFallingPlatform(X)
-        return
-    } else {
-        //> ContVMove: jmp SetHiMax   ;jump to skip the rest of this
-        setHiMax(X, Y)
-        return
     }
+    //> ContVMove: jmp SetHiMax   ;jump to skip the rest of this
+    setHiMax(X, Y)
+    return
 }
 
 // Decompiled from MoveFallingPlatform
@@ -13956,22 +13927,18 @@ fun moveDropPlatform(X: Int) {
     //> bne SetMdMax  ;skip ahead of other value set here
     X = X
     if (Y == 0) {
-        //  Fall-through tail call to moveEnemySlowVert
-        moveEnemySlowVert(X)
-        return
-    } else {
-        //> SetMdMax: lda #$02         ;set maximum speed in A
-        A = 0x02
-        //> bne SetXMoveAmt  ;unconditional branch
-        if (!(A == 0)) {
-            //  goto SetXMoveAmt -> setXMoveAmt
-            setXMoveAmt(A, X, Y)
-            return
-        }
-        //  Fall-through tail call to moveEnemySlowVert
-        moveEnemySlowVert(X)
+    }
+    //> SetMdMax: lda #$02         ;set maximum speed in A
+    A = 0x02
+    //> bne SetXMoveAmt  ;unconditional branch
+    if (!(A == 0)) {
+        //  goto SetXMoveAmt -> setXMoveAmt
+        setXMoveAmt(A, X, Y)
         return
     }
+    //  Fall-through tail call to moveEnemySlowVert
+    moveEnemySlowVert(X)
+    return
 }
 
 // Decompiled from MoveEnemySlowVert
@@ -13990,8 +13957,6 @@ fun moveEnemySlowVert(X: Int): Int {
         return Y
     } else {
         //> ;--------------------------------
-        //  Fall-through tail call to movejEnemyvertically
-        movejEnemyvertically(X)
         return Y
     }
 }
@@ -14939,10 +14904,11 @@ fun checkThreeBytes() {
         //  goto Inc2B -> inc2B
         inc2B()
         return
+    } else {
+        //  Fall-through to inc3B
+        inc3B()
+        return
     }
-    //  Fall-through tail call to inc3B
-    inc3B()
-    return
 }
 
 // Decompiled from Inc3B
@@ -14997,8 +14963,7 @@ fun checkpointEnemyID(X: Int) {
         //> lda Enemy_Y_Position,x
         A = enemyYPosition[X]
         //> adc #$08                     ;add eight pixels to what will eventually be the
-        // by Claude: Carry is 0 because we're in the branch where Enemy_ID[X] < 0x15
-        temp0 = A + 0x08
+        temp0 = A + 0x08 + if (A >= 0x15) 1 else 0
         A = temp0 and 0xFF
         //> sta Enemy_Y_Position,x       ;enemy object's vertical coordinate ($00-$14 only)
         enemyYPosition[X] = A
@@ -15359,8 +15324,6 @@ fun smallBBox(X: Int): Int {
         return A
     } else {
         //> ;--------------------------------
-        //  Fall-through tail call to initRedPTroopa
-        initRedPTroopa(X)
         return A
     }
 }
@@ -15494,9 +15457,6 @@ fun initLakitu(X: Int) {
     //> bne KillLakitu             ;the frenzy buffer, and branch to kill lakitu if so
     X = X
     if (A == 0) {
-        //  Fall-through tail call to setupLakitu
-        setupLakitu(X)
-        return
     } else {
         //> KillLakitu:
         //> jmp EraseEnemyObject
@@ -21323,8 +21283,6 @@ fun xMovingPlatform(X: Int): Int {
     //> bmi ExXMP                    ;branch ahead to leave
     X = temp0
     if ((A and 0x80) == 0) {
-        //  Fall-through tail call to positionPlayerOnHPlat
-        positionPlayerOnHPlat(X)
         return X
     } else {
         //> ExXMP:   rts                       ;and we are done here
@@ -21883,9 +21841,6 @@ fun handleEnemyFBallCol(X: Int) {
                 //> cmp #$15
                 //> bcs ExHCF                 ;branch to leave if identifier => $15
                 if (!(A >= 0x15)) {
-                    //  Fall-through tail call to shellOrBlockDefeat
-                    shellOrBlockDefeat(X)
-                    return
                     //> EnemySmackScore:
                     //> jsr SetupFloateyNumber   ;update necessary score variables
                     temp2 = setupFloateyNumber(A, X)
@@ -22253,16 +22208,12 @@ fun injurePlayer(): Int {
     A = injuryTimer
     //> bne ExInjColRoutines     ;at zero, and branch to leave if so
     if (A == 0) {
-        //  Fall-through tail call to forceInjury
-        forceInjury(A)
-        return X
-    } else {
-        //> ExInjColRoutines:
-        //> ldx ObjectOffset              ;get enemy offset and leave
-        X = objectOffset
-        //> rts
-        return X
     }
+    //> ExInjColRoutines:
+    //> ldx ObjectOffset              ;get enemy offset and leave
+    X = objectOffset
+    //> rts
+    return X
 }
 
 // Decompiled from ForceInjury
@@ -22276,6 +22227,7 @@ fun forceInjury(A: Int) {
     var playerXSpeed by MemoryByte(Player_X_Speed)
     var playerYSpeed by MemoryByte(Player_Y_Speed)
     var square1SoundQueue by MemoryByte(Square1SoundQueue)
+    val enemyId by MemoryByteIndexed(Enemy_ID)
     //> ForceInjury:
     //> ldx PlayerStatus          ;check player's status
     X = playerStatus
@@ -22322,6 +22274,16 @@ fun forceInjury(A: Int) {
     }
     //> StompedEnemyPtsData:
     //> .db $02, $06, $05, $06
+    //> EnemyStomped:
+    //> lda Enemy_ID,x             ;check for spiny, branch to hurt player
+    A = enemyId[X]
+    //> cmp #Spiny                 ;if found
+    //> beq InjurePlayer
+    if (A == Spiny) {
+        //  goto InjurePlayer -> injurePlayer
+        injurePlayer()
+        return
+    }
     //  Fall-through tail call to playerEnemyCollision
     playerEnemyCollision(X, Y)
     return
@@ -22732,8 +22694,14 @@ fun enemyTurnAround(X: Int) {
                 }
                 //> cmp #$07
                 //> bcs ExTA                 ;if any OTHER enemy object => $07, leave
-                //  SKIPPED: Fall-through to rXSpd would create mutual recursion cycle
-                return
+                if (A >= 0x07) {
+                    //  goto ExTA
+                    return
+                } else {
+                    //  Fall-through to rXSpd
+                    rXSpd(X)
+                    return
+                }
             }
         }
     }
@@ -25144,9 +25112,6 @@ fun hammerBroBGColl(A: Int, X: Int): Pair<Int, Int> {
         //> cmp #$23             ;check for blank metatile $23 and branch if not found
         //> bne UnderHammerBro
         if (A == 0x23) {
-            //  Fall-through tail call to killEnemyAboveBlock
-            killEnemyAboveBlock(X)
-            return Pair(X, Y)
         }
         //> UnderHammerBro:
         //> lda EnemyFrameTimer,x ;check timer used by hammer bro
@@ -25314,19 +25279,15 @@ fun getFireballBoundBox(X: Int): Int {
     A = temp0 and 0xFF
     X = X
     if (Y == 0) {
-        //  Fall-through tail call to getMiscBoundBox
-        getMiscBoundBox(X)
-        return X
-    } else {
-        //> FBallB: jsr BoundingBoxCore       ;get bounding box coordinates
-        val pair0 = boundingBoxCore(X, Y)
-        temp1 = pair0.first
-        temp2 = pair0.second
-        X = temp1
-        //> jmp CheckRightScreenBBox  ;jump to handle any offscreen coordinates
-        checkRightScreenBBox(temp1, temp2)
-        return X
     }
+    //> FBallB: jsr BoundingBoxCore       ;get bounding box coordinates
+    val pair0 = boundingBoxCore(X, Y)
+    temp1 = pair0.first
+    temp2 = pair0.second
+    X = temp1
+    //> jmp CheckRightScreenBBox  ;jump to handle any offscreen coordinates
+    checkRightScreenBBox(temp1, temp2)
+    return X
 }
 
 // Decompiled from GetMiscBoundBox
@@ -25488,8 +25449,6 @@ fun largePlatformBoundBox(A: Int, X: Int): Int {
     A = temp0
     Y = temp1
     if (!(temp0 >= 0xFE)) {
-        //  Fall-through tail call to setupEOffsetFBBox
-        setupEOffsetFBBox(X)
         return X
     } else {
         //> MoveBoundBoxOffscreen:
@@ -26489,14 +26448,10 @@ fun flagpoleGfxHandler(X: Int) {
     //> beq ExitDumpSpr                ;if none of these bits set, branch to leave
     if (A != 0) {
         //> ;-------------------------------------------------------------------------------------
-        //  SKIPPED: Fall-through to moveSixSpritesOffscreen would create mutual recursion cycle
-        return
-    } else {
-        //> ExitDumpSpr:
-        //> rts
-        return
     }
-    // SKIPPED: Fall-through to moveSixSpritesOffscreen would create mutual recursion cycle
+    //> ExitDumpSpr:
+    //> rts
+    return
 }
 
 // Decompiled from MoveSixSpritesOffscreen
@@ -27180,9 +27135,6 @@ fun enemyGfxHandler(X: Int): Pair<Int, Int> {
             A = A and 0x20
             //> beq DrawBowser
             if (A != 0) {
-                //  Fall-through tail call to flipBowserOver
-                flipBowserOver(X)
-                return Pair(X, Y)
             }
             //> DrawBowser:
             //> jmp DrawEnemyObject   ;draw bowser's graphics now
@@ -27501,8 +27453,6 @@ fun checkForHammerBro(X: Int): Pair<Int, Int> {
         checkDefeatedState(X)
         return Pair(X, Y)
     } else {
-        //  Fall-through tail call to checkAnimationStop
-        checkAnimationStop(X)
         return Pair(X, Y)
     }
 }
@@ -28183,13 +28133,9 @@ fun chkLeftCo(A: Int, Y: Int) {
     A = A
     Y = Y
     if (A != 0) {
-        //  SKIPPED: Fall-through to moveColOffscreen would create mutual recursion cycle
-        return
-    } else {
-        //> ExDBlk: rts
-        return
     }
-    // SKIPPED: Fall-through to moveColOffscreen would create mutual recursion cycle
+    //> ExDBlk: rts
+    return
 }
 
 // Decompiled from MoveColOffscreen
@@ -28466,9 +28412,6 @@ fun drawexplosionFireball(X: Int) {
     //> bcs KillFireBall         ;branch if so, otherwise continue to draw explosion
     X = X
     if (!(A >= 0x03)) {
-        //  Fall-through tail call to drawexplosionFireworks
-        drawexplosionFireworks(A, Y)
-        return
     } else {
         //> KillFireBall:
         //> lda #$00                    ;clear fireball state to kill it
@@ -30112,7 +30055,8 @@ fun drawSpriteObject(X: Int, Y: Int): Int {
     //> lda $00
     A = memory[0x0].toInt()
     //> bcc NoHFlip                ;if d1 not set, branch
-    // by Claude: Fixed control flow - unconditional 'bne SetHFAt' should skip NoHFlip block
+    X = X
+    Y = Y
     if ((orig1 and 0x01) != 0) {
         //> sta Sprite_Tilenumber+4,y  ;store first tile into second sprite
         spriteTilenumber[4 + Y] = A
@@ -30123,16 +30067,15 @@ fun drawSpriteObject(X: Int, Y: Int): Int {
         //> lda #$40                   ;activate horizontal flip OAM attribute
         A = 0x40
         //> bne SetHFAt                ;and unconditionally branch
-    } else {
-        //> NoHFlip: sta Sprite_Tilenumber,y    ;store first tile into first sprite
-        spriteTilenumber[Y] = A
-        //> lda $01                    ;and second into second sprite
-        A = memory[0x1].toInt()
-        //> sta Sprite_Tilenumber+4,y
-        spriteTilenumber[4 + Y] = A
-        //> lda #$00                   ;clear bit for horizontal flip
-        A = 0x00
     }
+    //> NoHFlip: sta Sprite_Tilenumber,y    ;store first tile into first sprite
+    spriteTilenumber[Y] = A
+    //> lda $01                    ;and second into second sprite
+    A = memory[0x1].toInt()
+    //> sta Sprite_Tilenumber+4,y
+    spriteTilenumber[4 + Y] = A
+    //> lda #$00                   ;clear bit for horizontal flip
+    A = 0x00
     //> SetHFAt: ora $04                    ;add other OAM attributes if necessary
     A = A or memory[0x4].toInt()
     //> sta Sprite_Attributes,y    ;store sprite attributes
@@ -30492,7 +30435,6 @@ fun setfreqTri(A: Int) {
     }
     //> NoTone: rts
     return
-    // SKIPPED: Fall-through to square1SfxHandler would create mutual recursion cycle
 }
 
 // Decompiled from Square1SfxHandler
@@ -30523,8 +30465,6 @@ fun square1SfxHandler() {
         return
         A = temp0
         if (X == 0) {
-            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
-            return
             //> PlaySmallJump:
             //> lda #$26               ;branch here for small mario jumping sound
             A = 0x26
@@ -30532,8 +30472,6 @@ fun square1SfxHandler() {
             //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
             return
             if (A == 0) {
-                //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
-                return
                 //> PlayBigJump:
                 //> lda #$18               ;branch here for big mario jumping sound
                 A = 0x18
@@ -30590,8 +30528,6 @@ fun square1SfxHandler() {
         //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
         return
         if (Y == 0) {
-            //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
-            return
             //> PlayFireballThrow:
             //> lda #$05
             A = 0x05
@@ -30601,8 +30537,6 @@ fun square1SfxHandler() {
             //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
             return
             if (Y == 0) {
-                //  SKIPPED: Fall-through to setfreqTri would create mutual recursion cycle
-                return
                 //> PlayBump:
                 //> lda #$0a                ;load length of sfx and reg contents for bump sound
                 A = 0x0A
@@ -30801,13 +30735,9 @@ fun decrementSfx1Length() {
     squ1Sfxlencounter = (squ1Sfxlencounter - 1) and 0xFF
     //> bne ExSfx1
     if (squ1Sfxlencounter == 0) {
-        //  SKIPPED: Fall-through to stopSquare1Sfx would create mutual recursion cycle
-        return
-    } else {
-        //> ExSfx1: rts
-        return
     }
-    // SKIPPED: Fall-through to stopSquare1Sfx would create mutual recursion cycle
+    //> ExSfx1: rts
+    return
 }
 
 // Decompiled from StopSquare1Sfx
@@ -30835,7 +30765,10 @@ fun stopSquare1Sfx() {
 // Decompiled from ContinueCGrabTTick
 fun continueCGrabTTick() {
     var A: Int = 0
+    var X: Int = 0
+    var Y: Int = 0
     var squ2Sfxlencounter by MemoryByte(Squ2_SfxLenCounter)
+    val powerUpGrabFreqData by MemoryByteIndexed(PowerUpGrabFreqData)
     val sndSquare2Reg by MemoryByteIndexed(SND_SQUARE2_REG)
     //> ContinueCGrabTTick:
     //> lda Squ2_SfxLenCounter  ;check for time to play second tone yet
@@ -30853,11 +30786,114 @@ fun continueCGrabTTick() {
         //  goto DecrementSfx2Length -> decrementSfx2Length
         decrementSfx2Length()
         return
+    }
+    //> PlayBlast:
+    //> lda #$20                ;load length of fireworks/gunfire sound
+    A = 0x20
+    //> sta Squ2_SfxLenCounter
+    squ2Sfxlencounter = A
+    //> ldy #$94                ;load reg contents of fireworks/gunfire sound
+    Y = 0x94
+    //> lda #$5e
+    A = 0x5E
+    //> bne SBlasJ
+    //  SKIPPED: Fall-through to square2SfxHandler would create mutual recursion cycle
+    return
+    if (A == 0) {
+        //> ContinueBlast:
+        //> lda Squ2_SfxLenCounter  ;check for time to play second part
+        A = squ2Sfxlencounter
+        //> cmp #$18
+        //> bne DecrementSfx2Length
+        if (!(A == 0x18)) {
+            //  goto DecrementSfx2Length -> decrementSfx2Length
+            decrementSfx2Length()
+            return
+        }
+        //  SKIPPED: Fall-through to square2SfxHandler would create mutual recursion cycle
+        return
+        //> ldy #$93                ;load second part reg contents then
+        Y = 0x93
+        //> lda #$18
+        A = 0x18
+        //  SKIPPED: Fall-through to square2SfxHandler would create mutual recursion cycle
+        return
     } else {
+        //> SBlasJ: bne BlstSJp             ;unconditional branch to load rest of reg contents
+        //  SKIPPED: Fall-through to square2SfxHandler would create mutual recursion cycle
+        return
+        if (A == 0) {
+            //> PlayPowerUpGrab:
+            //> lda #$36                    ;load length of power-up grab sound
+            A = 0x36
+            //> sta Squ2_SfxLenCounter
+            squ2Sfxlencounter = A
+            //  SKIPPED: Fall-through to square2SfxHandler would create mutual recursion cycle
+            return
+            //> ContinuePowerUpGrab:
+            //> lda Squ2_SfxLenCounter      ;load frequency reg based on length left over
+            A = squ2Sfxlencounter
+            //> lsr                         ;divide by 2
+            val orig0: Int = A
+            A = orig0 shr 1
+            //> bcs DecrementSfx2Length     ;alter frequency every other frame
+            if ((orig0 and 0x01) != 0) {
+                //  goto DecrementSfx2Length -> decrementSfx2Length
+                decrementSfx2Length()
+                return
+            }
+            //  SKIPPED: Fall-through to square2SfxHandler would create mutual recursion cycle
+            return
+            //> tay
+            Y = A
+            //> lda PowerUpGrabFreqData-1,y ;use length left over / 2 for frequency offset
+            A = powerUpGrabFreqData[-1 + Y]
+            //> ldx #$5d                    ;store reg contents of power-up grab sound
+            X = 0x5D
+            //> ldy #$7f
+            Y = 0x7F
+            //  SKIPPED: Fall-through to square2SfxHandler would create mutual recursion cycle
+            return
+            //> LoadSqu2Regs:
+            //> jsr PlaySqu2Sfx
+            playSqu2Sfx(A, X, Y)
+            //  Fall-through tail call to decrementSfx2Length
+            decrementSfx2Length()
+            return
+            //> JumpToDecLength2:
+            //> jmp DecrementSfx2Length
+            decrementSfx2Length()
+            return
+        }
+    }
+    //> BlstSJp: bne PBFRegs
+    //  SKIPPED: Fall-through to square2SfxHandler would create mutual recursion cycle
+    return
+    if (A == 0) {
+        //> ContinueBowserFall:
+        //> lda Squ2_SfxLenCounter   ;check for almost near the end
+        A = squ2Sfxlencounter
+        //> cmp #$08
+        //> bne DecrementSfx2Length
+        if (!(A == 0x08)) {
+            //  goto DecrementSfx2Length -> decrementSfx2Length
+            decrementSfx2Length()
+            return
+        }
+        //  SKIPPED: Fall-through to square2SfxHandler would create mutual recursion cycle
+        return
+        //> ldy #$a4                 ;if so, load the rest of reg contents for bowser defeat sound
+        Y = 0xA4
+        //> lda #$5a
+        A = 0x5A
+        //  SKIPPED: Fall-through to square2SfxHandler would create mutual recursion cycle
+        return
+    } else {
+        //> PBFRegs:  ldx #$9f                 ;the fireworks/gunfire sound shares part of reg contents here
+        X = 0x9F
         //  SKIPPED: Fall-through to square2SfxHandler would create mutual recursion cycle
         return
     }
-    // SKIPPED: Fall-through to square2SfxHandler would create mutual recursion cycle
 }
 
 // Decompiled from DecrementSfx2Length
@@ -30868,13 +30904,9 @@ fun decrementSfx2Length() {
     squ2Sfxlencounter = (squ2Sfxlencounter - 1) and 0xFF
     //> bne ExSfx2
     if (squ2Sfxlencounter == 0) {
-        //  SKIPPED: Fall-through to emptySfx2Buffer would create mutual recursion cycle
-        return
-    } else {
-        //> ExSfx2: rts
-        return
     }
-    // SKIPPED: Fall-through to emptySfx2Buffer would create mutual recursion cycle
+    //> ExSfx2: rts
+    return
 }
 
 // Decompiled from EmptySfx2Buffer
@@ -31062,8 +31094,9 @@ fun noiseSfxHandler() {
         }
     }
     //> ;--------------------------------
-    //  Fall-through tail call to musicHandler
-    musicHandler()
+    //> ContinueMusic:
+    //> jmp HandleSquare2Music  ;if we have music, start with square 2 channel
+    handleSquare2Music()
     return
 }
 
@@ -31092,11 +31125,27 @@ fun loadEventMusic(A: Int) {
     var A: Int = A
     var X: Int = 0
     var Y: Int = 0
+    var altRegContentFlag by MemoryByte(AltRegContentFlag)
     var areaMusicBuffer by MemoryByte(AreaMusicBuffer)
     var areamusicbufferAlt by MemoryByte(AreaMusicBuffer_Alt)
     var eventMusicBuffer by MemoryByte(EventMusicBuffer)
     var groundMusicHeaderOfs by MemoryByte(GroundMusicHeaderOfs)
+    var musicDataHigh by MemoryByte(MusicDataHigh)
+    var musicDataLow by MemoryByte(MusicDataLow)
+    var musicoffsetNoise by MemoryByte(MusicOffset_Noise)
+    var musicoffsetSquare1 by MemoryByte(MusicOffset_Square1)
+    var musicoffsetSquare2 by MemoryByte(MusicOffset_Square2)
+    var musicoffsetTriangle by MemoryByte(MusicOffset_Triangle)
+    var noiseDataLoopbackOfs by MemoryByte(NoiseDataLoopbackOfs)
+    var noiseBeatlencounter by MemoryByte(Noise_BeatLenCounter)
+    var noteLenLookupTblOfs by MemoryByte(NoteLenLookupTblOfs)
     var noteLengthTblAdder by MemoryByte(NoteLengthTblAdder)
+    var sndMasterctrlReg by MemoryByte(SND_MASTERCTRL_REG)
+    var squ1Notelencounter by MemoryByte(Squ1_NoteLenCounter)
+    var squ2Notelencounter by MemoryByte(Squ2_NoteLenCounter)
+    var triNotelencounter by MemoryByte(Tri_NoteLenCounter)
+    val musicHeaderData by MemoryByteIndexed(MusicHeaderData)
+    val musicHeaderOffsetData by MemoryByteIndexed(MusicHeaderOffsetData)
     //> LoadEventMusic:
     //> sta EventMusicBuffer      ;copy event music queue contents to buffer
     eventMusicBuffer = A
@@ -31128,9 +31177,6 @@ fun loadEventMusic(A: Int) {
         noteLengthTblAdder = X
         //> bne FindEventMusicHeader  ;unconditional branch
         if (X == 0) {
-            //  Fall-through tail call to musicHandler
-            musicHandler()
-            return
             //> LoadAreaMusic:
             //> cmp #$04                  ;is it underground music?
             //> bne NoStop1               ;no, do not stop square 1 sfx
@@ -31168,8 +31214,63 @@ fun loadEventMusic(A: Int) {
         handleAreaMusicLoopB(A)
         return
     } while ((orig0 and 0x01) == 0)
-    //  Fall-through tail call to handleAreaMusicLoopB
-    handleAreaMusicLoopB(A)
+    //> LoadHeader:
+    //> lda MusicHeaderOffsetData,y  ;load offset for header
+    A = musicHeaderOffsetData[Y]
+    //> tay
+    Y = A
+    //> lda MusicHeaderData,y        ;now load the header
+    A = musicHeaderData[Y]
+    //> sta NoteLenLookupTblOfs
+    noteLenLookupTblOfs = A
+    //> lda MusicHeaderData+1,y
+    A = musicHeaderData[1 + Y]
+    //> sta MusicDataLow
+    musicDataLow = A
+    //> lda MusicHeaderData+2,y
+    A = musicHeaderData[2 + Y]
+    //> sta MusicDataHigh
+    musicDataHigh = A
+    //> lda MusicHeaderData+3,y
+    A = musicHeaderData[3 + Y]
+    //> sta MusicOffset_Triangle
+    musicoffsetTriangle = A
+    //> lda MusicHeaderData+4,y
+    A = musicHeaderData[4 + Y]
+    //> sta MusicOffset_Square1
+    musicoffsetSquare1 = A
+    //> lda MusicHeaderData+5,y
+    A = musicHeaderData[5 + Y]
+    //> sta MusicOffset_Noise
+    musicoffsetNoise = A
+    //> sta NoiseDataLoopbackOfs
+    noiseDataLoopbackOfs = A
+    //> lda #$01                     ;initialize music note counters
+    A = 0x01
+    //> sta Squ2_NoteLenCounter
+    squ2Notelencounter = A
+    //> sta Squ1_NoteLenCounter
+    squ1Notelencounter = A
+    //> sta Tri_NoteLenCounter
+    triNotelencounter = A
+    //> sta Noise_BeatLenCounter
+    noiseBeatlencounter = A
+    //> lda #$00                     ;initialize music data offset for square 2
+    A = 0x00
+    //> sta MusicOffset_Square2
+    musicoffsetSquare2 = A
+    //> sta AltRegContentFlag        ;initialize alternate control reg data used by square 1
+    altRegContentFlag = A
+    //> lda #$0b                     ;disable triangle channel and reenable it
+    A = 0x0B
+    //> sta SND_MASTERCTRL_REG
+    sndMasterctrlReg = A
+    //> lda #$0f
+    A = 0x0F
+    //> sta SND_MASTERCTRL_REG
+    sndMasterctrlReg = A
+    //  Fall-through tail call to handleSquare2Music
+    handleSquare2Music()
     return
 }
 
