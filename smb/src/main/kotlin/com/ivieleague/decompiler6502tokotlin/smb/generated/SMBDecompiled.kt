@@ -14978,7 +14978,8 @@ fun checkpointEnemyID(X: Int) {
         //> lda Enemy_Y_Position,x
         A = enemyYPosition[X]
         //> adc #$08                     ;add eight pixels to what will eventually be the
-        temp0 = A + 0x08 + if (A >= 0x15) 1 else 0
+        // by Claude: Carry is 0 because we're in the branch where Enemy_ID[X] < 0x15
+        temp0 = A + 0x08
         A = temp0 and 0xFF
         //> sta Enemy_Y_Position,x       ;enemy object's vertical coordinate ($00-$14 only)
         enemyYPosition[X] = A
