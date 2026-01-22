@@ -30112,8 +30112,7 @@ fun drawSpriteObject(X: Int, Y: Int): Int {
     //> lda $00
     A = memory[0x0].toInt()
     //> bcc NoHFlip                ;if d1 not set, branch
-    X = X
-    Y = Y
+    // by Claude: Fixed control flow - unconditional 'bne SetHFAt' should skip NoHFlip block
     if ((orig1 and 0x01) != 0) {
         //> sta Sprite_Tilenumber+4,y  ;store first tile into second sprite
         spriteTilenumber[4 + Y] = A
@@ -30124,15 +30123,16 @@ fun drawSpriteObject(X: Int, Y: Int): Int {
         //> lda #$40                   ;activate horizontal flip OAM attribute
         A = 0x40
         //> bne SetHFAt                ;and unconditionally branch
+    } else {
+        //> NoHFlip: sta Sprite_Tilenumber,y    ;store first tile into first sprite
+        spriteTilenumber[Y] = A
+        //> lda $01                    ;and second into second sprite
+        A = memory[0x1].toInt()
+        //> sta Sprite_Tilenumber+4,y
+        spriteTilenumber[4 + Y] = A
+        //> lda #$00                   ;clear bit for horizontal flip
+        A = 0x00
     }
-    //> NoHFlip: sta Sprite_Tilenumber,y    ;store first tile into first sprite
-    spriteTilenumber[Y] = A
-    //> lda $01                    ;and second into second sprite
-    A = memory[0x1].toInt()
-    //> sta Sprite_Tilenumber+4,y
-    spriteTilenumber[4 + Y] = A
-    //> lda #$00                   ;clear bit for horizontal flip
-    A = 0x00
     //> SetHFAt: ora $04                    ;add other OAM attributes if necessary
     A = A or memory[0x4].toInt()
     //> sta Sprite_Attributes,y    ;store sprite attributes
