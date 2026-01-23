@@ -340,6 +340,43 @@ class CodeGenContext(
     }
 
     /**
+     * by Claude - Generate a return statement appropriate for the current function's output type.
+     * Uses the function's declared outputs to determine what values to return.
+     */
+    fun generateFunctionReturn(): KReturn {
+        val fn = currentFunction ?: return KReturn()
+        val outputs = fn.outputs ?: return KReturn()
+
+        val hasAOutput = TrackedAsIo.A in outputs
+        val hasXOutput = TrackedAsIo.X in outputs
+        val hasYOutput = TrackedAsIo.Y in outputs
+
+        // Count register outputs
+        val registerOutputCount = listOf(hasAOutput, hasXOutput, hasYOutput).count { it }
+
+        return when {
+            registerOutputCount >= 2 -> {
+                // Multi-register return as Pair
+                val firstReg = when {
+                    hasAOutput -> "A"
+                    hasXOutput -> "X"
+                    else -> "Y"
+                }
+                val secondReg = when {
+                    hasYOutput -> "Y"
+                    hasXOutput && firstReg != "X" -> "X"
+                    else -> "Y"
+                }
+                KReturn(KCall("Pair", listOf(KVar(firstReg), KVar(secondReg))))
+            }
+            hasAOutput -> KReturn(KVar("A"))
+            hasXOutput -> KReturn(KVar("X"))
+            hasYOutput -> KReturn(KVar("Y"))
+            else -> KReturn()
+        }
+    }
+
+    /**
      * Materialize a register if it contains any value that needs to be captured before branches.
      * Returns statements to emit (variable declaration or assignment) and updates the register to reference the variable.
      *
@@ -444,6 +481,8 @@ fun buildFallThroughGraph(functions: Collection<AssemblyFunction>): Map<Assembly
         for (block in functionBlocks) {
             val fallThrough = block.fallThroughExit
             if (fallThrough != null && fallThrough.function != func && fallThrough.function != null) {
+                val funcName = func.startingBlock.label
+                val targetName = fallThrough.function!!.startingBlock.label
                 graph.getOrPut(func) { mutableSetOf() }.add(fallThrough.function!!)
             }
         }
@@ -456,11 +495,15 @@ fun buildFallThroughGraph(functions: Collection<AssemblyFunction>): Map<Assembly
  * Check if adding a fall-through tail call from sourceFunc to targetFunc would create a cycle.
  * A cycle exists if we can follow fall-through relationships from targetFunc back to sourceFunc.
  */
+// by Claude - Check if adding a fall-through tail call from sourceFunc to targetFunc would create a cycle.
+// A cycle exists if we can follow fall-through relationships from targetFunc back to sourceFunc.
 fun wouldCreateFallThroughCycle(
     sourceFunc: AssemblyFunction,
     targetFunc: AssemblyFunction,
     fallThroughGraph: Map<AssemblyFunction, Set<AssemblyFunction>>
 ): Boolean {
+    if (sourceFunc === targetFunc) return true
+
     // BFS from targetFunc to see if we can reach sourceFunc
     val visited = mutableSetOf<AssemblyFunction>()
     val queue = ArrayDeque<AssemblyFunction>()
@@ -558,18 +601,73 @@ fun ControlNode.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                 }
             }
 
-            // by Claude - Merge convertedBlocks: blocks converted in EITHER branch should
-            // be marked as converted for the code AFTER the if-else (the join point code).
-            // This prevents duplicate conversion of join point blocks.
-            ctx.convertedBlocks.clear()
-            ctx.convertedBlocks.addAll(convertedBlocksBeforeBranch)
-            ctx.convertedBlocks.addAll(thenConvertedBlocks)
-            ctx.convertedBlocks.addAll(elseConvertedBlocks)
+            // by Claude - Fix for internal forward branches with empty thenBranch (e.g., bpl/bmi consecutive branches)
+            // When thenBranch has no actionable code (empty or only comments) and this is an internal forward branch
+            // (like bmi LeftFrict after bpl RghtFrict), we need to generate code to jump to the branch target
+            // instead of falling through incorrectly. This handles the pattern where mutually exclusive branches
+            // (bpl/bmi) have their targets outside the current control flow range.
+            val thenHasOnlyComments = thenStmts.all { it is KComment }
+            if (thenHasOnlyComments && this.condition.sense) {
+                // sense=true means branch-taken executes the then-branch
+                // But then-branch is empty, so the branch target code isn't being generated here
+                val branchTarget = branchBlock.branchExit
+                val isInternalForwardBranch = branchTarget != null &&
+                    branchTarget.function == branchBlock.function &&
+                    branchTarget.originalLineIndex > branchBlock.originalLineIndex
+
+                if (isInternalForwardBranch && branchTarget != null) {
+                    // Check if branch target is a known function entry point or has a JMP to another function
+                    val targetLabel = branchTarget.label ?: "internal_target"
+                    val jmpInstr = branchTarget.lines.find { it.instruction?.op == AssemblyOp.JMP }?.instruction
+                    val jmpTarget = (jmpInstr?.address as? AssemblyAddressing.Direct)?.label
+                    val jmpTargetFunction = jmpTarget?.let { label ->
+                        ctx.functionRegistry[assemblyLabelToKotlinName(label)]
+                    }
+
+                    // Generate a comment and return to prevent incorrect fall-through
+                    // The actual branch target code should be generated elsewhere in the function
+                    if (jmpTargetFunction != null && jmpTarget != null) {
+                        val targetName = assemblyLabelToKotlinName(jmpTarget)
+                        val args = mutableListOf<KotlinExpr>()
+                        if (jmpTargetFunction.inputs?.contains(TrackedAsIo.A) == true) {
+                            args.add(getRegisterValueOrDefault("A", ctx))
+                        }
+                        if (jmpTargetFunction.inputs?.contains(TrackedAsIo.X) == true) {
+                            args.add(getRegisterValueOrDefault("X", ctx))
+                        }
+                        if (jmpTargetFunction.inputs?.contains(TrackedAsIo.Y) == true) {
+                            args.add(getRegisterValueOrDefault("Y", ctx))
+                        }
+                        thenStmts.toMutableList().also { stmts ->
+                            stmts.add(KComment("goto $targetLabel -> $targetName (internal forward branch)", commentTypeIndicator = " "))
+                            stmts.add(KExprStmt(KCall(targetName, args)))
+                            stmts.add(KReturn())
+                        }.also { result.add(KIf(condition, it, elseStmts)); return result }
+                    } else {
+                        // No JMP target - just add a comment indicating the branch and return
+                        // This at least prevents incorrect fall-through
+                        thenStmts.toMutableList().also { stmts ->
+                            stmts.add(KComment("goto $targetLabel (internal forward branch - code generated later)", commentTypeIndicator = " "))
+                            stmts.add(KReturn())
+                        }.also { result.add(KIf(condition, it, elseStmts)); return result }
+                    }
+                }
+            }
 
             // by Claude - Smart merge: if one branch terminates (return), use the other branch's state
             // This preserves flags from the continuing branch for loop conditions
             val thenTerminates = thenStmts.lastOrNull()?.isTerminating() == true
             val elseTerminates = elseStmts.lastOrNull()?.isTerminating() == true
+
+            // by Claude - FIX: Only merge convertedBlocks from branches that reach the continuation.
+            // If a branch terminates (returns), its convertedBlocks should NOT be included
+            // because the continuation code is NOT reachable from that path.
+            // This fixes the bug where LeftFrict was converted in a terminating path but then
+            // was skipped when reached via a different path (JoypFrict -> BCC fall-through).
+            ctx.convertedBlocks.clear()
+            ctx.convertedBlocks.addAll(convertedBlocksBeforeBranch)
+            if (!thenTerminates) ctx.convertedBlocks.addAll(thenConvertedBlocks)
+            if (!elseTerminates) ctx.convertedBlocks.addAll(elseConvertedBlocks)
 
             when {
                 thenTerminates && !elseTerminates -> ctx.restoreState(elseState)
@@ -882,13 +980,24 @@ fun Condition.toKotlinExpr(ctx: CodeGenContext): KotlinExpr {
                 else -> KVar("flagC") as KotlinExpr
             }
         }
-        AssemblyOp.BMI, AssemblyOp.BPL -> ctx.negativeFlag ?: run {
-            // Fallback: build negative test from likely register
-            // Most often N flag comes from A, Y, or X after LDA/DEY/DEX/etc.
-            val reg = ctx.registerA ?: ctx.registerY ?: ctx.registerX
-                ?: ctx.getFunctionLevelVar("A") ?: ctx.getFunctionLevelVar("Y") ?: ctx.getFunctionLevelVar("X")
-                ?: KVar("A")
-            KBinaryOp(KParen(KBinaryOp(reg, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+        AssemblyOp.BMI, AssemblyOp.BPL -> {
+            // by Claude - FIX: If negativeFlag is a literal boolean (e.g., from LSR which clears N),
+            // it may be stale and should be reconstructed from the A register or instruction stream.
+            // This fixes the "if (!false)" bug when a branch depends on N flag set by an earlier instruction
+            // that was skipped (already converted block).
+            val flagValue = ctx.negativeFlag
+            val isLiteralBoolean = flagValue is KLiteral && (flagValue.value == "true" || flagValue.value == "false")
+
+            if (flagValue != null && !isLiteralBoolean) {
+                flagValue
+            } else {
+                // Fallback: build negative test from likely register
+                // Most often N flag comes from A, Y, or X after LDA/DEY/DEX/etc.
+                val reg = ctx.registerA ?: ctx.registerY ?: ctx.registerX
+                    ?: ctx.getFunctionLevelVar("A") ?: ctx.getFunctionLevelVar("Y") ?: ctx.getFunctionLevelVar("X")
+                    ?: KVar("A")
+                KBinaryOp(KParen(KBinaryOp(reg, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+            }
         }
         AssemblyOp.BVC, AssemblyOp.BVS -> ctx.overflowFlag ?: KVar("flagV") // Overflow is harder to reconstruct
         // Unknown branch type - default to true to create valid syntax
@@ -986,9 +1095,10 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
 
         // Only generate orphaned branch handling if:
         // 1. Target is outside the function (exit), or
-        // 2. Target is a break target for an enclosing loop
-        // Skip handling for internal forward branches that just skip code within a loop
-        if ((targetIsExit || targetIsBreakTarget) && branchTarget != null) {
+        // 2. Target is a break target for an enclosing loop, or
+        // 3. Internal forward branch (to prevent incorrect fall-through, e.g., bpl/bmi patterns)
+        // by Claude - Added isInternalForwardBranch to fix consecutive branch patterns like bpl/bmi
+        if ((targetIsExit || targetIsBreakTarget || isInternalForwardBranch) && branchTarget != null) {
             // Generate an if-statement for this orphaned branch
             // The condition is based on the branch type
             val condition = buildOrphanedBranchCondition(lastInstr, ctx)
@@ -1016,6 +1126,87 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                         KComment("goto $targetLabel", commentTypeIndicator = " "),
                         KLabeledBreak(breakLabel)
                     )
+                } else if (isInternalForwardBranch) {
+                    // by Claude - Internal forward branch: inline the target block's code if small enough
+                    // This handles patterns like bpl/bmi where the branch goes to code
+                    // elsewhere in the same function.
+                    // To avoid JVM method size limits, we only inline small blocks.
+
+                    // by Claude - Helper function to check if a block is a join point
+                    // A join point is entered from multiple paths within the same function
+                    fun isJoinPoint(block: AssemblyBlock): Boolean {
+                        val entriesFromSameFunction = block.enteredFrom.filter { it.function == block.function }
+                        return entriesFromSameFunction.size > 1
+                    }
+
+                    // Count instructions in the target path to decide whether to inline
+                    // Stop at: RTS, JMP, external function, or JOIN POINT (multiple entries)
+                    var totalInstructions = 0
+                    var checkBlock: AssemblyBlock? = branchTarget
+                    var checkLimit = 10
+                    while (checkBlock != null && checkLimit-- > 0) {
+                        totalInstructions += checkBlock.lines.count { it.instruction != null }
+                        val lastInstr = checkBlock.lines.lastOrNull { it.instruction != null }?.instruction
+                        if (lastInstr?.op == AssemblyOp.RTS || lastInstr?.op == AssemblyOp.JMP) break
+                        val nextBlock = checkBlock.fallThroughExit
+                        if (nextBlock?.function != this.function) break
+                        // Stop at join points - blocks with multiple entry points
+                        if (nextBlock != null && isJoinPoint(nextBlock)) break
+                        checkBlock = nextBlock
+                    }
+
+                    // Only inline if target path is small (max 30 instructions to avoid bloat)
+                    if (totalInstructions <= 30) {
+                        val inlinedStmts = mutableListOf<KotlinStmt>()
+                        inlinedStmts.add(KComment("goto $targetLabel (internal forward branch)", commentTypeIndicator = " "))
+
+                        // Save FULL context state for inlining
+                        val savedState = ctx.saveState()
+                        val savedConvertedBlocks = ctx.convertedBlocks.toSet()
+
+                        // Reset flag tracking for the inlined path
+                        ctx.zeroFlag = null
+                        ctx.carryFlag = null
+                        ctx.negativeFlag = null
+                        ctx.overflowFlag = null
+
+                        ctx.convertedBlocks.removeAll(setOf(branchTarget))
+
+                        var currentBlock: AssemblyBlock? = branchTarget
+                        var inlineLimit = 10
+                        while (currentBlock != null && inlineLimit-- > 0) {
+                            if (currentBlock in ctx.convertedBlocks && currentBlock != branchTarget) break
+                            inlinedStmts.addAll(currentBlock.toKotlin(ctx))
+                            val lastInstr = currentBlock.lines.lastOrNull { it.instruction != null }?.instruction
+                            if (lastInstr?.op == AssemblyOp.RTS || lastInstr?.op == AssemblyOp.JMP) break
+                            val nextBlock = currentBlock.fallThroughExit
+                            if (nextBlock?.function != this.function) break
+                            // Stop at join points - blocks with multiple entry points
+                            if (nextBlock != null && isJoinPoint(nextBlock)) break
+                            currentBlock = nextBlock
+                        }
+
+                        // Restore state but mark ONLY the target block as converted
+                        // This prevents duplicate conversion of just the target block (e.g., SlowM)
+                        // while allowing other blocks (like join points) to be converted normally
+                        ctx.restoreState(savedState)
+                        ctx.convertedBlocks.clear()
+                        ctx.convertedBlocks.addAll(savedConvertedBlocks)
+                        ctx.convertedBlocks.add(branchTarget)  // Only mark the target as converted
+
+                        val lastStmt = inlinedStmts.lastOrNull()
+                        if (lastStmt !is KReturn) {
+                            inlinedStmts.add(ctx.generateFunctionReturn())
+                        }
+                        inlinedStmts
+                    } else {
+                        // Target path too large - just generate comment and return
+                        // This at least prevents incorrect fall-through, even if not fully correct
+                        listOf(
+                            KComment("goto $targetLabel (internal forward branch - not inlined due to size)", commentTypeIndicator = " "),
+                            ctx.generateFunctionReturn()
+                        )
+                    }
                 } else if (targetIsFunctionEntry) {
                     // by Claude - Branch to another function's entry point - generate call
                     val funcName = assemblyLabelToKotlinName(branchTarget.label!!)

@@ -572,8 +572,52 @@ fun List<AssemblyBlock>.functionify(
         functionEntryBlocks.getOrPut(candidate) { ArrayList() }
     }
 
-    // Step 2: For each function, compute its blocks using dominator tree
-    for ((entryBlock, callers) in functionEntryBlocks.entries) {
+    // by Claude - Step 2a: First pass - identify which blocks are reachable from multiple functions.
+    // These "contested" blocks should be promoted to their own functions.
+    val blockReachableFrom = mutableMapOf<AssemblyBlock, MutableSet<AssemblyBlock>>() // block -> set of function entry blocks that can reach it
+
+    // Sort by line number for deterministic processing
+    val sortedFunctionEntries = functionEntryBlocks.entries.sortedBy { it.key.originalLineIndex }
+
+    for ((entryBlock, _) in sortedFunctionEntries) {
+        // Find all blocks reachable from this function entry
+        val toVisit = mutableListOf(entryBlock)
+        val visited = mutableSetOf<AssemblyBlock>()
+
+        while (toVisit.isNotEmpty()) {
+            val current = toVisit.removeAt(0)
+            if (current in visited) continue
+            visited.add(current)
+
+            // Stop at other function entries (they're handled separately)
+            if (current in functionEntryBlocks && current != entryBlock) {
+                continue
+            }
+
+            // Record that this block is reachable from entryBlock
+            blockReachableFrom.getOrPut(current) { mutableSetOf() }.add(entryBlock)
+
+            // Continue traversal
+            current.fallThroughExit?.let { if (it !in visited) toVisit.add(it) }
+            current.branchExit?.let { if (it !in visited) toVisit.add(it) }
+        }
+    }
+
+    // Promote contested blocks to their own functions
+    val promotedBlocks = mutableSetOf<AssemblyBlock>()
+    for ((block, reachableFromSet) in blockReachableFrom) {
+        if (reachableFromSet.size > 1 && block !in functionEntryBlocks) {
+            // This block is reachable from multiple functions - promote it
+            functionEntryBlocks.getOrPut(block) { ArrayList() }
+            promotedBlocks.add(block)
+        }
+    }
+
+    // Re-sort after promotions
+    val finalSortedFunctionEntries = functionEntryBlocks.entries.sortedBy { it.key.originalLineIndex }
+
+    // Step 2b: For each function, compute its blocks using dominator tree
+    for ((entryBlock, callers) in finalSortedFunctionEntries) {
         val function = AssemblyFunction(entryBlock, callers)
 
         // Find all blocks that belong to this function
@@ -626,6 +670,14 @@ fun List<AssemblyBlock>.functionify(
                 // Mark this block to skip its first instruction for THIS function only
                 // because the BIT instruction "eats" the next 2 bytes (first instruction)
                 current.skipFirstInstructionForFunctions.add(function)
+            }
+
+            // by Claude - If this block is already owned by a different function,
+            // don't include it in this function's blocks. This happens when multiple
+            // functions share common code via branches. The shared code stays with
+            // whoever claimed it first, and other functions will generate calls to it.
+            if (current.function != null && current.function != function) {
+                continue
             }
 
             functionBlocks.add(current)

@@ -1009,7 +1009,9 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
 
             // Pre-test loop: header has conditional branch that exits forward, body ends with JMP back to header
             // Check this BEFORE IF-THEN patterns to correctly identify loops
-            if (b.isConditional()) {
+            // by Claude - Skip if this block is already being processed as a loop header
+            // by natural loop detection. This prevents duplicate nested loops.
+            if (b.isConditional() && b !in processingLoopHeaders) {
                 val ft = b.fallThroughExit
                 val br = b.branchExit
                 val ftIdx = ft?.let { indexOf[it] } ?: -1
