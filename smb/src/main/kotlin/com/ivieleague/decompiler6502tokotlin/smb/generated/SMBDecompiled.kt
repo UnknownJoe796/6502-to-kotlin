@@ -752,6 +752,10 @@ fun pauseRoutine() {
     A = gamePauseStatus
     //> and #%01111111         ;is not pressed
     A = A and 0x7F
+    //> SetPause:      sta GamePauseStatus
+    gamePauseStatus = A
+    //> ExitPause:     rts
+    return
 }
 
 // Decompiled from SpriteShuffler
@@ -1434,6 +1438,7 @@ fun demoEngine(): Boolean {
     //> dec DemoActionTimer    ;decrement action timer
     demoActionTimer = (demoActionTimer - 1) and 0xFF
     //> clc                    ;clear carry if demo still going
+    //> DemoOver: rts
     return false
 }
 
@@ -1599,7 +1604,15 @@ fun playerVictoryWalk() {
     victoryWalkControl = (victoryWalkControl + 1) and 0xFF
     //> iny                     ;note Y will be used to walk the player
     Y = (Y + 1) and 0xFF
-    if (Y != 0) {
+    //> DontWalk:    tya                     ;put contents of Y in A and
+    A = Y
+    //> jsr AutoControlPlayer   ;use A to move player to the right or not
+    autoControlPlayer(A)
+    //> lda ScreenLeft_PageLoc  ;check page location of left side of screen
+    A = screenleftPageloc
+    //> cmp DestinationPageLoc  ;against set value here
+    //> beq ExitVWalk           ;branch if equal to change modes if necessary
+    if (A != destinationPageLoc) {
         //> lda ScrollFractional
         A = scrollFractional
         //> clc                     ;do fixed point math on fractional part of scroll
@@ -1773,6 +1786,8 @@ fun thankPlayer(A: Int) {
             return
         }
     }
+    //> EvalForMusic:  cpy #$03                  ;if counter not yet at 3 (world 8 only), branch
+    //> bne PrintMsg              ;to print message only (note world 1-7 will only
     if (Y == 0x03) {
         //> lda #VictoryMusic         ;reach this code if counter = 0, and will always branch)
         A = VictoryMusic
@@ -2142,9 +2157,13 @@ fun floateyNumbersRoutine(X: Int): Int {
             X = objectOffset
         }
     }
+    //> FloateyPart:  lda FloateyNum_Y_Pos,x       ;get vertical coordinate for
+    A = floateynumYPos[X]
+    //> cmp #$18                     ;floatey number, if coordinate in the
+    //> bcc SetupNumSpr              ;status bar, branch
     if (A >= 0x18) {
         //> sbc #$01
-        temp4 = A - 0x01
+        temp4 = A - 0x01 - if (A >= 0x18) 0 else 1
         A = temp4 and 0xFF
         //> sta FloateyNum_Y_Pos,x       ;otherwise subtract one and store as new
         floateynumYPos[X] = A
@@ -4676,7 +4695,10 @@ fun initializeArea() {
     }
     //> SetSecHard:    inc SecondaryHardMode    ;set secondary hard mode flag for areas 5-3 and beyond
     secondaryHardMode = (secondaryHardMode + 1) and 0xFF
-    if (secondaryHardMode != 0) {
+    //> CheckHalfway:  lda HalfwayPage
+    A = halfwayPage
+    //> beq DoneInitArea
+    if (A != 0) {
         //> lda #$02                 ;if halfway page set, overwrite start position from header
         A = 0x02
         //> sta PlayerEntranceCtrl
@@ -4862,6 +4884,10 @@ fun initializeMemory(Y: Int): Int {
             }
             //> InitByte:     sta ($06),y       ;otherwise, initialize byte with current low byte in Y
             memory[readWord(0x6) + Y] = A.toUByte()
+            //> SkipByte:     dey
+            Y = (Y - 1) and 0xFF
+            //> cpy #$ff          ;do this until all bytes in page have been erased
+            //> bne InitByteLoop
         } while (Y != 0xFF)
         //> dex               ;go onto the next page
         X = (X - 1) and 0xFF
@@ -4920,6 +4946,10 @@ fun getAreaMusic() {
             //> ldy #$04               ;select music for cloud type level if found
             Y = 0x04
         }
+        //> StoreMusic:  lda MusicSelectData,y  ;otherwise select appropriate music for level type
+        A = musicSelectData[Y]
+        //> sta AreaMusicQueue     ;store in queue and leave
+        areaMusicQueue = A
     }
     //> ExitGetM:    rts
     return
@@ -5987,6 +6017,12 @@ fun processAreaData() {
                     }
                 }
             }
+            //> RdyDecode:  jsr DecodeAreaData       ;do sub and do not turn on flag
+            decodeAreaData(0)
+            //> jmp ChkLength
+            //> jmp ChkLength (not a known function)
+            //> SetBehind:  inc BehindAreaParserFlag ;turn on flag if object is behind renderer
+            behindAreaParserFlag = (behindAreaParserFlag + 1) and 0xFF
             //> NextAObj:   jsr IncAreaObjOffset     ;increment buffer offset and move on
             incAreaObjOffset()
             //> ChkLength:  ldx ObjectOffset         ;get buffer offset
@@ -7038,6 +7074,10 @@ fun castleObject(X: Int, Y: Int): Int {
                 return X
             }
         }
+        //> PlayerStop: ldy #$52                 ;put brick at floor to stop player at end of level
+        Y = 0x52
+        //> sty MetatileBuffer+10    ;this is only done if we're on the second column
+        metatileBuffer[10] = Y
     }
     //> ExitCastle: rts
     return X
@@ -8303,6 +8343,10 @@ fun renderUnderPart(A: Int, X: Int, Y: Int): Pair<Int, Int> {
         }
         //> DrawThisRow: sta MetatileBuffer,x  ;render contents of A from routine that called this
         metatileBuffer[X] = A
+        //> WaitOneRow:  inx
+        X = (X + 1) and 0xFF
+        //> cpx #$0d              ;stop rendering if we're at the bottom of the screen
+        //> bcs ExitUPartR
         if (!(X >= 0x0D)) {
             //> ldy AreaObjectHeight  ;decrement, and stop rendering if there is no more length
             Y = areaObjectHeight
@@ -9175,6 +9219,12 @@ fun chkPOffscr(A: Int) {
         //> sta Player_X_Speed          ;otherwise nullify horizontal speed of player
         playerXSpeed = A
     }
+    //> InitPlatScrl: lda #$00                    ;nullify platform force imposed on scroll
+    A = 0x00
+    //> sta Platform_X_Scroll
+    platformXScroll = A
+    //> rts
+    return
 }
 
 // Decompiled from GetScreenPosition
@@ -9401,6 +9451,23 @@ fun playerEntrance() {
         //> cmp #$48                  ;check player's horizontal position
         //> bcc ExitEntr              ;if not far enough to the right, branch to leave
         if (A >= 0x48) {
+            //> PlayerRdy:  lda #$08                  ;set routine to be executed by game engine next frame
+            A = 0x08
+            //> sta GameEngineSubroutine
+            gameEngineSubroutine = A
+            //> lda #$01                  ;set to face player to the right
+            A = 0x01
+            //> sta PlayerFacingDir
+            playerFacingDir = A
+            //> lsr                       ;init A
+            val orig1: Int = A
+            A = orig1 shr 1
+            //> sta AltEntranceControl    ;init mode of entry
+            altEntranceControl = A
+            //> sta DisableCollisionDet   ;init collision detection disable flag
+            disableCollisionDet = A
+            //> sta JoypadOverride        ;nullify controller override bits
+            joypadOverride = A
         }
     }
     //> ExitEntr:   rts                       ;leave!
@@ -13189,6 +13256,27 @@ fun playerCtrlRoutine() {
             //> sta SavedJoypadBits
             savedJoypadBits = A
         }
+        //> SaveJoyp:   lda SavedJoypadBits         ;otherwise store A and B buttons in $0a
+        A = savedJoypadBits
+        //> and #%11000000
+        A = A and 0xC0
+        //> sta A_B_Buttons
+        aBButtons = A
+        //> lda SavedJoypadBits         ;store left and right buttons in $0c
+        A = savedJoypadBits
+        //> and #%00000011
+        A = A and 0x03
+        //> sta Left_Right_Buttons
+        leftRightButtons = A
+        //> lda SavedJoypadBits         ;store up and down buttons in $0b
+        A = savedJoypadBits
+        //> and #%00001100
+        A = A and 0x0C
+        //> sta Up_Down_Buttons
+        upDownButtons = A
+        //> and #%00000100              ;check for pressing down
+        A = A and 0x04
+        //> beq SizeChk                 ;if not, branch
         if (A != 0) {
             //> lda Player_State            ;check player's state
             A = playerState
@@ -13372,7 +13460,9 @@ fun playerCtrlRoutine() {
             //> sty $07                     ;change value here
             memory[0x7] = Y.toUByte()
         }
-        if ((A and 0x80) == 0) {
+        //> ChkHoleX:   cmp $07                     ;compare vertical high byte with value set here
+        //> bmi ExitCtrl                ;if less, branch to leave
+        if (((A - memory[0x7].toInt()) and 0xFF and 0x80) == 0) {
             //> dex                         ;otherwise decrement flag in X
             X = (X - 1) and 0xFF
             //> bmi CloudExit               ;if flag was clear, branch to set modes and other values
@@ -14174,17 +14264,26 @@ fun jumpSwimSub() {
     A = verticalForceDown
     //> sta VerticalForce
     verticalForce = A
-    //> jsr GetPlayerAnimSpeed     ;do a sub to get animation frame timing
-    getPlayerAnimSpeed()
-    //> lda Player_Y_Position
-    A = playerYPosition
-    //> cmp #$14                   ;check vertical position against preset value
-    //> bcs LRWater                ;if not yet reached a certain position, branch ahead
-    if (!(A >= 0x14)) {
-        //> lda #$18
-        A = 0x18
-        //> sta VerticalForce          ;otherwise set fractional
-        verticalForce = A
+    //> ProcSwim: lda SwimmingFlag           ;if swimming flag not set,
+    A = swimmingFlag
+    //> beq LRAir                  ;branch ahead to last part
+    if (A == 0) {
+        //  goto LRAir -> lRAir
+        lRAir()
+        return
+    } else {
+        //> jsr GetPlayerAnimSpeed     ;do a sub to get animation frame timing
+        getPlayerAnimSpeed()
+        //> lda Player_Y_Position
+        A = playerYPosition
+        //> cmp #$14                   ;check vertical position against preset value
+        //> bcs LRWater                ;if not yet reached a certain position, branch ahead
+        if (!(A >= 0x14)) {
+            //> lda #$18
+            A = 0x18
+            //> sta VerticalForce          ;otherwise set fractional
+            verticalForce = A
+        }
     }
     //> LRWater:  lda Left_Right_Buttons     ;check left/right controller bits (check for swimming)
     A = leftRightButtons
@@ -16288,6 +16387,614 @@ fun playerPhysicsSub() {
                 xPhysics()
                 return
             }
+            //> ProcJumping:
+            //> lda Player_State           ;check player state
+            A = playerState
+            //> beq InitJS                 ;if on the ground, branch
+            if (A == 0) {
+                //  goto InitJS (internal forward branch)
+                //> InitJS:    lda #$20                   ;set jump/swim timer
+                A = 0x20
+                //> sta JumpSwimTimer
+                jumpSwimTimer = A
+                //> ldy #$00                   ;initialize vertical force and dummy variable
+                Y = 0x00
+                //> sty Player_YMF_Dummy
+                playerYmfDummy = Y
+                //> sty Player_Y_MoveForce
+                playerYMoveforce = Y
+                //> lda Player_Y_HighPos       ;get vertical high and low bytes of jump origin
+                A = playerYHighpos
+                //> sta JumpOrigin_Y_HighPos   ;and store them next to each other here
+                jumporiginYHighpos = A
+                //> lda Player_Y_Position
+                A = playerYPosition
+                //> sta JumpOrigin_Y_Position
+                jumporiginYPosition = A
+                //> lda #$01                   ;set player state to jumping/swimming
+                A = 0x01
+                //> sta Player_State
+                playerState = A
+                //> lda Player_XSpeedAbsolute  ;check value related to walking/running speed
+                A = playerXspeedabsolute
+                //> cmp #$09
+                //> bcc ChkWtr                 ;branch if below certain values, increment Y
+                if (!(A >= 0x09)) {
+                    //  goto ChkWtr (internal forward branch)
+                    //> ChkWtr:    lda #$01                   ;set value here (apparently always set to 1)
+                    A = 0x01
+                    //> sta DiffToHaltJump
+                    diffToHaltJump = A
+                    //> lda SwimmingFlag           ;if swimming flag disabled, branch
+                    A = swimmingFlag
+                    //> beq GetYPhy
+                    if (A == 0) {
+                        //  goto GetYPhy (internal forward branch)
+                        //> GetYPhy:   lda JumpMForceData,y       ;store appropriate jump/swim
+                        A = jumpMForceData[Y]
+                        //> sta VerticalForce          ;data here
+                        verticalForce = A
+                        //> lda FallMForceData,y
+                        A = fallMForceData[Y]
+                        //> sta VerticalForceDown
+                        verticalForceDown = A
+                        //> lda InitMForceData,y
+                        A = initMForceData[Y]
+                        //> sta Player_Y_MoveForce
+                        playerYMoveforce = A
+                        //> lda PlayerYSpdData,y
+                        A = playerYSpdData[Y]
+                        //> sta Player_Y_Speed
+                        playerYSpeed = A
+                        //> lda SwimmingFlag           ;if swimming flag disabled, branch
+                        A = swimmingFlag
+                        //> beq PJumpSnd
+                        if (A == 0) {
+                            //  goto PJumpSnd (internal forward branch)
+                            //> PJumpSnd:  lda #Sfx_BigJump           ;load big mario's jump sound by default
+                            A = Sfx_BigJump
+                            //> ldy PlayerSize             ;is mario big?
+                            Y = playerSize
+                            //> beq SJumpSnd
+                            if (Y == 0) {
+                                //  goto SJumpSnd (internal forward branch)
+                                //> SJumpSnd:  sta Square1SoundQueue      ;store appropriate jump sound in square 1 sfx queue
+                                square1SoundQueue = A
+                                //  Fall-through tail call to xPhysics
+                                xPhysics()
+                                return
+                            }
+                            //> lda #Sfx_SmallJump         ;if not, load small mario's jump sound
+                            A = Sfx_SmallJump
+                            return
+                        }
+                        //> lda #Sfx_EnemyStomp        ;load swim/goomba stomp sound into
+                        A = Sfx_EnemyStomp
+                        //> sta Square1SoundQueue      ;square 1's sfx queue
+                        square1SoundQueue = A
+                        //> lda Player_Y_Position
+                        A = playerYPosition
+                        //> cmp #$14                   ;check vertical low byte of player position
+                        //> bcs X_Physics              ;if below a certain point, branch
+                        if (A >= 0x14) {
+                            //  goto X_Physics -> xPhysics
+                            xPhysics()
+                            return
+                        }
+                        //> lda #$00                   ;otherwise reset player's vertical speed
+                        A = 0x00
+                        //> sta Player_Y_Speed         ;and jump to something else to keep player
+                        playerYSpeed = A
+                        //> jmp X_Physics              ;from swimming above water level
+                        xPhysics()
+                        return
+                    }
+                    //> ldy #$05                   ;otherwise set Y to 5, range is 5-6
+                    Y = 0x05
+                    //> lda Whirlpool_Flag         ;if whirlpool flag not set, branch
+                    A = whirlpoolFlag
+                    //> beq GetYPhy
+                    if (A == 0) {
+                        //  goto GetYPhy (internal forward branch)
+                        //> GetYPhy:   lda JumpMForceData,y       ;store appropriate jump/swim
+                        A = jumpMForceData[Y]
+                        //> sta VerticalForce          ;data here
+                        verticalForce = A
+                        //> lda FallMForceData,y
+                        A = fallMForceData[Y]
+                        //> sta VerticalForceDown
+                        verticalForceDown = A
+                        //> lda InitMForceData,y
+                        A = initMForceData[Y]
+                        //> sta Player_Y_MoveForce
+                        playerYMoveforce = A
+                        //> lda PlayerYSpdData,y
+                        A = playerYSpdData[Y]
+                        //> sta Player_Y_Speed
+                        playerYSpeed = A
+                        //> lda SwimmingFlag           ;if swimming flag disabled, branch
+                        A = swimmingFlag
+                        //> beq PJumpSnd
+                        if (A == 0) {
+                            //  goto PJumpSnd (internal forward branch)
+                            //> PJumpSnd:  lda #Sfx_BigJump           ;load big mario's jump sound by default
+                            A = Sfx_BigJump
+                            //> ldy PlayerSize             ;is mario big?
+                            Y = playerSize
+                            //> beq SJumpSnd
+                            if (Y == 0) {
+                                //  goto SJumpSnd (internal forward branch)
+                                //> SJumpSnd:  sta Square1SoundQueue      ;store appropriate jump sound in square 1 sfx queue
+                                square1SoundQueue = A
+                                //  Fall-through tail call to xPhysics
+                                xPhysics()
+                                return
+                            }
+                            //> lda #Sfx_SmallJump         ;if not, load small mario's jump sound
+                            A = Sfx_SmallJump
+                            return
+                        }
+                        //> lda #Sfx_EnemyStomp        ;load swim/goomba stomp sound into
+                        A = Sfx_EnemyStomp
+                        //> sta Square1SoundQueue      ;square 1's sfx queue
+                        square1SoundQueue = A
+                        //> lda Player_Y_Position
+                        A = playerYPosition
+                        //> cmp #$14                   ;check vertical low byte of player position
+                        //> bcs X_Physics              ;if below a certain point, branch
+                        if (A >= 0x14) {
+                            //  goto X_Physics -> xPhysics
+                            xPhysics()
+                            return
+                        }
+                        //> lda #$00                   ;otherwise reset player's vertical speed
+                        A = 0x00
+                        //> sta Player_Y_Speed         ;and jump to something else to keep player
+                        playerYSpeed = A
+                        //> jmp X_Physics              ;from swimming above water level
+                        xPhysics()
+                        return
+                    }
+                    //> iny                        ;otherwise increment to 6
+                    Y = (Y + 1) and 0xFF
+                    return
+                }
+                //> iny                        ;for each amount equal or exceeded
+                Y = (Y + 1) and 0xFF
+                //> cmp #$10
+                //> bcc ChkWtr
+                if (!(A >= 0x10)) {
+                    //  goto ChkWtr (internal forward branch)
+                    //> ChkWtr:    lda #$01                   ;set value here (apparently always set to 1)
+                    A = 0x01
+                    //> sta DiffToHaltJump
+                    diffToHaltJump = A
+                    //> lda SwimmingFlag           ;if swimming flag disabled, branch
+                    A = swimmingFlag
+                    //> beq GetYPhy
+                    if (A == 0) {
+                        //  goto GetYPhy (internal forward branch)
+                        //> GetYPhy:   lda JumpMForceData,y       ;store appropriate jump/swim
+                        A = jumpMForceData[Y]
+                        //> sta VerticalForce          ;data here
+                        verticalForce = A
+                        //> lda FallMForceData,y
+                        A = fallMForceData[Y]
+                        //> sta VerticalForceDown
+                        verticalForceDown = A
+                        //> lda InitMForceData,y
+                        A = initMForceData[Y]
+                        //> sta Player_Y_MoveForce
+                        playerYMoveforce = A
+                        //> lda PlayerYSpdData,y
+                        A = playerYSpdData[Y]
+                        //> sta Player_Y_Speed
+                        playerYSpeed = A
+                        //> lda SwimmingFlag           ;if swimming flag disabled, branch
+                        A = swimmingFlag
+                        //> beq PJumpSnd
+                        if (A == 0) {
+                            //  goto PJumpSnd (internal forward branch)
+                            //> PJumpSnd:  lda #Sfx_BigJump           ;load big mario's jump sound by default
+                            A = Sfx_BigJump
+                            //> ldy PlayerSize             ;is mario big?
+                            Y = playerSize
+                            //> beq SJumpSnd
+                            if (Y == 0) {
+                                //  goto SJumpSnd (internal forward branch)
+                                //> SJumpSnd:  sta Square1SoundQueue      ;store appropriate jump sound in square 1 sfx queue
+                                square1SoundQueue = A
+                                //  Fall-through tail call to xPhysics
+                                xPhysics()
+                                return
+                            }
+                            //> lda #Sfx_SmallJump         ;if not, load small mario's jump sound
+                            A = Sfx_SmallJump
+                            return
+                        }
+                        //> lda #Sfx_EnemyStomp        ;load swim/goomba stomp sound into
+                        A = Sfx_EnemyStomp
+                        //> sta Square1SoundQueue      ;square 1's sfx queue
+                        square1SoundQueue = A
+                        //> lda Player_Y_Position
+                        A = playerYPosition
+                        //> cmp #$14                   ;check vertical low byte of player position
+                        //> bcs X_Physics              ;if below a certain point, branch
+                        if (A >= 0x14) {
+                            //  goto X_Physics -> xPhysics
+                            xPhysics()
+                            return
+                        }
+                        //> lda #$00                   ;otherwise reset player's vertical speed
+                        A = 0x00
+                        //> sta Player_Y_Speed         ;and jump to something else to keep player
+                        playerYSpeed = A
+                        //> jmp X_Physics              ;from swimming above water level
+                        xPhysics()
+                        return
+                    }
+                    //> ldy #$05                   ;otherwise set Y to 5, range is 5-6
+                    Y = 0x05
+                    //> lda Whirlpool_Flag         ;if whirlpool flag not set, branch
+                    A = whirlpoolFlag
+                    //> beq GetYPhy
+                    if (A == 0) {
+                        //  goto GetYPhy (internal forward branch)
+                        //> GetYPhy:   lda JumpMForceData,y       ;store appropriate jump/swim
+                        A = jumpMForceData[Y]
+                        //> sta VerticalForce          ;data here
+                        verticalForce = A
+                        //> lda FallMForceData,y
+                        A = fallMForceData[Y]
+                        //> sta VerticalForceDown
+                        verticalForceDown = A
+                        //> lda InitMForceData,y
+                        A = initMForceData[Y]
+                        //> sta Player_Y_MoveForce
+                        playerYMoveforce = A
+                        //> lda PlayerYSpdData,y
+                        A = playerYSpdData[Y]
+                        //> sta Player_Y_Speed
+                        playerYSpeed = A
+                        //> lda SwimmingFlag           ;if swimming flag disabled, branch
+                        A = swimmingFlag
+                        //> beq PJumpSnd
+                        if (A == 0) {
+                            //  goto PJumpSnd (internal forward branch)
+                            //> PJumpSnd:  lda #Sfx_BigJump           ;load big mario's jump sound by default
+                            A = Sfx_BigJump
+                            //> ldy PlayerSize             ;is mario big?
+                            Y = playerSize
+                            //> beq SJumpSnd
+                            if (Y == 0) {
+                                //  goto SJumpSnd (internal forward branch)
+                                //> SJumpSnd:  sta Square1SoundQueue      ;store appropriate jump sound in square 1 sfx queue
+                                square1SoundQueue = A
+                                //  Fall-through tail call to xPhysics
+                                xPhysics()
+                                return
+                            }
+                            //> lda #Sfx_SmallJump         ;if not, load small mario's jump sound
+                            A = Sfx_SmallJump
+                            return
+                        }
+                        //> lda #Sfx_EnemyStomp        ;load swim/goomba stomp sound into
+                        A = Sfx_EnemyStomp
+                        //> sta Square1SoundQueue      ;square 1's sfx queue
+                        square1SoundQueue = A
+                        //> lda Player_Y_Position
+                        A = playerYPosition
+                        //> cmp #$14                   ;check vertical low byte of player position
+                        //> bcs X_Physics              ;if below a certain point, branch
+                        if (A >= 0x14) {
+                            //  goto X_Physics -> xPhysics
+                            xPhysics()
+                            return
+                        }
+                        //> lda #$00                   ;otherwise reset player's vertical speed
+                        A = 0x00
+                        //> sta Player_Y_Speed         ;and jump to something else to keep player
+                        playerYSpeed = A
+                        //> jmp X_Physics              ;from swimming above water level
+                        xPhysics()
+                        return
+                    }
+                    //> iny                        ;otherwise increment to 6
+                    Y = (Y + 1) and 0xFF
+                    return
+                }
+                //> iny
+                Y = (Y + 1) and 0xFF
+                //> cmp #$19
+                //> bcc ChkWtr
+                if (!(A >= 0x19)) {
+                    //  goto ChkWtr (internal forward branch)
+                    //> ChkWtr:    lda #$01                   ;set value here (apparently always set to 1)
+                    A = 0x01
+                    //> sta DiffToHaltJump
+                    diffToHaltJump = A
+                    //> lda SwimmingFlag           ;if swimming flag disabled, branch
+                    A = swimmingFlag
+                    //> beq GetYPhy
+                    if (A == 0) {
+                        //  goto GetYPhy (internal forward branch)
+                        //> GetYPhy:   lda JumpMForceData,y       ;store appropriate jump/swim
+                        A = jumpMForceData[Y]
+                        //> sta VerticalForce          ;data here
+                        verticalForce = A
+                        //> lda FallMForceData,y
+                        A = fallMForceData[Y]
+                        //> sta VerticalForceDown
+                        verticalForceDown = A
+                        //> lda InitMForceData,y
+                        A = initMForceData[Y]
+                        //> sta Player_Y_MoveForce
+                        playerYMoveforce = A
+                        //> lda PlayerYSpdData,y
+                        A = playerYSpdData[Y]
+                        //> sta Player_Y_Speed
+                        playerYSpeed = A
+                        //> lda SwimmingFlag           ;if swimming flag disabled, branch
+                        A = swimmingFlag
+                        //> beq PJumpSnd
+                        if (A == 0) {
+                            //  goto PJumpSnd (internal forward branch)
+                            //> PJumpSnd:  lda #Sfx_BigJump           ;load big mario's jump sound by default
+                            A = Sfx_BigJump
+                            //> ldy PlayerSize             ;is mario big?
+                            Y = playerSize
+                            //> beq SJumpSnd
+                            if (Y == 0) {
+                                //  goto SJumpSnd (internal forward branch)
+                                //> SJumpSnd:  sta Square1SoundQueue      ;store appropriate jump sound in square 1 sfx queue
+                                square1SoundQueue = A
+                                //  Fall-through tail call to xPhysics
+                                xPhysics()
+                                return
+                            }
+                            //> lda #Sfx_SmallJump         ;if not, load small mario's jump sound
+                            A = Sfx_SmallJump
+                            return
+                        }
+                        //> lda #Sfx_EnemyStomp        ;load swim/goomba stomp sound into
+                        A = Sfx_EnemyStomp
+                        //> sta Square1SoundQueue      ;square 1's sfx queue
+                        square1SoundQueue = A
+                        //> lda Player_Y_Position
+                        A = playerYPosition
+                        //> cmp #$14                   ;check vertical low byte of player position
+                        //> bcs X_Physics              ;if below a certain point, branch
+                        if (A >= 0x14) {
+                            //  goto X_Physics -> xPhysics
+                            xPhysics()
+                            return
+                        }
+                        //> lda #$00                   ;otherwise reset player's vertical speed
+                        A = 0x00
+                        //> sta Player_Y_Speed         ;and jump to something else to keep player
+                        playerYSpeed = A
+                        //> jmp X_Physics              ;from swimming above water level
+                        xPhysics()
+                        return
+                    }
+                    //> ldy #$05                   ;otherwise set Y to 5, range is 5-6
+                    Y = 0x05
+                    //> lda Whirlpool_Flag         ;if whirlpool flag not set, branch
+                    A = whirlpoolFlag
+                    //> beq GetYPhy
+                    if (A == 0) {
+                        //  goto GetYPhy (internal forward branch)
+                        //> GetYPhy:   lda JumpMForceData,y       ;store appropriate jump/swim
+                        A = jumpMForceData[Y]
+                        //> sta VerticalForce          ;data here
+                        verticalForce = A
+                        //> lda FallMForceData,y
+                        A = fallMForceData[Y]
+                        //> sta VerticalForceDown
+                        verticalForceDown = A
+                        //> lda InitMForceData,y
+                        A = initMForceData[Y]
+                        //> sta Player_Y_MoveForce
+                        playerYMoveforce = A
+                        //> lda PlayerYSpdData,y
+                        A = playerYSpdData[Y]
+                        //> sta Player_Y_Speed
+                        playerYSpeed = A
+                        //> lda SwimmingFlag           ;if swimming flag disabled, branch
+                        A = swimmingFlag
+                        //> beq PJumpSnd
+                        if (A == 0) {
+                            //  goto PJumpSnd (internal forward branch)
+                            //> PJumpSnd:  lda #Sfx_BigJump           ;load big mario's jump sound by default
+                            A = Sfx_BigJump
+                            //> ldy PlayerSize             ;is mario big?
+                            Y = playerSize
+                            //> beq SJumpSnd
+                            if (Y == 0) {
+                                //  goto SJumpSnd (internal forward branch)
+                                //> SJumpSnd:  sta Square1SoundQueue      ;store appropriate jump sound in square 1 sfx queue
+                                square1SoundQueue = A
+                                //  Fall-through tail call to xPhysics
+                                xPhysics()
+                                return
+                            }
+                            //> lda #Sfx_SmallJump         ;if not, load small mario's jump sound
+                            A = Sfx_SmallJump
+                            return
+                        }
+                        //> lda #Sfx_EnemyStomp        ;load swim/goomba stomp sound into
+                        A = Sfx_EnemyStomp
+                        //> sta Square1SoundQueue      ;square 1's sfx queue
+                        square1SoundQueue = A
+                        //> lda Player_Y_Position
+                        A = playerYPosition
+                        //> cmp #$14                   ;check vertical low byte of player position
+                        //> bcs X_Physics              ;if below a certain point, branch
+                        if (A >= 0x14) {
+                            //  goto X_Physics -> xPhysics
+                            xPhysics()
+                            return
+                        }
+                        //> lda #$00                   ;otherwise reset player's vertical speed
+                        A = 0x00
+                        //> sta Player_Y_Speed         ;and jump to something else to keep player
+                        playerYSpeed = A
+                        //> jmp X_Physics              ;from swimming above water level
+                        xPhysics()
+                        return
+                    }
+                    //> iny                        ;otherwise increment to 6
+                    Y = (Y + 1) and 0xFF
+                    return
+                }
+                //> iny
+                Y = (Y + 1) and 0xFF
+                //> cmp #$1c
+                //> bcc ChkWtr                 ;note that for jumping, range is 0-4 for Y
+                if (!(A >= 0x1C)) {
+                    //  goto ChkWtr (internal forward branch)
+                    //> ChkWtr:    lda #$01                   ;set value here (apparently always set to 1)
+                    A = 0x01
+                    //> sta DiffToHaltJump
+                    diffToHaltJump = A
+                    //> lda SwimmingFlag           ;if swimming flag disabled, branch
+                    A = swimmingFlag
+                    //> beq GetYPhy
+                    if (A == 0) {
+                        //  goto GetYPhy (internal forward branch)
+                        //> GetYPhy:   lda JumpMForceData,y       ;store appropriate jump/swim
+                        A = jumpMForceData[Y]
+                        //> sta VerticalForce          ;data here
+                        verticalForce = A
+                        //> lda FallMForceData,y
+                        A = fallMForceData[Y]
+                        //> sta VerticalForceDown
+                        verticalForceDown = A
+                        //> lda InitMForceData,y
+                        A = initMForceData[Y]
+                        //> sta Player_Y_MoveForce
+                        playerYMoveforce = A
+                        //> lda PlayerYSpdData,y
+                        A = playerYSpdData[Y]
+                        //> sta Player_Y_Speed
+                        playerYSpeed = A
+                        //> lda SwimmingFlag           ;if swimming flag disabled, branch
+                        A = swimmingFlag
+                        //> beq PJumpSnd
+                        if (A == 0) {
+                            //  goto PJumpSnd (internal forward branch)
+                            //> PJumpSnd:  lda #Sfx_BigJump           ;load big mario's jump sound by default
+                            A = Sfx_BigJump
+                            //> ldy PlayerSize             ;is mario big?
+                            Y = playerSize
+                            //> beq SJumpSnd
+                            if (Y == 0) {
+                                //  goto SJumpSnd (internal forward branch)
+                                //> SJumpSnd:  sta Square1SoundQueue      ;store appropriate jump sound in square 1 sfx queue
+                                square1SoundQueue = A
+                                //  Fall-through tail call to xPhysics
+                                xPhysics()
+                                return
+                            }
+                            //> lda #Sfx_SmallJump         ;if not, load small mario's jump sound
+                            A = Sfx_SmallJump
+                            return
+                        }
+                        //> lda #Sfx_EnemyStomp        ;load swim/goomba stomp sound into
+                        A = Sfx_EnemyStomp
+                        //> sta Square1SoundQueue      ;square 1's sfx queue
+                        square1SoundQueue = A
+                        //> lda Player_Y_Position
+                        A = playerYPosition
+                        //> cmp #$14                   ;check vertical low byte of player position
+                        //> bcs X_Physics              ;if below a certain point, branch
+                        if (A >= 0x14) {
+                            //  goto X_Physics -> xPhysics
+                            xPhysics()
+                            return
+                        }
+                        //> lda #$00                   ;otherwise reset player's vertical speed
+                        A = 0x00
+                        //> sta Player_Y_Speed         ;and jump to something else to keep player
+                        playerYSpeed = A
+                        //> jmp X_Physics              ;from swimming above water level
+                        xPhysics()
+                        return
+                    }
+                    //> ldy #$05                   ;otherwise set Y to 5, range is 5-6
+                    Y = 0x05
+                    //> lda Whirlpool_Flag         ;if whirlpool flag not set, branch
+                    A = whirlpoolFlag
+                    //> beq GetYPhy
+                    if (A == 0) {
+                        //  goto GetYPhy (internal forward branch)
+                        //> GetYPhy:   lda JumpMForceData,y       ;store appropriate jump/swim
+                        A = jumpMForceData[Y]
+                        //> sta VerticalForce          ;data here
+                        verticalForce = A
+                        //> lda FallMForceData,y
+                        A = fallMForceData[Y]
+                        //> sta VerticalForceDown
+                        verticalForceDown = A
+                        //> lda InitMForceData,y
+                        A = initMForceData[Y]
+                        //> sta Player_Y_MoveForce
+                        playerYMoveforce = A
+                        //> lda PlayerYSpdData,y
+                        A = playerYSpdData[Y]
+                        //> sta Player_Y_Speed
+                        playerYSpeed = A
+                        //> lda SwimmingFlag           ;if swimming flag disabled, branch
+                        A = swimmingFlag
+                        //> beq PJumpSnd
+                        if (A == 0) {
+                            //  goto PJumpSnd (internal forward branch)
+                            //> PJumpSnd:  lda #Sfx_BigJump           ;load big mario's jump sound by default
+                            A = Sfx_BigJump
+                            //> ldy PlayerSize             ;is mario big?
+                            Y = playerSize
+                            //> beq SJumpSnd
+                            if (Y == 0) {
+                                //  goto SJumpSnd (internal forward branch)
+                                //> SJumpSnd:  sta Square1SoundQueue      ;store appropriate jump sound in square 1 sfx queue
+                                square1SoundQueue = A
+                                //  Fall-through tail call to xPhysics
+                                xPhysics()
+                                return
+                            }
+                            //> lda #Sfx_SmallJump         ;if not, load small mario's jump sound
+                            A = Sfx_SmallJump
+                            return
+                        }
+                        //> lda #Sfx_EnemyStomp        ;load swim/goomba stomp sound into
+                        A = Sfx_EnemyStomp
+                        //> sta Square1SoundQueue      ;square 1's sfx queue
+                        square1SoundQueue = A
+                        //> lda Player_Y_Position
+                        A = playerYPosition
+                        //> cmp #$14                   ;check vertical low byte of player position
+                        //> bcs X_Physics              ;if below a certain point, branch
+                        if (A >= 0x14) {
+                            //  goto X_Physics -> xPhysics
+                            xPhysics()
+                            return
+                        }
+                        //> lda #$00                   ;otherwise reset player's vertical speed
+                        A = 0x00
+                        //> sta Player_Y_Speed         ;and jump to something else to keep player
+                        playerYSpeed = A
+                        //> jmp X_Physics              ;from swimming above water level
+                        xPhysics()
+                        return
+                    }
+                    //> iny                        ;otherwise increment to 6
+                    Y = (Y + 1) and 0xFF
+                    return
+                }
+                //> iny
+                Y = (Y + 1) and 0xFF
+                return
+            }
             //> lda SwimmingFlag           ;if swimming flag not set, jump to do something else
             A = swimmingFlag
             //> beq NoJump                 ;to prevent midair jumping, otherwise continue
@@ -17704,6 +18411,13 @@ fun xPhysics() {
             }
         }
     }
+    //> ChkRFast:  iny                        ;if running timer not set or level type is water,
+    Y = (Y + 1) and 0xFF
+    //> inc $00                    ;increment Y again and temp variable in memory
+    memory[0x0] = ((memory[0x0].toInt() + 1) and 0xFF).toUByte()
+    //> lda RunningSpeed
+    A = runningSpeed
+    //> bne FastXSp                ;if running speed set here, branch
     if (A == 0) {
         //> lda Player_XSpeedAbsolute
         A = playerXspeedabsolute
@@ -17851,6 +18565,8 @@ fun imposeFriction(A: Int): Int {
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
     var frictionAdderHigh by MemoryByte(FrictionAdderHigh)
     var frictionAdderLow by MemoryByte(FrictionAdderLow)
     var maximumLeftSpeed by MemoryByte(MaximumLeftSpeed)
@@ -17929,7 +18645,24 @@ fun imposeFriction(A: Int): Int {
     A = orig0 shr 1
     //> bcc RghtFrict             ;if left button pressed, carry = 0, thus branch
     if ((orig0 and 0x01) != 0) {
-        if ((A and 0x80) == 0) {
+        //> LeftFrict: lda Player_X_MoveForce    ;load value set here
+        A = playerXMoveforce
+        //> clc
+        //> adc FrictionAdderLow      ;add to it another value set here
+        temp3 = A + frictionAdderLow
+        A = temp3 and 0xFF
+        //> sta Player_X_MoveForce    ;store here
+        playerXMoveforce = A
+        //> lda Player_X_Speed
+        A = playerXSpeed
+        //> adc FrictionAdderHigh     ;add value plus carry to horizontal speed
+        temp4 = A + frictionAdderHigh + if (temp3 > 0xFF) 1 else 0
+        A = temp4 and 0xFF
+        //> sta Player_X_Speed        ;set as new horizontal speed
+        playerXSpeed = A
+        //> cmp MaximumRightSpeed     ;compare against maximum value for right movement
+        //> bmi XSpdSign              ;if horizontal speed greater negatively, branch
+        if (((A - maximumRightSpeed) and 0xFF and 0x80) == 0) {
             //> lda MaximumRightSpeed     ;otherwise set preset value as horizontal speed
             A = maximumRightSpeed
             //> sta Player_X_Speed        ;thus slowing the player's left movement down
@@ -17943,15 +18676,15 @@ fun imposeFriction(A: Int): Int {
     A = playerXMoveforce
     //> sec
     //> sbc FrictionAdderLow      ;subtract from it another value set here
-    temp3 = A - frictionAdderLow
-    A = temp3 and 0xFF
+    temp5 = A - frictionAdderLow
+    A = temp5 and 0xFF
     //> sta Player_X_MoveForce    ;store here
     playerXMoveforce = A
     //> lda Player_X_Speed
     A = playerXSpeed
     //> sbc FrictionAdderHigh     ;subtract value plus borrow from horizontal speed
-    temp4 = A - frictionAdderHigh - if (temp3 >= 0) 0 else 1
-    A = temp4 and 0xFF
+    temp6 = A - frictionAdderHigh - if (temp5 >= 0) 0 else 1
+    A = temp6 and 0xFF
     //> sta Player_X_Speed        ;set as new horizontal speed
     playerXSpeed = A
     //> cmp MaximumLeftSpeed      ;compare against maximum value for left movement
@@ -17973,8 +18706,8 @@ fun imposeFriction(A: Int): Int {
         A = A xor 0xFF
         //> clc                       ;otherwise get two's compliment to get absolute
         //> adc #$01                  ;unsigned walking/running speed
-        temp5 = A + 0x01
-        A = temp5 and 0xFF
+        temp7 = A + 0x01
+        A = temp7 and 0xFF
         //  Fall-through tail call to setAbsSpd
         setAbsSpd(A)
         return A
@@ -18605,6 +19338,8 @@ fun processWhirlpools() {
     var temp11: Int = 0
     var temp12: Int = 0
     var temp13: Int = 0
+    var temp14: Int = 0
+    var temp15: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
@@ -18727,6 +19462,40 @@ fun processWhirlpools() {
             //> ExitWh: rts                         ;leave
             return
         }
+        //> WhirlpoolActivate:
+        //> lda Whirlpool_Length,y      ;get length of whirlpool
+        A = whirlpoolLength[Y]
+        //> lsr                         ;divide by 2
+        val orig2: Int = A
+        A = orig2 shr 1
+        //> sta $00                     ;save here
+        memory[0x0] = A.toUByte()
+        //> lda Whirlpool_LeftExtent,y  ;get left extent of whirlpool
+        A = whirlpoolLeftextent[Y]
+        //> clc
+        //> adc $00                     ;add length divided by 2
+        temp8 = A + memory[0x0].toInt()
+        A = temp8 and 0xFF
+        //> sta $01                     ;save as center of whirlpool
+        memory[0x1] = A.toUByte()
+        //> lda Whirlpool_PageLoc,y     ;get page location
+        A = whirlpoolPageloc[Y]
+        //> adc #$00                    ;add carry
+        temp9 = A + if (temp8 > 0xFF) 1 else 0
+        A = temp9 and 0xFF
+        //> sta $00                     ;save as page location of whirlpool center
+        memory[0x0] = A.toUByte()
+        //> lda FrameCounter            ;get frame counter
+        A = frameCounter
+        //> lsr                         ;shift d0 into carry (to run on every other frame)
+        val orig3: Int = A
+        A = orig3 shr 1
+        //> bcc WhPull                  ;if d0 not set, branch to last part of code
+        if (!((orig3 and 0x01) != 0)) {
+            //  goto WhPull -> whPull
+            whPull()
+            return
+        }
     } else {
         //> ExitWh: rts                         ;leave
         return
@@ -18735,28 +19504,28 @@ fun processWhirlpools() {
     A = memory[0x1].toInt()
     //> sec
     //> sbc Player_X_Position       ;subtract player's horizontal coordinate
-    temp8 = A - playerXPosition
-    A = temp8 and 0xFF
+    temp10 = A - playerXPosition
+    A = temp10 and 0xFF
     //> lda $00                     ;get page location of center
     A = memory[0x0].toInt()
     //> sbc Player_PageLoc          ;subtract borrow
-    temp9 = A - playerPageloc - if (temp8 >= 0) 0 else 1
-    A = temp9 and 0xFF
+    temp11 = A - playerPageloc - if (temp10 >= 0) 0 else 1
+    A = temp11 and 0xFF
     //> bpl LeftWh                  ;if player to the left of center, branch
-    if ((temp9 and 0xFF and 0x80) != 0) {
+    if ((temp11 and 0xFF and 0x80) != 0) {
         //> lda Player_X_Position       ;otherwise slowly pull player left, towards the center
         A = playerXPosition
         //> sec
         //> sbc #$01                    ;subtract one pixel
-        temp10 = A - 0x01
-        A = temp10 and 0xFF
+        temp12 = A - 0x01
+        A = temp12 and 0xFF
         //> sta Player_X_Position       ;set player's new horizontal coordinate
         playerXPosition = A
         //> lda Player_PageLoc
         A = playerPageloc
         //> sbc #$00                    ;subtract borrow
-        temp11 = A - if (temp10 >= 0) 0 else 1
-        A = temp11 and 0xFF
+        temp13 = A - if (temp12 >= 0) 0 else 1
+        A = temp13 and 0xFF
         //> jmp SetPWh                  ;jump to set player's new page location
         setPWh(A)
         return
@@ -18764,10 +19533,10 @@ fun processWhirlpools() {
         //> LeftWh: lda Player_CollisionBits    ;get player's collision bits
         A = playerCollisionbits
         //> lsr                         ;shift d0 into carry
-        val orig2: Int = A
-        A = orig2 shr 1
+        val orig4: Int = A
+        A = orig4 shr 1
         //> bcc WhPull                  ;if d0 not set, branch
-        if (!((orig2 and 0x01) != 0)) {
+        if (!((orig4 and 0x01) != 0)) {
             //  goto WhPull -> whPull
             whPull()
             return
@@ -18777,15 +19546,15 @@ fun processWhirlpools() {
     A = playerXPosition
     //> clc
     //> adc #$01                    ;add one pixel
-    temp12 = A + 0x01
-    A = temp12 and 0xFF
+    temp14 = A + 0x01
+    A = temp14 and 0xFF
     //> sta Player_X_Position       ;set player's new horizontal coordinate
     playerXPosition = A
     //> lda Player_PageLoc
     A = playerPageloc
     //> adc #$00                    ;add carry
-    temp13 = A + if (temp12 > 0xFF) 1 else 0
-    A = temp13 and 0xFF
+    temp15 = A + if (temp14 > 0xFF) 1 else 0
+    A = temp15 and 0xFF
     //  Fall-through tail call to setPWh
     setPWh(A)
     return
@@ -20507,6 +21276,7 @@ fun playerHeadCollision(A: Int): Int {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
     var blockBounceTimer by MemoryByte(BlockBounceTimer)
     var brickCoinTimer by MemoryByte(BrickCoinTimer)
     var brickCoinTimerFlag by MemoryByte(BrickCoinTimerFlag)
@@ -20666,6 +21436,29 @@ fun playerHeadCollision(A: Int): Int {
         //> PutOldMT:  tya                      ;put metatile into A
         A = Y
     }
+    //> PutMTileB: sta Block_Metatile,x     ;store whatever metatile be appropriate here
+    blockMetatile[X] = A
+    //> jsr InitBlock_XY_Pos     ;get block object horizontal coordinates saved
+    initblockXyPos(X)
+    //> ldy $02                  ;get vertical high nybble offset
+    Y = memory[0x2].toInt()
+    //> lda #$23
+    A = 0x23
+    //> sta ($06),y              ;write blank metatile $23 to block buffer
+    memory[readWord(0x6) + Y] = A.toUByte()
+    //> lda #$10
+    A = 0x10
+    //> sta BlockBounceTimer     ;set block bounce timer
+    blockBounceTimer = A
+    //> pla                      ;pull original metatile from stack
+    A = pull()
+    //> sta $05                  ;and save here
+    memory[0x5] = A.toUByte()
+    //> ldy #$00                 ;set default offset
+    Y = 0x00
+    //> lda CrouchingFlag        ;is player crouching?
+    A = crouchingFlag
+    //> bne SmallBP              ;if so, branch to increment offset
     if (A == 0) {
         //> lda PlayerSize           ;is player big?
         A = playerSize
@@ -20703,7 +21496,21 @@ fun playerHeadCollision(A: Int): Int {
     }
     //> SmallBP:   iny                      ;increment for small or big and crouching
     Y = (Y + 1) and 0xFF
-    if (Y != 0) {
+    //> BigBP:     lda Player_Y_Position    ;get player's vertical coordinate
+    A = playerYPosition
+    //> clc
+    //> adc BlockYPosAdderData,y ;add value determined by size
+    temp3 = A + blockYPosAdderData[Y]
+    A = temp3 and 0xFF
+    //> and #$f0                 ;mask out low nybble to get 16-pixel correspondence
+    A = A and 0xF0
+    //> sta Block_Y_Position,x   ;save as vertical coordinate for block object
+    blockYPosition[X] = A
+    //> ldy Block_State,x        ;get block object state
+    Y = blockState[X]
+    //> cpy #$11
+    //> beq Unbreak              ;if set to value loaded for unbreakable, branch
+    if (Y != 0x11) {
         //> jsr BrickShatter         ;execute code for breakable brick
         brickShatter(X)
         //> jmp InvOBit              ;skip subroutine to do last part of code here
@@ -22018,12 +22825,28 @@ fun procLoopCommand(X: Int): Int {
     var Y: Int = 0
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp10: Int = 0
+    var temp11: Int = 0
+    var temp12: Int = 0
+    var temp13: Int = 0
+    var temp14: Int = 0
+    var temp15: Int = 0
+    var temp16: Int = 0
+    var temp17: Int = 0
+    var temp18: Int = 0
+    var temp19: Int = 0
     var temp2: Int = 0
+    var temp20: Int = 0
+    var temp21: Int = 0
+    var temp22: Int = 0
+    var temp23: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
     var temp6: Int = 0
     var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var areaPointer by MemoryByte(AreaPointer)
     var currentColumnPos by MemoryByte(CurrentColumnPos)
     var currentPageLoc by MemoryByte(CurrentPageLoc)
@@ -22118,22 +22941,49 @@ fun procLoopCommand(X: Int): Int {
                 }
             }
             loop1@ do {
+                //> IncMLoop: inc MultiLoopPassCntr     ;increment master multi-part counter
+                multiLoopPassCntr = (multiLoopPassCntr + 1) and 0xFF
+                //> lda MultiLoopPassCntr     ;have we done all three parts?
+                A = multiLoopPassCntr
+                //> cmp #$03
+                //> bne InitLCmd              ;if not, skip this part
+                if (!(A == 0x03)) {
+                    //  goto InitLCmd (internal forward branch)
+                    //> InitLCmd: lda #$00                  ;initialize loop command flag
+                    A = 0x00
+                    //> sta LoopCommand
+                    loopCommand = A
+                    //> ;--------------------------------
+                    return X
+                }
+                //> lda MultiLoopCorrectCntr  ;if so, have we done them all correctly?
+                A = multiLoopCorrectCntr
+                //> cmp #$03
+                //> beq InitMLp               ;if so, branch past unnecessary check here
+                if (A == 0x03) {
+                    //  goto InitMLp (internal forward branch)
+                    //> InitMLp:  lda #$00                  ;initialize counters used for multi-part loop commands
+                    A = 0x00
+                    //> sta MultiLoopPassCntr
+                    multiLoopPassCntr = A
+                    //> sta MultiLoopCorrectCntr
+                    multiLoopCorrectCntr = A
+                    return X
+                }
+                //> bne DoLpBack              ;unconditional branch if previous branch fails
+                if (!(A == 0x03)) {
+                    //  goto DoLpBack
+                    break@loop1
+                }
                 //> WrongChk: lda WorldNumber           ;are we in world 7? (check performed on
                 A = worldNumber
                 //> cmp #World7               ;incorrect vertical position or not on solid ground)
                 //> beq IncMLoop
             } while (A == World7)
-            //> InitMLp:  lda #$00                  ;initialize counters used for multi-part loop commands
-            A = 0x00
-            //> sta MultiLoopPassCntr
-            multiLoopPassCntr = A
-            //> sta MultiLoopCorrectCntr
-            multiLoopCorrectCntr = A
-            //> InitLCmd: lda #$00                  ;initialize loop command flag
-            A = 0x00
-            //> sta LoopCommand
-            loopCommand = A
-            //> ;--------------------------------
+            //> DoLpBack: jsr ExecGameLoopback      ;if player is not in right place, loop back
+            execGameLoopback(Y)
+            //> jsr KillAllEnemies
+            killAllEnemies(A)
         }
     }
     //> ChkEnemyFrenzy:
@@ -22573,6 +23423,619 @@ fun procLoopCommand(X: Int): Int {
                                 }
                                 return X
                             }
+                            //> cpx #$05                 ;check for end of buffer
+                            //> bcc CheckRightBounds     ;if not at end of buffer, branch
+                            if (!(X >= 0x05)) {
+                                //  goto CheckRightBounds (internal forward branch)
+                                //> CheckRightBounds:
+                                //> lda ScreenRight_X_Pos    ;add 48 to pixel coordinate of right boundary
+                                A = screenrightXPos
+                                //> clc
+                                //> adc #$30
+                                temp6 = A + 0x30
+                                A = temp6 and 0xFF
+                                //> and #%11110000           ;store high nybble
+                                A = A and 0xF0
+                                //> sta $07
+                                memory[0x7] = A.toUByte()
+                                //> lda ScreenRight_PageLoc  ;add carry to page location of right boundary
+                                A = screenrightPageloc
+                                //> adc #$00
+                                temp7 = A + if (temp6 > 0xFF) 1 else 0
+                                A = temp7 and 0xFF
+                                //> sta $06                  ;store page location + carry
+                                memory[0x6] = A.toUByte()
+                                //> ldy EnemyDataOffset
+                                Y = enemyDataOffset
+                                //> iny
+                                Y = (Y + 1) and 0xFF
+                                //> lda (EnemyData),y        ;if MSB of enemy object is clear, branch to check for row $0f
+                                A = memory[readWord(EnemyData) + Y].toInt()
+                                //> asl
+                                val orig16: Int = A
+                                A = (orig16 shl 1) and 0xFF
+                                //> bcc CheckPageCtrlRow
+                                if (!((orig16 and 0x80) != 0)) {
+                                    //  goto CheckPageCtrlRow (internal forward branch)
+                                    //> CheckPageCtrlRow:
+                                    //> dey
+                                    Y = (Y - 1) and 0xFF
+                                    //> lda (EnemyData),y        ;reread first byte
+                                    A = memory[readWord(EnemyData) + Y].toInt()
+                                    //> and #$0f
+                                    A = A and 0x0F
+                                    //> cmp #$0f                 ;check for special row $0f
+                                    //> bne PositionEnemyObj     ;if not found, branch to position enemy object
+                                    if (!(A == 0x0F)) {
+                                        //  goto PositionEnemyObj (internal forward branch)
+                                        //> PositionEnemyObj:
+                                        //> lda EnemyObjectPageLoc   ;store page control as page location
+                                        A = enemyObjectPageLoc
+                                        //> sta Enemy_PageLoc,x      ;for enemy object
+                                        enemyPageloc[X] = A
+                                        //> lda (EnemyData),y        ;get first byte of enemy object
+                                        A = memory[readWord(EnemyData) + Y].toInt()
+                                        //> and #%11110000
+                                        A = A and 0xF0
+                                        //> sta Enemy_X_Position,x   ;store column position
+                                        enemyXPosition[X] = A
+                                        //> cmp ScreenRight_X_Pos    ;check column position against right boundary
+                                        //> lda Enemy_PageLoc,x      ;without subtracting, then subtract borrow
+                                        A = enemyPageloc[X]
+                                        //> sbc ScreenRight_PageLoc  ;from page location
+                                        temp8 = A - screenrightPageloc - if (A >= screenrightXPos) 0 else 1
+                                        A = temp8 and 0xFF
+                                        //> bcs CheckRightExtBounds  ;if enemy object beyond or at boundary, branch
+                                        if (temp8 >= 0) {
+                                            //  goto CheckRightExtBounds (internal forward branch)
+                                            //> CheckRightExtBounds:
+                                            //> lda $07                  ;check right boundary + 48 against
+                                            A = memory[0x7].toInt()
+                                            //> cmp Enemy_X_Position,x   ;column position without subtracting,
+                                            //> lda $06                  ;then subtract borrow from page control temp
+                                            A = memory[0x6].toInt()
+                                            //> sbc Enemy_PageLoc,x      ;plus carry
+                                            temp9 = A - enemyPageloc[X] - if (A >= enemyXPosition[X]) 0 else 1
+                                            A = temp9 and 0xFF
+                                            //> bcc CheckFrenzyBuffer    ;if enemy object beyond extended boundary, branch
+                                            if (!(temp9 >= 0)) {
+                                                //  goto CheckFrenzyBuffer -> checkFrenzyBuffer
+                                                checkFrenzyBuffer(X)
+                                                return X
+                                            }
+                                            //> lda #$01                 ;store value in vertical high byte
+                                            A = 0x01
+                                            //> sta Enemy_Y_HighPos,x
+                                            enemyYHighpos[X] = A
+                                            //> lda (EnemyData),y        ;get first byte again
+                                            A = memory[readWord(EnemyData) + Y].toInt()
+                                            //> asl                      ;multiply by four to get the vertical
+                                            val orig17: Int = A
+                                            A = (orig17 shl 1) and 0xFF
+                                            //> asl                      ;coordinate
+                                            val orig18: Int = A
+                                            A = (orig18 shl 1) and 0xFF
+                                            //> asl
+                                            val orig19: Int = A
+                                            A = (orig19 shl 1) and 0xFF
+                                            //> asl
+                                            val orig20: Int = A
+                                            A = (orig20 shl 1) and 0xFF
+                                            //> sta Enemy_Y_Position,x
+                                            enemyYPosition[X] = A
+                                            //> cmp #$e0                 ;do one last check for special row $0e
+                                            //> beq ParseRow0e           ;(necessary if branched to $c1cb)
+                                            if (A == 0xE0) {
+                                                //  goto ParseRow0e (internal forward branch)
+                                                //> ParseRow0e:
+                                                //> iny                      ;increment Y to load third byte of object
+                                                Y = (Y + 1) and 0xFF
+                                                //> iny
+                                                Y = (Y + 1) and 0xFF
+                                                //> lda (EnemyData),y
+                                                A = memory[readWord(EnemyData) + Y].toInt()
+                                                //> lsr                      ;move 3 MSB to the bottom, effectively
+                                                val orig21: Int = A
+                                                A = orig21 shr 1
+                                                //> lsr                      ;making %xxx00000 into %00000xxx
+                                                val orig22: Int = A
+                                                A = orig22 shr 1
+                                                //> lsr
+                                                val orig23: Int = A
+                                                A = orig23 shr 1
+                                                //> lsr
+                                                val orig24: Int = A
+                                                A = orig24 shr 1
+                                                //> lsr
+                                                val orig25: Int = A
+                                                A = orig25 shr 1
+                                                //> cmp WorldNumber          ;is it the same world number as we're on?
+                                                //> bne NotUse               ;if not, do not use (this allows multiple uses
+                                                if (!(A == worldNumber)) {
+                                                    //  goto NotUse (internal forward branch)
+                                                    //> NotUse: jmp Inc3B
+                                                    inc3B()
+                                                    return X
+                                                }
+                                                //> dey                      ;of the same area, like the underground bonus areas)
+                                                Y = (Y - 1) and 0xFF
+                                                //> lda (EnemyData),y        ;otherwise, get second byte and use as offset
+                                                A = memory[readWord(EnemyData) + Y].toInt()
+                                                //> sta AreaPointer          ;to addresses for level and enemy object data
+                                                areaPointer = A
+                                                //> iny
+                                                Y = (Y + 1) and 0xFF
+                                                //> lda (EnemyData),y        ;get third byte again, and this time mask out
+                                                A = memory[readWord(EnemyData) + Y].toInt()
+                                                //> and #%00011111           ;the 3 MSB from before, save as page number to be
+                                                A = A and 0x1F
+                                                //> sta EntrancePage         ;used upon entry to area, if area is entered
+                                                entrancePage = A
+                                                return X
+                                            }
+                                            //> iny
+                                            Y = (Y + 1) and 0xFF
+                                            //> lda (EnemyData),y        ;get second byte of object
+                                            A = memory[readWord(EnemyData) + Y].toInt()
+                                            //> and #%01000000           ;check to see if hard mode bit is set
+                                            A = A and 0x40
+                                            //> beq CheckForEnemyGroup   ;if not, branch to check for group enemy objects
+                                            if (A == 0) {
+                                                //  goto CheckForEnemyGroup (internal forward branch)
+                                                //> CheckForEnemyGroup:
+                                                //> lda (EnemyData),y      ;get second byte and mask out 2 MSB
+                                                A = memory[readWord(EnemyData) + Y].toInt()
+                                                //> and #%00111111
+                                                A = A and 0x3F
+                                                //> cmp #$37               ;check for value below $37
+                                                //> bcc BuzzyBeetleMutate
+                                                if (!(A >= 0x37)) {
+                                                    //  goto BuzzyBeetleMutate (internal forward branch)
+                                                    //> BuzzyBeetleMutate:
+                                                    //> cmp #Goomba          ;if below $37, check for goomba
+                                                    //> bne StrID            ;value ($3f or more always fails)
+                                                    if (!(A == Goomba)) {
+                                                        //  goto StrID (internal forward branch)
+                                                        //> StrID:  sta Enemy_ID,x       ;store enemy object number into buffer
+                                                        enemyId[X] = A
+                                                        //> lda #$01
+                                                        A = 0x01
+                                                        //> sta Enemy_Flag,x     ;set flag for enemy in buffer
+                                                        enemyFlag[X] = A
+                                                        //> jsr InitEnemyObject
+                                                        initEnemyObject(X)
+                                                        //> lda Enemy_Flag,x     ;check to see if flag is set
+                                                        A = enemyFlag[X]
+                                                        //> bne Inc2B            ;if not, leave, otherwise branch
+                                                        if (!(A == 0)) {
+                                                            //  goto Inc2B -> inc2B
+                                                            inc2B()
+                                                            return X
+                                                        }
+                                                        //> rts
+                                                        return X
+                                                    }
+                                                    //> ldy PrimaryHardMode  ;check if primary hard mode flag is set
+                                                    Y = primaryHardMode
+                                                    //> beq StrID            ;and if so, change goomba to buzzy beetle
+                                                    if (Y == 0) {
+                                                        //  goto StrID (internal forward branch)
+                                                        //> StrID:  sta Enemy_ID,x       ;store enemy object number into buffer
+                                                        enemyId[X] = A
+                                                        //> lda #$01
+                                                        A = 0x01
+                                                        //> sta Enemy_Flag,x     ;set flag for enemy in buffer
+                                                        enemyFlag[X] = A
+                                                        //> jsr InitEnemyObject
+                                                        initEnemyObject(X)
+                                                        //> lda Enemy_Flag,x     ;check to see if flag is set
+                                                        A = enemyFlag[X]
+                                                        //> bne Inc2B            ;if not, leave, otherwise branch
+                                                        if (!(A == 0)) {
+                                                            //  goto Inc2B -> inc2B
+                                                            inc2B()
+                                                            return X
+                                                        }
+                                                        //> rts
+                                                        return X
+                                                    }
+                                                    //> lda #BuzzyBeetle
+                                                    A = BuzzyBeetle
+                                                    return X
+                                                }
+                                                //> cmp #$3f               ;if $37 or greater, check for value
+                                                //> bcc DoGroup            ;below $3f, branch if below $3f
+                                                if (!(A >= 0x3F)) {
+                                                    //  goto DoGroup (internal forward branch)
+                                                    //> DoGroup:
+                                                    //> jmp HandleGroupEnemies   ;handle enemy group objects
+                                                    handleGroupEnemies(A)
+                                                    return X
+                                                }
+                                                return X
+                                            }
+                                            //> lda SecondaryHardMode    ;if set, check to see if secondary hard mode flag
+                                            A = secondaryHardMode
+                                            //> beq Inc2B                ;is on, and if not, branch to skip this object completely
+                                            if (A == 0) {
+                                                //  goto Inc2B -> inc2B
+                                                inc2B()
+                                                return X
+                                            }
+                                            return X
+                                        }
+                                        //> lda (EnemyData),y
+                                        A = memory[readWord(EnemyData) + Y].toInt()
+                                        //> and #%00001111           ;check for special row $0e
+                                        A = A and 0x0F
+                                        //> cmp #$0e                 ;if found, jump elsewhere
+                                        //> beq ParseRow0e
+                                        if (A == 0x0E) {
+                                            //  goto ParseRow0e (internal forward branch)
+                                            //> ParseRow0e:
+                                            //> iny                      ;increment Y to load third byte of object
+                                            Y = (Y + 1) and 0xFF
+                                            //> iny
+                                            Y = (Y + 1) and 0xFF
+                                            //> lda (EnemyData),y
+                                            A = memory[readWord(EnemyData) + Y].toInt()
+                                            //> lsr                      ;move 3 MSB to the bottom, effectively
+                                            val orig26: Int = A
+                                            A = orig26 shr 1
+                                            //> lsr                      ;making %xxx00000 into %00000xxx
+                                            val orig27: Int = A
+                                            A = orig27 shr 1
+                                            //> lsr
+                                            val orig28: Int = A
+                                            A = orig28 shr 1
+                                            //> lsr
+                                            val orig29: Int = A
+                                            A = orig29 shr 1
+                                            //> lsr
+                                            val orig30: Int = A
+                                            A = orig30 shr 1
+                                            //> cmp WorldNumber          ;is it the same world number as we're on?
+                                            //> bne NotUse               ;if not, do not use (this allows multiple uses
+                                            if (!(A == worldNumber)) {
+                                                //  goto NotUse (internal forward branch)
+                                                //> NotUse: jmp Inc3B
+                                                inc3B()
+                                                return X
+                                            }
+                                            //> dey                      ;of the same area, like the underground bonus areas)
+                                            Y = (Y - 1) and 0xFF
+                                            //> lda (EnemyData),y        ;otherwise, get second byte and use as offset
+                                            A = memory[readWord(EnemyData) + Y].toInt()
+                                            //> sta AreaPointer          ;to addresses for level and enemy object data
+                                            areaPointer = A
+                                            //> iny
+                                            Y = (Y + 1) and 0xFF
+                                            //> lda (EnemyData),y        ;get third byte again, and this time mask out
+                                            A = memory[readWord(EnemyData) + Y].toInt()
+                                            //> and #%00011111           ;the 3 MSB from before, save as page number to be
+                                            A = A and 0x1F
+                                            //> sta EntrancePage         ;used upon entry to area, if area is entered
+                                            entrancePage = A
+                                            return X
+                                        }
+                                        //> jmp CheckThreeBytes      ;if not found, unconditional jump
+                                        checkThreeBytes()
+                                        return X
+                                    }
+                                    return X
+                                }
+                                return X
+                            }
+                            //> iny
+                            Y = (Y + 1) and 0xFF
+                            //> lda (EnemyData),y        ;check for specific value here
+                            A = memory[readWord(EnemyData) + Y].toInt()
+                            //> and #%00111111           ;not sure what this was intended for, exactly
+                            A = A and 0x3F
+                            //> cmp #$2e                 ;this part is quite possibly residual code
+                            //> beq CheckRightBounds     ;but it has the effect of keeping enemies out of
+                            if (A == 0x2E) {
+                                //  goto CheckRightBounds (internal forward branch)
+                                //> CheckRightBounds:
+                                //> lda ScreenRight_X_Pos    ;add 48 to pixel coordinate of right boundary
+                                A = screenrightXPos
+                                //> clc
+                                //> adc #$30
+                                temp10 = A + 0x30
+                                A = temp10 and 0xFF
+                                //> and #%11110000           ;store high nybble
+                                A = A and 0xF0
+                                //> sta $07
+                                memory[0x7] = A.toUByte()
+                                //> lda ScreenRight_PageLoc  ;add carry to page location of right boundary
+                                A = screenrightPageloc
+                                //> adc #$00
+                                temp11 = A + if (temp10 > 0xFF) 1 else 0
+                                A = temp11 and 0xFF
+                                //> sta $06                  ;store page location + carry
+                                memory[0x6] = A.toUByte()
+                                //> ldy EnemyDataOffset
+                                Y = enemyDataOffset
+                                //> iny
+                                Y = (Y + 1) and 0xFF
+                                //> lda (EnemyData),y        ;if MSB of enemy object is clear, branch to check for row $0f
+                                A = memory[readWord(EnemyData) + Y].toInt()
+                                //> asl
+                                val orig31: Int = A
+                                A = (orig31 shl 1) and 0xFF
+                                //> bcc CheckPageCtrlRow
+                                if (!((orig31 and 0x80) != 0)) {
+                                    //  goto CheckPageCtrlRow (internal forward branch)
+                                    //> CheckPageCtrlRow:
+                                    //> dey
+                                    Y = (Y - 1) and 0xFF
+                                    //> lda (EnemyData),y        ;reread first byte
+                                    A = memory[readWord(EnemyData) + Y].toInt()
+                                    //> and #$0f
+                                    A = A and 0x0F
+                                    //> cmp #$0f                 ;check for special row $0f
+                                    //> bne PositionEnemyObj     ;if not found, branch to position enemy object
+                                    if (!(A == 0x0F)) {
+                                        //  goto PositionEnemyObj (internal forward branch)
+                                        //> PositionEnemyObj:
+                                        //> lda EnemyObjectPageLoc   ;store page control as page location
+                                        A = enemyObjectPageLoc
+                                        //> sta Enemy_PageLoc,x      ;for enemy object
+                                        enemyPageloc[X] = A
+                                        //> lda (EnemyData),y        ;get first byte of enemy object
+                                        A = memory[readWord(EnemyData) + Y].toInt()
+                                        //> and #%11110000
+                                        A = A and 0xF0
+                                        //> sta Enemy_X_Position,x   ;store column position
+                                        enemyXPosition[X] = A
+                                        //> cmp ScreenRight_X_Pos    ;check column position against right boundary
+                                        //> lda Enemy_PageLoc,x      ;without subtracting, then subtract borrow
+                                        A = enemyPageloc[X]
+                                        //> sbc ScreenRight_PageLoc  ;from page location
+                                        temp12 = A - screenrightPageloc - if (A >= screenrightXPos) 0 else 1
+                                        A = temp12 and 0xFF
+                                        //> bcs CheckRightExtBounds  ;if enemy object beyond or at boundary, branch
+                                        if (temp12 >= 0) {
+                                            //  goto CheckRightExtBounds (internal forward branch)
+                                            //> CheckRightExtBounds:
+                                            //> lda $07                  ;check right boundary + 48 against
+                                            A = memory[0x7].toInt()
+                                            //> cmp Enemy_X_Position,x   ;column position without subtracting,
+                                            //> lda $06                  ;then subtract borrow from page control temp
+                                            A = memory[0x6].toInt()
+                                            //> sbc Enemy_PageLoc,x      ;plus carry
+                                            temp13 = A - enemyPageloc[X] - if (A >= enemyXPosition[X]) 0 else 1
+                                            A = temp13 and 0xFF
+                                            //> bcc CheckFrenzyBuffer    ;if enemy object beyond extended boundary, branch
+                                            if (!(temp13 >= 0)) {
+                                                //  goto CheckFrenzyBuffer -> checkFrenzyBuffer
+                                                checkFrenzyBuffer(X)
+                                                return X
+                                            }
+                                            //> lda #$01                 ;store value in vertical high byte
+                                            A = 0x01
+                                            //> sta Enemy_Y_HighPos,x
+                                            enemyYHighpos[X] = A
+                                            //> lda (EnemyData),y        ;get first byte again
+                                            A = memory[readWord(EnemyData) + Y].toInt()
+                                            //> asl                      ;multiply by four to get the vertical
+                                            val orig32: Int = A
+                                            A = (orig32 shl 1) and 0xFF
+                                            //> asl                      ;coordinate
+                                            val orig33: Int = A
+                                            A = (orig33 shl 1) and 0xFF
+                                            //> asl
+                                            val orig34: Int = A
+                                            A = (orig34 shl 1) and 0xFF
+                                            //> asl
+                                            val orig35: Int = A
+                                            A = (orig35 shl 1) and 0xFF
+                                            //> sta Enemy_Y_Position,x
+                                            enemyYPosition[X] = A
+                                            //> cmp #$e0                 ;do one last check for special row $0e
+                                            //> beq ParseRow0e           ;(necessary if branched to $c1cb)
+                                            if (A == 0xE0) {
+                                                //  goto ParseRow0e (internal forward branch)
+                                                //> ParseRow0e:
+                                                //> iny                      ;increment Y to load third byte of object
+                                                Y = (Y + 1) and 0xFF
+                                                //> iny
+                                                Y = (Y + 1) and 0xFF
+                                                //> lda (EnemyData),y
+                                                A = memory[readWord(EnemyData) + Y].toInt()
+                                                //> lsr                      ;move 3 MSB to the bottom, effectively
+                                                val orig36: Int = A
+                                                A = orig36 shr 1
+                                                //> lsr                      ;making %xxx00000 into %00000xxx
+                                                val orig37: Int = A
+                                                A = orig37 shr 1
+                                                //> lsr
+                                                val orig38: Int = A
+                                                A = orig38 shr 1
+                                                //> lsr
+                                                val orig39: Int = A
+                                                A = orig39 shr 1
+                                                //> lsr
+                                                val orig40: Int = A
+                                                A = orig40 shr 1
+                                                //> cmp WorldNumber          ;is it the same world number as we're on?
+                                                //> bne NotUse               ;if not, do not use (this allows multiple uses
+                                                if (!(A == worldNumber)) {
+                                                    //  goto NotUse (internal forward branch)
+                                                    //> NotUse: jmp Inc3B
+                                                    inc3B()
+                                                    return X
+                                                }
+                                                //> dey                      ;of the same area, like the underground bonus areas)
+                                                Y = (Y - 1) and 0xFF
+                                                //> lda (EnemyData),y        ;otherwise, get second byte and use as offset
+                                                A = memory[readWord(EnemyData) + Y].toInt()
+                                                //> sta AreaPointer          ;to addresses for level and enemy object data
+                                                areaPointer = A
+                                                //> iny
+                                                Y = (Y + 1) and 0xFF
+                                                //> lda (EnemyData),y        ;get third byte again, and this time mask out
+                                                A = memory[readWord(EnemyData) + Y].toInt()
+                                                //> and #%00011111           ;the 3 MSB from before, save as page number to be
+                                                A = A and 0x1F
+                                                //> sta EntrancePage         ;used upon entry to area, if area is entered
+                                                entrancePage = A
+                                                return X
+                                            }
+                                            //> iny
+                                            Y = (Y + 1) and 0xFF
+                                            //> lda (EnemyData),y        ;get second byte of object
+                                            A = memory[readWord(EnemyData) + Y].toInt()
+                                            //> and #%01000000           ;check to see if hard mode bit is set
+                                            A = A and 0x40
+                                            //> beq CheckForEnemyGroup   ;if not, branch to check for group enemy objects
+                                            if (A == 0) {
+                                                //  goto CheckForEnemyGroup (internal forward branch)
+                                                //> CheckForEnemyGroup:
+                                                //> lda (EnemyData),y      ;get second byte and mask out 2 MSB
+                                                A = memory[readWord(EnemyData) + Y].toInt()
+                                                //> and #%00111111
+                                                A = A and 0x3F
+                                                //> cmp #$37               ;check for value below $37
+                                                //> bcc BuzzyBeetleMutate
+                                                if (!(A >= 0x37)) {
+                                                    //  goto BuzzyBeetleMutate (internal forward branch)
+                                                    //> BuzzyBeetleMutate:
+                                                    //> cmp #Goomba          ;if below $37, check for goomba
+                                                    //> bne StrID            ;value ($3f or more always fails)
+                                                    if (!(A == Goomba)) {
+                                                        //  goto StrID (internal forward branch)
+                                                        //> StrID:  sta Enemy_ID,x       ;store enemy object number into buffer
+                                                        enemyId[X] = A
+                                                        //> lda #$01
+                                                        A = 0x01
+                                                        //> sta Enemy_Flag,x     ;set flag for enemy in buffer
+                                                        enemyFlag[X] = A
+                                                        //> jsr InitEnemyObject
+                                                        initEnemyObject(X)
+                                                        //> lda Enemy_Flag,x     ;check to see if flag is set
+                                                        A = enemyFlag[X]
+                                                        //> bne Inc2B            ;if not, leave, otherwise branch
+                                                        if (!(A == 0)) {
+                                                            //  goto Inc2B -> inc2B
+                                                            inc2B()
+                                                            return X
+                                                        }
+                                                        //> rts
+                                                        return X
+                                                    }
+                                                    //> ldy PrimaryHardMode  ;check if primary hard mode flag is set
+                                                    Y = primaryHardMode
+                                                    //> beq StrID            ;and if so, change goomba to buzzy beetle
+                                                    if (Y == 0) {
+                                                        //  goto StrID (internal forward branch)
+                                                        //> StrID:  sta Enemy_ID,x       ;store enemy object number into buffer
+                                                        enemyId[X] = A
+                                                        //> lda #$01
+                                                        A = 0x01
+                                                        //> sta Enemy_Flag,x     ;set flag for enemy in buffer
+                                                        enemyFlag[X] = A
+                                                        //> jsr InitEnemyObject
+                                                        initEnemyObject(X)
+                                                        //> lda Enemy_Flag,x     ;check to see if flag is set
+                                                        A = enemyFlag[X]
+                                                        //> bne Inc2B            ;if not, leave, otherwise branch
+                                                        if (!(A == 0)) {
+                                                            //  goto Inc2B -> inc2B
+                                                            inc2B()
+                                                            return X
+                                                        }
+                                                        //> rts
+                                                        return X
+                                                    }
+                                                    //> lda #BuzzyBeetle
+                                                    A = BuzzyBeetle
+                                                    return X
+                                                }
+                                                //> cmp #$3f               ;if $37 or greater, check for value
+                                                //> bcc DoGroup            ;below $3f, branch if below $3f
+                                                if (!(A >= 0x3F)) {
+                                                    //  goto DoGroup (internal forward branch)
+                                                    //> DoGroup:
+                                                    //> jmp HandleGroupEnemies   ;handle enemy group objects
+                                                    handleGroupEnemies(A)
+                                                    return X
+                                                }
+                                                return X
+                                            }
+                                            //> lda SecondaryHardMode    ;if set, check to see if secondary hard mode flag
+                                            A = secondaryHardMode
+                                            //> beq Inc2B                ;is on, and if not, branch to skip this object completely
+                                            if (A == 0) {
+                                                //  goto Inc2B -> inc2B
+                                                inc2B()
+                                                return X
+                                            }
+                                            return X
+                                        }
+                                        //> lda (EnemyData),y
+                                        A = memory[readWord(EnemyData) + Y].toInt()
+                                        //> and #%00001111           ;check for special row $0e
+                                        A = A and 0x0F
+                                        //> cmp #$0e                 ;if found, jump elsewhere
+                                        //> beq ParseRow0e
+                                        if (A == 0x0E) {
+                                            //  goto ParseRow0e (internal forward branch)
+                                            //> ParseRow0e:
+                                            //> iny                      ;increment Y to load third byte of object
+                                            Y = (Y + 1) and 0xFF
+                                            //> iny
+                                            Y = (Y + 1) and 0xFF
+                                            //> lda (EnemyData),y
+                                            A = memory[readWord(EnemyData) + Y].toInt()
+                                            //> lsr                      ;move 3 MSB to the bottom, effectively
+                                            val orig41: Int = A
+                                            A = orig41 shr 1
+                                            //> lsr                      ;making %xxx00000 into %00000xxx
+                                            val orig42: Int = A
+                                            A = orig42 shr 1
+                                            //> lsr
+                                            val orig43: Int = A
+                                            A = orig43 shr 1
+                                            //> lsr
+                                            val orig44: Int = A
+                                            A = orig44 shr 1
+                                            //> lsr
+                                            val orig45: Int = A
+                                            A = orig45 shr 1
+                                            //> cmp WorldNumber          ;is it the same world number as we're on?
+                                            //> bne NotUse               ;if not, do not use (this allows multiple uses
+                                            if (!(A == worldNumber)) {
+                                                //  goto NotUse (internal forward branch)
+                                                //> NotUse: jmp Inc3B
+                                                inc3B()
+                                                return X
+                                            }
+                                            //> dey                      ;of the same area, like the underground bonus areas)
+                                            Y = (Y - 1) and 0xFF
+                                            //> lda (EnemyData),y        ;otherwise, get second byte and use as offset
+                                            A = memory[readWord(EnemyData) + Y].toInt()
+                                            //> sta AreaPointer          ;to addresses for level and enemy object data
+                                            areaPointer = A
+                                            //> iny
+                                            Y = (Y + 1) and 0xFF
+                                            //> lda (EnemyData),y        ;get third byte again, and this time mask out
+                                            A = memory[readWord(EnemyData) + Y].toInt()
+                                            //> and #%00011111           ;the 3 MSB from before, save as page number to be
+                                            A = A and 0x1F
+                                            //> sta EntrancePage         ;used upon entry to area, if area is entered
+                                            entrancePage = A
+                                            return X
+                                        }
+                                        //> jmp CheckThreeBytes      ;if not found, unconditional jump
+                                        checkThreeBytes()
+                                        return X
+                                    }
+                                    return X
+                                }
+                                return X
+                            }
+                            //> rts                      ;the sixth slot
                             return X
                         }
                         //> jmp CheckFrenzyBuffer    ;if found, jump to check frenzy buffer, otherwise
@@ -22595,6 +24058,34 @@ fun procLoopCommand(X: Int): Int {
                     initEnemyObject(X)
                     return X
                 }
+                //> lda Player_State          ;check to see if the player is
+                A = playerState
+                //> cmp #$00                  ;on solid ground (i.e. not jumping or falling)
+                //> bne WrongChk              ;if not, player fails to pass loop, and loopback
+                if (!(A == 0x00)) {
+                    //  goto WrongChk (internal forward branch)
+                    //> WrongChk: lda WorldNumber           ;are we in world 7? (check performed on
+                    A = worldNumber
+                    //> cmp #World7               ;incorrect vertical position or not on solid ground)
+                    //> beq IncMLoop
+                    return X
+                }
+                //> lda WorldNumber           ;are we in world 7? (check performed on correct
+                A = worldNumber
+                //> cmp #World7               ;vertical position and on solid ground)
+                //> bne InitMLp               ;if not, initialize flags used there, otherwise
+                if (!(A == World7)) {
+                    //  goto InitMLp (internal forward branch)
+                    //> InitMLp:  lda #$00                  ;initialize counters used for multi-part loop commands
+                    A = 0x00
+                    //> sta MultiLoopPassCntr
+                    multiLoopPassCntr = A
+                    //> sta MultiLoopCorrectCntr
+                    multiLoopCorrectCntr = A
+                    return X
+                }
+                //> inc MultiLoopCorrectCntr  ;increment counter for correct progression
+                multiLoopCorrectCntr = (multiLoopCorrectCntr + 1) and 0xFF
                 //> sta Enemy_ID,x        ;store as enemy object identifier here
                 enemyId[X] = A
                 //> lda #$01
@@ -22613,6 +24104,618 @@ fun procLoopCommand(X: Int): Int {
                 //> jmp CheckFrenzyBuffer    ;if found, jump to check frenzy buffer, otherwise
                 checkFrenzyBuffer(X)
                 return X
+                //> cpx #$05                 ;check for end of buffer
+                //> bcc CheckRightBounds     ;if not at end of buffer, branch
+                if (!(X >= 0x05)) {
+                    //  goto CheckRightBounds (internal forward branch)
+                    //> CheckRightBounds:
+                    //> lda ScreenRight_X_Pos    ;add 48 to pixel coordinate of right boundary
+                    A = screenrightXPos
+                    //> clc
+                    //> adc #$30
+                    temp14 = A + 0x30
+                    A = temp14 and 0xFF
+                    //> and #%11110000           ;store high nybble
+                    A = A and 0xF0
+                    //> sta $07
+                    memory[0x7] = A.toUByte()
+                    //> lda ScreenRight_PageLoc  ;add carry to page location of right boundary
+                    A = screenrightPageloc
+                    //> adc #$00
+                    temp15 = A + if (temp14 > 0xFF) 1 else 0
+                    A = temp15 and 0xFF
+                    //> sta $06                  ;store page location + carry
+                    memory[0x6] = A.toUByte()
+                    //> ldy EnemyDataOffset
+                    Y = enemyDataOffset
+                    //> iny
+                    Y = (Y + 1) and 0xFF
+                    //> lda (EnemyData),y        ;if MSB of enemy object is clear, branch to check for row $0f
+                    A = memory[readWord(EnemyData) + Y].toInt()
+                    //> asl
+                    val orig46: Int = A
+                    A = (orig46 shl 1) and 0xFF
+                    //> bcc CheckPageCtrlRow
+                    if (!((orig46 and 0x80) != 0)) {
+                        //  goto CheckPageCtrlRow (internal forward branch)
+                        //> CheckPageCtrlRow:
+                        //> dey
+                        Y = (Y - 1) and 0xFF
+                        //> lda (EnemyData),y        ;reread first byte
+                        A = memory[readWord(EnemyData) + Y].toInt()
+                        //> and #$0f
+                        A = A and 0x0F
+                        //> cmp #$0f                 ;check for special row $0f
+                        //> bne PositionEnemyObj     ;if not found, branch to position enemy object
+                        if (!(A == 0x0F)) {
+                            //  goto PositionEnemyObj (internal forward branch)
+                            //> PositionEnemyObj:
+                            //> lda EnemyObjectPageLoc   ;store page control as page location
+                            A = enemyObjectPageLoc
+                            //> sta Enemy_PageLoc,x      ;for enemy object
+                            enemyPageloc[X] = A
+                            //> lda (EnemyData),y        ;get first byte of enemy object
+                            A = memory[readWord(EnemyData) + Y].toInt()
+                            //> and #%11110000
+                            A = A and 0xF0
+                            //> sta Enemy_X_Position,x   ;store column position
+                            enemyXPosition[X] = A
+                            //> cmp ScreenRight_X_Pos    ;check column position against right boundary
+                            //> lda Enemy_PageLoc,x      ;without subtracting, then subtract borrow
+                            A = enemyPageloc[X]
+                            //> sbc ScreenRight_PageLoc  ;from page location
+                            temp16 = A - screenrightPageloc - if (A >= screenrightXPos) 0 else 1
+                            A = temp16 and 0xFF
+                            //> bcs CheckRightExtBounds  ;if enemy object beyond or at boundary, branch
+                            if (temp16 >= 0) {
+                                //  goto CheckRightExtBounds (internal forward branch)
+                                //> CheckRightExtBounds:
+                                //> lda $07                  ;check right boundary + 48 against
+                                A = memory[0x7].toInt()
+                                //> cmp Enemy_X_Position,x   ;column position without subtracting,
+                                //> lda $06                  ;then subtract borrow from page control temp
+                                A = memory[0x6].toInt()
+                                //> sbc Enemy_PageLoc,x      ;plus carry
+                                temp17 = A - enemyPageloc[X] - if (A >= enemyXPosition[X]) 0 else 1
+                                A = temp17 and 0xFF
+                                //> bcc CheckFrenzyBuffer    ;if enemy object beyond extended boundary, branch
+                                if (!(temp17 >= 0)) {
+                                    //  goto CheckFrenzyBuffer -> checkFrenzyBuffer
+                                    checkFrenzyBuffer(X)
+                                    return X
+                                }
+                                //> lda #$01                 ;store value in vertical high byte
+                                A = 0x01
+                                //> sta Enemy_Y_HighPos,x
+                                enemyYHighpos[X] = A
+                                //> lda (EnemyData),y        ;get first byte again
+                                A = memory[readWord(EnemyData) + Y].toInt()
+                                //> asl                      ;multiply by four to get the vertical
+                                val orig47: Int = A
+                                A = (orig47 shl 1) and 0xFF
+                                //> asl                      ;coordinate
+                                val orig48: Int = A
+                                A = (orig48 shl 1) and 0xFF
+                                //> asl
+                                val orig49: Int = A
+                                A = (orig49 shl 1) and 0xFF
+                                //> asl
+                                val orig50: Int = A
+                                A = (orig50 shl 1) and 0xFF
+                                //> sta Enemy_Y_Position,x
+                                enemyYPosition[X] = A
+                                //> cmp #$e0                 ;do one last check for special row $0e
+                                //> beq ParseRow0e           ;(necessary if branched to $c1cb)
+                                if (A == 0xE0) {
+                                    //  goto ParseRow0e (internal forward branch)
+                                    //> ParseRow0e:
+                                    //> iny                      ;increment Y to load third byte of object
+                                    Y = (Y + 1) and 0xFF
+                                    //> iny
+                                    Y = (Y + 1) and 0xFF
+                                    //> lda (EnemyData),y
+                                    A = memory[readWord(EnemyData) + Y].toInt()
+                                    //> lsr                      ;move 3 MSB to the bottom, effectively
+                                    val orig51: Int = A
+                                    A = orig51 shr 1
+                                    //> lsr                      ;making %xxx00000 into %00000xxx
+                                    val orig52: Int = A
+                                    A = orig52 shr 1
+                                    //> lsr
+                                    val orig53: Int = A
+                                    A = orig53 shr 1
+                                    //> lsr
+                                    val orig54: Int = A
+                                    A = orig54 shr 1
+                                    //> lsr
+                                    val orig55: Int = A
+                                    A = orig55 shr 1
+                                    //> cmp WorldNumber          ;is it the same world number as we're on?
+                                    //> bne NotUse               ;if not, do not use (this allows multiple uses
+                                    if (!(A == worldNumber)) {
+                                        //  goto NotUse (internal forward branch)
+                                        //> NotUse: jmp Inc3B
+                                        inc3B()
+                                        return X
+                                    }
+                                    //> dey                      ;of the same area, like the underground bonus areas)
+                                    Y = (Y - 1) and 0xFF
+                                    //> lda (EnemyData),y        ;otherwise, get second byte and use as offset
+                                    A = memory[readWord(EnemyData) + Y].toInt()
+                                    //> sta AreaPointer          ;to addresses for level and enemy object data
+                                    areaPointer = A
+                                    //> iny
+                                    Y = (Y + 1) and 0xFF
+                                    //> lda (EnemyData),y        ;get third byte again, and this time mask out
+                                    A = memory[readWord(EnemyData) + Y].toInt()
+                                    //> and #%00011111           ;the 3 MSB from before, save as page number to be
+                                    A = A and 0x1F
+                                    //> sta EntrancePage         ;used upon entry to area, if area is entered
+                                    entrancePage = A
+                                    return X
+                                }
+                                //> iny
+                                Y = (Y + 1) and 0xFF
+                                //> lda (EnemyData),y        ;get second byte of object
+                                A = memory[readWord(EnemyData) + Y].toInt()
+                                //> and #%01000000           ;check to see if hard mode bit is set
+                                A = A and 0x40
+                                //> beq CheckForEnemyGroup   ;if not, branch to check for group enemy objects
+                                if (A == 0) {
+                                    //  goto CheckForEnemyGroup (internal forward branch)
+                                    //> CheckForEnemyGroup:
+                                    //> lda (EnemyData),y      ;get second byte and mask out 2 MSB
+                                    A = memory[readWord(EnemyData) + Y].toInt()
+                                    //> and #%00111111
+                                    A = A and 0x3F
+                                    //> cmp #$37               ;check for value below $37
+                                    //> bcc BuzzyBeetleMutate
+                                    if (!(A >= 0x37)) {
+                                        //  goto BuzzyBeetleMutate (internal forward branch)
+                                        //> BuzzyBeetleMutate:
+                                        //> cmp #Goomba          ;if below $37, check for goomba
+                                        //> bne StrID            ;value ($3f or more always fails)
+                                        if (!(A == Goomba)) {
+                                            //  goto StrID (internal forward branch)
+                                            //> StrID:  sta Enemy_ID,x       ;store enemy object number into buffer
+                                            enemyId[X] = A
+                                            //> lda #$01
+                                            A = 0x01
+                                            //> sta Enemy_Flag,x     ;set flag for enemy in buffer
+                                            enemyFlag[X] = A
+                                            //> jsr InitEnemyObject
+                                            initEnemyObject(X)
+                                            //> lda Enemy_Flag,x     ;check to see if flag is set
+                                            A = enemyFlag[X]
+                                            //> bne Inc2B            ;if not, leave, otherwise branch
+                                            if (!(A == 0)) {
+                                                //  goto Inc2B -> inc2B
+                                                inc2B()
+                                                return X
+                                            }
+                                            //> rts
+                                            return X
+                                        }
+                                        //> ldy PrimaryHardMode  ;check if primary hard mode flag is set
+                                        Y = primaryHardMode
+                                        //> beq StrID            ;and if so, change goomba to buzzy beetle
+                                        if (Y == 0) {
+                                            //  goto StrID (internal forward branch)
+                                            //> StrID:  sta Enemy_ID,x       ;store enemy object number into buffer
+                                            enemyId[X] = A
+                                            //> lda #$01
+                                            A = 0x01
+                                            //> sta Enemy_Flag,x     ;set flag for enemy in buffer
+                                            enemyFlag[X] = A
+                                            //> jsr InitEnemyObject
+                                            initEnemyObject(X)
+                                            //> lda Enemy_Flag,x     ;check to see if flag is set
+                                            A = enemyFlag[X]
+                                            //> bne Inc2B            ;if not, leave, otherwise branch
+                                            if (!(A == 0)) {
+                                                //  goto Inc2B -> inc2B
+                                                inc2B()
+                                                return X
+                                            }
+                                            //> rts
+                                            return X
+                                        }
+                                        //> lda #BuzzyBeetle
+                                        A = BuzzyBeetle
+                                        return X
+                                    }
+                                    //> cmp #$3f               ;if $37 or greater, check for value
+                                    //> bcc DoGroup            ;below $3f, branch if below $3f
+                                    if (!(A >= 0x3F)) {
+                                        //  goto DoGroup (internal forward branch)
+                                        //> DoGroup:
+                                        //> jmp HandleGroupEnemies   ;handle enemy group objects
+                                        handleGroupEnemies(A)
+                                        return X
+                                    }
+                                    return X
+                                }
+                                //> lda SecondaryHardMode    ;if set, check to see if secondary hard mode flag
+                                A = secondaryHardMode
+                                //> beq Inc2B                ;is on, and if not, branch to skip this object completely
+                                if (A == 0) {
+                                    //  goto Inc2B -> inc2B
+                                    inc2B()
+                                    return X
+                                }
+                                return X
+                            }
+                            //> lda (EnemyData),y
+                            A = memory[readWord(EnemyData) + Y].toInt()
+                            //> and #%00001111           ;check for special row $0e
+                            A = A and 0x0F
+                            //> cmp #$0e                 ;if found, jump elsewhere
+                            //> beq ParseRow0e
+                            if (A == 0x0E) {
+                                //  goto ParseRow0e (internal forward branch)
+                                //> ParseRow0e:
+                                //> iny                      ;increment Y to load third byte of object
+                                Y = (Y + 1) and 0xFF
+                                //> iny
+                                Y = (Y + 1) and 0xFF
+                                //> lda (EnemyData),y
+                                A = memory[readWord(EnemyData) + Y].toInt()
+                                //> lsr                      ;move 3 MSB to the bottom, effectively
+                                val orig56: Int = A
+                                A = orig56 shr 1
+                                //> lsr                      ;making %xxx00000 into %00000xxx
+                                val orig57: Int = A
+                                A = orig57 shr 1
+                                //> lsr
+                                val orig58: Int = A
+                                A = orig58 shr 1
+                                //> lsr
+                                val orig59: Int = A
+                                A = orig59 shr 1
+                                //> lsr
+                                val orig60: Int = A
+                                A = orig60 shr 1
+                                //> cmp WorldNumber          ;is it the same world number as we're on?
+                                //> bne NotUse               ;if not, do not use (this allows multiple uses
+                                if (!(A == worldNumber)) {
+                                    //  goto NotUse (internal forward branch)
+                                    //> NotUse: jmp Inc3B
+                                    inc3B()
+                                    return X
+                                }
+                                //> dey                      ;of the same area, like the underground bonus areas)
+                                Y = (Y - 1) and 0xFF
+                                //> lda (EnemyData),y        ;otherwise, get second byte and use as offset
+                                A = memory[readWord(EnemyData) + Y].toInt()
+                                //> sta AreaPointer          ;to addresses for level and enemy object data
+                                areaPointer = A
+                                //> iny
+                                Y = (Y + 1) and 0xFF
+                                //> lda (EnemyData),y        ;get third byte again, and this time mask out
+                                A = memory[readWord(EnemyData) + Y].toInt()
+                                //> and #%00011111           ;the 3 MSB from before, save as page number to be
+                                A = A and 0x1F
+                                //> sta EntrancePage         ;used upon entry to area, if area is entered
+                                entrancePage = A
+                                return X
+                            }
+                            //> jmp CheckThreeBytes      ;if not found, unconditional jump
+                            checkThreeBytes()
+                            return X
+                        }
+                        return X
+                    }
+                    return X
+                }
+                //> iny
+                Y = (Y + 1) and 0xFF
+                //> lda (EnemyData),y        ;check for specific value here
+                A = memory[readWord(EnemyData) + Y].toInt()
+                //> and #%00111111           ;not sure what this was intended for, exactly
+                A = A and 0x3F
+                //> cmp #$2e                 ;this part is quite possibly residual code
+                //> beq CheckRightBounds     ;but it has the effect of keeping enemies out of
+                if (A == 0x2E) {
+                    //  goto CheckRightBounds (internal forward branch)
+                    //> CheckRightBounds:
+                    //> lda ScreenRight_X_Pos    ;add 48 to pixel coordinate of right boundary
+                    A = screenrightXPos
+                    //> clc
+                    //> adc #$30
+                    temp18 = A + 0x30
+                    A = temp18 and 0xFF
+                    //> and #%11110000           ;store high nybble
+                    A = A and 0xF0
+                    //> sta $07
+                    memory[0x7] = A.toUByte()
+                    //> lda ScreenRight_PageLoc  ;add carry to page location of right boundary
+                    A = screenrightPageloc
+                    //> adc #$00
+                    temp19 = A + if (temp18 > 0xFF) 1 else 0
+                    A = temp19 and 0xFF
+                    //> sta $06                  ;store page location + carry
+                    memory[0x6] = A.toUByte()
+                    //> ldy EnemyDataOffset
+                    Y = enemyDataOffset
+                    //> iny
+                    Y = (Y + 1) and 0xFF
+                    //> lda (EnemyData),y        ;if MSB of enemy object is clear, branch to check for row $0f
+                    A = memory[readWord(EnemyData) + Y].toInt()
+                    //> asl
+                    val orig61: Int = A
+                    A = (orig61 shl 1) and 0xFF
+                    //> bcc CheckPageCtrlRow
+                    if (!((orig61 and 0x80) != 0)) {
+                        //  goto CheckPageCtrlRow (internal forward branch)
+                        //> CheckPageCtrlRow:
+                        //> dey
+                        Y = (Y - 1) and 0xFF
+                        //> lda (EnemyData),y        ;reread first byte
+                        A = memory[readWord(EnemyData) + Y].toInt()
+                        //> and #$0f
+                        A = A and 0x0F
+                        //> cmp #$0f                 ;check for special row $0f
+                        //> bne PositionEnemyObj     ;if not found, branch to position enemy object
+                        if (!(A == 0x0F)) {
+                            //  goto PositionEnemyObj (internal forward branch)
+                            //> PositionEnemyObj:
+                            //> lda EnemyObjectPageLoc   ;store page control as page location
+                            A = enemyObjectPageLoc
+                            //> sta Enemy_PageLoc,x      ;for enemy object
+                            enemyPageloc[X] = A
+                            //> lda (EnemyData),y        ;get first byte of enemy object
+                            A = memory[readWord(EnemyData) + Y].toInt()
+                            //> and #%11110000
+                            A = A and 0xF0
+                            //> sta Enemy_X_Position,x   ;store column position
+                            enemyXPosition[X] = A
+                            //> cmp ScreenRight_X_Pos    ;check column position against right boundary
+                            //> lda Enemy_PageLoc,x      ;without subtracting, then subtract borrow
+                            A = enemyPageloc[X]
+                            //> sbc ScreenRight_PageLoc  ;from page location
+                            temp20 = A - screenrightPageloc - if (A >= screenrightXPos) 0 else 1
+                            A = temp20 and 0xFF
+                            //> bcs CheckRightExtBounds  ;if enemy object beyond or at boundary, branch
+                            if (temp20 >= 0) {
+                                //  goto CheckRightExtBounds (internal forward branch)
+                                //> CheckRightExtBounds:
+                                //> lda $07                  ;check right boundary + 48 against
+                                A = memory[0x7].toInt()
+                                //> cmp Enemy_X_Position,x   ;column position without subtracting,
+                                //> lda $06                  ;then subtract borrow from page control temp
+                                A = memory[0x6].toInt()
+                                //> sbc Enemy_PageLoc,x      ;plus carry
+                                temp21 = A - enemyPageloc[X] - if (A >= enemyXPosition[X]) 0 else 1
+                                A = temp21 and 0xFF
+                                //> bcc CheckFrenzyBuffer    ;if enemy object beyond extended boundary, branch
+                                if (!(temp21 >= 0)) {
+                                    //  goto CheckFrenzyBuffer -> checkFrenzyBuffer
+                                    checkFrenzyBuffer(X)
+                                    return X
+                                }
+                                //> lda #$01                 ;store value in vertical high byte
+                                A = 0x01
+                                //> sta Enemy_Y_HighPos,x
+                                enemyYHighpos[X] = A
+                                //> lda (EnemyData),y        ;get first byte again
+                                A = memory[readWord(EnemyData) + Y].toInt()
+                                //> asl                      ;multiply by four to get the vertical
+                                val orig62: Int = A
+                                A = (orig62 shl 1) and 0xFF
+                                //> asl                      ;coordinate
+                                val orig63: Int = A
+                                A = (orig63 shl 1) and 0xFF
+                                //> asl
+                                val orig64: Int = A
+                                A = (orig64 shl 1) and 0xFF
+                                //> asl
+                                val orig65: Int = A
+                                A = (orig65 shl 1) and 0xFF
+                                //> sta Enemy_Y_Position,x
+                                enemyYPosition[X] = A
+                                //> cmp #$e0                 ;do one last check for special row $0e
+                                //> beq ParseRow0e           ;(necessary if branched to $c1cb)
+                                if (A == 0xE0) {
+                                    //  goto ParseRow0e (internal forward branch)
+                                    //> ParseRow0e:
+                                    //> iny                      ;increment Y to load third byte of object
+                                    Y = (Y + 1) and 0xFF
+                                    //> iny
+                                    Y = (Y + 1) and 0xFF
+                                    //> lda (EnemyData),y
+                                    A = memory[readWord(EnemyData) + Y].toInt()
+                                    //> lsr                      ;move 3 MSB to the bottom, effectively
+                                    val orig66: Int = A
+                                    A = orig66 shr 1
+                                    //> lsr                      ;making %xxx00000 into %00000xxx
+                                    val orig67: Int = A
+                                    A = orig67 shr 1
+                                    //> lsr
+                                    val orig68: Int = A
+                                    A = orig68 shr 1
+                                    //> lsr
+                                    val orig69: Int = A
+                                    A = orig69 shr 1
+                                    //> lsr
+                                    val orig70: Int = A
+                                    A = orig70 shr 1
+                                    //> cmp WorldNumber          ;is it the same world number as we're on?
+                                    //> bne NotUse               ;if not, do not use (this allows multiple uses
+                                    if (!(A == worldNumber)) {
+                                        //  goto NotUse (internal forward branch)
+                                        //> NotUse: jmp Inc3B
+                                        inc3B()
+                                        return X
+                                    }
+                                    //> dey                      ;of the same area, like the underground bonus areas)
+                                    Y = (Y - 1) and 0xFF
+                                    //> lda (EnemyData),y        ;otherwise, get second byte and use as offset
+                                    A = memory[readWord(EnemyData) + Y].toInt()
+                                    //> sta AreaPointer          ;to addresses for level and enemy object data
+                                    areaPointer = A
+                                    //> iny
+                                    Y = (Y + 1) and 0xFF
+                                    //> lda (EnemyData),y        ;get third byte again, and this time mask out
+                                    A = memory[readWord(EnemyData) + Y].toInt()
+                                    //> and #%00011111           ;the 3 MSB from before, save as page number to be
+                                    A = A and 0x1F
+                                    //> sta EntrancePage         ;used upon entry to area, if area is entered
+                                    entrancePage = A
+                                    return X
+                                }
+                                //> iny
+                                Y = (Y + 1) and 0xFF
+                                //> lda (EnemyData),y        ;get second byte of object
+                                A = memory[readWord(EnemyData) + Y].toInt()
+                                //> and #%01000000           ;check to see if hard mode bit is set
+                                A = A and 0x40
+                                //> beq CheckForEnemyGroup   ;if not, branch to check for group enemy objects
+                                if (A == 0) {
+                                    //  goto CheckForEnemyGroup (internal forward branch)
+                                    //> CheckForEnemyGroup:
+                                    //> lda (EnemyData),y      ;get second byte and mask out 2 MSB
+                                    A = memory[readWord(EnemyData) + Y].toInt()
+                                    //> and #%00111111
+                                    A = A and 0x3F
+                                    //> cmp #$37               ;check for value below $37
+                                    //> bcc BuzzyBeetleMutate
+                                    if (!(A >= 0x37)) {
+                                        //  goto BuzzyBeetleMutate (internal forward branch)
+                                        //> BuzzyBeetleMutate:
+                                        //> cmp #Goomba          ;if below $37, check for goomba
+                                        //> bne StrID            ;value ($3f or more always fails)
+                                        if (!(A == Goomba)) {
+                                            //  goto StrID (internal forward branch)
+                                            //> StrID:  sta Enemy_ID,x       ;store enemy object number into buffer
+                                            enemyId[X] = A
+                                            //> lda #$01
+                                            A = 0x01
+                                            //> sta Enemy_Flag,x     ;set flag for enemy in buffer
+                                            enemyFlag[X] = A
+                                            //> jsr InitEnemyObject
+                                            initEnemyObject(X)
+                                            //> lda Enemy_Flag,x     ;check to see if flag is set
+                                            A = enemyFlag[X]
+                                            //> bne Inc2B            ;if not, leave, otherwise branch
+                                            if (!(A == 0)) {
+                                                //  goto Inc2B -> inc2B
+                                                inc2B()
+                                                return X
+                                            }
+                                            //> rts
+                                            return X
+                                        }
+                                        //> ldy PrimaryHardMode  ;check if primary hard mode flag is set
+                                        Y = primaryHardMode
+                                        //> beq StrID            ;and if so, change goomba to buzzy beetle
+                                        if (Y == 0) {
+                                            //  goto StrID (internal forward branch)
+                                            //> StrID:  sta Enemy_ID,x       ;store enemy object number into buffer
+                                            enemyId[X] = A
+                                            //> lda #$01
+                                            A = 0x01
+                                            //> sta Enemy_Flag,x     ;set flag for enemy in buffer
+                                            enemyFlag[X] = A
+                                            //> jsr InitEnemyObject
+                                            initEnemyObject(X)
+                                            //> lda Enemy_Flag,x     ;check to see if flag is set
+                                            A = enemyFlag[X]
+                                            //> bne Inc2B            ;if not, leave, otherwise branch
+                                            if (!(A == 0)) {
+                                                //  goto Inc2B -> inc2B
+                                                inc2B()
+                                                return X
+                                            }
+                                            //> rts
+                                            return X
+                                        }
+                                        //> lda #BuzzyBeetle
+                                        A = BuzzyBeetle
+                                        return X
+                                    }
+                                    //> cmp #$3f               ;if $37 or greater, check for value
+                                    //> bcc DoGroup            ;below $3f, branch if below $3f
+                                    if (!(A >= 0x3F)) {
+                                        //  goto DoGroup (internal forward branch)
+                                        //> DoGroup:
+                                        //> jmp HandleGroupEnemies   ;handle enemy group objects
+                                        handleGroupEnemies(A)
+                                        return X
+                                    }
+                                    return X
+                                }
+                                //> lda SecondaryHardMode    ;if set, check to see if secondary hard mode flag
+                                A = secondaryHardMode
+                                //> beq Inc2B                ;is on, and if not, branch to skip this object completely
+                                if (A == 0) {
+                                    //  goto Inc2B -> inc2B
+                                    inc2B()
+                                    return X
+                                }
+                                return X
+                            }
+                            //> lda (EnemyData),y
+                            A = memory[readWord(EnemyData) + Y].toInt()
+                            //> and #%00001111           ;check for special row $0e
+                            A = A and 0x0F
+                            //> cmp #$0e                 ;if found, jump elsewhere
+                            //> beq ParseRow0e
+                            if (A == 0x0E) {
+                                //  goto ParseRow0e (internal forward branch)
+                                //> ParseRow0e:
+                                //> iny                      ;increment Y to load third byte of object
+                                Y = (Y + 1) and 0xFF
+                                //> iny
+                                Y = (Y + 1) and 0xFF
+                                //> lda (EnemyData),y
+                                A = memory[readWord(EnemyData) + Y].toInt()
+                                //> lsr                      ;move 3 MSB to the bottom, effectively
+                                val orig71: Int = A
+                                A = orig71 shr 1
+                                //> lsr                      ;making %xxx00000 into %00000xxx
+                                val orig72: Int = A
+                                A = orig72 shr 1
+                                //> lsr
+                                val orig73: Int = A
+                                A = orig73 shr 1
+                                //> lsr
+                                val orig74: Int = A
+                                A = orig74 shr 1
+                                //> lsr
+                                val orig75: Int = A
+                                A = orig75 shr 1
+                                //> cmp WorldNumber          ;is it the same world number as we're on?
+                                //> bne NotUse               ;if not, do not use (this allows multiple uses
+                                if (!(A == worldNumber)) {
+                                    //  goto NotUse (internal forward branch)
+                                    //> NotUse: jmp Inc3B
+                                    inc3B()
+                                    return X
+                                }
+                                //> dey                      ;of the same area, like the underground bonus areas)
+                                Y = (Y - 1) and 0xFF
+                                //> lda (EnemyData),y        ;otherwise, get second byte and use as offset
+                                A = memory[readWord(EnemyData) + Y].toInt()
+                                //> sta AreaPointer          ;to addresses for level and enemy object data
+                                areaPointer = A
+                                //> iny
+                                Y = (Y + 1) and 0xFF
+                                //> lda (EnemyData),y        ;get third byte again, and this time mask out
+                                A = memory[readWord(EnemyData) + Y].toInt()
+                                //> and #%00011111           ;the 3 MSB from before, save as page number to be
+                                A = A and 0x1F
+                                //> sta EntrancePage         ;used upon entry to area, if area is entered
+                                entrancePage = A
+                                return X
+                            }
+                            //> jmp CheckThreeBytes      ;if not found, unconditional jump
+                            checkThreeBytes()
+                            return X
+                        }
+                        return X
+                    }
+                    return X
+                }
                 //> rts                      ;the sixth slot
                 return X
                 //> iny
@@ -22648,10 +24751,10 @@ fun procLoopCommand(X: Int): Int {
     //> lda Enemy_PageLoc,x      ;without subtracting, then subtract borrow
     A = enemyPageloc[X]
     //> sbc ScreenRight_PageLoc  ;from page location
-    temp6 = A - screenrightPageloc - if (A >= screenrightXPos) 0 else 1
-    A = temp6 and 0xFF
+    temp22 = A - screenrightPageloc - if (A >= screenrightXPos) 0 else 1
+    A = temp22 and 0xFF
     //> bcs CheckRightExtBounds  ;if enemy object beyond or at boundary, branch
-    if (!(temp6 >= 0)) {
+    if (!(temp22 >= 0)) {
         //> lda (EnemyData),y
         A = memory[readWord(EnemyData) + Y].toInt()
         //> and #%00001111           ;check for special row $0e
@@ -22671,10 +24774,10 @@ fun procLoopCommand(X: Int): Int {
     //> lda $06                  ;then subtract borrow from page control temp
     A = memory[0x6].toInt()
     //> sbc Enemy_PageLoc,x      ;plus carry
-    temp7 = A - enemyPageloc[X] - if (A >= enemyXPosition[X]) 0 else 1
-    A = temp7 and 0xFF
+    temp23 = A - enemyPageloc[X] - if (A >= enemyXPosition[X]) 0 else 1
+    A = temp23 and 0xFF
     //> bcc CheckFrenzyBuffer    ;if enemy object beyond extended boundary, branch
-    if (!(temp7 >= 0)) {
+    if (!(temp23 >= 0)) {
         //  goto CheckFrenzyBuffer -> checkFrenzyBuffer
         checkFrenzyBuffer(X)
         return X
@@ -22686,17 +24789,17 @@ fun procLoopCommand(X: Int): Int {
         //> lda (EnemyData),y        ;get first byte again
         A = memory[readWord(EnemyData) + Y].toInt()
         //> asl                      ;multiply by four to get the vertical
-        val orig16: Int = A
-        A = (orig16 shl 1) and 0xFF
+        val orig76: Int = A
+        A = (orig76 shl 1) and 0xFF
         //> asl                      ;coordinate
-        val orig17: Int = A
-        A = (orig17 shl 1) and 0xFF
+        val orig77: Int = A
+        A = (orig77 shl 1) and 0xFF
         //> asl
-        val orig18: Int = A
-        A = (orig18 shl 1) and 0xFF
+        val orig78: Int = A
+        A = (orig78 shl 1) and 0xFF
         //> asl
-        val orig19: Int = A
-        A = (orig19 shl 1) and 0xFF
+        val orig79: Int = A
+        A = (orig79 shl 1) and 0xFF
         //> sta Enemy_Y_Position,x
         enemyYPosition[X] = A
         //> cmp #$e0                 ;do one last check for special row $0e
@@ -22781,20 +24884,20 @@ fun procLoopCommand(X: Int): Int {
     //> lda (EnemyData),y
     A = memory[readWord(EnemyData) + Y].toInt()
     //> lsr                      ;move 3 MSB to the bottom, effectively
-    val orig20: Int = A
-    A = orig20 shr 1
+    val orig80: Int = A
+    A = orig80 shr 1
     //> lsr                      ;making %xxx00000 into %00000xxx
-    val orig21: Int = A
-    A = orig21 shr 1
+    val orig81: Int = A
+    A = orig81 shr 1
     //> lsr
-    val orig22: Int = A
-    A = orig22 shr 1
+    val orig82: Int = A
+    A = orig82 shr 1
     //> lsr
-    val orig23: Int = A
-    A = orig23 shr 1
+    val orig83: Int = A
+    A = orig83 shr 1
     //> lsr
-    val orig24: Int = A
-    A = orig24 shr 1
+    val orig84: Int = A
+    A = orig84 shr 1
     //> cmp WorldNumber          ;is it the same world number as we're on?
     //> bne NotUse               ;if not, do not use (this allows multiple uses
     if (A == worldNumber) {
@@ -25923,6 +28026,8 @@ fun moveNormalEnemy(X: Int): Pair<Int, Int> {
                 }
             }
         }
+        //> SlowM:  ldy #$01                  ;if branched here, increment Y to slow horizontal movement
+        Y = 0x01
     } else {
         //> MEHor: jmp MoveEnemyHorizontally  ;jump here to move enemy horizontally for <> $2e and d6 set
         moveEnemyHorizontally(A, X)
@@ -26249,6 +28354,8 @@ fun moveBloober(X: Int) {
                 //> dey                        ;otherwise decrement to set right moving direction
                 Y = (Y - 1) and 0xFF
             }
+            //> SBMDir: sty Enemy_MovingDir,x      ;set moving direction of bloober, then continue on here
+            enemyMovingdir[X] = Y
         }
         //> BlooberSwim:
         //> jsr ProcSwimmingB        ;execute sub to make bloober swim characteristically
@@ -26696,6 +28803,7 @@ fun procFirebar(X: Int): Int {
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
+    var temp5: Int = 0
     var duplicateobjOffset by MemoryByte(DuplicateObj_Offset)
     var enemyOffscreenbits by MemoryByte(Enemy_OffscreenBits)
     var enemyRelXpos by MemoryByte(Enemy_Rel_XPos)
@@ -26803,6 +28911,40 @@ fun procFirebar(X: Int): Int {
             //> sta FirebarSpinState_High,x
             firebarspinstateHigh[X] = A
         }
+        //> SetupGFB: sta $ef                     ;save high byte of spinning thing, modified or otherwise
+        memory[0xEF] = A.toUByte()
+        //> jsr RelativeEnemyPosition   ;get relative coordinates to screen
+        temp5 = relativeEnemyPosition(X)
+        X = temp5
+        //> jsr GetFirebarPosition      ;do a sub here (residual, too early to be used now)
+        getFirebarPosition(A)
+        //> ldy Enemy_SprDataOffset,x   ;get OAM data offset
+        Y = enemySprdataoffset[temp5]
+        //> lda Enemy_Rel_YPos          ;get relative vertical coordinate
+        A = enemyRelYpos
+        //> sta Sprite_Y_Position,y     ;store as Y in OAM data
+        spriteYPosition[Y] = A
+        //> sta $07                     ;also save here
+        memory[0x7] = A.toUByte()
+        //> lda Enemy_Rel_XPos          ;get relative horizontal coordinate
+        A = enemyRelXpos
+        //> sta Sprite_X_Position,y     ;store as X in OAM data
+        spriteXPosition[Y] = A
+        //> sta $06                     ;also save here
+        memory[0x6] = A.toUByte()
+        //> lda #$01
+        A = 0x01
+        //> sta $00                     ;set $01 value here (not necessary)
+        memory[0x0] = A.toUByte()
+        //> jsr FirebarCollision        ;draw fireball part and do collision detection
+        firebarCollision(Y)
+        //> ldy #$05                    ;load value for short firebars by default
+        Y = 0x05
+        //> lda Enemy_ID,x
+        A = enemyId[temp5]
+        //> cmp #$1f                    ;are we doing a long firebar?
+        //> bcc SetMFbar                ;no, branch then
+        X = temp5
         if (A >= 0x1F) {
             //> ldy #$0b                    ;otherwise load value for long firebars
             Y = 0x0B
@@ -26953,7 +29095,11 @@ fun chkFOfs(A: Int, Y: Int) {
         temp1 = A + enemyRelYpos
         A = temp1 and 0xFF
     }
-    // Fall-through tail call to firebarCollision
+    //> SetVFbr: sta Sprite_Y_Position,y  ;store as Y coordinate here
+    spriteYPosition[Y] = A
+    //> sta $07                  ;also store here for now
+    memory[0x7] = A.toUByte()
+    //  Fall-through tail call to firebarCollision
     firebarCollision(Y)
     return
 }
@@ -27029,7 +29175,9 @@ fun firebarCollision(Y: Int) {
     A = temp0 and 0xFF
     //> tay
     Y = A
-    // Fall-through tail call to fBCLoop
+    //> BigJp:   tya                      ;get vertical coordinate, altered or otherwise, from Y
+    A = Y
+    //  Fall-through tail call to fBCLoop
     fBCLoop(A)
     return
 }
@@ -27045,6 +29193,10 @@ fun fBCLoop(A: Int) {
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
+    var temp6: Int = 0
+    var temp7: Int = 0
+    var temp8: Int = 0
+    var temp9: Int = 0
     var enemyMovingdir by MemoryByte(Enemy_MovingDir)
     var playerYPosition by MemoryByte(Player_Y_Position)
     val firebarYPos by MemoryByteIndexed(FirebarYPos)
@@ -27137,20 +29289,111 @@ fun fBCLoop(A: Int) {
         return
     } else {
         while (true) {
+            //> lda $06                  ;if firebar on far right on the screen, skip this,
+            A = memory[0x6].toInt()
+            //> cmp #$f0                 ;because, really, what's the point?
+            //> bcs Chk2Ofs
+            if (A >= 0xF0) {
+                //  goto Chk2Ofs (internal forward branch)
+                //> Chk2Ofs: lda $05                  ;if value of $02 was set earlier for whatever reason,
+                A = memory[0x5].toInt()
+                //> cmp #$02                 ;branch to increment OAM offset and leave, no collision
+                //> beq NoColFB
+                if (A == 0x02) {
+                    //  goto NoColFB -> noColFB
+                    noColFB()
+                    return
+                }
+                //> ldy $05                  ;otherwise get temp here and use as offset
+                Y = memory[0x5].toInt()
+                //> lda Player_Y_Position
+                A = playerYPosition
+                //> clc
+                //> adc FirebarYPos,y        ;add value loaded with offset to player's vertical coordinate
+                temp5 = A + firebarYPos[Y]
+                A = temp5 and 0xFF
+                //> inc $05                  ;then increment temp and jump back
+                memory[0x5] = ((memory[0x5].toInt() + 1) and 0xFF).toUByte()
+                //> jmp FBCLoop
+                return
+            }
+            //> lda Sprite_X_Position+4  ;get OAM X coordinate for sprite #1
+            A = spriteXPosition[4]
+            //> clc
+            //> adc #$04                 ;add four pixels
+            temp6 = A + 0x04
+            A = temp6 and 0xFF
+            //> sta $04                  ;store here
+            memory[0x4] = A.toUByte()
+            //> sec                      ;subtract horizontal coordinate of firebar
+            //> sbc $06                  ;from the X coordinate of player's sprite 1
+            temp7 = A - memory[0x6].toInt()
+            A = temp7 and 0xFF
+            //> bpl ChkFBCl              ;if modded X coordinate to the right of firebar
+            if (!((temp7 and 0xFF and 0x80) != 0)) {
+                //  goto ChkFBCl (internal forward branch)
+                //> ChkFBCl: cmp #$08                 ;if difference < 8 pixels, collision, thus branch
+                //> bcc ChgSDir              ;to process
+                if (!(A >= 0x08)) {
+                    //  goto ChgSDir (internal forward branch)
+                    //> ChgSDir: ldx #$01                 ;set movement direction by default
+                    X = 0x01
+                    //> lda $04                  ;if OAM X coordinate of player's sprite 1
+                    A = memory[0x4].toInt()
+                    //> cmp $06                  ;is greater than horizontal coordinate of firebar
+                    //> bcs SetSDir              ;then do not alter movement direction
+                    if (A >= memory[0x6].toInt()) {
+                        //  goto SetSDir (internal forward branch)
+                        //> SetSDir: stx Enemy_MovingDir      ;store movement direction here
+                        enemyMovingdir = X
+                        //> ldx #$00
+                        X = 0x00
+                        //> lda $00                  ;save value written to $00 to stack
+                        A = memory[0x0].toInt()
+                        //> pha
+                        push(A)
+                        //> jsr InjurePlayer         ;perform sub to hurt or kill player
+                        injurePlayer()
+                        //> pla
+                        A = pull()
+                        //> sta $00                  ;get value of $00 from stack
+                        memory[0x0] = A.toUByte()
+                        //  Fall-through tail call to noColFB
+                        noColFB()
+                        return
+                    }
+                    //> inx                      ;otherwise increment it
+                    X = (X + 1) and 0xFF
+                    return
+                }
+                return
+            }
+            //> eor #$ff                 ;skip two's compliment part
+            A = A xor 0xFF
+            //> clc                      ;otherwise get two's compliment
+            //> adc #$01
+            temp8 = A + 0x01
+            A = temp8 and 0xFF
             //> ldy $05                  ;otherwise get temp here and use as offset
             Y = memory[0x5].toInt()
             //> lda Player_Y_Position
             A = playerYPosition
             //> clc
             //> adc FirebarYPos,y        ;add value loaded with offset to player's vertical coordinate
-            temp5 = A + firebarYPos[Y]
-            A = temp5 and 0xFF
+            temp9 = A + firebarYPos[Y]
+            A = temp9 and 0xFF
             //> inc $05                  ;then increment temp and jump back
             memory[0x5] = ((memory[0x5].toInt() + 1) and 0xFF).toUByte()
             //> jmp FBCLoop
         }
     }
-    if (!(temp5 > 0xFF)) {
+    //> ChgSDir: ldx #$01                 ;set movement direction by default
+    X = 0x01
+    //> lda $04                  ;if OAM X coordinate of player's sprite 1
+    A = memory[0x4].toInt()
+    //> cmp $06                  ;is greater than horizontal coordinate of firebar
+    //> bcs SetSDir              ;then do not alter movement direction
+    if (!(A >= memory[0x6].toInt())) {
         //> inx                      ;otherwise increment it
         X = (X + 1) and 0xFF
     }
@@ -27496,8 +29739,16 @@ fun moveLakitu(X: Int) {
     } while ((Y and 0x80) == 0)
     //> jsr PlayerLakituDiff       ;execute sub to set speed and create spinys
     temp1 = playerLakituDiff(X)
-    A = temp1
-    if (Y == 0) {
+    //> SetLSpd: sta LakituMoveSpeed,x      ;set movement speed returned from sub
+    lakituMoveSpeed[X] = temp1
+    //> ldy #$01                   ;set moving direction to right by default
+    Y = 0x01
+    //> lda LakituMoveDirection,x
+    A = lakituMoveDirection[X]
+    //> and #$01                   ;get LSB of moving direction
+    A = A and 0x01
+    //> bne SetLMov                ;if set, branch to the end to use moving direction
+    if (A == 0) {
         //> lda LakituMoveSpeed,x
         A = lakituMoveSpeed[X]
         //> eor #$ff                   ;get two's compliment of moving speed
@@ -27657,6 +29908,10 @@ fun playerLakituDiff(X: Int): Int {
             }
         }
     }
+    //> SubDifAdj: lda $0001,y                ;get one of three saved values from earlier
+    A = memory[0x1 + Y].toInt()
+    //> ldy $00                    ;get saved horizontal difference
+    Y = memory[0x0].toInt()
     loop0@ do {
         //> SPixelLak: sec                        ;subtract one for each pixel of horizontal difference
         //> sbc #$01                   ;from one of three saved values
@@ -27666,6 +29921,7 @@ fun playerLakituDiff(X: Int): Int {
         Y = (Y - 1) and 0xFF
         //> bpl SPixelLak              ;branch until all pixels are subtracted, to adjust difference
     } while ((Y and 0x80) == 0)
+    //> ExMoveLak: rts                        ;leave!!!
     return A
 }
 
@@ -29293,6 +31549,11 @@ fun balancePlatform(X: Int): Int {
     //> ColFlg: cmp ObjectOffset            ;if collision flag matches
     //> beq PlatDn                  ;current enemy object offset, branch
     if (A != objectOffset) {
+        //> PlatUp: jsr MovePlatformUp          ;do a sub to move upwards
+        movePlatformUp()
+        //> jmp DoOtherPlatform         ;jump ahead to remaining code
+        doOtherPlatform(X)
+        return X
         //> PlatSt: jsr StopPlatforms           ;do a sub to stop movement
         stopPlatforms(A, X, Y)
         //> jmp DoOtherPlatform         ;jump ahead to remaining code
@@ -30099,7 +32360,7 @@ fun offscreenBoundsCheck(X: Int) {
             }
         }
         //> LimitB:   adc #$38                ;add 56 pixels to coordinate if hammer bro or piranha plant
-        temp0 = A + 0x38
+        temp0 = A + 0x38 + if (Y >= HammerBro) 1 else 0
         A = temp0 and 0xFF
         //> ExtendLB: sbc #$48                ;subtract 72 pixels regardless of enemy object
         temp1 = A - 0x48 - if (temp0 > 0xFF) 0 else 1
@@ -30177,6 +32438,8 @@ fun offscreenBoundsCheck(X: Int) {
         //> TooFar:   jsr EraseEnemyObject    ;erase object if necessary
         temp7 = eraseEnemyObject(X)
     }
+    //> ExScrnBd: rts                     ;leave
+    return
 }
 
 // Decompiled from FireballEnemyCollision
@@ -30324,7 +32587,16 @@ fun fireballEnemyCollision(X: Int): Int {
                             }
                         }
                     }
-                } while ((A and 0x80) == 0)
+                    //> NoFToECol: pla                         ;pull fireball offset from stack
+                    A = pull()
+                    //> tay                         ;put it in Y
+                    Y = A
+                    //> ldx $01                     ;get enemy object offset
+                    X = memory[0x1].toInt()
+                    //> dex                         ;decrement it
+                    X = (X - 1) and 0xFF
+                    //> bpl FireballEnemyCDLoop     ;loop back until collision detection done on all enemies
+                } while ((X and 0x80) == 0)
             }
         }
     }
@@ -31968,6 +34240,10 @@ fun procLPlatCollisions(X: Int, Y: Int) {
     }
     //> SideC:   jsr ImpedePlayerMove       ;deal with horizontal collision
     impedePlayerMove()
+    //> NoSideC: ldx ObjectOffset           ;return with enemy object buffer offset
+    X = objectOffset
+    //> rts
+    return
 }
 
 // Decompiled from PositionPlayerOnS_Plat
@@ -32124,7 +34400,15 @@ fun playerBGCollision() {
     var temp15: Int = 0
     var temp16: Int = 0
     var temp17: Int = 0
+    var temp18: Int = 0
+    var temp19: Int = 0
     var temp2: Int = 0
+    var temp20: Int = 0
+    var temp21: Int = 0
+    var temp22: Int = 0
+    var temp23: Int = 0
+    var temp24: Int = 0
+    var temp25: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
     var temp5: Int = 0
@@ -32573,6 +34857,10 @@ fun playerBGCollision() {
                 }
                 //> SetPSte:  sta Player_State          ;set whatever player state is appropriate
                 playerState = A
+                //> ChkOnScr: lda Player_Y_HighPos
+                A = playerYHighpos
+                //> cmp #$01                  ;check player's vertical high byte for still on the screen
+                //> bne ExPBGCol              ;branch to leave if not
                 if (A == 0x01) {
                     //> lda #$ff
                     A = 0xFF
@@ -32960,9 +35248,12 @@ fun playerBGCollision() {
                     //> ExPBGCol: rts                       ;otherwise leave
                     return
                 }
-                //> lda PlayerSize
-                A = playerSize
-                //> bne GBBAdr                  ;if player small, skip ahead
+                //> ChkCollSize:
+                //> ldy #$02                    ;load default offset
+                Y = 0x02
+                //> lda CrouchingFlag
+                A = crouchingFlag
+                //> bne GBBAdr                  ;if player crouching, skip ahead
                 if (!(A == 0)) {
                     //  goto GBBAdr (internal forward branch)
                     //> GBBAdr:  lda BlockBufferAdderData,y  ;get value using offset
@@ -33081,11 +35372,9 @@ fun playerBGCollision() {
                     X = (X + 1) and 0xFF
                     return
                 }
-                //> dey                         ;otherwise decrement offset for big player not crouching
-                Y = (Y - 1) and 0xFF
-                //> lda SwimmingFlag
-                A = swimmingFlag
-                //> bne GBBAdr                  ;if swimming flag set, skip ahead
+                //> lda PlayerSize
+                A = playerSize
+                //> bne GBBAdr                  ;if player small, skip ahead
                 if (!(A == 0)) {
                     //  goto GBBAdr (internal forward branch)
                     //> GBBAdr:  lda BlockBufferAdderData,y  ;get value using offset
@@ -33204,6 +35493,129 @@ fun playerBGCollision() {
                     X = (X + 1) and 0xFF
                     return
                 }
+                //> dey                         ;otherwise decrement offset for big player not crouching
+                Y = (Y - 1) and 0xFF
+                //> lda SwimmingFlag
+                A = swimmingFlag
+                //> bne GBBAdr                  ;if swimming flag set, skip ahead
+                if (!(A == 0)) {
+                    //  goto GBBAdr (internal forward branch)
+                    //> GBBAdr:  lda BlockBufferAdderData,y  ;get value using offset
+                    A = blockBufferAdderData[Y]
+                    //> sta $eb                     ;store value here
+                    memory[0xEB] = A.toUByte()
+                    //> tay                         ;put value into Y, as offset for block buffer routine
+                    Y = A
+                    //> ldx PlayerSize              ;get player's size as offset
+                    X = playerSize
+                    //> lda CrouchingFlag
+                    A = crouchingFlag
+                    //> beq HeadChk                 ;if player not crouching, branch ahead
+                    if (A == 0) {
+                        //  goto HeadChk (internal forward branch)
+                        //> HeadChk: lda Player_Y_Position       ;get player's vertical coordinate
+                        A = playerYPosition
+                        //> cmp PlayerBGUpperExtent,x   ;compare with upper extent value based on offset
+                        //> bcc DoFootCheck             ;if player is too high, skip this part
+                        if (!(A >= playerBGUpperExtent[X])) {
+                            //  goto DoFootCheck -> doFootCheck
+                            doFootCheck(X)
+                            return
+                        }
+                        //> jsr BlockBufferColli_Head   ;do player-to-bg collision detection on top of
+                        blockbuffercolliHead(Y)
+                        //> beq DoFootCheck             ;player, and branch if nothing above player's head
+                        if (A == playerBGUpperExtent[X]) {
+                            //  goto DoFootCheck -> doFootCheck
+                            doFootCheck(X)
+                            return
+                        }
+                        //> jsr CheckForCoinMTiles      ;check to see if player touched coin with their head
+                        temp16 = checkForCoinMTiles(A)
+                        //> bcs AwardTouchedCoin        ;if so, branch to some other part of code
+                        if (A >= playerBGUpperExtent[X]) {
+                            //  goto AwardTouchedCoin -> awardTouchedCoin
+                            awardTouchedCoin()
+                            return
+                        }
+                        //> ldy Player_Y_Speed          ;check player's vertical speed
+                        Y = playerYSpeed
+                        //> bpl DoFootCheck             ;if player not moving upwards, branch elsewhere
+                        if (!((Y and 0x80) != 0)) {
+                            //  goto DoFootCheck -> doFootCheck
+                            doFootCheck(X)
+                            return
+                        }
+                        //> ldy $04                     ;check lower nybble of vertical coordinate returned
+                        Y = memory[0x4].toInt()
+                        //> cpy #$04                    ;from collision detection routine
+                        //> bcc DoFootCheck             ;if low nybble < 4, branch
+                        if (!(Y >= 0x04)) {
+                            //  goto DoFootCheck -> doFootCheck
+                            doFootCheck(X)
+                            return
+                        }
+                        //> jsr CheckForSolidMTiles     ;check to see what player's head bumped on
+                        val flag8: Boolean = checkForSolidMTiles(temp16, X)
+                        //> bcs SolidOrClimb            ;if player collided with solid metatile, branch
+                        if (flag8) {
+                            //  goto SolidOrClimb (internal forward branch)
+                            //> SolidOrClimb:
+                            //> cmp #$26               ;if climbing metatile,
+                            //> beq NYSpd              ;branch ahead and do not play sound
+                            if (temp16 == 0x26) {
+                                //  goto NYSpd (internal forward branch)
+                                //> NYSpd: lda #$01               ;set player's vertical speed to nullify
+                                A = 0x01
+                                //> sta Player_Y_Speed     ;jump or swim
+                                playerYSpeed = A
+                                //  Fall-through tail call to doFootCheck
+                                doFootCheck(X)
+                                return
+                            }
+                            //> lda #Sfx_Bump
+                            A = Sfx_Bump
+                            //> sta Square1SoundQueue  ;otherwise load bump sound
+                            square1SoundQueue = A
+                            return
+                        }
+                        //> ldy AreaType                ;otherwise check area type
+                        Y = areaType
+                        //> beq NYSpd                   ;if water level, branch ahead
+                        if (Y == 0) {
+                            //  goto NYSpd (internal forward branch)
+                            //> NYSpd: lda #$01               ;set player's vertical speed to nullify
+                            A = 0x01
+                            //> sta Player_Y_Speed     ;jump or swim
+                            playerYSpeed = A
+                            //  Fall-through tail call to doFootCheck
+                            doFootCheck(X)
+                            return
+                        }
+                        //> ldy BlockBounceTimer        ;if block bounce timer not expired,
+                        Y = blockBounceTimer
+                        //> bne NYSpd                   ;branch ahead, do not process collision
+                        if (!(Y == 0)) {
+                            //  goto NYSpd (internal forward branch)
+                            //> NYSpd: lda #$01               ;set player's vertical speed to nullify
+                            A = 0x01
+                            //> sta Player_Y_Speed     ;jump or swim
+                            playerYSpeed = A
+                            //  Fall-through tail call to doFootCheck
+                            doFootCheck(X)
+                            return
+                        }
+                        //> jsr PlayerHeadCollision     ;otherwise do a sub to process collision
+                        temp17 = playerHeadCollision(temp16)
+                        X = temp17
+                        //> jmp DoFootCheck             ;jump ahead to skip these other parts here
+                        doFootCheck(temp17)
+                        return
+                    }
+                    //> inx                         ;otherwise increment size as offset
+                    X = (X + 1) and 0xFF
+                    return
+                }
                 //> dey                         ;otherwise decrement offset
                 Y = (Y - 1) and 0xFF
             } else {
@@ -33225,6 +35637,387 @@ fun playerBGCollision() {
             //> ExPBGCol: rts                       ;otherwise leave
             return
         }
+        //> ChkCollSize:
+        //> ldy #$02                    ;load default offset
+        Y = 0x02
+        //> lda CrouchingFlag
+        A = crouchingFlag
+        //> bne GBBAdr                  ;if player crouching, skip ahead
+        if (!(A == 0)) {
+            //  goto GBBAdr (internal forward branch)
+            //> GBBAdr:  lda BlockBufferAdderData,y  ;get value using offset
+            A = blockBufferAdderData[Y]
+            //> sta $eb                     ;store value here
+            memory[0xEB] = A.toUByte()
+            //> tay                         ;put value into Y, as offset for block buffer routine
+            Y = A
+            //> ldx PlayerSize              ;get player's size as offset
+            X = playerSize
+            //> lda CrouchingFlag
+            A = crouchingFlag
+            //> beq HeadChk                 ;if player not crouching, branch ahead
+            if (A == 0) {
+                //  goto HeadChk (internal forward branch)
+                //> HeadChk: lda Player_Y_Position       ;get player's vertical coordinate
+                A = playerYPosition
+                //> cmp PlayerBGUpperExtent,x   ;compare with upper extent value based on offset
+                //> bcc DoFootCheck             ;if player is too high, skip this part
+                if (!(A >= playerBGUpperExtent[X])) {
+                    //  goto DoFootCheck -> doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> jsr BlockBufferColli_Head   ;do player-to-bg collision detection on top of
+                blockbuffercolliHead(Y)
+                //> beq DoFootCheck             ;player, and branch if nothing above player's head
+                if (A == playerBGUpperExtent[X]) {
+                    //  goto DoFootCheck -> doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> jsr CheckForCoinMTiles      ;check to see if player touched coin with their head
+                temp18 = checkForCoinMTiles(A)
+                //> bcs AwardTouchedCoin        ;if so, branch to some other part of code
+                if (A >= playerBGUpperExtent[X]) {
+                    //  goto AwardTouchedCoin -> awardTouchedCoin
+                    awardTouchedCoin()
+                    return
+                }
+                //> ldy Player_Y_Speed          ;check player's vertical speed
+                Y = playerYSpeed
+                //> bpl DoFootCheck             ;if player not moving upwards, branch elsewhere
+                if (!((Y and 0x80) != 0)) {
+                    //  goto DoFootCheck -> doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> ldy $04                     ;check lower nybble of vertical coordinate returned
+                Y = memory[0x4].toInt()
+                //> cpy #$04                    ;from collision detection routine
+                //> bcc DoFootCheck             ;if low nybble < 4, branch
+                if (!(Y >= 0x04)) {
+                    //  goto DoFootCheck -> doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> jsr CheckForSolidMTiles     ;check to see what player's head bumped on
+                val flag9: Boolean = checkForSolidMTiles(temp18, X)
+                //> bcs SolidOrClimb            ;if player collided with solid metatile, branch
+                if (flag9) {
+                    //  goto SolidOrClimb (internal forward branch)
+                    //> SolidOrClimb:
+                    //> cmp #$26               ;if climbing metatile,
+                    //> beq NYSpd              ;branch ahead and do not play sound
+                    if (temp18 == 0x26) {
+                        //  goto NYSpd (internal forward branch)
+                        //> NYSpd: lda #$01               ;set player's vertical speed to nullify
+                        A = 0x01
+                        //> sta Player_Y_Speed     ;jump or swim
+                        playerYSpeed = A
+                        //  Fall-through tail call to doFootCheck
+                        doFootCheck(X)
+                        return
+                    }
+                    //> lda #Sfx_Bump
+                    A = Sfx_Bump
+                    //> sta Square1SoundQueue  ;otherwise load bump sound
+                    square1SoundQueue = A
+                    return
+                }
+                //> ldy AreaType                ;otherwise check area type
+                Y = areaType
+                //> beq NYSpd                   ;if water level, branch ahead
+                if (Y == 0) {
+                    //  goto NYSpd (internal forward branch)
+                    //> NYSpd: lda #$01               ;set player's vertical speed to nullify
+                    A = 0x01
+                    //> sta Player_Y_Speed     ;jump or swim
+                    playerYSpeed = A
+                    //  Fall-through tail call to doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> ldy BlockBounceTimer        ;if block bounce timer not expired,
+                Y = blockBounceTimer
+                //> bne NYSpd                   ;branch ahead, do not process collision
+                if (!(Y == 0)) {
+                    //  goto NYSpd (internal forward branch)
+                    //> NYSpd: lda #$01               ;set player's vertical speed to nullify
+                    A = 0x01
+                    //> sta Player_Y_Speed     ;jump or swim
+                    playerYSpeed = A
+                    //  Fall-through tail call to doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> jsr PlayerHeadCollision     ;otherwise do a sub to process collision
+                temp19 = playerHeadCollision(temp18)
+                X = temp19
+                //> jmp DoFootCheck             ;jump ahead to skip these other parts here
+                doFootCheck(temp19)
+                return
+            }
+            //> inx                         ;otherwise increment size as offset
+            X = (X + 1) and 0xFF
+            return
+        }
+        //> lda PlayerSize
+        A = playerSize
+        //> bne GBBAdr                  ;if player small, skip ahead
+        if (!(A == 0)) {
+            //  goto GBBAdr (internal forward branch)
+            //> GBBAdr:  lda BlockBufferAdderData,y  ;get value using offset
+            A = blockBufferAdderData[Y]
+            //> sta $eb                     ;store value here
+            memory[0xEB] = A.toUByte()
+            //> tay                         ;put value into Y, as offset for block buffer routine
+            Y = A
+            //> ldx PlayerSize              ;get player's size as offset
+            X = playerSize
+            //> lda CrouchingFlag
+            A = crouchingFlag
+            //> beq HeadChk                 ;if player not crouching, branch ahead
+            if (A == 0) {
+                //  goto HeadChk (internal forward branch)
+                //> HeadChk: lda Player_Y_Position       ;get player's vertical coordinate
+                A = playerYPosition
+                //> cmp PlayerBGUpperExtent,x   ;compare with upper extent value based on offset
+                //> bcc DoFootCheck             ;if player is too high, skip this part
+                if (!(A >= playerBGUpperExtent[X])) {
+                    //  goto DoFootCheck -> doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> jsr BlockBufferColli_Head   ;do player-to-bg collision detection on top of
+                blockbuffercolliHead(Y)
+                //> beq DoFootCheck             ;player, and branch if nothing above player's head
+                if (A == playerBGUpperExtent[X]) {
+                    //  goto DoFootCheck -> doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> jsr CheckForCoinMTiles      ;check to see if player touched coin with their head
+                temp20 = checkForCoinMTiles(A)
+                //> bcs AwardTouchedCoin        ;if so, branch to some other part of code
+                if (A >= playerBGUpperExtent[X]) {
+                    //  goto AwardTouchedCoin -> awardTouchedCoin
+                    awardTouchedCoin()
+                    return
+                }
+                //> ldy Player_Y_Speed          ;check player's vertical speed
+                Y = playerYSpeed
+                //> bpl DoFootCheck             ;if player not moving upwards, branch elsewhere
+                if (!((Y and 0x80) != 0)) {
+                    //  goto DoFootCheck -> doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> ldy $04                     ;check lower nybble of vertical coordinate returned
+                Y = memory[0x4].toInt()
+                //> cpy #$04                    ;from collision detection routine
+                //> bcc DoFootCheck             ;if low nybble < 4, branch
+                if (!(Y >= 0x04)) {
+                    //  goto DoFootCheck -> doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> jsr CheckForSolidMTiles     ;check to see what player's head bumped on
+                val flag10: Boolean = checkForSolidMTiles(temp20, X)
+                //> bcs SolidOrClimb            ;if player collided with solid metatile, branch
+                if (flag10) {
+                    //  goto SolidOrClimb (internal forward branch)
+                    //> SolidOrClimb:
+                    //> cmp #$26               ;if climbing metatile,
+                    //> beq NYSpd              ;branch ahead and do not play sound
+                    if (temp20 == 0x26) {
+                        //  goto NYSpd (internal forward branch)
+                        //> NYSpd: lda #$01               ;set player's vertical speed to nullify
+                        A = 0x01
+                        //> sta Player_Y_Speed     ;jump or swim
+                        playerYSpeed = A
+                        //  Fall-through tail call to doFootCheck
+                        doFootCheck(X)
+                        return
+                    }
+                    //> lda #Sfx_Bump
+                    A = Sfx_Bump
+                    //> sta Square1SoundQueue  ;otherwise load bump sound
+                    square1SoundQueue = A
+                    return
+                }
+                //> ldy AreaType                ;otherwise check area type
+                Y = areaType
+                //> beq NYSpd                   ;if water level, branch ahead
+                if (Y == 0) {
+                    //  goto NYSpd (internal forward branch)
+                    //> NYSpd: lda #$01               ;set player's vertical speed to nullify
+                    A = 0x01
+                    //> sta Player_Y_Speed     ;jump or swim
+                    playerYSpeed = A
+                    //  Fall-through tail call to doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> ldy BlockBounceTimer        ;if block bounce timer not expired,
+                Y = blockBounceTimer
+                //> bne NYSpd                   ;branch ahead, do not process collision
+                if (!(Y == 0)) {
+                    //  goto NYSpd (internal forward branch)
+                    //> NYSpd: lda #$01               ;set player's vertical speed to nullify
+                    A = 0x01
+                    //> sta Player_Y_Speed     ;jump or swim
+                    playerYSpeed = A
+                    //  Fall-through tail call to doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> jsr PlayerHeadCollision     ;otherwise do a sub to process collision
+                temp21 = playerHeadCollision(temp20)
+                X = temp21
+                //> jmp DoFootCheck             ;jump ahead to skip these other parts here
+                doFootCheck(temp21)
+                return
+            }
+            //> inx                         ;otherwise increment size as offset
+            X = (X + 1) and 0xFF
+            return
+        }
+        //> dey                         ;otherwise decrement offset for big player not crouching
+        Y = (Y - 1) and 0xFF
+        //> lda SwimmingFlag
+        A = swimmingFlag
+        //> bne GBBAdr                  ;if swimming flag set, skip ahead
+        if (!(A == 0)) {
+            //  goto GBBAdr (internal forward branch)
+            //> GBBAdr:  lda BlockBufferAdderData,y  ;get value using offset
+            A = blockBufferAdderData[Y]
+            //> sta $eb                     ;store value here
+            memory[0xEB] = A.toUByte()
+            //> tay                         ;put value into Y, as offset for block buffer routine
+            Y = A
+            //> ldx PlayerSize              ;get player's size as offset
+            X = playerSize
+            //> lda CrouchingFlag
+            A = crouchingFlag
+            //> beq HeadChk                 ;if player not crouching, branch ahead
+            if (A == 0) {
+                //  goto HeadChk (internal forward branch)
+                //> HeadChk: lda Player_Y_Position       ;get player's vertical coordinate
+                A = playerYPosition
+                //> cmp PlayerBGUpperExtent,x   ;compare with upper extent value based on offset
+                //> bcc DoFootCheck             ;if player is too high, skip this part
+                if (!(A >= playerBGUpperExtent[X])) {
+                    //  goto DoFootCheck -> doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> jsr BlockBufferColli_Head   ;do player-to-bg collision detection on top of
+                blockbuffercolliHead(Y)
+                //> beq DoFootCheck             ;player, and branch if nothing above player's head
+                if (A == playerBGUpperExtent[X]) {
+                    //  goto DoFootCheck -> doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> jsr CheckForCoinMTiles      ;check to see if player touched coin with their head
+                temp22 = checkForCoinMTiles(A)
+                //> bcs AwardTouchedCoin        ;if so, branch to some other part of code
+                if (A >= playerBGUpperExtent[X]) {
+                    //  goto AwardTouchedCoin -> awardTouchedCoin
+                    awardTouchedCoin()
+                    return
+                }
+                //> ldy Player_Y_Speed          ;check player's vertical speed
+                Y = playerYSpeed
+                //> bpl DoFootCheck             ;if player not moving upwards, branch elsewhere
+                if (!((Y and 0x80) != 0)) {
+                    //  goto DoFootCheck -> doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> ldy $04                     ;check lower nybble of vertical coordinate returned
+                Y = memory[0x4].toInt()
+                //> cpy #$04                    ;from collision detection routine
+                //> bcc DoFootCheck             ;if low nybble < 4, branch
+                if (!(Y >= 0x04)) {
+                    //  goto DoFootCheck -> doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> jsr CheckForSolidMTiles     ;check to see what player's head bumped on
+                val flag11: Boolean = checkForSolidMTiles(temp22, X)
+                //> bcs SolidOrClimb            ;if player collided with solid metatile, branch
+                if (flag11) {
+                    //  goto SolidOrClimb (internal forward branch)
+                    //> SolidOrClimb:
+                    //> cmp #$26               ;if climbing metatile,
+                    //> beq NYSpd              ;branch ahead and do not play sound
+                    if (temp22 == 0x26) {
+                        //  goto NYSpd (internal forward branch)
+                        //> NYSpd: lda #$01               ;set player's vertical speed to nullify
+                        A = 0x01
+                        //> sta Player_Y_Speed     ;jump or swim
+                        playerYSpeed = A
+                        //  Fall-through tail call to doFootCheck
+                        doFootCheck(X)
+                        return
+                    }
+                    //> lda #Sfx_Bump
+                    A = Sfx_Bump
+                    //> sta Square1SoundQueue  ;otherwise load bump sound
+                    square1SoundQueue = A
+                    return
+                }
+                //> ldy AreaType                ;otherwise check area type
+                Y = areaType
+                //> beq NYSpd                   ;if water level, branch ahead
+                if (Y == 0) {
+                    //  goto NYSpd (internal forward branch)
+                    //> NYSpd: lda #$01               ;set player's vertical speed to nullify
+                    A = 0x01
+                    //> sta Player_Y_Speed     ;jump or swim
+                    playerYSpeed = A
+                    //  Fall-through tail call to doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> ldy BlockBounceTimer        ;if block bounce timer not expired,
+                Y = blockBounceTimer
+                //> bne NYSpd                   ;branch ahead, do not process collision
+                if (!(Y == 0)) {
+                    //  goto NYSpd (internal forward branch)
+                    //> NYSpd: lda #$01               ;set player's vertical speed to nullify
+                    A = 0x01
+                    //> sta Player_Y_Speed     ;jump or swim
+                    playerYSpeed = A
+                    //  Fall-through tail call to doFootCheck
+                    doFootCheck(X)
+                    return
+                }
+                //> jsr PlayerHeadCollision     ;otherwise do a sub to process collision
+                temp23 = playerHeadCollision(temp22)
+                X = temp23
+                //> jmp DoFootCheck             ;jump ahead to skip these other parts here
+                doFootCheck(temp23)
+                return
+            }
+            //> inx                         ;otherwise increment size as offset
+            X = (X + 1) and 0xFF
+            return
+        }
+        //> dey                         ;otherwise decrement offset
+        Y = (Y - 1) and 0xFF
+        //> inx                         ;otherwise increment size as offset
+        X = (X + 1) and 0xFF
+        //> HeadChk: lda Player_Y_Position       ;get player's vertical coordinate
+        A = playerYPosition
+        //> cmp PlayerBGUpperExtent,x   ;compare with upper extent value based on offset
+        //> bcc DoFootCheck             ;if player is too high, skip this part
+        if (!(A >= playerBGUpperExtent[X])) {
+            //  goto DoFootCheck -> doFootCheck
+            doFootCheck(X)
+            return
+        }
     } else {
         //> ExPBGCol: rts                       ;otherwise leave
         return
@@ -33232,15 +36025,15 @@ fun playerBGCollision() {
     //> jsr BlockBufferColli_Head   ;do player-to-bg collision detection on top of
     blockbuffercolliHead(Y)
     //> beq DoFootCheck             ;player, and branch if nothing above player's head
-    if (A == playerBGUpperExtent[X]) {
+    if (A == 0) {
         //  goto DoFootCheck -> doFootCheck
         doFootCheck(X)
         return
     } else {
         //> jsr CheckForCoinMTiles      ;check to see if player touched coin with their head
-        temp16 = checkForCoinMTiles(A)
+        temp24 = checkForCoinMTiles(A)
         //> bcs AwardTouchedCoin        ;if so, branch to some other part of code
-        if (A >= playerBGUpperExtent[X]) {
+        if (flagC) {
             //  goto AwardTouchedCoin -> awardTouchedCoin
             awardTouchedCoin()
             return
@@ -33265,10 +36058,10 @@ fun playerBGCollision() {
         }
     }
     //> jsr CheckForSolidMTiles     ;check to see what player's head bumped on
-    val flag8: Boolean = checkForSolidMTiles(temp16, X)
+    val flag12: Boolean = checkForSolidMTiles(temp24, X)
     //> bcs SolidOrClimb            ;if player collided with solid metatile, branch
-    A = temp16
-    if (!flag8) {
+    A = temp24
+    if (!flag12) {
         //> ldy AreaType                ;otherwise check area type
         Y = areaType
         //> beq NYSpd                   ;if water level, branch ahead
@@ -33278,10 +36071,10 @@ fun playerBGCollision() {
             //> bne NYSpd                   ;branch ahead, do not process collision
             if (Y == 0) {
                 //> jsr PlayerHeadCollision     ;otherwise do a sub to process collision
-                temp17 = playerHeadCollision(A)
-                X = temp17
+                temp25 = playerHeadCollision(A)
+                X = temp25
                 //> jmp DoFootCheck             ;jump ahead to skip these other parts here
-                doFootCheck(temp17)
+                doFootCheck(temp25)
                 return
             }
         }
@@ -33519,9 +36312,25 @@ fun doFootCheck(X: Int) {
                 return
             }
         }
+        //> BHalf: ldy $eb                   ;load block adder offset
+        Y = memory[0xEB].toInt()
+        //> iny                       ;increment it
+        Y = (Y + 1) and 0xFF
+        //> lda Player_Y_Position     ;get player's vertical position
+        A = playerYPosition
+        //> cmp #$08
+        //> bcc ExSCH                 ;if too high, branch to leave
         if (A >= 0x08) {
+            //> cmp #$d0
+            //> bcs ExSCH                 ;if too low, branch to leave
             if (!(A >= 0xD0)) {
-                if (A == 0) {
+                //> jsr BlockBufferColli_Side ;do player-to-bg collision detection on other half of player
+                blockbuffercolliSide()
+                //> bne CheckSideMTiles       ;if something found, branch
+                if (A == 0xD0) {
+                    //> dec $00                   ;otherwise decrement counter
+                    memory[0x0] = ((memory[0x0].toInt() - 1) and 0xFF).toUByte()
+                    //> bne SideCheckLoop         ;run code until both sides of player are checked
                 } else {
                     break@loop0
                 }
@@ -33531,7 +36340,7 @@ fun doFootCheck(X: Int) {
         } else {
             break@loop0
         }
-    } while (A != 0)
+    } while (memory[0x0].toInt() != 0)
     //> ExSCH: rts                       ;leave
     return
 }
@@ -33963,7 +36772,8 @@ fun chkJumpspringMetatiles(A: Int): Boolean {
         }
     }
     //> JSFnd:   sec           ;set carry if found
-    return false
+    //> NoJSFnd: rts           ;leave
+    return true
 }
 
 // Decompiled from HandlePipeEntry
@@ -34383,7 +37193,7 @@ fun enemyToBGCollisionDet(X: Int): Pair<Int, Int> {
     //> bne HandleEToBGCollision ;if block underneath enemy, branch
     A = temp0
     Y = temp1
-    if (A == 0) {
+    if (Y == Spiny) {
         //> NoEToBGCollision:
         //> jmp ChkForRedKoopa       ;otherwise skip and do something else
         chkForRedKoopa(X)
@@ -34393,7 +37203,7 @@ fun enemyToBGCollisionDet(X: Int): Pair<Int, Int> {
         //> jsr ChkForNonSolids       ;if something is underneath enemy, find out what
         chkForNonSolids(A)
         //> beq NoEToBGCollision      ;if blank $26, coins, or hidden blocks, jump, enemy falls through
-        if (A == 0) {
+        if (Y == Spiny) {
             //> NoEToBGCollision:
             //> jmp ChkForRedKoopa       ;otherwise skip and do something else
             chkForRedKoopa(X)
@@ -34579,6 +37389,14 @@ fun enemyToBGCollisionDet(X: Int): Pair<Int, Int> {
             }
         }
     }
+    //> LandEnemyInitState:
+    //> jsr EnemyLanding       ;land enemy properly
+    enemyLanding(X)
+    //> lda Enemy_State,x
+    A = enemyState[X]
+    //> and #%10000000         ;if d7 of enemy state is set, branch
+    A = A and 0x80
+    //> bne NMovShellFallBit
     if (A == 0) {
         //> lda #$00               ;otherwise initialize enemy state and leave
         A = 0x00
@@ -34730,7 +37548,14 @@ fun setStun(X: Int) {
     }
     //> SetWYSpd: lda #$ff                   ;change the vertical speed
     A = 0xFF
-    if ((A and 0x80) != 0) {
+    //> SetNotW:  sta Enemy_Y_Speed,x        ;set vertical speed now
+    enemyYSpeed[X] = A
+    //> ldy #$01
+    Y = 0x01
+    //> jsr PlayerEnemyDiff        ;get horizontal difference between player and enemy object
+    val flag1: Boolean = playerEnemyDiff(X)
+    //> bpl ChkBBill               ;branch if enemy is to the right of player
+    if ((Y and 0x80) != 0) {
         //> iny                        ;increment Y if not
         Y = (Y + 1) and 0xFF
     }
@@ -36213,6 +39038,18 @@ fun drawHammer(X: Int) {
     X = 0x00
     //> beq RenderH                 ;do unconditional branch to rendering part
     if (X != 0) {
+        //> GetHPose:   lda FrameCounter            ;get frame counter
+        A = frameCounter
+        //> lsr                         ;move d3-d2 to d1-d0
+        val orig2: Int = A
+        A = orig2 shr 1
+        //> lsr
+        val orig3: Int = A
+        A = orig3 shr 1
+        //> and #%00000011              ;mask out all but d1-d0 (changes every four frames)
+        A = A and 0x03
+        //> tax                         ;use as timing offset
+        X = A
     }
     //> RenderH:    lda Misc_Rel_YPos           ;get relative vertical coordinate
     A = miscRelYpos
@@ -37801,6 +40638,11 @@ fun drawEnemyObject(X: Int) {
             spriteAttributes[20 + Y] = A
         }
     }
+    //> CheckToMirrorLakitu:
+    //> lda $ef                     ;check for lakitu enemy object
+    A = memory[0xEF].toInt()
+    //> cmp #Lakitu
+    //> bne CheckToMirrorJSpring    ;branch if not found
     if (A == Lakitu) {
         //> lda VerticalFlipFlag
         A = verticalFlipFlag
@@ -38881,6 +41723,8 @@ fun playerGfxHandler() {
                 //> sta Sprite_Tilenumber+24,y  ;to animate player's feet when swimming
                 spriteTilenumber[24 + Y] = A
             }
+            //> ExPGH:  rts                         ;then leave
+            return
         } else {
             //> DoChangeSize:
             //> jsr HandleChangeSize          ;find proper offset to graphics table for grow/shrink
@@ -39547,6 +42391,8 @@ fun chkForPlayerAttrib() {
     A = A or 0x40
     //> sta Sprite_Attributes+28,y  ;sprite in the fourth row
     spriteAttributes[28 + Y] = A
+    //> ExPlyrAt:  rts                         ;leave
+    return
 }
 
 // Decompiled from RelativePlayerPosition
@@ -40117,6 +42963,9 @@ fun drawSpriteObject(X: Int, Y: Int): Int {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
+    var temp3: Int = 0
+    var temp4: Int = 0
+    var temp5: Int = 0
     val spriteAttributes by MemoryByteIndexed(Sprite_Attributes)
     val spriteTilenumber by MemoryByteIndexed(Sprite_Tilenumber)
     val spriteXPosition by MemoryByteIndexed(Sprite_X_Position)
@@ -40201,6 +43050,49 @@ fun drawSpriteObject(X: Int, Y: Int): Int {
     spriteTilenumber[4 + Y] = A
     //> lda #$00                   ;clear bit for horizontal flip
     A = 0x00
+    //> SetHFAt: ora $04                    ;add other OAM attributes if necessary
+    A = A or memory[0x4].toInt()
+    //> sta Sprite_Attributes,y    ;store sprite attributes
+    spriteAttributes[Y] = A
+    //> sta Sprite_Attributes+4,y
+    spriteAttributes[4 + Y] = A
+    //> lda $02                    ;now the y coordinates
+    A = memory[0x2].toInt()
+    //> sta Sprite_Y_Position,y    ;note because they are
+    spriteYPosition[Y] = A
+    //> sta Sprite_Y_Position+4,y  ;side by side, they are the same
+    spriteYPosition[4 + Y] = A
+    //> lda $05
+    A = memory[0x5].toInt()
+    //> sta Sprite_X_Position,y    ;store x coordinate, then
+    spriteXPosition[Y] = A
+    //> clc                        ;add 8 pixels and store another to
+    //> adc #$08                   ;put them side by side
+    temp3 = A + 0x08
+    A = temp3 and 0xFF
+    //> sta Sprite_X_Position+4,y
+    spriteXPosition[4 + Y] = A
+    //> lda $02                    ;add eight pixels to the next y
+    A = memory[0x2].toInt()
+    //> clc                        ;coordinate
+    //> adc #$08
+    temp4 = A + 0x08
+    A = temp4 and 0xFF
+    //> sta $02
+    memory[0x2] = A.toUByte()
+    //> tya                        ;add eight to the offset in Y to
+    A = Y
+    //> clc                        ;move to the next two sprites
+    //> adc #$08
+    temp5 = A + 0x08
+    A = temp5 and 0xFF
+    //> tay
+    Y = A
+    //> inx                        ;increment offset to return it to the
+    X = (X + 1) and 0xFF
+    //> inx                        ;routine that called this subroutine
+    X = (X + 1) and 0xFF
+    //> rts
     return X
 }
 
@@ -40325,6 +43217,19 @@ fun soundEngine() {
     //> beq PTone2F
     if (A != 0x24) {
         loop0@ do {
+            //> PTone1F: lda #$44                  ;play first tone
+            A = 0x44
+            //> bne PTRegC                ;unconditional branch
+            if (!(A == 0)) {
+                //  goto PTRegC (internal forward branch)
+                //> PTRegC:  ldx #$84
+                X = 0x84
+                //> ldy #$7f
+                Y = 0x7F
+                //> jsr PlaySqu1Sfx
+                playSqu1Sfx(A, X, Y)
+                return
+            }
             //> cmp #$1e                  ;time to play first again?
             //> beq PTone1F
         } while (A == 0x1E)
@@ -40459,7 +43364,16 @@ fun soundEngine() {
     }
     //> PTone2F: lda #$64                  ;store reg contents and play the pause sfx
     A = 0x64
-    if (A == 0) {
+    //> PTRegC:  ldx #$84
+    X = 0x84
+    //> ldy #$7f
+    Y = 0x7F
+    //> jsr PlaySqu1Sfx
+    playSqu1Sfx(A, X, Y)
+    //> DecPauC: dec Squ1_SfxLenCounter    ;decrement pause sfx counter
+    squ1Sfxlencounter = (squ1Sfxlencounter - 1) and 0xFF
+    //> bne SkipSoundSubroutines
+    if (squ1Sfxlencounter == 0) {
         //> lda #$00                  ;disable sound if in pause mode and
         A = 0x00
         //> sta SND_MASTERCTRL_REG    ;not currently playing the pause sfx
@@ -40480,6 +43394,21 @@ fun soundEngine() {
         pauseSoundBuffer = A
         //> beq SkipSoundSubroutines
         if (A != 0) {
+            //> RunSoundSubroutines:
+            //> jsr Square1SfxHandler  ;play sfx on square channel 1
+            square1SfxHandler()
+            //> jsr Square2SfxHandler  ; ''  ''  '' square channel 2
+            square2SfxHandler()
+            //> jsr NoiseSfxHandler    ; ''  ''  '' noise channel
+            noiseSfxHandler()
+            //> jsr MusicHandler       ;play music on all channels
+            musicHandler()
+            //> lda #$00               ;clear the music queues
+            A = 0x00
+            //> sta AreaMusicQueue
+            areaMusicQueue = A
+            //> sta EventMusicQueue
+            eventMusicQueue = A
         }
     }
     //> SkipSoundSubroutines:
@@ -40520,6 +43449,10 @@ fun soundEngine() {
         //> dec DAC_Counter        ;decrement counter
         dacCounter = (dacCounter - 1) and 0xFF
     }
+    //> StrWave:  sty SND_DELTA_REG+1    ;store into DMC load register (??)
+    sndDeltaReg[1] = Y
+    //> rts                    ;we are done here
+    return
 }
 
 // Decompiled from Dump_Squ1_Regs
@@ -42447,6 +45380,10 @@ fun handleSquare2Music() {
                 //> rts
                 return
             }
+            //> MusicLoopBack:
+            //> jmp HandleAreaMusicLoopB
+            handleAreaMusicLoopB(A)
+            return
         } else {
             //> VictoryMLoopBack:
             //> jmp LoadEventMusic
@@ -42715,7 +45652,16 @@ fun handleSquare2Music() {
             //> LongN:    lda #$ff                ;or any secondary (including win castle) except death and d4
             A = 0xFF
         }
+        //> LoadTriCtrlReg:
+        //> sta SND_TRIANGLE_REG      ;save final contents of A into control reg for triangle
+        sndTriangleReg[0] = A
     }
+    //> HandleNoiseMusic:
+    //> lda AreaMusicBuffer       ;check if playing underground or castle music
+    A = areaMusicBuffer
+    //> and #%11110011
+    A = A and 0xF3
+    //> beq ExitMusicHandler      ;if so, skip the noise routine
     if (A != 0) {
         //> dec Noise_BeatLenCounter  ;decrement noise beat length
         noiseBeatlencounter = (noiseBeatlencounter - 1) and 0xFF
@@ -42901,6 +45847,11 @@ fun loadControlRegs(): Int {
     }
     //> WaterMus:  lda #$28              ;this value is used for water music and all other event music
     A = 0x28
+    //> AllMus:    ldx #$82              ;load contents of other sound regs for square 2
+    X = 0x82
+    //> ldy #$7f
+    Y = 0x7F
+    //> rts
     return A
 }
 

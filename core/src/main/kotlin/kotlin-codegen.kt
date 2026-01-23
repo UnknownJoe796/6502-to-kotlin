@@ -2164,10 +2164,41 @@ fun KotlinStmt.isTerminating(): Boolean {
         is KLabeledBreak -> true
         is KBreak -> true
         // For if statements, terminating only if BOTH branches terminate
-        is KIf -> thenBranch.lastOrNull()?.isTerminating() == true &&
-                  elseBranch.lastOrNull()?.isTerminating() == true
+        is KIf -> {
+            val thenTerminates = thenBranch.lastOrNull()?.isTerminating() == true
+            val elseTerminates = elseBranch.lastOrNull()?.isTerminating() == true
+
+            if (thenTerminates && elseTerminates) {
+                true
+            } else if (elseBranch.isEmpty()) {
+                // by Claude - Special case: nested if with same condition (bpl/bmi pattern)
+                // Look for ANY nested if with the same condition whose then branch terminates.
+                // This handles: if (cond) { if (cond) { return } } where the fall-through is dead code.
+                // The nested if can be anywhere in the then branch, not just at the end.
+                val nestedSameConditionIf = thenBranch.filterIsInstance<KIf>()
+                    .find { conditionsAreEquivalent(this.condition, it.condition) }
+                if (nestedSameConditionIf != null &&
+                    nestedSameConditionIf.thenBranch.lastOrNull()?.isTerminating() == true) {
+                    true
+                } else {
+                    thenTerminates
+                }
+            } else {
+                false
+            }
+        }
         else -> false
     }
+}
+
+/**
+ * by Claude - Check if two conditions are structurally equivalent.
+ * Used to detect nested ifs with the same condition (bpl/bmi pattern).
+ */
+private fun conditionsAreEquivalent(cond1: KotlinExpr, cond2: KotlinExpr): Boolean {
+    // Compare rendered strings for simplicity
+    // This handles cases like (A and 0x80) != 0 being the same
+    return cond1.toKotlin() == cond2.toKotlin()
 }
 
 /**
