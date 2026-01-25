@@ -78,8 +78,9 @@ class KotlinAstInterpreter(
             is KComment, is KBlockComment -> { /* Skip comments */ }
             is KBreak -> { /* TODO: Handle break in loops */ }
             is KContinue -> { /* TODO: Handle continue in loops */ }
-            // by Claude - Handle labeled loops and breaks (for nested loop breaks)
+            // by Claude - Handle labeled loops, breaks, and continues (for nested loop control)
             is KLabeledBreak -> { /* TODO: Handle labeled break */ }
+            is KLabeledContinue -> { /* TODO: Handle labeled continue */ }
             is KLabeledWhile -> executeWhile(KWhile(stmt.condition, stmt.body)) // Delegate to unlabeled
             is KLabeledDoWhile -> executeDoWhile(KDoWhile(stmt.body, stmt.condition)) // Delegate to unlabeled
             is KLabeledLoop -> executeLoop(KLoop(stmt.body)) // Delegate to unlabeled

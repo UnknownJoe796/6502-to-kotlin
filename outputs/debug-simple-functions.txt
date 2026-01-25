@@ -23,7 +23,7 @@ GetAreaObjXPosition
   Fall through: null
   Branch: null
   Entered from: [@4302]
-  Dominator: 4302
+  Dominator: null
 
 
 
@@ -51,7 +51,7 @@ GetAreaObjYPosition
   Fall through: null
   Branch: null
   Entered from: [@4312]
-  Dominator: 4312
+  Dominator: null
 
 
 
@@ -60,7 +60,7 @@ GetAreaObjYPosition
 --- Function Info ---
 Entry: PlayerEnemyDiff
 Inputs: X
-Outputs: NegativeFlag
+Outputs: NegativeFlag, $00, CarryFlag
 Clobbers: A, NegativeFlag, ZeroFlag, CarryFlag, OverflowFlag, $00
 
 --- Control Flow Nodes (1 nodes) ---
@@ -79,7 +79,7 @@ PlayerEnemyDiff
   Fall through: null
   Branch: null
   Entered from: [@12635]
-  Dominator: 12635
+  Dominator: null
 
 
 
@@ -108,6 +108,6 @@ InitVStf
   Fall through: null
   Branch: null
   Entered from: [SetBBox]
-  Dominator: SetBBox
+  Dominator: null
 
 

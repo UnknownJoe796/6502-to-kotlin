@@ -744,20 +744,34 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                     }
 
                     // by Claude - CRITICAL FIX: Propagate return value from JMP target
-                    // If the current function outputs A and the target function also outputs A,
-                    // we should use `return targetFunction(args)` instead of calling and returning separately.
-                    // This ensures the tail call properly returns the target's result.
+                    // Only use `return targetFunction(args)` when return types match exactly.
+                    // Otherwise call and return separately to handle type mismatches.
                     val currentFunc = ctx.currentFunction
                     val currentOutputsA = currentFunc?.outputs?.contains(TrackedAsIo.A) == true
+                    val currentOutputsX = currentFunc?.outputs?.contains(TrackedAsIo.X) == true
+                    val currentOutputsY = currentFunc?.outputs?.contains(TrackedAsIo.Y) == true
                     val targetOutputsA = targetFunction.outputs?.contains(TrackedAsIo.A) == true
+                    val targetOutputsX = targetFunction.outputs?.contains(TrackedAsIo.X) == true
+                    val targetOutputsY = targetFunction.outputs?.contains(TrackedAsIo.Y) == true
 
-                    if (currentOutputsA && targetOutputsA) {
-                        // Both functions output A - use return with call
+                    // Count register outputs for both functions
+                    val currentOutputCount = listOf(currentOutputsA, currentOutputsX, currentOutputsY).count { it }
+                    val targetOutputCount = listOf(targetOutputsA, targetOutputsX, targetOutputsY).count { it }
+
+                    // Only use tail call return if BOTH functions have the SAME return type
+                    val canTailCallReturn = currentOutputCount == targetOutputCount && currentOutputCount > 0 &&
+                        (currentOutputsA == targetOutputsA) &&
+                        (currentOutputsX == targetOutputsX) &&
+                        (currentOutputsY == targetOutputsY)
+
+                    if (canTailCallReturn) {
+                        // Both functions have matching return types - use return with call
                         stmts.add(KReturn(value = KCall(targetName, args)))
                     } else {
-                        // No return value to propagate
+                        // Return types don't match - call and return separately
+                        // by Claude - Fix return type mismatch by using ctx.generateFunctionReturn()
                         stmts.add(KExprStmt(KCall(targetName, args)))
-                        stmts.add(KReturn())
+                        stmts.add(ctx.generateFunctionReturn())
                     }
                 } else if (targetFunction == null) {
                     // Target is not a known function - add comment for debugging
@@ -817,7 +831,8 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                     branches = branches,
                     elseBranch = listOf(KComment("Unknown JumpEngine index"))
                 ))
-                stmts.add(KReturn())
+                // by Claude - Fix return type mismatch by using ctx.generateFunctionReturn()
+                stmts.add(ctx.generateFunctionReturn())
             } else {
                 val functionName = assemblyLabelToKotlinName(assemblyLabel)
 
@@ -921,9 +936,37 @@ fun AssemblyInstruction.toKotlin(ctx: CodeGenContext, lineIndex: Int = -1): List
                     }
                 }
 
+                // by Claude - CRITICAL FIX: Reset flag context after JSR calls
+                // After a function call, the flags should be based on the state at RTS time,
+                // not on stale comparisons from before the call. This fixes incorrect branch conditions
+                // like `if (A != 0xE4)` after a JSR when it should be `if (A == 0)` for a beq instruction.
+                //
+                // On 6502, after RTS the zero and negative flags are whatever the callee left them as.
+                // For `beq`/`bne` after JSR, the condition is typically based on A (from LDA/CMP in callee).
+                // We clear zeroFlag and negativeFlag to force fresh evaluation based on current A.
+                // We only preserve carryFlag if the function explicitly returns it.
+                if (hasAOutput) {
+                    // Function returned A - set flags based on the returned value
+                    val returnedA = ctx.registerA ?: KVar("A")
+                    ctx.zeroFlag = KBinaryOp(returnedA, "==", KLiteral("0"))
+                    ctx.negativeFlag = KBinaryOp(KParen(KBinaryOp(returnedA, "and", KLiteral("0x80"))), "!=", KLiteral("0"))
+                } else {
+                    // No A output - clear zero/negative flags so they rebuild from A
+                    ctx.zeroFlag = null
+                    ctx.negativeFlag = null
+                }
+
+                // Clear carry flag unless the function explicitly returns it
+                if (!hasCarryOutput) {
+                    ctx.carryFlag = null
+                }
+                // Always clear overflow flag - rarely tracked explicitly
+                ctx.overflowFlag = null
+
                 // Terminal subroutines like JumpEngine don't return - add a return statement
+                // by Claude - Fix return type mismatch by using ctx.generateFunctionReturn()
                 if (isTerminalSubroutine(this)) {
-                    stmts.add(KReturn())
+                    stmts.add(ctx.generateFunctionReturn())
                 }
             }
         }

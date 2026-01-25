@@ -308,6 +308,12 @@ object KContinue : KotlinStmt {
     override fun toKotlin(indent: String) = "${indent}continue"
 }
 
+/** Labeled continue statement: continue@label */
+// by Claude - Used for continuing to a specific loop in nested loop contexts
+data class KLabeledContinue(val label: String) : KotlinStmt {
+    override fun toKotlin(indent: String) = "${indent}continue@$label"
+}
+
 /** Comment: // This is a comment */
 data class KComment(val text: String, val commentTypeIndicator: String = "") : KotlinStmt {
     override fun toKotlin(indent: String) = "$indent//$commentTypeIndicator $text"

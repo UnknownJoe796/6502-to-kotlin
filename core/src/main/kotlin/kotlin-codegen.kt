@@ -134,15 +134,18 @@ class CodeGenContext(
     // the branch is already handled by the control structure (IfNode/LoopNode).
     var isInsideStructuredBranch: Boolean = false
 
-    // by Claude - Stack of enclosing loops for labeled break support
-    // Each entry is (loopLabel, breakTargets) where breakTargets are blocks that exit the loop
+    // by Claude - Stack of enclosing loops for labeled break and continue support
+    // Each entry is LoopInfo(label, header, breakTargets)
+    // - header: the loop header block (for continue detection)
+    // - breakTargets: blocks that exit the loop
+    data class LoopInfo(val label: String, val header: AssemblyBlock?, val breakTargets: Set<AssemblyBlock>)
     private var loopLabelCounter = 0
-    val loopStack = mutableListOf<Pair<String, Set<AssemblyBlock>>>()
+    val loopStack = mutableListOf<LoopInfo>()
 
     /** Push a new loop onto the stack and return its label */
-    fun pushLoop(breakTargets: Set<AssemblyBlock>): String {
+    fun pushLoop(header: AssemblyBlock?, breakTargets: Set<AssemblyBlock>): String {
         val label = "loop${loopLabelCounter++}"
-        loopStack.add(label to breakTargets)
+        loopStack.add(LoopInfo(label, header, breakTargets))
         return label
     }
 
@@ -158,14 +161,42 @@ class CodeGenContext(
     fun findBreakLabel(target: AssemblyBlock): String? {
         // Search from OUTERMOST to innermost loop - return the first (outermost) match
         for (i in loopStack.indices) {
-            val (label, breakTargets) = loopStack[i]
-            if (target in breakTargets) return label
+            val info = loopStack[i]
+            if (target in info.breakTargets) return info.label
         }
         return null
     }
 
     /** Check if a block is a break target for ANY enclosing loop */
     fun isBreakTarget(target: AssemblyBlock): Boolean = findBreakLabel(target) != null
+
+    // by Claude - Continue target support for internal back-branches to loop headers
+    /** Find the label for a continue target (loop header). Returns null if not a continue target. */
+    fun findContinueLabel(target: AssemblyBlock): String? {
+        // Search from INNERMOST to outermost - continue goes to the immediate enclosing loop
+        for (i in loopStack.indices.reversed()) {
+            val info = loopStack[i]
+            if (info.header == target) return info.label
+        }
+        return null
+    }
+
+    /** Check if a block is a continue target (loop header) for ANY enclosing loop */
+    fun isContinueTarget(target: AssemblyBlock): Boolean = findContinueLabel(target) != null
+
+    // by Claude - Track break targets that need flag-based exit handling
+    // Maps break target block -> flag variable name
+    // Used when a loop has multiple break targets where some have code to execute
+    val breakTargetFlags = mutableMapOf<AssemblyBlock, String>()
+
+    // by Claude - Counter for break target flag variables
+    private var breakFlagCounter = 0
+
+    /** Get a unique flag variable name for a break target */
+    fun nextBreakFlag(): String = "exitFlag${breakFlagCounter++}"
+
+    /** Get the flag name for a break target, or null if not a flagged target */
+    fun getBreakTargetFlag(target: AssemblyBlock): String? = breakTargetFlags[target]
 
     // ===== DELEGATE MEMORY ACCESS TRACKING =====
 
@@ -595,6 +626,11 @@ fun ControlNode.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                 if (branchTarget != null) {
                     val breakLabel = ctx.findBreakLabel(branchTarget)
                     if (breakLabel != null) {
+                        // by Claude - If this target has a flag, set it before breaking
+                        val flagName = ctx.getBreakTargetFlag(branchTarget)
+                        if (flagName != null) {
+                            elseStmts.add(KAssignment(KVar(flagName), KLiteral("true")))
+                        }
                         // Add labeled break to else branch
                         elseStmts.add(KLabeledBreak(breakLabel))
                     }
@@ -638,17 +674,19 @@ fun ControlNode.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                         if (jmpTargetFunction.inputs?.contains(TrackedAsIo.Y) == true) {
                             args.add(getRegisterValueOrDefault("Y", ctx))
                         }
+                        // by Claude - Use generateFunctionReturn to properly handle functions that return values
                         thenStmts.toMutableList().also { stmts ->
                             stmts.add(KComment("goto $targetLabel -> $targetName (internal forward branch)", commentTypeIndicator = " "))
                             stmts.add(KExprStmt(KCall(targetName, args)))
-                            stmts.add(KReturn())
+                            stmts.add(ctx.generateFunctionReturn())
                         }.also { result.add(KIf(condition, it, elseStmts)); return result }
                     } else {
                         // No JMP target - just add a comment indicating the branch and return
                         // This at least prevents incorrect fall-through
+                        // by Claude - Use generateFunctionReturn to properly handle functions that return values
                         thenStmts.toMutableList().also { stmts ->
                             stmts.add(KComment("goto $targetLabel (internal forward branch - code generated later)", commentTypeIndicator = " "))
-                            stmts.add(KReturn())
+                            stmts.add(ctx.generateFunctionReturn())
                         }.also { result.add(KIf(condition, it, elseStmts)); return result }
                     }
                 }
@@ -688,10 +726,33 @@ fun ControlNode.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
             result.addAll(ctx.materializeRegister("X", mutable = true))
             result.addAll(ctx.materializeRegister("Y", mutable = true))
 
-            // by Claude - Push loop onto stack for labeled break support
-            // If this loop has break targets, we may need labeled breaks from inner code
-            val loopLabel = ctx.pushLoop(this.breakTargets)
-            val needsLabel = this.breakTargets.isNotEmpty()
+            // by Claude - Detect break targets with code (not simple RTS)
+            // When a loop has multiple break targets where some have code and some are simple RTS,
+            // we need flag variables to track which exit path was taken.
+            // Example: CheckSideMTiles has code, ExSCH is just RTS
+            // NOTE: We only register the flag here - the declaration is added at function level
+            // in toKotlinFunction() to avoid scope issues with nested control structures.
+            val breakTargetsWithCode = this.breakTargets.filter { !it.isSimpleRts() }
+            val hasSimpleRtsTarget = this.breakTargets.any { it.isSimpleRts() }
+
+            // Only generate flags if we have BOTH: targets with code AND a simple RTS target
+            // This pattern indicates: break to target with code vs normal loop exit to RTS
+            if (breakTargetsWithCode.isNotEmpty() && hasSimpleRtsTarget) {
+                for (target in breakTargetsWithCode) {
+                    // Check if we already have a flag for this target (avoid duplicates in nested loops)
+                    if (ctx.breakTargetFlags[target] == null) {
+                        val flagName = ctx.nextBreakFlag()
+                        ctx.breakTargetFlags[target] = flagName
+                    }
+                    // NOTE: Flag declaration is added at function level, not here
+                }
+            }
+
+            // by Claude - Push loop onto stack for labeled break and continue support
+            // - Header is needed for continue detection (branches back to loop start)
+            // - Break targets are needed for break detection (branches to loop exit)
+            val loopLabel = ctx.pushLoop(this.header, this.breakTargets)
+            val needsLabel = this.breakTargets.isNotEmpty() || this.continueTargets.isNotEmpty()
 
             // by Claude - CRITICAL FIX: For PreTest loops (while loops), save the context state
             // BEFORE processing the body. This is because the loop condition should be evaluated
@@ -1024,6 +1085,16 @@ fun Condition.toKotlinExpr(ctx: CodeGenContext): KotlinExpr {
 }
 
 /**
+ * by Claude - Check if a block is a "simple RTS" block that only contains an RTS instruction.
+ * Such blocks just return with no additional code to execute.
+ */
+fun AssemblyBlock.isSimpleRts(): Boolean {
+    val instructions = this.lines.filter { it.instruction != null }.map { it.instruction!! }
+    // A simple RTS block has exactly one instruction: RTS
+    return instructions.size == 1 && instructions[0].op == AssemblyOp.RTS
+}
+
+/**
  * Convert an AssemblyBlock to Kotlin statements.
  */
 fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
@@ -1093,12 +1164,18 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
         // just skips some code within the loop and we shouldn't generate return.
         val targetIsBreakTarget = branchTarget != null && ctx.isBreakTarget(branchTarget)
 
+        // by Claude - Check if branch target is a continue target (loop header) for an enclosing loop
+        // If so, we need to generate a labeled continue. This handles the pattern:
+        //   dec $00; bne SideCheckLoop (branch back to loop start if counter != 0)
+        val targetIsContinueTarget = branchTarget != null && ctx.isContinueTarget(branchTarget)
+
         // Only generate orphaned branch handling if:
         // 1. Target is outside the function (exit), or
         // 2. Target is a break target for an enclosing loop, or
-        // 3. Internal forward branch (to prevent incorrect fall-through, e.g., bpl/bmi patterns)
+        // 3. Target is a continue target (loop header) for an enclosing loop, or
+        // 4. Internal forward branch (to prevent incorrect fall-through, e.g., bpl/bmi patterns)
         // by Claude - Added isInternalForwardBranch to fix consecutive branch patterns like bpl/bmi
-        if ((targetIsExit || targetIsBreakTarget || isInternalForwardBranch) && branchTarget != null) {
+        if ((targetIsExit || targetIsBreakTarget || targetIsContinueTarget || isInternalForwardBranch) && branchTarget != null) {
             // Generate an if-statement for this orphaned branch
             // The condition is based on the branch type
             val condition = buildOrphanedBranchCondition(lastInstr, ctx)
@@ -1119,13 +1196,26 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                     ctx.functionRegistry[assemblyLabelToKotlinName(label)]
                 }
 
-                val thenBody = if (targetIsBreakTarget) {
+                val thenBody = if (targetIsContinueTarget) {
+                    // by Claude - Branch to a continue target (loop header) - generate labeled continue
+                    // This handles patterns like: dec $00; bne SideCheckLoop
+                    val continueLabel = ctx.findContinueLabel(branchTarget)!!
+                    listOf(
+                        KComment("continue loop (branch back to $targetLabel)", commentTypeIndicator = " "),
+                        KLabeledContinue(continueLabel)
+                    )
+                } else if (targetIsBreakTarget) {
                     // by Claude - Branch to a break target - generate labeled break
                     val breakLabel = ctx.findBreakLabel(branchTarget)!!
-                    listOf(
-                        KComment("goto $targetLabel", commentTypeIndicator = " "),
-                        KLabeledBreak(breakLabel)
-                    )
+                    // by Claude - If this target has a flag, set it before breaking
+                    val flagName = ctx.getBreakTargetFlag(branchTarget)
+                    val stmts = mutableListOf<KotlinStmt>()
+                    stmts.add(KComment("goto $targetLabel", commentTypeIndicator = " "))
+                    if (flagName != null) {
+                        stmts.add(KAssignment(KVar(flagName), KLiteral("true")))
+                    }
+                    stmts.add(KLabeledBreak(breakLabel))
+                    stmts.toList()
                 } else if (isInternalForwardBranch) {
                     // by Claude - Internal forward branch: inline the target block's code if small enough
                     // This handles patterns like bpl/bmi where the branch goes to code
@@ -1220,10 +1310,11 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                     if (targetFunc.inputs?.contains(TrackedAsIo.Y) == true) {
                         args.add(getRegisterValueOrDefault("Y", ctx))
                     }
+                    // by Claude - Use generateFunctionReturn to properly handle functions that return values
                     listOf(
                         KComment("goto $targetLabel -> $funcName", commentTypeIndicator = " "),
                         KExprStmt(KCall(funcName, args)),
-                        KReturn()
+                        ctx.generateFunctionReturn()
                     )
                 } else if (jmpTargetFunction != null && jmpTarget != null) {
                     // Generate tail call to the JMP target function
@@ -1239,16 +1330,18 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                     if (jmpTargetFunction.inputs?.contains(TrackedAsIo.Y) == true) {
                         args.add(getRegisterValueOrDefault("Y", ctx))
                     }
+                    // by Claude - Use generateFunctionReturn to properly handle functions that return values
                     listOf(
                         KComment("goto $targetLabel -> $targetName", commentTypeIndicator = " "),
                         KExprStmt(KCall(targetName, args)),
-                        KReturn()
+                        ctx.generateFunctionReturn()
                     )
                 } else {
+                    // by Claude - Use generateFunctionReturn to properly handle functions that return values
                     // No JMP target found, just return
                     listOf(
                         KComment("goto $targetLabel", commentTypeIndicator = " "),
-                        KReturn()
+                        ctx.generateFunctionReturn()
                     )
                 }
 
@@ -1281,7 +1374,8 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
         if (wouldCycle) {
             stmts.add(KComment("SKIPPED: Fall-through to $targetName would create mutual recursion cycle", commentTypeIndicator = " "))
             // Don't generate the tail call - just return to avoid the cycle
-            stmts.add(KReturn())
+            // by Claude - Use generateFunctionReturn to properly handle functions that return values
+            stmts.add(ctx.generateFunctionReturn())
         } else {
             // Get the target function's inputs to determine arguments
             val targetInputs = targetFunction.inputs ?: emptySet()
@@ -1302,8 +1396,35 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
             }
 
             stmts.add(KComment("Fall-through tail call to $targetName", commentTypeIndicator = " "))
-            stmts.add(KExprStmt(KCall(targetName, args)))
-            stmts.add(KReturn())
+
+            // by Claude - For tail calls, if the target function returns a value and this function
+            // should return the same type, use `return targetFunction()` to propagate the return value
+            val thisHasAOutput = currentFunc?.outputs?.contains(TrackedAsIo.A) == true
+            val thisHasXOutput = currentFunc?.outputs?.contains(TrackedAsIo.X) == true
+            val thisHasYOutput = currentFunc?.outputs?.contains(TrackedAsIo.Y) == true
+            val targetHasAOutput = targetFunction.outputs?.contains(TrackedAsIo.A) == true
+            val targetHasXOutput = targetFunction.outputs?.contains(TrackedAsIo.X) == true
+            val targetHasYOutput = targetFunction.outputs?.contains(TrackedAsIo.Y) == true
+
+            // Count register outputs for both functions
+            val thisOutputCount = listOf(thisHasAOutput, thisHasXOutput, thisHasYOutput).count { it }
+            val targetOutputCount = listOf(targetHasAOutput, targetHasXOutput, targetHasYOutput).count { it }
+
+            // Only use tail call return if BOTH functions have the SAME return type
+            // (same number of outputs and matching registers)
+            val canTailCallReturn = thisOutputCount == targetOutputCount && thisOutputCount > 0 &&
+                (thisHasAOutput == targetHasAOutput) &&
+                (thisHasXOutput == targetHasXOutput) &&
+                (thisHasYOutput == targetHasYOutput)
+
+            if (canTailCallReturn) {
+                // True tail call - return the result of the function call directly
+                stmts.add(KReturn(KCall(targetName, args)))
+            } else {
+                // Not a tail call for return value - call and return separately
+                stmts.add(KExprStmt(KCall(targetName, args)))
+                stmts.add(ctx.generateFunctionReturn())
+            }
         }
     }
 
@@ -1553,6 +1674,14 @@ fun AssemblyFunction.toKotlinFunction(
     jumpEngineTables: Map<Int, JumpEngineTable> = emptyMap(),
     fallThroughGraph: Map<AssemblyFunction, Set<AssemblyFunction>> = emptyMap()
 ): KFunction {
+    // by Claude - Handle "empty functions" specially
+    // These are functions whose starting block is owned by another function (via BIT skip pattern)
+    // We need to generate code that sets the appropriate register values and calls the target
+    val fallsToFunc = this.emptyFunctionFallsTo
+    if (fallsToFunc != null) {
+        return generateEmptyFunctionCode(functionRegistry, fallThroughGraph)
+    }
+
     val ctx = CodeGenContext(functionRegistry, jumpEngineTables, this, fallThroughGraph)
 
     // by Claude - Pre-initialize register references for registers that are likely parameters
@@ -1625,12 +1754,65 @@ fun AssemblyFunction.toKotlinFunction(
 
         body.addAll(stmts)
 
-        // If this node contained a return at the top level, stop processing
-        if (stmts.any { it is KReturn }) {
-            break
-        }
+        // by Claude - FIX: Don't stop at return! Continue processing all control nodes.
+        // Some blocks after an RTS are still reachable via branches (like CheckSideMTiles
+        // which is reached via branches from inside SideCheckLoop, but comes after ExSCH's RTS
+        // in layout order). The control flow analysis already determined what's reachable.
 
         i++
+    }
+
+    // by Claude - Post-process: Handle flagged break targets that come after a simple return
+    // Pattern we're looking for in body:
+    //   ...code...
+    //   return           <- from simple RTS block (like ExSCH)
+    //   ...more code...  <- from flagged break target (like CheckSideMTiles)
+    //
+    // We need to restructure this to:
+    //   ...code...
+    //   if (exitFlag0) {   <- check the flag
+    //       ...more code... <- flagged target code
+    //   }
+    //   return
+    if (ctx.breakTargetFlags.isNotEmpty()) {
+        val restructured = mutableListOf<KotlinStmt>()
+        var i = 0
+        while (i < body.size) {
+            val stmt = body[i]
+
+            // Look for: return followed by more statements
+            if (stmt is KReturn && i + 1 < body.size) {
+                // Collect all statements after this return
+                val afterReturn = body.drop(i + 1)
+                if (afterReturn.isNotEmpty()) {
+                    // Find which flag this code belongs to
+                    // The flags were registered for specific blocks - find matching flag
+                    val flagsToCheck = ctx.breakTargetFlags.values.toList()
+
+                    if (flagsToCheck.isNotEmpty()) {
+                        // Generate if (flag) { afterReturn code }
+                        // For multiple flags, we'd need multiple if blocks, but typically there's just one
+                        for (flagName in flagsToCheck) {
+                            val ifBlock = KIf(
+                                condition = KVar(flagName),
+                                thenBranch = afterReturn,
+                                elseBranch = emptyList()
+                            )
+                            restructured.add(ifBlock)
+                        }
+                        restructured.add(stmt) // Add the return after the if blocks
+                        break // Done processing
+                    }
+                }
+            }
+
+            restructured.add(stmt)
+            i++
+        }
+
+        // Replace body with restructured version
+        body.clear()
+        body.addAll(restructured)
     }
 
     // Detect which registers are used/written in the function
@@ -1695,6 +1877,13 @@ fun AssemblyFunction.toKotlinFunction(
         finalBody.add(KVarDecl("Y", "Int", KLiteral("0"), mutable = true))
     } else if (yIsReassigned) {
         finalBody.add(KVarDecl("Y", "Int", KVar("Y"), mutable = true))
+    }
+
+    // by Claude - Declare break target flag variables at function level
+    // These are used to track which loop exit path was taken when a loop has
+    // multiple break targets (some with code, some simple RTS)
+    for ((_, flagName) in ctx.breakTargetFlags) {
+        finalBody.add(KVarDecl(flagName, "Boolean", KLiteral("false"), mutable = true))
     }
 
     // Declare all temp variables at function start
@@ -1784,24 +1973,46 @@ fun AssemblyFunction.toKotlinFunction(
                     }
 
                     finalBody.add(KComment("Fall-through tail call to $targetName"))
-                    finalBody.add(KExprStmt(KCall(targetName, args)))
 
-                    // by Claude - After tail call, add return statement with current register values
-                    // This handles cases where this function outputs registers that were set before the tail call
+                    // by Claude - For tail calls, if the target function returns a value and this function
+                    // should return the same type, use `return targetFunction()` to propagate the return value
                     val thisHasAOutput = this.outputs?.contains(TrackedAsIo.A) == true
+                    val thisHasXOutput = this.outputs?.contains(TrackedAsIo.X) == true
                     val thisHasYOutput = this.outputs?.contains(TrackedAsIo.Y) == true
-                    val returnValue: KotlinExpr? = when {
-                        thisHasAOutput && thisHasYOutput -> {
-                            KCall("Pair", listOf(
-                                getRegisterValueOrDefault("A", ctx),
-                                getRegisterValueOrDefault("Y", ctx)
-                            ))
+                    val targetHasAOutput = targetFunction.outputs?.contains(TrackedAsIo.A) == true
+                    val targetHasXOutput = targetFunction.outputs?.contains(TrackedAsIo.X) == true
+                    val targetHasYOutput = targetFunction.outputs?.contains(TrackedAsIo.Y) == true
+
+                    // Count register outputs for both functions
+                    val thisOutputCount = listOf(thisHasAOutput, thisHasXOutput, thisHasYOutput).count { it }
+                    val targetOutputCount = listOf(targetHasAOutput, targetHasXOutput, targetHasYOutput).count { it }
+
+                    // Only use tail call return if BOTH functions have the SAME return type
+                    // (same number of outputs and matching registers)
+                    val canTailCallReturn = thisOutputCount == targetOutputCount && thisOutputCount > 0 &&
+                        (thisHasAOutput == targetHasAOutput) &&
+                        (thisHasXOutput == targetHasXOutput) &&
+                        (thisHasYOutput == targetHasYOutput)
+
+                    if (canTailCallReturn) {
+                        // True tail call - return the result of the function call directly
+                        finalBody.add(KReturn(KCall(targetName, args)))
+                    } else {
+                        // Not a tail call for return value - call and return separately
+                        finalBody.add(KExprStmt(KCall(targetName, args)))
+                        val returnValue: KotlinExpr? = when {
+                            thisHasAOutput && thisHasYOutput -> {
+                                KCall("Pair", listOf(
+                                    getRegisterValueOrDefault("A", ctx),
+                                    getRegisterValueOrDefault("Y", ctx)
+                                ))
+                            }
+                            thisHasAOutput -> getRegisterValueOrDefault("A", ctx)
+                            thisHasYOutput -> getRegisterValueOrDefault("Y", ctx)
+                            else -> null
                         }
-                        thisHasAOutput -> getRegisterValueOrDefault("A", ctx)
-                        thisHasYOutput -> getRegisterValueOrDefault("Y", ctx)
-                        else -> null
+                        finalBody.add(KReturn(returnValue))
                     }
-                    finalBody.add(KReturn(returnValue))
                 }
                 break  // Only handle one fall-through (there shouldn't be multiple)
             }
@@ -2238,6 +2449,127 @@ fun labelToCamelCase(label: String): String {
             }
         }
         .joinToString("")
+}
+
+// by Claude - Generate code for "empty functions" whose starting block is owned by another function
+// These functions exist due to the BIT skip pattern (e.g., BlockBufferColli_Side)
+// We need to execute the starting block's instructions (without skipping) and call the target
+private fun AssemblyFunction.generateEmptyFunctionCode(
+    functionRegistry: Map<String, AssemblyFunction>,
+    fallThroughGraph: Map<AssemblyFunction, Set<AssemblyFunction>>
+): KFunction {
+    val body = mutableListOf<KotlinStmt>()
+    val params = mutableListOf<KParam>()
+
+    // Collect register values from the starting block's instructions
+    // These are the values that would be set by executing this function's code
+    var aValue: KotlinExpr? = null
+    var xValue: KotlinExpr? = null
+    var yValue: KotlinExpr? = null
+
+    // Helper to convert immediate value to Kotlin expression
+    fun immediateToExpr(addr: AssemblyAddressing.Value): KotlinExpr {
+        return when (addr) {
+            is AssemblyAddressing.ByteValue -> KLiteral("0x${addr.value.toString(16).uppercase().padStart(2, '0')}")
+            is AssemblyAddressing.ShortValue -> KLiteral("0x${addr.value.toString(16).uppercase().padStart(4, '0')}")
+            is AssemblyAddressing.ConstantReference -> KVar(addr.name)
+            is AssemblyAddressing.ConstantReferenceLower -> KCall("lowByte", listOf(KVar(addr.name)))
+            is AssemblyAddressing.ConstantReferenceUpper -> KCall("highByte", listOf(KVar(addr.name)))
+            is AssemblyAddressing.ValueLowerSelection -> KCall("lowByte", listOf(KLiteral("0x${addr.value.value.toString(16)}")))
+            is AssemblyAddressing.ValueUpperSelection -> KCall("highByte", listOf(KLiteral("0x${addr.value.value.toString(16)}")))
+        }
+    }
+
+    // Scan the starting block for LDA/LDX/LDY immediate values
+    // These set register values before the fall-through to the target function
+    for (line in startingBlock.lines) {
+        val instr = line.instruction ?: continue
+        when (instr.op) {
+            AssemblyOp.LDA -> {
+                val addr = instr.address
+                if (addr is AssemblyAddressing.Value) {
+                    aValue = immediateToExpr(addr)
+                }
+            }
+            AssemblyOp.LDX -> {
+                val addr = instr.address
+                if (addr is AssemblyAddressing.Value) {
+                    xValue = immediateToExpr(addr)
+                }
+            }
+            AssemblyOp.LDY -> {
+                val addr = instr.address
+                if (addr is AssemblyAddressing.Value) {
+                    yValue = immediateToExpr(addr)
+                }
+            }
+            else -> { /* ignore other instructions for now */ }
+        }
+    }
+
+    // Add parameters only for inputs that are NOT set by the starting block's code
+    // If the block sets a register explicitly (e.g., lda #$01), it's not a parameter
+    if (this.inputs?.contains(TrackedAsIo.A) == true && aValue == null) {
+        params.add(KParam("A", "Int"))
+        aValue = KVar("A")
+    }
+    if (this.inputs?.contains(TrackedAsIo.X) == true && xValue == null) {
+        params.add(KParam("X", "Int"))
+        xValue = KVar("X")
+    }
+    if (this.inputs?.contains(TrackedAsIo.Y) == true && yValue == null) {
+        params.add(KParam("Y", "Int"))
+        yValue = KVar("Y")
+    }
+
+    // Get the target function (the one we fall through to)
+    val targetFunc = emptyFunctionFallsTo!!
+    val targetName = targetFunc.startingBlock.label?.let { assemblyLabelToKotlinName(it) }
+        ?: "func_${targetFunc.startingBlock.originalLineIndex}"
+
+    // Build arguments for the target function call
+    val args = mutableListOf<KotlinExpr>()
+    if (targetFunc.inputs?.contains(TrackedAsIo.A) == true) {
+        args.add(aValue ?: KLiteral("0"))
+    }
+    if (targetFunc.inputs?.contains(TrackedAsIo.X) == true) {
+        args.add(xValue ?: KLiteral("0"))
+    }
+    if (targetFunc.inputs?.contains(TrackedAsIo.Y) == true) {
+        args.add(yValue ?: KLiteral("0"))
+    }
+
+    // Determine return type based on outputs
+    val hasAOutput = this.outputs?.contains(TrackedAsIo.A) == true
+    val hasXOutput = this.outputs?.contains(TrackedAsIo.X) == true
+    val hasYOutput = this.outputs?.contains(TrackedAsIo.Y) == true
+    val outputCount = listOf(hasAOutput, hasXOutput, hasYOutput).count { it }
+
+    val returnType = when {
+        outputCount >= 2 -> "Pair<Int, Int>"
+        hasAOutput || hasXOutput || hasYOutput -> "Int"
+        else -> null
+    }
+
+    // Generate the tail call
+    if (returnType != null) {
+        body.add(KReturn(KCall(targetName, args)))
+    } else {
+        body.add(KExprStmt(KCall(targetName, args)))
+        body.add(KReturn(null))
+    }
+
+    // Generate function name
+    val functionName = this.startingBlock.label?.let { assemblyLabelToKotlinName(it) }
+        ?: "func_${this.startingBlock.originalLineIndex}"
+
+    return KFunction(
+        name = functionName,
+        params = params,
+        returnType = returnType,
+        body = body,
+        comment = "Decompiled from ${this.startingBlock.label ?: "@${this.startingBlock.originalLineIndex}"}"
+    )
 }
 
 // Helper functions (wrapPropertyRead, wrapPropertyWrite, toKotlinExpr, etc.) moved to codegen-helpers.kt

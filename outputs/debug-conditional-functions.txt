@@ -27,7 +27,7 @@ CheckPlayerVertical
   Fall through: 11875
   Branch: ExCPV
   Entered from: [@11868]
-  Dominator: 11868
+  Dominator: null
 
 @11875
   Lines: 3
@@ -80,7 +80,7 @@ HandlePipeEntry
   Fall through: 12278
   Branch: ExPipeE
   Entered from: [@12273]
-  Dominator: 12273
+  Dominator: null
 
 @12278
   Lines: 3
@@ -262,31 +262,26 @@ ExScrnBd
 Entry: BubbleCheck
 Inputs: X
 Outputs: 
-Clobbers: A, NegativeFlag, ZeroFlag, $07, CarryFlag, Y, OverflowFlag
+Clobbers: A, NegativeFlag, ZeroFlag, $07, CarryFlag
 
---- Control Flow Nodes (4 nodes) ---
+--- Control Flow Nodes (3 nodes) ---
 
-[0] IfNode
-  Condition block: BubbleCheck
-  Sense: false
-  Then branch: 1 nodes
-  Else branch: 0 nodes
+[0] BlockNode
+  Block: BubbleCheck
+  Lines: 7
+    LDA PseudoRandomBitReg+1,X
+    AND #$01
+    ... (4 more)
 
-[1] IfNode
-  Condition block: MoveBubl
-  Sense: false
-  Then branch: 1 nodes
-  Else branch: 0 nodes
+[1] BlockNode
+  Block: @6395
+  Lines: 2
+    LDA AirBubbleTimer
+    BNE ExitBubl
 
 [2] BlockNode
-  Block: Y_Bubl
+  Block: @6397
   Lines: 1
-    STA Bubble_Y_Position,X
-
-[3] BlockNode
-  Block: ExitBubl
-  Lines: 1
-    RTS 
 
 --- Blocks Graph ---
 
@@ -295,7 +290,7 @@ BubbleCheck
   Fall through: 6395
   Branch: MoveBubl
   Entered from: [@6387]
-  Dominator: 6387
+  Dominator: null
 
 @6395
   Lines: 2
@@ -316,7 +311,7 @@ SetupBubble
   Fall through: 6403
   Branch: PosBubl
   Entered from: [@6397]
-  Dominator: 6397
+  Dominator: null
 
 @6403
   Lines: 1
@@ -337,28 +332,28 @@ MoveBubl
   Fall through: 6428
   Branch: Y_Bubl
   Entered from: [PosBubl, BubbleCheck]
-  Dominator: BubbleCheck
+  Dominator: null
 
 @6428
   Lines: 1
   Fall through: Y_Bubl
   Branch: null
   Entered from: [MoveBubl]
-  Dominator: MoveBubl
+  Dominator: null
 
 Y_Bubl
   Lines: 1
   Fall through: ExitBubl
   Branch: null
   Entered from: [@6428, MoveBubl]
-  Dominator: MoveBubl
+  Dominator: null
 
 ExitBubl
   Lines: 1
   Fall through: null
   Branch: null
   Entered from: [Y_Bubl, @6395]
-  Dominator: BubbleCheck
+  Dominator: null
 
 
 
@@ -367,7 +362,7 @@ ExitBubl
 --- Function Info ---
 Entry: PlayerLakituDiff
 Inputs: $00, X
-Outputs: 
+Outputs: A
 Clobbers: Y, NegativeFlag, ZeroFlag, A, CarryFlag, OverflowFlag, $00
 
 --- Control Flow Nodes (6 nodes) ---
@@ -413,7 +408,7 @@ PlayerLakituDiff
   Fall through: 10010
   Branch: ChkLakDif
   Entered from: [@10005]
-  Dominator: 10005
+  Dominator: null
 
 @10010
   Lines: 6

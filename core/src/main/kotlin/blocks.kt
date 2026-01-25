@@ -152,6 +152,14 @@ class AssemblyFunction(
 
     // by Claude - All blocks belonging to this function (populated during functionify)
     var blocks: Set<AssemblyBlock>? = null
+
+    // by Claude - For "empty functions" whose starting block is owned by another function
+    // (e.g., BlockBufferColli_Side whose code is absorbed into BlockBufferColli_Head via BIT skip pattern)
+    // This points to the function that the code falls through to
+    var emptyFunctionFallsTo: AssemblyFunction? = null
+
+    // by Claude - Flag indicating this is an empty function that needs fall-through resolution
+    var isEmptyFunction: Boolean = false
 }
 
 /**
@@ -732,6 +740,14 @@ fun List<AssemblyBlock>.functionify(
         function.clobbers = defined.toSet()
         function.blocks = functionBlocks  // by Claude - Store blocks for transitive input analysis
 
+        // by Claude - Mark "empty functions" whose starting block is owned by another function
+        // This happens with the BIT skip pattern (e.g., BlockBufferColli_Side).
+        // We'll resolve the actual fall-through target after all functions are created.
+        if (functionBlocks.isEmpty() && entryBlock.function != null && entryBlock.function != function) {
+            // Mark this as an empty function - will be resolved later
+            function.isEmptyFunction = true
+        }
+
         // Analyze function outputs by looping through callers. A state is an output if:
         // - This function can define it, AND
         // - At least one caller reads that state immediately after the call before redefining it.
@@ -855,6 +871,20 @@ fun List<AssemblyBlock>.functionify(
         .filter { func -> func.startingBlock.label != null }
         .associateBy { func -> func.startingBlock.label!! }
 
+    // by Claude - Resolve emptyFunctionFallsTo for empty functions
+    // Now that all functions are created and labelToFunction is built, we can find the target function
+    for (func in functions) {
+        if (func.isEmptyFunction) {
+            // Find the fall-through target by looking at the starting block's fall-through
+            val fallThroughBlock = func.startingBlock.fallThroughExit
+            val targetLabel = fallThroughBlock?.label
+            val targetFunction = if (targetLabel != null) labelToFunction[targetLabel] else null
+            if (targetFunction != null && targetFunction != func) {
+                func.emptyFunctionFallsTo = targetFunction
+            }
+        }
+    }
+
     var changed = true
     var iterations = 0
     val maxIterations = 100 // Prevent infinite loops in case of cycles
@@ -864,7 +894,52 @@ fun List<AssemblyBlock>.functionify(
         iterations++
 
         for (func in functions) {
-            val funcBlocks = func.blocks ?: continue
+            // by Claude - Handle "empty functions" first
+            // These are functions whose starting block is owned by another function (via BIT skip pattern)
+            // They should inherit inputs from the target function EXCEPT for registers set by their code
+            val fallsToFunc = func.emptyFunctionFallsTo
+            if (fallsToFunc != null) {
+                // Find which registers are set by the starting block's code
+                val definedByBlock = mutableSetOf<TrackedAsIo>()
+                for (line in func.startingBlock.lines) {
+                    val instr = line.instruction ?: continue
+                    when (instr.op) {
+                        AssemblyOp.LDA -> {
+                            if (instr.address is AssemblyAddressing.Value) {
+                                definedByBlock.add(TrackedAsIo.A)
+                            }
+                        }
+                        AssemblyOp.LDX -> {
+                            if (instr.address is AssemblyAddressing.Value) {
+                                definedByBlock.add(TrackedAsIo.X)
+                            }
+                        }
+                        AssemblyOp.LDY -> {
+                            if (instr.address is AssemblyAddressing.Value) {
+                                definedByBlock.add(TrackedAsIo.Y)
+                            }
+                        }
+                        else -> {}
+                    }
+                }
+
+                val currentInputs = func.inputs?.toMutableSet() ?: mutableSetOf()
+                val targetInputs = fallsToFunc.inputs ?: emptySet()
+                for (input in targetInputs) {
+                    // Only inherit input if NOT defined by the block's code
+                    if (input !in currentInputs && input !in definedByBlock) {
+                        currentInputs.add(input)
+                        changed = true
+                    }
+                }
+                if (currentInputs != func.inputs) {
+                    func.inputs = currentInputs
+                }
+                continue  // Skip normal processing for empty functions
+            }
+
+            val funcBlocks = func.blocks
+            if (funcBlocks == null || funcBlocks.isEmpty()) continue
             val currentInputs = func.inputs?.toMutableSet() ?: mutableSetOf()
             val definedBeforeCall = mutableSetOf<TrackedAsIo>()
 
@@ -936,7 +1011,22 @@ fun List<AssemblyBlock>.functionify(
         iterations++
 
         for (func in functions) {
-            val funcBlocks = func.blocks ?: continue
+            // by Claude - Handle "empty functions" first for clobbers propagation
+            val fallsToFunc = func.emptyFunctionFallsTo
+            if (fallsToFunc != null) {
+                val targetClobbers = fallsToFunc.clobbers ?: emptySet()
+                val currentClobbers = func.clobbers?.toMutableSet() ?: mutableSetOf()
+                val originalSize = currentClobbers.size
+                currentClobbers.addAll(targetClobbers)
+                if (currentClobbers.size != originalSize) {
+                    func.clobbers = currentClobbers
+                    changed = true
+                }
+                continue  // Skip normal processing for empty functions
+            }
+
+            val funcBlocks = func.blocks
+            if (funcBlocks == null || funcBlocks.isEmpty()) continue
             val currentClobbers = func.clobbers?.toMutableSet() ?: mutableSetOf()
             val originalSize = currentClobbers.size
 
@@ -1242,6 +1332,90 @@ fun List<AssemblyBlock>.functionify(
                                 targetFunction.outputs = targetOutputs
                                 changed = true
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // by Claude - Step 7b: Propagate outputs BACK from JMP targets and fall-throughs to source functions
+    // If function A tail-calls (JMPs to or falls through to) function B, and B outputs X, then A should also output X.
+    // This is because when someone calls A, they will eventually get B's return value.
+    // Example: blockbuffercolliFeet falls through to blockbuffercolliHead which falls through to blockBufferCollision,
+    // and blockBufferCollision outputs A, so both should also output A.
+    changed = true
+    iterations = 0
+
+    while (changed && iterations < maxIterations) {
+        changed = false
+        iterations++
+
+        for (func in functions) {
+            // by Claude - Handle "empty functions" first for output propagation too
+            val fallsToFunc = func.emptyFunctionFallsTo
+            if (fallsToFunc != null) {
+                val targetOutputs = fallsToFunc.outputs ?: emptySet()
+                val currentOutputs = func.outputs?.toMutableSet() ?: mutableSetOf()
+                val originalSize = currentOutputs.size
+                for (output in targetOutputs) {
+                    currentOutputs.add(output)
+                }
+                if (currentOutputs.size != originalSize) {
+                    func.outputs = currentOutputs
+                    changed = true
+                }
+                continue  // Skip normal processing for empty functions
+            }
+
+            val funcBlocks = func.blocks
+            if (funcBlocks == null || funcBlocks.isEmpty()) continue
+
+            // Find all JMP targets within this function (tail calls)
+            for (block in funcBlocks) {
+                for (line in block.lines) {
+                    val instr = line.instruction ?: continue
+                    if (instr.op == AssemblyOp.JMP) {
+                        val targetLabel = (instr.address as? AssemblyAddressing.Direct)?.label
+                        val targetFunction = if (targetLabel != null) labelToFunction[targetLabel] else null
+
+                        if (targetFunction != null && targetFunction != func) {
+                            // This function JMPs to targetFunction (tail call)
+                            // If targetFunction outputs something, this function should too
+                            val targetOutputs = targetFunction.outputs ?: emptySet()
+                            val currentOutputs = func.outputs?.toMutableSet() ?: mutableSetOf()
+                            val originalSize = currentOutputs.size
+
+                            for (output in targetOutputs) {
+                                currentOutputs.add(output)
+                            }
+
+                            if (currentOutputs.size != originalSize) {
+                                func.outputs = currentOutputs
+                                changed = true
+                            }
+                        }
+                    }
+                }
+
+                // by Claude - Also check fall-through exits to other functions
+                // If the last block falls through to another function, propagate that function's outputs back
+                val fallThroughTarget = block.fallThroughExit
+                if (fallThroughTarget != null) {
+                    val targetFunction = labelToFunction[fallThroughTarget.label]
+                    if (targetFunction != null && targetFunction != func) {
+                        // This function falls through to targetFunction (tail call via fall-through)
+                        val targetOutputs = targetFunction.outputs ?: emptySet()
+                        val currentOutputs = func.outputs?.toMutableSet() ?: mutableSetOf()
+                        val originalSize = currentOutputs.size
+
+                        for (output in targetOutputs) {
+                            currentOutputs.add(output)
+                        }
+
+                        if (currentOutputs.size != originalSize) {
+                            func.outputs = currentOutputs
+                            changed = true
                         }
                     }
                 }
