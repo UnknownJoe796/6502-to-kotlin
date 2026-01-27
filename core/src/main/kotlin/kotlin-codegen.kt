@@ -381,6 +381,7 @@ class CodeGenContext(
         val hasAOutput = TrackedAsIo.A in outputs
         val hasXOutput = TrackedAsIo.X in outputs
         val hasYOutput = TrackedAsIo.Y in outputs
+        val hasCarryOutput = TrackedAsIo.CarryFlag in outputs
 
         // Count register outputs
         val registerOutputCount = listOf(hasAOutput, hasXOutput, hasYOutput).count { it }
@@ -403,6 +404,17 @@ class CodeGenContext(
             hasAOutput -> KReturn(KVar("A"))
             hasXOutput -> KReturn(KVar("X"))
             hasYOutput -> KReturn(KVar("Y"))
+            // by Claude - Handle Boolean return from carry flag
+            // For functions that return Boolean based on carry, use carryFlag if available
+            // Otherwise fall back to false as a safe default
+            hasCarryOutput -> {
+                val carryValue = carryFlag
+                if (carryValue != null) {
+                    KReturn(carryValue)
+                } else {
+                    KReturn(KLiteral("false"))
+                }
+            }
             else -> KReturn()
         }
     }
@@ -1271,17 +1283,36 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                     // To avoid JVM method size limits, we only inline small blocks.
 
                     // by Claude - Helper function to check if a block is a join point
-                    // A join point is entered from multiple paths within the same function
+                    // A join point is entered from multiple paths - count ALL entries regardless of function assignment
+                    // This catches shared utility blocks that may have incorrect function ownership
                     fun isJoinPoint(block: AssemblyBlock): Boolean {
-                        val entriesFromSameFunction = block.enteredFrom.filter { it.function == block.function }
-                        return entriesFromSameFunction.size > 1
+                        return block.enteredFrom.size > 1
                     }
+
+                    // by Claude - CRITICAL FIX: Don't inline if the branch target itself is a join point
+                    // Join points have multiple entry paths (e.g., DrawPipe in verticalPipe).
+                    // Inlining them would duplicate code and cause the fall-through path to miss
+                    // the join-point code entirely.
+                    // However, for functions that return non-Unit values (Boolean, Int, Pair, etc.),
+                    // we cannot simply return early because we don't know what value the join point
+                    // would return. For those functions, we must still inline the join point code.
+                    val functionReturnsUnit = ctx.currentFunction?.outputs.isNullOrEmpty()
+                    if (isJoinPoint(branchTarget) && functionReturnsUnit) {
+                        listOf(
+                            KComment("goto $targetLabel (shared join point - not inlined)", commentTypeIndicator = " "),
+                            ctx.generateFunctionReturn()
+                        )
+                    } else {
+                    // by Claude - Use more conservative inline limit for functions with many branches
+                    // This helps prevent exponential code growth in complex functions
+                    val blockCount = this.function?.blocks?.size ?: 10
+                    val adjustedInlineLimit = if (blockCount > 50) 3 else 10
 
                     // Count instructions in the target path to decide whether to inline
                     // Stop at: RTS, JMP, external function, or JOIN POINT (multiple entries)
                     var totalInstructions = 0
                     var checkBlock: AssemblyBlock? = branchTarget
-                    var checkLimit = 10
+                    var checkLimit = adjustedInlineLimit  // by Claude - use same limit as inlining
                     while (checkBlock != null && checkLimit-- > 0) {
                         totalInstructions += checkBlock.lines.count { it.instruction != null }
                         val lastInstr = checkBlock.lines.lastOrNull { it.instruction != null }?.instruction
@@ -1311,7 +1342,7 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                         ctx.convertedBlocks.removeAll(setOf(branchTarget))
 
                         var currentBlock: AssemblyBlock? = branchTarget
-                        var inlineLimit = 10
+                        var inlineLimit = adjustedInlineLimit
                         while (currentBlock != null && inlineLimit-- > 0) {
                             if (currentBlock in ctx.convertedBlocks && currentBlock != branchTarget) break
                             inlinedStmts.addAll(currentBlock.toKotlin(ctx))
@@ -1324,13 +1355,18 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                             currentBlock = nextBlock
                         }
 
-                        // Restore state but mark ONLY the target block as converted
-                        // This prevents duplicate conversion of just the target block (e.g., SlowM)
-                        // while allowing other blocks (like join points) to be converted normally
+                        // by Claude - CRITICAL FIX: Capture ALL blocks converted during inlining
+                        // including those converted in recursive toKotlin() calls.
+                        // This prevents exponential code duplication where follow-through blocks
+                        // get re-inlined from other branches (causing 52,682 -> 487,000+ lines!)
+                        val allConvertedDuringInlining = ctx.convertedBlocks.toSet()
+
+                        // Restore flag state but preserve the converted blocks
                         ctx.restoreState(savedState)
                         ctx.convertedBlocks.clear()
                         ctx.convertedBlocks.addAll(savedConvertedBlocks)
-                        ctx.convertedBlocks.add(branchTarget)  // Only mark the target as converted
+                        // Add ALL blocks that were converted during the entire inlining process
+                        ctx.convertedBlocks.addAll(allConvertedDuringInlining)
 
                         val lastStmt = inlinedStmts.lastOrNull()
                         if (lastStmt !is KReturn) {
@@ -1345,6 +1381,7 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                             ctx.generateFunctionReturn()
                         )
                     }
+                    }  // by Claude - close the else block for isJoinPoint check
                 } else if (targetIsFunctionEntry) {
                     // by Claude - Branch to another function's entry point - generate call
                     val funcName = assemblyLabelToKotlinName(branchTarget.label!!)
