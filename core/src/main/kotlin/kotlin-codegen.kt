@@ -754,23 +754,50 @@ fun ControlNode.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
             val loopLabel = ctx.pushLoop(this.header, this.breakTargets)
             val needsLabel = this.breakTargets.isNotEmpty() || this.continueTargets.isNotEmpty()
 
-            // by Claude - CRITICAL FIX: For PreTest loops (while loops), save the context state
-            // BEFORE processing the body. This is because the loop condition should be evaluated
-            // using the pre-loop state, not the state after the body has been processed.
-            // This fixes issues where temp variables (like carryFromLsr2) are referenced in the
-            // loop condition but declared inside the loop body.
-            val preBodyState = if (this.kind == LoopKind.PreTest) ctx.saveState() else null
+            // by Claude - For PreTest (while) loops, include header block instructions in the body.
+            // In 6502 code, the loop header often contains both body instructions (like INX, CPX)
+            // and the condition check (like BEQ). The structural analysis separates the header from
+            // the body, but for correct code generation, we need to emit the header's non-branch
+            // instructions at the start of each loop iteration.
+            val headerStmts = if (this.kind == LoopKind.PreTest) {
+                val stmts = mutableListOf<KotlinStmt>()
+                for (line in this.header.lines) {
+                    // Add original assembly line as comment
+                    if (line.originalLine != null) {
+                        val trimmedLine = line.originalLine.trim()
+                        if (trimmedLine.isNotEmpty()) {
+                            stmts.add(KComment(trimmedLine, commentTypeIndicator = ">"))
+                        }
+                    }
+                    // Generate Kotlin code for the instruction (excluding branch instructions)
+                    val instr = line.instruction
+                    if (instr != null && !instr.op.isBranch) {
+                        stmts.addAll(instr.toKotlin(ctx, line.originalLineIndex))
+                    }
+                }
+                stmts
+            } else {
+                emptyList<KotlinStmt>()
+            }
 
-            val bodyStmts = this.body.flatMap { it.toKotlin(ctx) }
+            // by Claude - CRITICAL FIX: For PreTest loops, save state AFTER processing header
+            // instructions but BEFORE processing body. The header (like CMP) sets flags that
+            // determine the loop condition, while the body (like SBC) may overwrite those flags.
+            // We need to use the header's flag state for the condition, not the body's state.
+            val postHeaderState = if (this.kind == LoopKind.PreTest) ctx.saveState() else null
+
+            val bodyStmts = headerStmts + this.body.flatMap { it.toKotlin(ctx) }
 
             // by Claude - Pop loop from stack after body is processed
             ctx.popLoop()
 
             val loop = when (this.kind) {
                 LoopKind.PreTest -> {
-                    // by Claude - Restore pre-body state for condition evaluation
-                    // This ensures the condition uses variables that exist BEFORE the loop body
-                    preBodyState?.let { ctx.restoreState(it) }
+                    // by Claude - For PreTest loops, restore the flag state from after processing
+                    // the header but before processing the body. This ensures the condition uses
+                    // the flags set by the header's comparison (like CMP), not flags overwritten
+                    // by the body (like SBC).
+                    postHeaderState?.let { ctx.restoreState(it) }
                     val condition = this.condition?.toKotlinExpr(ctx) ?: KLiteral("true")
                     if (needsLabel) KLabeledWhile(loopLabel, condition, bodyStmts)
                     else KWhile(condition, bodyStmts)
@@ -791,7 +818,28 @@ fun ControlNode.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
         }
 
         is GotoNode -> {
-            listOf(KComment("goto ${this.to.label ?: "@${this.to.originalLineIndex}"}"))
+            // by Claude - Enhanced GotoNode handling with diagnostics
+            val targetLabel = this.to.label ?: "@${this.to.originalLineIndex}"
+            val sourceLabel = this.from.label ?: "@${this.from.originalLineIndex}"
+
+            // Check if this is actually a break target
+            val breakLabel = ctx.findBreakLabel(this.to)
+            if (breakLabel != null) {
+                return listOf(KLabeledBreak(breakLabel))
+            }
+
+            // Check if this is actually a continue target
+            val continueLabel = ctx.findContinueLabel(this.to)
+            if (continueLabel != null) {
+                return listOf(KLabeledContinue(continueLabel))
+            }
+
+            // Otherwise emit as a comment with diagnostic info
+            // In a fully structured program, we shouldn't reach here
+            listOf(
+                KComment("UNSTRUCTURED: goto $targetLabel (from $sourceLabel)"),
+                KComment("  -> This edge could not be represented by structured control flow")
+            )
         }
 
         is BreakNode -> {
@@ -1357,8 +1405,11 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
     // by Claude - Handle fall-through to external function (different from current function)
     // This happens when a block like SetBehind just increments a flag and falls through
     // to NextAObj which is a separate function. We need to generate a tail call.
+    // NOTE: Only do this if ctx.currentFunction is set - otherwise we can't determine
+    // if the fall-through is to a different function.
     val fallThroughBlock = this.fallThroughExit
-    if (fallThroughBlock != null && fallThroughBlock.function != ctx.currentFunction && fallThroughBlock.function != null) {
+    if (fallThroughBlock != null && ctx.currentFunction != null &&
+        fallThroughBlock.function != ctx.currentFunction && fallThroughBlock.function != null) {
         // This block falls through to another function - generate tail call
         val targetFunction = fallThroughBlock.function!!
         val targetName = targetFunction.startingBlock.label?.let { assemblyLabelToKotlinName(it) }
@@ -2000,14 +2051,27 @@ fun AssemblyFunction.toKotlinFunction(
                     } else {
                         // Not a tail call for return value - call and return separately
                         finalBody.add(KExprStmt(KCall(targetName, args)))
+                        // by Claude - Fixed: handle all multi-register output combinations (X+Y, A+X, etc.)
                         val returnValue: KotlinExpr? = when {
-                            thisHasAOutput && thisHasYOutput -> {
+                            thisOutputCount >= 2 -> {
+                                // Multi-register return as Pair - determine which two registers
+                                val firstReg = when {
+                                    thisHasAOutput -> "A"
+                                    thisHasXOutput -> "X"
+                                    else -> "Y"
+                                }
+                                val secondReg = when {
+                                    thisHasYOutput -> "Y"
+                                    thisHasXOutput && firstReg != "X" -> "X"
+                                    else -> "Y" // fallback
+                                }
                                 KCall("Pair", listOf(
-                                    getRegisterValueOrDefault("A", ctx),
-                                    getRegisterValueOrDefault("Y", ctx)
+                                    getRegisterValueOrDefault(firstReg, ctx),
+                                    getRegisterValueOrDefault(secondReg, ctx)
                                 ))
                             }
                             thisHasAOutput -> getRegisterValueOrDefault("A", ctx)
+                            thisHasXOutput -> getRegisterValueOrDefault("X", ctx)
                             thisHasYOutput -> getRegisterValueOrDefault("Y", ctx)
                             else -> null
                         }

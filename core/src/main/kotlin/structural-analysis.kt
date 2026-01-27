@@ -1,0 +1,791 @@
+package com.ivieleague.decompiler6502tokotlin.hand
+
+// by Claude - Structural analysis algorithm for principled control flow analysis
+// This implements bottom-up region formation with guaranteed edge coverage
+
+/**
+ * Result of structural analysis for a function.
+ */
+data class StructureResult(
+    val region: Region,
+    val edgeTracker: EdgeTracker,
+    val validation: EdgeValidationResult?
+)
+
+/**
+ * Configuration for structural analysis.
+ */
+data class StructureConfig(
+    /** Whether to throw on validation failure (missing edges) */
+    val throwOnMissingEdges: Boolean = false,
+    /** Whether to use 6502-specific pattern recognition */
+    val use6502Patterns: Boolean = true
+)
+
+/**
+ * Main entry point for structural analysis of a function.
+ *
+ * This replaces the old analyzeControls() function with a principled algorithm that:
+ * 1. Tracks every CFG edge
+ * 2. Builds structured regions bottom-up
+ * 3. Validates that every edge is accounted for
+ * 4. Reports unstructured edges with diagnostics
+ */
+fun AssemblyFunction.analyzeStructure(
+    config: StructureConfig = StructureConfig()
+): StructureResult {
+    val blocks = this.blocks ?: setOf(this.startingBlock)
+
+    // Handle empty functions (e.g., those absorbed via BIT skip pattern)
+    if (blocks.isEmpty()) {
+        val tracker = EdgeTracker(this, blocks)
+        return StructureResult(
+            region = UnstructuredRegion(
+                id = nextRegionId(),
+                entry = this.startingBlock,
+                blocks = emptySet(),
+                unstructuredEdges = emptyList()
+            ),
+            edgeTracker = tracker,
+            validation = tracker.validateSoft() // Return valid (empty) validation
+        )
+    }
+
+    // Create edge tracker for this function
+    val tracker = EdgeTracker(this, blocks)
+
+    // Recompute dominators for THIS function's reachable blocks
+    blocks.toList().dominators()
+
+    // Detect natural loops
+    val naturalLoops = blocks.toList().detectNaturalLoops()
+
+    // Build the region hierarchy
+    val analyzer = StructuralAnalyzer(this, blocks, tracker, naturalLoops, config)
+    val region = analyzer.analyze()
+
+    // Validate edge coverage
+    val validation = if (config.throwOnMissingEdges) {
+        tracker.validate()
+    } else {
+        tracker.validateSoft()
+    }
+
+    return StructureResult(region, tracker, validation)
+}
+
+/**
+ * Internal class that performs the structural analysis.
+ */
+private class StructuralAnalyzer(
+    private val function: AssemblyFunction,
+    private val allBlocks: Set<AssemblyBlock>,
+    private val tracker: EdgeTracker,
+    private val naturalLoops: List<NaturalLoop>,
+    private val config: StructureConfig
+) {
+    // Layout order (sorted by original line index, with entry first)
+    private val layout: List<AssemblyBlock>
+    private val indexOf: Map<AssemblyBlock, Int>
+    private val loopByHeader: Map<AssemblyBlock, NaturalLoop>
+
+    // Track which blocks have been consumed into regions
+    private val consumedBlocks = mutableSetOf<AssemblyBlock>()
+
+    // Track loop headers currently being processed (for recursion prevention)
+    private val processingLoopHeaders = mutableSetOf<AssemblyBlock>()
+
+    init {
+        val sortedByAddress = allBlocks.sortedBy { it.originalLineIndex }
+        layout = if (sortedByAddress.firstOrNull() == function.startingBlock) {
+            sortedByAddress
+        } else {
+            listOf(function.startingBlock) + sortedByAddress.filter { it != function.startingBlock }
+        }
+        indexOf = layout.withIndex().associate { it.value to it.index }
+        loopByHeader = naturalLoops.associateBy { it.header }
+    }
+
+    /**
+     * Main analysis entry point.
+     */
+    fun analyze(): Region {
+        return buildRegionForRange(0, layout.size)
+    }
+
+    /**
+     * Build a region for a range of blocks in the layout.
+     */
+    private fun buildRegionForRange(startIdx: Int, endIdx: Int): Region {
+        if (startIdx >= endIdx) {
+            // Empty range - return an empty unstructured region
+            return UnstructuredRegion(
+                id = nextRegionId(),
+                entry = layout.getOrElse(startIdx) { function.startingBlock },
+                blocks = emptySet(),
+                unstructuredEdges = emptyList()
+            )
+        }
+
+        val regions = mutableListOf<Region>()
+        var i = startIdx
+
+        while (i < endIdx) {
+            val block = layout[i]
+
+            // Skip blocks already consumed by a previous region
+            if (block in consumedBlocks) {
+                i++
+                continue
+            }
+
+            // Try to build a region starting at this block
+            val result = tryBuildRegion(block, i, endIdx)
+
+            if (result != null) {
+                regions.add(result.region)
+                consumedBlocks.addAll(result.region.blocks)
+                i = result.nextIndex
+            } else {
+                // Fall back to a single block region
+                val blockRegion = BlockRegion(nextRegionId(), block)
+                regions.add(blockRegion)
+                consumedBlocks.add(block)
+                consumeBlockEdgesAsStructured(block)
+                i++
+            }
+        }
+
+        return when {
+            regions.isEmpty() -> UnstructuredRegion(
+                id = nextRegionId(),
+                entry = layout.getOrElse(startIdx) { function.startingBlock },
+                blocks = emptySet(),
+                unstructuredEdges = emptyList()
+            )
+            regions.size == 1 -> regions.first()
+            else -> SequenceRegion(nextRegionId(), regions)
+        }
+    }
+
+    /**
+     * Result of trying to build a region.
+     */
+    private data class RegionBuildResult(
+        val region: Region,
+        val nextIndex: Int
+    )
+
+    /**
+     * Try to build a structured region starting at the given block.
+     */
+    private fun tryBuildRegion(block: AssemblyBlock, blockIdx: Int, endIdx: Int): RegionBuildResult? {
+        // 1. Check for natural loop at this header
+        val loop = loopByHeader[block]?.takeIf { block !in processingLoopHeaders }
+        if (loop != null) {
+            val result = tryBuildLoopRegion(block, loop, blockIdx, endIdx)
+            if (result != null) return result
+        }
+
+        // 2. Check for if-then-else pattern
+        if (isConditionalBlock(block)) {
+            val result = tryBuildIfRegion(block, blockIdx, endIdx)
+            if (result != null) return result
+        }
+
+        // 3. Check for infinite loop (JMP backward)
+        if (isUnconditionalJmp(block)) {
+            val target = block.branchExit
+            val targetIdx = target?.let { indexOf[it] } ?: -1
+            if (target != null && targetIdx in 0..blockIdx && target !in processingLoopHeaders) {
+                val result = tryBuildInfiniteLoop(block, target, targetIdx, blockIdx, endIdx)
+                if (result != null) return result
+            }
+        }
+
+        // 4. Fall back to single block
+        return null
+    }
+
+    /**
+     * Try to build a loop region from a natural loop.
+     */
+    private fun tryBuildLoopRegion(
+        header: AssemblyBlock,
+        loop: NaturalLoop,
+        headerIdx: Int,
+        endIdx: Int
+    ): RegionBuildResult? {
+        // Filter loop body to only blocks in current range
+        val loopBodyBlocks = loop.body.filter { indexOf[it] != null && indexOf[it]!! < endIdx }
+        if (loopBodyBlocks.isEmpty()) return null
+
+        val loopEnd = loopBodyBlocks.maxOf { indexOf[it]!! } + 1
+
+        // Determine loop kind
+        val headerIsConditional = isConditionalBlock(header)
+        val backEdgeSource = loop.backEdges.firstOrNull()?.first
+        val backEdgeIsConditional = backEdgeSource?.let { isConditionalBlock(it) } ?: false
+
+        // Check if header's branch is internal (stays in loop) vs external (exits loop)
+        val headerBranchInLoop = header.branchExit?.let { it in loop.body } ?: false
+
+        // by Claude - Check if header has body instructions that should execute before condition.
+        // Key insight for patterns:
+        // - Pattern: INX; CPX #$03; BEQ -> INX is body, CPX/BEQ is condition = PostTest
+        // - Pattern: LDA #$00; BEQ -> LDA immediate is condition setup = PreTest
+        // - Pattern: LDA $addr; BEQ -> LDA memory is body (load has side effect) = PostTest
+        //
+        // The distinction for LDA/LDX/LDY without compare:
+        // - Immediate mode (#$xx): loading a constant, this IS the condition (test if constant is zero)
+        // - Memory addressing: loading from memory, this is body code
+        val hasCompareInstruction = header.lines.any { line ->
+            line.instruction?.op in setOf(AssemblyOp.CMP, AssemblyOp.CPX, AssemblyOp.CPY, AssemblyOp.BIT)
+        }
+        val headerHasBodyInstructions = if (!hasCompareInstruction) {
+            // No compare instruction - check if loads are from memory (body) vs immediate (condition)
+            header.lines.any { line ->
+                val instr = line.instruction ?: return@any false
+                val op = instr.op
+                // Load from memory (not immediate) is body code
+                if (op in setOf(AssemblyOp.LDA, AssemblyOp.LDX, AssemblyOp.LDY)) {
+                    // Check if it's memory addressing (not immediate/Value type)
+                    instr.address != null && instr.address !is AssemblyAddressing.Value
+                } else {
+                    // Other state-modifying instructions are body code
+                    op in setOf(
+                        AssemblyOp.INX, AssemblyOp.INY, AssemblyOp.DEX, AssemblyOp.DEY,
+                        AssemblyOp.INC, AssemblyOp.DEC,
+                        AssemblyOp.ASL, AssemblyOp.LSR, AssemblyOp.ROL, AssemblyOp.ROR,
+                        AssemblyOp.STA, AssemblyOp.STX, AssemblyOp.STY,
+                        AssemblyOp.ADC, AssemblyOp.SBC, AssemblyOp.AND, AssemblyOp.ORA, AssemblyOp.EOR,
+                        AssemblyOp.TAX, AssemblyOp.TAY, AssemblyOp.TXA, AssemblyOp.TYA
+                    )
+                }
+            }
+        } else {
+            // Has compare - check for state-modifying instructions before the compare
+            var foundCompare = false
+            header.lines.any { line ->
+                val op = line.instruction?.op ?: return@any false
+                if (op in setOf(AssemblyOp.CMP, AssemblyOp.CPX, AssemblyOp.CPY, AssemblyOp.BIT)) {
+                    foundCompare = true
+                    return@any false // Don't count compare as body
+                }
+                if (foundCompare) return@any false // After compare is condition, not body
+                // Before compare: check if it modifies state (not just loads)
+                // State-modifying: INC/DEC/INX/INY/DEX/DEY, ASL/LSR/ROL/ROR, STA/STX/STY, etc.
+                op in setOf(
+                    AssemblyOp.INX, AssemblyOp.INY, AssemblyOp.DEX, AssemblyOp.DEY,
+                    AssemblyOp.INC, AssemblyOp.DEC,
+                    AssemblyOp.ASL, AssemblyOp.LSR, AssemblyOp.ROL, AssemblyOp.ROR,
+                    AssemblyOp.STA, AssemblyOp.STX, AssemblyOp.STY,
+                    AssemblyOp.ADC, AssemblyOp.SBC, AssemblyOp.AND, AssemblyOp.ORA, AssemblyOp.EOR,
+                    AssemblyOp.TAX, AssemblyOp.TAY, AssemblyOp.TXA, AssemblyOp.TYA
+                )
+            }
+        }
+
+        val loopKind = determineLoopKind(
+            headerIsConditional = headerIsConditional,
+            backEdgeIsConditional = backEdgeIsConditional,
+            headerBranchInLoop = headerBranchInLoop,
+            hasExits = loop.exits.isNotEmpty(),
+            isSingleBlock = loop.body.size == 1 && backEdgeSource == header,
+            headerHasBodyInstructions = headerHasBodyInstructions
+        )
+
+        // Mark as processing to prevent recursion
+        processingLoopHeaders.add(header)
+
+        try {
+            // Build the body region
+            // by Claude - Include header in body for PostTest loops when:
+            // 1. Header has internal branch (original condition)
+            // 2. Header has body instructions before condition
+            // 3. Header is not conditional (all its instructions are body code)
+            val includeHeaderInBody = loopKind == LoopKind.PostTest &&
+                (headerBranchInLoop || headerHasBodyInstructions || !headerIsConditional)
+            val bodyStartIdx = if (includeHeaderInBody) {
+                headerIdx // Include header in body for PostTest
+            } else {
+                headerIdx + 1
+            }
+
+            val bodyRegion = if (bodyStartIdx < loopEnd) {
+                buildRegionForRange(bodyStartIdx, loopEnd)
+            } else {
+                BlockRegion(nextRegionId(), header)
+            }
+
+            // Consume loop edges
+            consumeLoopEdges(loop, header)
+
+            // Create the appropriate loop region
+            val region = when (loopKind) {
+                LoopKind.PreTest -> {
+                    val condLine = header.lastInstructionLine()!!
+                    val exitBlock = loop.exits.firstOrNull()
+                    WhileLoopRegion(
+                        id = nextRegionId(),
+                        header = header,
+                        conditionLine = condLine,
+                        continueOnBranch = header.branchExit == header, // branch continues if it's a self-loop
+                        bodyRegion = bodyRegion,
+                        exitBlock = exitBlock
+                    )
+                }
+                LoopKind.PostTest -> {
+                    // by Claude - Determine condition block for PostTest loops:
+                    // 1. If header has body instructions AND header's branch is INTERNAL (stays in loop),
+                    //    then header's branch is an if-then inside the loop, not the loop condition.
+                    //    Use back-edge source for condition.
+                    // 2. If header has body instructions AND header's branch is EXTERNAL (exits loop),
+                    //    then header's branch IS the loop condition.
+                    // 3. Otherwise use back-edge source (traditional do-while).
+                    val condBlock = if (headerHasBodyInstructions && headerIsConditional && !headerBranchInLoop) {
+                        // Header has body + external exit condition (e.g., INX; CPX; BEQ Done)
+                        header
+                    } else {
+                        // Either header's branch is internal (if-then inside loop) or no header condition
+                        backEdgeSource ?: header
+                    }
+                    val condLine = condBlock.lastInstructionLine()!!
+                    val exitBlock = loop.exits.firstOrNull()
+                    DoWhileLoopRegion(
+                        id = nextRegionId(),
+                        header = header,
+                        conditionBlock = condBlock,
+                        conditionLine = condLine,
+                        continueOnBranch = condBlock.branchExit == header,
+                        bodyRegion = bodyRegion,
+                        exitBlock = exitBlock
+                    )
+                }
+                LoopKind.Infinite -> {
+                    InfiniteLoopRegion(
+                        id = nextRegionId(),
+                        header = header,
+                        bodyRegion = bodyRegion
+                    )
+                }
+            }
+
+            return RegionBuildResult(region, loopEnd)
+        } finally {
+            processingLoopHeaders.remove(header)
+        }
+    }
+
+    /**
+     * Try to build an if-then or if-then-else region.
+     */
+    private fun tryBuildIfRegion(block: AssemblyBlock, blockIdx: Int, endIdx: Int): RegionBuildResult? {
+        val ft = block.fallThroughExit
+        val br = block.branchExit
+
+        if (ft == null || br == null) return null
+
+        val ftIdx = indexOf[ft] ?: return null
+        val brIdx = indexOf[br] ?: -1
+
+        // Fall-through should be next block (standard if-then pattern)
+        if (ftIdx != blockIdx + 1) return null
+
+        // Branch should be forward within range
+        val effectiveBrIdx = if (brIdx in (blockIdx + 1) until endIdx) brIdx else -1
+
+        if (effectiveBrIdx <= 0) {
+            // Branch is backward or out of range - could be loop or exit
+            // Check if it's a backward branch to a loop header
+            if (brIdx in 0..blockIdx) {
+                // This is a backward branch - mark as continue if inside a loop
+                tracker.markUnstructured(block, br, "backward branch (loop continue or goto)")
+            }
+            return null
+        }
+
+        // by Claude - Check for if-then-else pattern: then ends with JMP to join
+        // The then path may be one or more blocks, ending with a JMP to the join point.
+        // The else path is from the branch target to the join point.
+        val lastThenIdx = effectiveBrIdx - 1
+        if (lastThenIdx >= blockIdx + 1) {  // Changed from > to >= to handle single-block then
+            val lastThenBlock = layout[lastThenIdx]
+            if (isUnconditionalJmp(lastThenBlock)) {
+                val join = lastThenBlock.branchExit
+                val joinIdx = join?.let { indexOf[it] }
+                if (joinIdx != null && joinIdx > effectiveBrIdx && joinIdx <= endIdx) {
+                    // IF-THEN-ELSE pattern
+                    // Include the JMP block in the then region (thenEnd = lastThenIdx + 1)
+                    // The code generator will handle the JMP as implicit since the
+                    // if-then-else structure already provides the control flow.
+                    return buildIfThenElseRegion(
+                        condBlock = block,
+                        thenStart = blockIdx + 1,
+                        thenEnd = lastThenIdx + 1, // Include the JMP block
+                        elseStart = effectiveBrIdx,
+                        elseEnd = joinIdx,
+                        joinIdx = joinIdx,
+                        endIdx = endIdx
+                    )
+                }
+            }
+        }
+
+        // IF-THEN pattern
+        return buildIfThenRegion(
+            condBlock = block,
+            thenStart = blockIdx + 1,
+            thenEnd = effectiveBrIdx,
+            joinIdx = effectiveBrIdx,
+            endIdx = endIdx
+        )
+    }
+
+    /**
+     * Build an if-then region.
+     */
+    private fun buildIfThenRegion(
+        condBlock: AssemblyBlock,
+        thenStart: Int,
+        thenEnd: Int,
+        joinIdx: Int,
+        endIdx: Int
+    ): RegionBuildResult? {
+        if (thenStart >= thenEnd) {
+            // Empty then branch - this shouldn't happen in well-formed code
+            return null
+        }
+
+        val thenRegion = buildRegionForRange(thenStart, thenEnd)
+        val condLine = condBlock.lastInstructionLine() ?: return null
+        val joinBlock = layout.getOrNull(joinIdx)
+
+        // Consume the conditional branch edge (to join)
+        condBlock.branchExit?.let { tracker.consumeEdge(condBlock, it) }
+        // Consume the fall-through edge (to then)
+        condBlock.fallThroughExit?.let { tracker.consumeEdge(condBlock, it) }
+
+        val region = IfThenRegion(
+            id = nextRegionId(),
+            conditionBlock = condBlock,
+            conditionLine = condLine,
+            sense = false, // fall-through is the then-path
+            thenRegion = thenRegion,
+            joinBlock = joinBlock
+        )
+
+        return RegionBuildResult(region, joinIdx)
+    }
+
+    /**
+     * Build an if-then-else region.
+     */
+    private fun buildIfThenElseRegion(
+        condBlock: AssemblyBlock,
+        thenStart: Int,
+        thenEnd: Int,
+        elseStart: Int,
+        elseEnd: Int,
+        joinIdx: Int,
+        endIdx: Int
+    ): RegionBuildResult? {
+        val thenRegion = buildRegionForRange(thenStart, thenEnd)
+        val elseRegion = buildRegionForRange(elseStart, elseEnd)
+        val condLine = condBlock.lastInstructionLine() ?: return null
+        val joinBlock = layout.getOrNull(joinIdx)
+
+        // Consume edges
+        condBlock.branchExit?.let { tracker.consumeEdge(condBlock, it) }
+        condBlock.fallThroughExit?.let { tracker.consumeEdge(condBlock, it) }
+
+        // Consume the JMP-to-join edge from end of then block
+        val lastThenBlock = layout.getOrNull(thenEnd)
+        lastThenBlock?.branchExit?.let { tracker.consumeEdge(lastThenBlock, it) }
+
+        val region = IfThenElseRegion(
+            id = nextRegionId(),
+            conditionBlock = condBlock,
+            conditionLine = condLine,
+            sense = false, // fall-through is the then-path
+            thenRegion = thenRegion,
+            elseRegion = elseRegion,
+            joinBlock = joinBlock
+        )
+
+        return RegionBuildResult(region, joinIdx)
+    }
+
+    /**
+     * Try to build an infinite loop region.
+     */
+    private fun tryBuildInfiniteLoop(
+        jmpBlock: AssemblyBlock,
+        header: AssemblyBlock,
+        headerIdx: Int,
+        jmpIdx: Int,
+        endIdx: Int
+    ): RegionBuildResult? {
+        // Mark as processing
+        processingLoopHeaders.add(header)
+
+        try {
+            // Build the body from header to jmp block (inclusive)
+            val bodyRegion = buildRegionForRange(headerIdx, jmpIdx + 1)
+
+            // Consume the back-edge
+            tracker.consumeEdge(jmpBlock, header)
+
+            val region = InfiniteLoopRegion(
+                id = nextRegionId(),
+                header = header,
+                bodyRegion = bodyRegion
+            )
+
+            return RegionBuildResult(region, jmpIdx + 1)
+        } finally {
+            processingLoopHeaders.remove(header)
+        }
+    }
+
+    // ========================================================================
+    // Helper methods
+    // ========================================================================
+
+    private fun AssemblyBlock.lastInstructionLine(): AssemblyLine? =
+        this.lines.lastOrNull { it.instruction != null }
+
+    private fun isConditionalBlock(block: AssemblyBlock): Boolean =
+        block.lastInstructionLine()?.instruction?.op?.isBranch == true
+
+    private fun isUnconditionalJmp(block: AssemblyBlock): Boolean =
+        block.lastInstructionLine()?.instruction?.op == AssemblyOp.JMP
+
+    private fun isReturnBlock(block: AssemblyBlock): Boolean =
+        block.lastInstructionLine()?.instruction?.op.let {
+            it == AssemblyOp.RTS || it == AssemblyOp.RTI
+        } == true
+
+    private fun determineLoopKind(
+        headerIsConditional: Boolean,
+        backEdgeIsConditional: Boolean,
+        headerBranchInLoop: Boolean,
+        hasExits: Boolean,
+        isSingleBlock: Boolean,
+        headerHasBodyInstructions: Boolean = false  // by Claude - new parameter
+    ): LoopKind {
+        return when {
+            // Infinite loop: no exits and no conditional
+            !hasExits && !headerIsConditional && !backEdgeIsConditional -> LoopKind.Infinite
+            // Single-block self-loop with conditional: PostTest
+            isSingleBlock && headerIsConditional -> LoopKind.PostTest
+            // Header has internal branch only, back-edge is conditional: PostTest
+            headerIsConditional && headerBranchInLoop && backEdgeIsConditional -> LoopKind.PostTest
+            // Header not conditional, back-edge is: PostTest
+            !headerIsConditional && backEdgeIsConditional -> LoopKind.PostTest
+            // by Claude - Header has body instructions before the condition: PostTest (do-while)
+            // This handles patterns like: Loop: INX; CPX #$03; BEQ Done; JMP Loop
+            // The INX is loop body, CPX/BEQ is the condition, so body executes before condition
+            headerIsConditional && headerHasBodyInstructions && hasExits -> LoopKind.PostTest
+            // Header is conditional with external exit and no body instructions: PreTest
+            headerIsConditional && !headerBranchInLoop && hasExits && !headerHasBodyInstructions -> LoopKind.PreTest
+            // Default to PreTest
+            else -> LoopKind.PreTest
+        }
+    }
+
+    /**
+     * Consume edges for a natural loop.
+     */
+    private fun consumeLoopEdges(loop: NaturalLoop, header: AssemblyBlock) {
+        // Consume back-edges
+        for ((source, _) in loop.backEdges) {
+            tracker.consumeEdge(source, header)
+        }
+
+        // Consume internal edges within the loop body
+        for (block in loop.body) {
+            block.fallThroughExit?.let { target ->
+                if (target in loop.body) {
+                    tracker.consumeEdge(block, target)
+                }
+            }
+            block.branchExit?.let { target ->
+                if (target in loop.body) {
+                    tracker.consumeEdge(block, target)
+                } else if (target in loop.exits) {
+                    // Exit edge - consume as structured (break)
+                    tracker.consumeEdge(block, target)
+                }
+            }
+        }
+    }
+
+    /**
+     * Consume a block's edges as structured (fall-through and branch).
+     */
+    private fun consumeBlockEdgesAsStructured(block: AssemblyBlock) {
+        block.fallThroughExit?.let { target ->
+            if (target in allBlocks) {
+                tracker.consumeEdge(block, target)
+            }
+        }
+        block.branchExit?.let { target ->
+            if (target in allBlocks) {
+                tracker.consumeEdge(block, target)
+            }
+        }
+    }
+}
+
+// ============================================================================
+// Conversion from Region to ControlNode (for compatibility with existing codegen)
+// ============================================================================
+
+/**
+ * Convert a Region hierarchy to the existing ControlNode hierarchy.
+ * This allows gradual migration - the new structural analysis produces Regions,
+ * which are then converted to ControlNodes for code generation.
+ */
+fun Region.toControlNodes(): List<ControlNode> {
+    var nextId = 0
+
+    fun Region.convert(): List<ControlNode> {
+        return when (this) {
+            is BlockRegion -> listOf(BlockNode(id = nextId++, block = block))
+
+            is SequenceRegion -> children.flatMap { it.convert() }
+
+            is IfThenRegion -> {
+                val cond = Condition(
+                    branchBlock = conditionBlock,
+                    branchLine = conditionLine,
+                    sense = sense
+                )
+                listOf(IfNode(
+                    id = nextId++,
+                    condition = cond,
+                    thenBranch = thenRegion.convert().toMutableList(),
+                    elseBranch = mutableListOf(),
+                    join = joinBlock
+                ))
+            }
+
+            is IfThenElseRegion -> {
+                val cond = Condition(
+                    branchBlock = conditionBlock,
+                    branchLine = conditionLine,
+                    sense = sense
+                )
+                listOf(IfNode(
+                    id = nextId++,
+                    condition = cond,
+                    thenBranch = thenRegion.convert().toMutableList(),
+                    elseBranch = elseRegion.convert().toMutableList(),
+                    join = joinBlock
+                ))
+            }
+
+            is WhileLoopRegion -> {
+                val cond = Condition(
+                    branchBlock = header,
+                    branchLine = conditionLine,
+                    sense = continueOnBranch
+                )
+                listOf(LoopNode(
+                    id = nextId++,
+                    kind = LoopKind.PreTest,
+                    header = header,
+                    condition = cond,
+                    body = bodyRegion.convert().toMutableList(),
+                    continueTargets = setOf(header),
+                    breakTargets = exitBlock?.let { setOf(it) } ?: emptySet()
+                ))
+            }
+
+            is DoWhileLoopRegion -> {
+                val cond = Condition(
+                    branchBlock = conditionBlock,
+                    branchLine = conditionLine,
+                    sense = continueOnBranch
+                )
+                listOf(LoopNode(
+                    id = nextId++,
+                    kind = LoopKind.PostTest,
+                    header = header,
+                    condition = cond,
+                    body = bodyRegion.convert().toMutableList(),
+                    continueTargets = setOf(header),
+                    breakTargets = exitBlock?.let { setOf(it) } ?: emptySet()
+                ))
+            }
+
+            is InfiniteLoopRegion -> {
+                listOf(LoopNode(
+                    id = nextId++,
+                    kind = LoopKind.Infinite,
+                    header = header,
+                    condition = null,
+                    body = bodyRegion.convert().toMutableList(),
+                    continueTargets = setOf(header),
+                    breakTargets = emptySet()
+                ))
+            }
+
+            is SwitchRegion -> {
+                // Convert switch cases
+                val switchCases = cases.map { case ->
+                    SwitchNode.Case(
+                        matchValues = case.indices,
+                        nodes = case.region?.convert()?.toMutableList() ?: mutableListOf()
+                    )
+                }
+                listOf(SwitchNode(
+                    id = nextId++,
+                    selector = selectorExpr ?: LiteralValue(0),
+                    cases = switchCases,
+                    defaultBranch = defaultRegion?.convert()?.toMutableList() ?: mutableListOf(),
+                    join = joinBlock
+                ))
+            }
+
+            is UnstructuredRegion -> {
+                // For unstructured regions, emit blocks with gotos
+                val nodes = mutableListOf<ControlNode>()
+
+                // Add child regions if any
+                for (child in childRegions) {
+                    nodes.addAll(child.convert())
+                }
+
+                // Add remaining blocks as BlockNodes
+                val childBlocks = childRegions.flatMapTo(mutableSetOf()) { it.blocks }
+                for (block in blocks) {
+                    if (block !in childBlocks) {
+                        nodes.add(BlockNode(id = nextId++, block = block))
+                    }
+                }
+
+                // Add GotoNodes for unstructured edges
+                for (edge in unstructuredEdges) {
+                    nodes.add(GotoNode(id = nextId++, from = edge.source, to = edge.target))
+                }
+
+                nodes
+            }
+        }
+    }
+
+    return this.convert()
+}
+
+/**
+ * Analyze structure and convert to control nodes in one step.
+ * This is the main entry point for the new analysis that's compatible with existing code.
+ */
+fun AssemblyFunction.analyzeStructureToControls(
+    config: StructureConfig = StructureConfig()
+): List<ControlNode> {
+    val result = analyzeStructure(config)
+    return result.region.toControlNodes()
+}

@@ -680,11 +680,37 @@ private fun computeIfExits(
 // -------------------------
 
 /**
- * Build a simple structured representation for this function by linearizing
- * its reachable basic blocks into BlockNodes in reverse postorder. The result
- * is stored in [AssemblyFunction.asControls] and also returned.
+ * Build a structured representation for this function using the principled
+ * structural analysis algorithm. The result is stored in [AssemblyFunction.asControls]
+ * and also returned.
+ *
+ * by Claude - This now uses the new principled structural analysis that:
+ * 1. Tracks every CFG edge
+ * 2. Builds structured regions bottom-up
+ * 3. Validates that every edge is accounted for
  */
 fun AssemblyFunction.analyzeControls(): List<ControlNode> {
+    // Use the new principled structural analysis
+    val result = analyzeStructure(StructureConfig(
+        throwOnMissingEdges = false,
+        use6502Patterns = true
+    ))
+
+    // Convert to ControlNodes and store
+    val nodes = result.region.toControlNodes()
+    this.asControls = nodes
+    return nodes
+}
+
+// ============================================================================
+// OLD ANALYSIS CODE (KEPT FOR REFERENCE - TO BE DELETED)
+// ============================================================================
+// The following ~850 lines were the old pattern-matching implementation.
+// They have been replaced by the principled structural analysis above.
+// TODO: Remove after confirming the new analysis works correctly.
+
+@Deprecated("Use analyzeControls() which now uses the new structural analysis")
+fun AssemblyFunction.analyzeControlsOld(): List<ControlNode> {
     val fn = this
 
     // Collect reachable blocks within this function
@@ -1560,4 +1586,124 @@ fun AssemblyFunction.analyzeControls(): List<ControlNode> {
 /** Analyze controls for a list of functions. */
 fun List<AssemblyFunction>.analyzeControls() {
     for (f in this) f.analyzeControls()
+}
+
+// ============================================================================
+// NEW PRINCIPLED CONTROL FLOW ANALYSIS (by Claude)
+// ============================================================================
+// This is the new structured analysis that guarantees edge coverage.
+// It can be used alongside the old analyzeControls() for comparison.
+
+/**
+ * Analyze control flow using the new principled structural analysis.
+ *
+ * This is an alternative to analyzeControls() that:
+ * 1. Tracks every CFG edge
+ * 2. Builds structured regions bottom-up
+ * 3. Validates that every edge is accounted for
+ * 4. Reports unstructured edges with diagnostics
+ *
+ * @param useStrict If true, throws on unaccounted edges. If false, marks them as unstructured.
+ * @return The analysis result including the region tree and edge tracking info.
+ */
+fun AssemblyFunction.analyzeControlsStructured(
+    useStrict: Boolean = false
+): StructureResult {
+    val config = StructureConfig(
+        throwOnMissingEdges = useStrict,
+        use6502Patterns = true
+    )
+
+    val result = analyzeStructure(config)
+
+    // Convert to ControlNodes and store in asControls for compatibility
+    this.asControls = result.region.toControlNodes()
+
+    return result
+}
+
+/**
+ * Analyze controls for a list of functions using the new principled analysis.
+ *
+ * @param useStrict If true, throws on unaccounted edges.
+ * @return Map of function to its analysis result for inspection.
+ */
+fun List<AssemblyFunction>.analyzeControlsStructured(
+    useStrict: Boolean = false
+): Map<AssemblyFunction, StructureResult> {
+    return associateWith { f -> f.analyzeControlsStructured(useStrict) }
+}
+
+/**
+ * Generate a diagnostic report comparing old and new control analysis.
+ */
+fun AssemblyFunction.compareControlAnalysis(): String = buildString {
+    val funcLabel = startingBlock.label ?: "@${startingBlock.originalLineIndex}"
+    appendLine("Control Analysis Comparison: $funcLabel")
+    appendLine("=" .repeat(50))
+
+    // Run old analysis
+    val oldNodes = analyzeControls()
+    val oldNodeCount = oldNodes.size
+    val oldCoveredBlocks = oldNodes.flatMapTo(mutableSetOf()) { it.coveredBlocks }
+
+    appendLine()
+    appendLine("OLD ANALYSIS:")
+    appendLine("  Nodes: $oldNodeCount")
+    appendLine("  Covered blocks: ${oldCoveredBlocks.size}")
+    appendLine("  Node types: ${oldNodes.groupBy { it::class.simpleName }.mapValues { it.value.size }}")
+
+    // Run new analysis
+    val newResult = analyzeControlsStructured(useStrict = false)
+    val newNodes = asControls ?: emptyList()
+    val newNodeCount = newNodes.size
+    val newCoveredBlocks = newNodes.flatMapTo(mutableSetOf()) { it.coveredBlocks }
+
+    appendLine()
+    appendLine("NEW ANALYSIS:")
+    appendLine("  Nodes: $newNodeCount")
+    appendLine("  Covered blocks: ${newCoveredBlocks.size}")
+    appendLine("  Node types: ${newNodes.groupBy { it::class.simpleName }.mapValues { it.value.size }}")
+
+    // Edge tracking results
+    val validation = newResult.validation
+    if (validation != null) {
+        appendLine()
+        appendLine("EDGE TRACKING:")
+        appendLine("  Total edges: ${validation.allEdges.size}")
+        appendLine("  Consumed (structured): ${validation.consumedEdges.size}")
+        appendLine("  Unstructured (goto): ${validation.unstructuredEdges.size}")
+        appendLine("  Missing (ERROR): ${validation.missingEdges.size}")
+
+        if (validation.missingEdges.isNotEmpty()) {
+            appendLine()
+            appendLine("  MISSING EDGES:")
+            for (edge in validation.missingEdges) {
+                appendLine("    - $edge")
+            }
+        }
+
+        if (validation.unstructuredEdges.isNotEmpty()) {
+            appendLine()
+            appendLine("  UNSTRUCTURED EDGES:")
+            for ((edge, reason) in validation.unstructuredEdges) {
+                appendLine("    - $edge: $reason")
+            }
+        }
+    }
+
+    // Compare coverage
+    val onlyOld = oldCoveredBlocks - newCoveredBlocks
+    val onlyNew = newCoveredBlocks - oldCoveredBlocks
+
+    if (onlyOld.isNotEmpty() || onlyNew.isNotEmpty()) {
+        appendLine()
+        appendLine("COVERAGE DIFFERENCES:")
+        if (onlyOld.isNotEmpty()) {
+            appendLine("  Blocks only in OLD: ${onlyOld.map { it.label ?: "@${it.originalLineIndex}" }}")
+        }
+        if (onlyNew.isNotEmpty()) {
+            appendLine("  Blocks only in NEW: ${onlyNew.map { it.label ?: "@${it.originalLineIndex}" }}")
+        }
+    }
 }

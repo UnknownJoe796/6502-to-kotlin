@@ -473,13 +473,18 @@ fun List<AssemblyBlock>.functionify(
         for ((index, line) in block.lines.withIndex()) {
             // by Claude - Collect JMP targets as candidates for later filtering
             // Track which block the JMP comes from so we can check loop membership
+            // IMPORTANT: Skip backward JMPs - those are loop jumps, not function calls
             if (line.instruction?.op == AssemblyOp.JMP) {
                 val addr = line.instruction.address
                 if (addr is AssemblyAddressing.Direct) {
                     val targetLabel = addr.label
                     val targetBlock = labelToBlock[targetLabel]
-                    // Only consider as candidate if not already in the current block's fall-through path
-                    if (targetBlock != null && targetBlock != block.fallThroughExit) {
+                    // Only consider as candidate if:
+                    // - not already in the current block's fall-through path
+                    // - not a backward jump (backward JMPs form loops, not function calls)
+                    val isBackwardJmp = targetBlock != null &&
+                        targetBlock.originalLineIndex <= block.originalLineIndex
+                    if (targetBlock != null && targetBlock != block.fallThroughExit && !isBackwardJmp) {
                         jmpTargetCandidates.add(targetBlock)
                         jmpSources.getOrPut(targetBlock) { mutableSetOf() }.add(block)
                     }
@@ -575,6 +580,18 @@ fun List<AssemblyBlock>.functionify(
 
         if (allSourcesInSameLoop) {
             continue // Don't promote internal loop blocks to functions
+        }
+
+        // by Claude - Check if this block has non-JMP entries (fall-through from other blocks).
+        // If a block is reachable via fall-through, it's likely a join point within a function
+        // (like the end of an if-then-else), not a separate function.
+        val hasNonJmpEntry = candidate.enteredFrom.any { entry ->
+            // Check if entry falls through to candidate
+            entry.fallThroughExit == candidate
+        }
+
+        if (hasNonJmpEntry) {
+            continue // Don't promote join points to functions
         }
 
         functionEntryBlocks.getOrPut(candidate) { ArrayList() }
