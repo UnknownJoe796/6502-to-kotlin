@@ -323,13 +323,12 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                         return block.enteredFrom.size > 1
                     }
 
-                    // by Claude - CRITICAL FIX: Don't inline if the branch target itself is a join point
-                    // Join points have multiple entry paths (e.g., DrawPipe in verticalPipe).
-                    // Inlining them would duplicate code and cause the fall-through path to miss
-                    // the join-point code entirely.
-                    // However, for functions that return non-Unit values (Boolean, Int, Pair, etc.),
-                    // we cannot simply return early because we don't know what value the join point
-                    // would return. For those functions, we must still inline the join point code.
+                    // by Claude - Join points (blocks with multiple entry paths) need special handling.
+                    // KNOWN ISSUE: The current approach (return early for Unit functions) is WRONG
+                    // because the join point code still needs to execute on all paths.
+                    // However, fixing this properly requires implementing labeled blocks with break/continue
+                    // or restructuring the code generator to use proper control flow.
+                    // TODO: Implement proper forward branch handling using labeled blocks.
                     val functionReturnsUnit = ctx.currentFunction?.outputs.isNullOrEmpty()
                     if (isJoinPoint(branchTarget) && functionReturnsUnit) {
                         listOf(
@@ -415,7 +414,7 @@ fun AssemblyBlock.toKotlin(ctx: CodeGenContext): List<KotlinStmt> {
                             ctx.generateFunctionReturn()
                         )
                     }
-                    }  // by Claude - close the else block for isJoinPoint check
+                    }  // end of join point else block
                 } else if (targetIsFunctionEntry) {
                     // by Claude - Branch to another function's entry point - generate call
                     val funcName = assemblyLabelToKotlinName(branchTarget.label!!)

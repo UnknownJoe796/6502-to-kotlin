@@ -911,16 +911,24 @@ fun operModeExecutionTree() {
 
 // Decompiled from MoveAllSpritesOffscreen
 fun moveAllSpritesOffscreen() {
-    var A: Int = 0
     var Y: Int = 0
-    val spriteYPosition by MemoryByteIndexed(Sprite_Y_Position)
     //> MoveAllSpritesOffscreen:
     //> ldy #$00                ;this routine moves all sprites off the screen
     Y = 0x00
     //> .db $2c                 ;BIT instruction opcode
+    //  Fall-through tail call to moveSpritesOffscreen
+    moveSpritesOffscreen()
+    return
+}
+
+// Decompiled from MoveSpritesOffscreen
+fun moveSpritesOffscreen() {
+    var A: Int = 0
+    var Y: Int = 0
+    val spriteYPosition by MemoryByteIndexed(Sprite_Y_Position)
     //> MoveSpritesOffscreen:
     //> ldy #$04                ;this routine moves all but sprite 0
-    //  (skipped by BIT $2C)
+    Y = 0x04
     //> lda #$f8                ;off the screen
     A = 0xF8
     loop0@ do {
@@ -941,13 +949,6 @@ fun moveAllSpritesOffscreen() {
         }
     } while (Y != 0)
     //> rts
-    return
-}
-
-// Decompiled from MoveSpritesOffscreen
-fun moveSpritesOffscreen() {
-    // Fall-through tail call to moveAllSpritesOffscreen
-    moveAllSpritesOffscreen()
     return
 }
 
@@ -1223,27 +1224,38 @@ fun chkContinue(A: Int) {
     var temp1: Int = 0
     var continueWorld by MemoryByte(ContinueWorld)
     var demoTimer by MemoryByte(DemoTimer)
+    var disableScreenFlag by MemoryByte(DisableScreenFlag)
     var fetchNewGameTimerFlag by MemoryByte(FetchNewGameTimerFlag)
     var hidden1UpFlag by MemoryByte(Hidden1UpFlag)
     var offscrHidden1upflag by MemoryByte(OffScr_Hidden1UpFlag)
     var operMode by MemoryByte(OperMode)
     var opermodeTask by MemoryByte(OperMode_Task)
     var primaryHardMode by MemoryByte(PrimaryHardMode)
+    var sprite0HitDetectFlag by MemoryByte(Sprite0HitDetectFlag)
     var worldSelectEnableFlag by MemoryByte(WorldSelectEnableFlag)
     val scoreAndCoinDisplay by MemoryByteIndexed(ScoreAndCoinDisplay)
     //> ChkContinue:  ldy DemoTimer               ;if timer for demo has expired, reset modes
     Y = demoTimer
     //> beq ResetTitle
+    A = A
     if (Y == 0) {
-        //  goto ResetTitle -> resetTitle
-        resetTitle()
+        //> ResetTitle:   lda #$00                    ;reset game modes, disable
+        A = 0x00
+        //> sta OperMode                ;sprite 0 check and disable
+        operMode = A
+        //> sta OperMode_Task           ;screen output
+        opermodeTask = A
+        //> sta Sprite0HitDetectFlag
+        sprite0HitDetectFlag = A
+        //> inc DisableScreenFlag
+        disableScreenFlag = (disableScreenFlag + 1) and 0xFF
+        //> rts
         return
     } else {
         //> asl                         ;check to see if A button was also pushed
         val orig0: Int = A
         A = (orig0 shl 1) and 0xFF
         //> bcc StartWorld1             ;if not, don't load continue function's world number
-        A = A
         if ((orig0 and 0x80) != 0) {
             //> lda ContinueWorld           ;load previously saved world number for secret
             A = continueWorld
@@ -1858,14 +1870,13 @@ fun floateyNumbersRoutine(X: Int): Int {
     //> lda FloateyNum_Control,x     ;load control for floatey number
     A = floateynumControl[X]
     //> beq EndExitOne               ;if zero, branch to leave
+    X = X
     if (A == 0) {
-        //  goto EndExitOne -> endExitOne
-        endExitOne()
+        //> EndExitOne:    rts                        ;and leave
         return X
     } else {
         //> cmp #$0b                     ;if less than $0b, branch
         //> bcc ChkNumTimer
-        X = X
         if (A >= 0x0B) {
             //> lda #$0b                     ;otherwise set to $0b, thus keeping
             A = 0x0B
@@ -2950,11 +2961,15 @@ fun writeGameText(A: Int) {
     X = gameTextOffsets[Y]
     //> ldy #$00
     Y = 0x00
-    loop0@ while (A != 0xFF) {
+    loop0@ do {
         //> GameTextLoop:  lda GameText,x           ;load message data
         A = gameText[X]
         //> cmp #$ff                 ;check for terminator
         //> beq EndGameText          ;branch to end text if found
+        if (A == 0xFF) {
+            //  goto EndGameText
+            break@loop0
+        }
         //> sta VRAM_Buffer1,y       ;otherwise write data to buffer
         vramBuffer1[Y] = A
         //> inx                      ;and increment increment
@@ -2966,7 +2981,7 @@ fun writeGameText(A: Int) {
             //  continue loop (branch back to GameTextLoop)
             continue@loop0
         }
-    }
+    } while (Y != 0)
     //> EndGameText:   lda #$00                 ;put null terminator at end
     A = 0x00
     //> sta VRAM_Buffer1,y
@@ -4163,7 +4178,7 @@ fun updateScreen() {
     var ppuAddress by MemoryByte(PPU_ADDRESS)
     var ppuData by MemoryByte(PPU_DATA)
     val ppuStatus by MemoryByteIndexed(PPU_STATUS)
-    loop0@ do {
+    loop0@ while (A == 0) {
         //> UpdateScreen:  ldx PPU_STATUS            ;reset flip-flop
         X = ppuStatus[0]
         //> ldy #$00                  ;load first byte from indirect as a pointer
@@ -4171,9 +4186,6 @@ fun updateScreen() {
         //> lda ($00),y
         A = memory[readWord(0x0) + Y].toInt()
         //> bne WriteBufferToScreen   ;if byte is zero we have no further updates to make here
-        //  Fall-through tail call to initScroll
-        initScroll(A)
-        return
         //> WriteBufferToScreen:
         //> sta PPU_ADDRESS           ;store high byte of vram address
         ppuAddress = A
@@ -4268,7 +4280,7 @@ fun updateScreen() {
         ppuAddress = A
         //> sta PPU_ADDRESS
         ppuAddress = A
-    } while (!true /* unknown branch STA */)
+    }
     // Fall-through tail call to initScroll
     initScroll(A)
     return
@@ -5748,9 +5760,13 @@ fun areaParserCore() {
     if (Y != 0) {
         //> lda CurrentPageLoc         ;otherwise check for every third page
         A = currentPageLoc
-        loop1@ while (((A - 0x03) and 0xFF and 0x80) == 0) {
+        loop1@ do {
             //> ThirdP:   cmp #$03
             //> bmi RendBack               ;if less than three we're there
+            if (((A - 0x03) and 0xFF and 0x80) != 0) {
+                //  goto RendBack
+                break@loop1
+            }
             //> sec
             //> sbc #$03                   ;if 3 or more, subtract 3 and
             temp0 = A - 0x03
@@ -5760,7 +5776,7 @@ fun areaParserCore() {
                 //  continue loop (branch back to ThirdP)
                 continue@loop1
             }
-        }
+        } while ((temp0 and 0xFF and 0x80) == 0)
         //> RendBack: asl                        ;move results to higher nybble
         val orig0: Int = A
         A = (orig0 shl 1) and 0xFF
@@ -6286,8 +6302,7 @@ fun decodeAreaData(X: Int) {
     //> cmp #$fd
     //> beq EndAParse              ;if end of level, leave this routine
     if (A == 0xFD) {
-        //  goto EndAParse -> endAParse
-        endAParse()
+        //> EndAParse:  rts
         return
     } else {
         //> and #$0f                   ;otherwise, mask out low nybble
@@ -6492,6 +6507,10 @@ fun decodeAreaData(X: Int) {
         A = orig7 shr 1
         //> cmp CurrentColumnPos       ;is this where we're at?
         //> bne LeavePar               ;if not, branch to leave
+        if (A != currentColumnPos) {
+            //> LeavePar: rts
+            return
+        }
         //> StrAObj:  lda AreaDataOffset         ;if so, load area obj offset and store in buffer
         A = areaDataOffset
         //> sta AreaObjOffsetBuffer,x
@@ -6541,10 +6560,10 @@ fun decodeAreaData(X: Int) {
             bridgeHigh(X, Y)
         }
         11 -> {
-            bridgeMiddle()
+            bridgeMiddle(X, Y)
         }
         12 -> {
-            bridgeLow()
+            bridgeLow(X, Y)
         }
         13 -> {
             holeWater(X, Y)
@@ -6553,7 +6572,7 @@ fun decodeAreaData(X: Int) {
             questionblockrowHigh(X, Y)
         }
         15 -> {
-            questionblockrowLow()
+            questionblockrowLow(X, Y)
         }
         16 -> {
             endlessRope()
@@ -7694,16 +7713,23 @@ fun holeWater(X: Int, Y: Int): Pair<Int, Int> {
 // Decompiled from QuestionBlockRow_High
 fun questionblockrowHigh(X: Int, Y: Int): Int {
     var A: Int = 0
-    var X: Int = X
-    var temp0: Int = 0
-    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
     //> QuestionBlockRow_High:
     //> lda #$03    ;start on the fourth row
     A = 0x03
     //> .db $2c     ;BIT instruction opcode
+    //  Fall-through tail call to questionblockrowLow
+    return questionblockrowLow(X, Y)
+}
+
+// Decompiled from QuestionBlockRow_Low
+fun questionblockrowLow(X: Int, Y: Int): Int {
+    var A: Int = 0
+    var X: Int = X
+    var temp0: Int = 0
+    val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
     //> QuestionBlockRow_Low:
     //> lda #$07             ;start on the eighth row
-    //  (skipped by BIT $2C)
+    A = 0x07
     //> pha                  ;save whatever row to the stack for now
     push(A)
     //> jsr ChkLrgObjLength  ;get low nybble and save as length
@@ -7720,28 +7746,38 @@ fun questionblockrowHigh(X: Int, Y: Int): Int {
     return X
 }
 
-// Decompiled from QuestionBlockRow_Low
-fun questionblockrowLow() {
-}
-
 // Decompiled from Bridge_High
 fun bridgeHigh(X: Int, Y: Int): Pair<Int, Int> {
+    var A: Int = 0
+    //> Bridge_High:
+    //> lda #$06  ;start on the seventh row from top of screen
+    A = 0x06
+    //> .db $2c   ;BIT instruction opcode
+    //  Fall-through tail call to bridgeMiddle
+    return bridgeMiddle(X, Y)
+}
+
+// Decompiled from Bridge_Middle
+fun bridgeMiddle(X: Int, Y: Int): Pair<Int, Int> {
+    var A: Int = 0
+    //> Bridge_Middle:
+    //> lda #$07  ;start on the eighth row
+    A = 0x07
+    //> .db $2c   ;BIT instruction opcode
+    //  Fall-through tail call to bridgeLow
+    return bridgeLow(X, Y)
+}
+
+// Decompiled from Bridge_Low
+fun bridgeLow(X: Int, Y: Int): Pair<Int, Int> {
     var A: Int = 0
     var X: Int = X
     var Y: Int = Y
     var temp0: Int = 0
     val metatileBuffer by MemoryByteIndexed(MetatileBuffer)
-    //> Bridge_High:
-    //> lda #$06  ;start on the seventh row from top of screen
-    A = 0x06
-    //> .db $2c   ;BIT instruction opcode
-    //> Bridge_Middle:
-    //> lda #$07  ;start on the eighth row
-    //  (skipped by BIT $2C)
-    //> .db $2c   ;BIT instruction opcode
     //> Bridge_Low:
     //> lda #$09             ;start on the tenth row
-    //  (skipped by BIT $2C)
+    A = 0x09
     //> pha                  ;save whatever row to the stack for now
     push(A)
     //> jsr ChkLrgObjLength  ;get low nybble and save as length
@@ -7762,16 +7798,6 @@ fun bridgeHigh(X: Int, Y: Int): Pair<Int, Int> {
     A = 0x63
     //> jmp RenderUnderPart
     return renderUnderPart(A, X, Y)
-}
-
-// Decompiled from Bridge_Middle
-fun bridgeMiddle() {
-    bridgeLow()
-    return
-}
-
-// Decompiled from Bridge_Low
-fun bridgeLow() {
 }
 
 // Decompiled from FlagBalls_Residual
@@ -12445,6 +12471,7 @@ fun exGTimer() {
 // Decompiled from WarpZoneObject
 fun warpZoneObject(X: Int): Int {
     var A: Int = 0
+    var X: Int = X
     var playerYHighpos by MemoryByte(Player_Y_HighPos)
     var playerYPosition by MemoryByte(Player_Y_Position)
     var scrollLock by MemoryByte(ScrollLock)
@@ -12453,9 +12480,9 @@ fun warpZoneObject(X: Int): Int {
     //> lda ScrollLock         ;check for scroll lock flag
     A = scrollLock
     //> beq ExGTimer           ;branch if not set to leave
+    X = X
     if (A == 0) {
-        //  goto ExGTimer -> exGTimer
-        exGTimer()
+        //> ExGTimer:  rts                        ;leave
         return A
     } else {
         //> lda Player_Y_Position  ;check to see if player's vertical coordinate has
@@ -12463,9 +12490,8 @@ fun warpZoneObject(X: Int): Int {
         //> and Player_Y_HighPos   ;same bits set as in vertical high byte (why?)
         A = A and playerYHighpos
         //> bne ExGTimer           ;if so, branch to leave
-        if (!(A == 0)) {
-            //  goto ExGTimer -> exGTimer
-            exGTimer()
+        if (A != 0) {
+            //> ExGTimer:  rts                        ;leave
             return A
         }
     }
@@ -14585,7 +14611,7 @@ fun bumpBlock(X: Int, Y: Int) {
             coinBlock(X, Y)
         }
         3 -> {
-            extraLifeMushBlock()
+            extraLifeMushBlock(X)
         }
         4 -> {
             mushFlowerBlock(X)
@@ -14594,13 +14620,13 @@ fun bumpBlock(X: Int, Y: Int) {
             vineBlock()
         }
         6 -> {
-            starBlock()
+            starBlock(X)
         }
         7 -> {
             coinBlock(X, Y)
         }
         8 -> {
-            extraLifeMushBlock()
+            extraLifeMushBlock(X)
         }
         else -> {
             // Unknown JumpEngine index
@@ -14625,7 +14651,30 @@ fun bumpBlock(X: Int, Y: Int) {
 // Decompiled from MushFlowerBlock
 fun mushFlowerBlock(X: Int) {
     var A: Int = 0
-    var X: Int = X
+    //> MushFlowerBlock:
+    //> lda #$00       ;load mushroom/fire flower into power-up type
+    A = 0x00
+    //> .db $2c        ;BIT instruction opcode
+    //  Fall-through tail call to starBlock
+    starBlock(X)
+    return
+}
+
+// Decompiled from StarBlock
+fun starBlock(X: Int) {
+    var A: Int = 0
+    //> StarBlock:
+    //> lda #$02       ;load star into power-up type
+    A = 0x02
+    //> .db $2c        ;BIT instruction opcode
+    //  Fall-through tail call to extraLifeMushBlock
+    extraLifeMushBlock(X)
+    return
+}
+
+// Decompiled from ExtraLifeMushBlock
+fun extraLifeMushBlock(X: Int) {
+    var A: Int = 0
     var temp0: Int = 0
     val blockPageloc by MemoryByteIndexed(Block_PageLoc)
     val blockXPosition by MemoryByteIndexed(Block_X_Position)
@@ -14635,10 +14684,13 @@ fun mushFlowerBlock(X: Int) {
     val enemyXPosition by MemoryByteIndexed(Enemy_X_Position)
     val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
     val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
-    //> MushFlowerBlock:
-    //> lda #$00       ;load mushroom/fire flower into power-up type
-    A = 0x00
-    //> .db $2c        ;BIT instruction opcode
+    //> ExtraLifeMushBlock:
+    //> lda #$03         ;load 1-up mushroom into power-up type
+    A = 0x03
+    //> sta $39          ;store correct power-up type
+    memory[0x39] = A.toUByte()
+    //> jmp SetupPowerUp
+    //> jmp SetupPowerUp (not a known function)
     //> SetupPowerUp:
     //> lda #PowerUpObject        ;load power-up identifier into
     A = PowerUpObject
@@ -14667,33 +14719,6 @@ fun mushFlowerBlock(X: Int) {
     //  Fall-through tail call to pwrUpJmp
     pwrUpJmp()
     return
-    //> StarBlock:
-    //> lda #$02       ;load star into power-up type
-    //  (skipped by BIT $2C)
-    //> .db $2c        ;BIT instruction opcode
-    X = X
-    loop0@ while (true) {
-        //> ExtraLifeMushBlock:
-        //> lda #$03         ;load 1-up mushroom into power-up type
-        //  (skipped by BIT $2C)
-        //> sta $39          ;store correct power-up type
-        memory[0x39] = A.toUByte()
-        //> jmp SetupPowerUp
-        //> jmp SetupPowerUp (not a known function)
-    }
-    // Fall-through tail call to pwrUpJmp
-    pwrUpJmp()
-    return
-}
-
-// Decompiled from StarBlock
-fun starBlock() {
-    extraLifeMushBlock()
-    return
-}
-
-// Decompiled from ExtraLifeMushBlock
-fun extraLifeMushBlock() {
 }
 
 // Decompiled from VineBlock
@@ -15478,16 +15503,23 @@ fun imposeGravitySprObj(A: Int, X: Int) {
 // Decompiled from MovePlatformDown
 fun movePlatformDown(X: Int): Int {
     var A: Int = 0
-    var X: Int = X
-    var Y: Int = 0
-    val enemyId by MemoryByteIndexed(Enemy_ID)
     //> MovePlatformDown:
     //> lda #$00    ;save value to stack (if branching here, execute next
     A = 0x00
     //> .db $2c     ;part as BIT instruction)
+    //  Fall-through tail call to movePlatformUp
+    return movePlatformUp(X)
+}
+
+// Decompiled from MovePlatformUp
+fun movePlatformUp(X: Int): Int {
+    var A: Int = 0
+    var X: Int = X
+    var Y: Int = 0
+    val enemyId by MemoryByteIndexed(Enemy_ID)
     //> MovePlatformUp:
     //> lda #$01        ;save value to stack
-    //  (skipped by BIT $2C)
+    A = 0x01
     //> pha
     push(A)
     //> ldy Enemy_ID,x  ;get enemy object identifier
@@ -15520,13 +15552,6 @@ fun movePlatformDown(X: Int): Int {
     //  Fall-through tail call to redPTroopaGrav
     redPTroopaGrav(A, X)
     return X
-}
-
-// Decompiled from MovePlatformUp
-fun movePlatformUp() {
-    // Fall-through tail call to movePlatformDown
-    movePlatformDown(0)
-    return
 }
 
 // Decompiled from RedPTroopaGrav
@@ -15778,263 +15803,15 @@ fun enemiesAndLoopsCore(X: Int): Int {
         //> ExitELCore: rts
         return X
     }
-    loop0@ do {
+    loop0@ while (A != 0) {
         //> ProcLoopCommand:
         //> lda LoopCommand           ;check if loop command was found
         A = loopCommand
         //> beq ChkEnemyFrenzy
-        if (A != 0) {
-            //> lda CurrentColumnPos      ;check to see if we're still on the first page
-            A = currentColumnPos
-            //> bne ChkEnemyFrenzy        ;if not, do not loop yet
-            if (!(A == 0)) {
-                //  goto ChkEnemyFrenzy (internal forward branch)
-                //> ChkEnemyFrenzy:
-                //> lda EnemyFrenzyQueue  ;check for enemy object in frenzy queue
-                A = enemyFrenzyQueue
-                //> beq ProcessEnemyData  ;if not, skip this part
-                if (A == 0) {
-                    //  goto ProcessEnemyData (internal forward branch)
-                    //> ProcessEnemyData:
-                    //> ldy EnemyDataOffset      ;get offset of enemy object data
-                    Y = enemyDataOffset
-                    //> lda (EnemyData),y        ;load first byte
-                    A = memory[readWord(EnemyData) + Y].toInt()
-                    //> cmp #$ff                 ;check for EOD terminator
-                    //> bne CheckEndofBuffer
-                    if (!(A == 0xFF)) {
-                        //  goto CheckEndofBuffer (internal forward branch)
-                        //> CheckEndofBuffer:
-                        //> and #%00001111           ;check for special row $0e
-                        A = A and 0x0F
-                        //> cmp #$0e
-                        //> beq CheckRightBounds     ;if found, branch, otherwise
-                        if (A == 0x0E) {
-                            //  goto CheckRightBounds (internal forward branch)
-                            //> CheckRightBounds:
-                            //> lda ScreenRight_X_Pos    ;add 48 to pixel coordinate of right boundary
-                            A = screenrightXPos
-                            //> clc
-                            //> adc #$30
-                            temp0 = A + 0x30
-                            A = temp0 and 0xFF
-                            //> and #%11110000           ;store high nybble
-                            A = A and 0xF0
-                            //> sta $07
-                            memory[0x7] = A.toUByte()
-                            //> lda ScreenRight_PageLoc  ;add carry to page location of right boundary
-                            A = screenrightPageloc
-                            //> adc #$00
-                            temp1 = A + if (temp0 > 0xFF) 1 else 0
-                            A = temp1 and 0xFF
-                            //> sta $06                  ;store page location + carry
-                            memory[0x6] = A.toUByte()
-                            //> ldy EnemyDataOffset
-                            Y = enemyDataOffset
-                            //> iny
-                            Y = (Y + 1) and 0xFF
-                            //> lda (EnemyData),y        ;if MSB of enemy object is clear, branch to check for row $0f
-                            A = memory[readWord(EnemyData) + Y].toInt()
-                            //> asl
-                            val orig1: Int = A
-                            A = (orig1 shl 1) and 0xFF
-                            //> bcc CheckPageCtrlRow
-                            if (!((orig1 and 0x80) != 0)) {
-                                //  goto CheckPageCtrlRow (internal forward branch)
-                                //> CheckPageCtrlRow:
-                                //> dey
-                                Y = (Y - 1) and 0xFF
-                                //> lda (EnemyData),y        ;reread first byte
-                                A = memory[readWord(EnemyData) + Y].toInt()
-                                //> and #$0f
-                                A = A and 0x0F
-                                //> cmp #$0f                 ;check for special row $0f
-                                //> bne PositionEnemyObj     ;if not found, branch to position enemy object
-                                if (!(A == 0x0F)) {
-                                    //  goto PositionEnemyObj
-                                    break@loop0
-                                }
-                                //> lda EnemyObjectPageSel   ;if page select set,
-                                A = enemyObjectPageSel
-                                //> bne PositionEnemyObj     ;branch without reading second byte
-                                if (!(A == 0)) {
-                                    //  goto PositionEnemyObj
-                                    break@loop0
-                                }
-                                //> iny
-                                Y = (Y + 1) and 0xFF
-                                //> lda (EnemyData),y        ;otherwise, get second byte, mask out 2 MSB
-                                A = memory[readWord(EnemyData) + Y].toInt()
-                                //> and #%00111111
-                                A = A and 0x3F
-                                //> sta EnemyObjectPageLoc   ;store as page control for enemy object data
-                                enemyObjectPageLoc = A
-                                //> inc EnemyDataOffset      ;increment enemy object data offset 2 bytes
-                                enemyDataOffset = (enemyDataOffset + 1) and 0xFF
-                                //> inc EnemyDataOffset
-                                enemyDataOffset = (enemyDataOffset + 1) and 0xFF
-                                //> inc EnemyObjectPageSel   ;set page select for enemy object data and
-                                enemyObjectPageSel = (enemyObjectPageSel + 1) and 0xFF
-                                //> jmp ProcLoopCommand      ;jump back to process loop commands again
-                                //> jmp ProcLoopCommand (not a known function)
-                                return X
-                            }
-                            //> lda EnemyObjectPageSel   ;if page select already set, do not set again
-                            A = enemyObjectPageSel
-                            //> bne CheckPageCtrlRow
-                            if (!(A == 0)) {
-                                //  goto CheckPageCtrlRow (internal forward branch)
-                                //> CheckPageCtrlRow:
-                                //> dey
-                                Y = (Y - 1) and 0xFF
-                                //> lda (EnemyData),y        ;reread first byte
-                                A = memory[readWord(EnemyData) + Y].toInt()
-                                //> and #$0f
-                                A = A and 0x0F
-                                //> cmp #$0f                 ;check for special row $0f
-                                //> bne PositionEnemyObj     ;if not found, branch to position enemy object
-                                if (!(A == 0x0F)) {
-                                    //  goto PositionEnemyObj
-                                    break@loop0
-                                }
-                                return X
-                            }
-                            //> inc EnemyObjectPageSel   ;otherwise, if MSB is set, set page select
-                            enemyObjectPageSel = (enemyObjectPageSel + 1) and 0xFF
-                            //> inc EnemyObjectPageLoc   ;and increment page control
-                            enemyObjectPageLoc = (enemyObjectPageLoc + 1) and 0xFF
-                            return X
-                        }
-                        //> cpx #$05                 ;check for end of buffer
-                        //> bcc CheckRightBounds     ;if not at end of buffer, branch
-                        if (!(X >= 0x05)) {
-                            //  goto CheckRightBounds (internal forward branch)
-                            //> CheckRightBounds:
-                            //> lda ScreenRight_X_Pos    ;add 48 to pixel coordinate of right boundary
-                            A = screenrightXPos
-                            //> clc
-                            //> adc #$30
-                            temp2 = A + 0x30
-                            A = temp2 and 0xFF
-                            //> and #%11110000           ;store high nybble
-                            A = A and 0xF0
-                            //> sta $07
-                            memory[0x7] = A.toUByte()
-                            //> lda ScreenRight_PageLoc  ;add carry to page location of right boundary
-                            A = screenrightPageloc
-                            //> adc #$00
-                            temp3 = A + if (temp2 > 0xFF) 1 else 0
-                            A = temp3 and 0xFF
-                            //> sta $06                  ;store page location + carry
-                            memory[0x6] = A.toUByte()
-                            //> ldy EnemyDataOffset
-                            Y = enemyDataOffset
-                            //> iny
-                            Y = (Y + 1) and 0xFF
-                            //> lda (EnemyData),y        ;if MSB of enemy object is clear, branch to check for row $0f
-                            A = memory[readWord(EnemyData) + Y].toInt()
-                            //> asl
-                            val orig2: Int = A
-                            A = (orig2 shl 1) and 0xFF
-                            //> bcc CheckPageCtrlRow
-                            if (!((orig2 and 0x80) != 0)) {
-                                //  goto CheckPageCtrlRow (internal forward branch)
-                                //> CheckPageCtrlRow:
-                                //> dey
-                                Y = (Y - 1) and 0xFF
-                                //> lda (EnemyData),y        ;reread first byte
-                                A = memory[readWord(EnemyData) + Y].toInt()
-                                //> and #$0f
-                                A = A and 0x0F
-                                //> cmp #$0f                 ;check for special row $0f
-                                //> bne PositionEnemyObj     ;if not found, branch to position enemy object
-                                if (!(A == 0x0F)) {
-                                    //  goto PositionEnemyObj
-                                    break@loop0
-                                }
-                                return X
-                            }
-                            return X
-                        }
-                        //> iny
-                        Y = (Y + 1) and 0xFF
-                        //> lda (EnemyData),y        ;check for specific value here
-                        A = memory[readWord(EnemyData) + Y].toInt()
-                        //> and #%00111111           ;not sure what this was intended for, exactly
-                        A = A and 0x3F
-                        //> cmp #$2e                 ;this part is quite possibly residual code
-                        //> beq CheckRightBounds     ;but it has the effect of keeping enemies out of
-                        if (A == 0x2E) {
-                            //  goto CheckRightBounds (internal forward branch)
-                            //> CheckRightBounds:
-                            //> lda ScreenRight_X_Pos    ;add 48 to pixel coordinate of right boundary
-                            A = screenrightXPos
-                            //> clc
-                            //> adc #$30
-                            temp4 = A + 0x30
-                            A = temp4 and 0xFF
-                            //> and #%11110000           ;store high nybble
-                            A = A and 0xF0
-                            //> sta $07
-                            memory[0x7] = A.toUByte()
-                            //> lda ScreenRight_PageLoc  ;add carry to page location of right boundary
-                            A = screenrightPageloc
-                            //> adc #$00
-                            temp5 = A + if (temp4 > 0xFF) 1 else 0
-                            A = temp5 and 0xFF
-                            //> sta $06                  ;store page location + carry
-                            memory[0x6] = A.toUByte()
-                            //> ldy EnemyDataOffset
-                            Y = enemyDataOffset
-                            //> iny
-                            Y = (Y + 1) and 0xFF
-                            //> lda (EnemyData),y        ;if MSB of enemy object is clear, branch to check for row $0f
-                            A = memory[readWord(EnemyData) + Y].toInt()
-                            //> asl
-                            val orig3: Int = A
-                            A = (orig3 shl 1) and 0xFF
-                            //> bcc CheckPageCtrlRow
-                            if (!((orig3 and 0x80) != 0)) {
-                                //  goto CheckPageCtrlRow (internal forward branch)
-                                //> CheckPageCtrlRow:
-                                //> dey
-                                Y = (Y - 1) and 0xFF
-                                //> lda (EnemyData),y        ;reread first byte
-                                A = memory[readWord(EnemyData) + Y].toInt()
-                                //> and #$0f
-                                A = A and 0x0F
-                                //> cmp #$0f                 ;check for special row $0f
-                                //> bne PositionEnemyObj     ;if not found, branch to position enemy object
-                                if (!(A == 0x0F)) {
-                                    //  goto PositionEnemyObj
-                                    break@loop0
-                                }
-                                return X
-                            }
-                            return X
-                        }
-                        return X
-                    }
-                    //> jmp CheckFrenzyBuffer    ;if found, jump to check frenzy buffer, otherwise
-                    //> jmp CheckFrenzyBuffer (not a known function)
-                    return X
-                }
-                //> sta Enemy_ID,x        ;store as enemy object identifier here
-                enemyId[X] = A
-                //> lda #$01
-                A = 0x01
-                //> sta Enemy_Flag,x      ;activate enemy object flag
-                enemyFlag[X] = A
-                //> lda #$00
-                A = 0x00
-                //> sta Enemy_State,x     ;initialize state and frenzy queue
-                enemyState[X] = A
-                //> sta EnemyFrenzyQueue
-                enemyFrenzyQueue = A
-                //> jmp InitEnemyObject   ;and then jump to deal with this enemy
-                initEnemyObject(X)
-                return X
-            }
+        //> lda CurrentColumnPos      ;check to see if we're still on the first page
+        A = currentColumnPos
+        //> bne ChkEnemyFrenzy        ;if not, do not loop yet
+        if (A == 0) {
             //> ldy #$0b                  ;start at the end of each set of loop data
             Y = 0x0B
             loop1@ do {
@@ -16154,17 +15931,280 @@ fun enemiesAndLoopsCore(X: Int): Int {
             loopCommand = A
             //> ;--------------------------------
         }
+        //> ChkEnemyFrenzy:
+        //> lda EnemyFrenzyQueue  ;check for enemy object in frenzy queue
+        A = enemyFrenzyQueue
+        //> beq ProcessEnemyData  ;if not, skip this part
         if (A != 0) {
+            //> sta Enemy_ID,x        ;store as enemy object identifier here
+            enemyId[X] = A
+            //> lda #$01
+            A = 0x01
+            //> sta Enemy_Flag,x      ;activate enemy object flag
+            enemyFlag[X] = A
+            //> lda #$00
+            A = 0x00
+            //> sta Enemy_State,x     ;initialize state and frenzy queue
+            enemyState[X] = A
+            //> sta EnemyFrenzyQueue
+            enemyFrenzyQueue = A
+            //> jmp InitEnemyObject   ;and then jump to deal with this enemy
+            initEnemyObject(X)
+            return X
         }
-        if (A == 0) {
+        //> ProcessEnemyData:
+        //> ldy EnemyDataOffset      ;get offset of enemy object data
+        Y = enemyDataOffset
+        //> lda (EnemyData),y        ;load first byte
+        A = memory[readWord(EnemyData) + Y].toInt()
+        //> cmp #$ff                 ;check for EOD terminator
+        //> bne CheckEndofBuffer
+        if (A == 0xFF) {
+            //> jmp CheckFrenzyBuffer    ;if found, jump to check frenzy buffer, otherwise
+            //> jmp CheckFrenzyBuffer (not a known function)
         }
-        if (A != 0) {
+        //> CheckEndofBuffer:
+        //> and #%00001111           ;check for special row $0e
+        A = A and 0x0F
+        //> cmp #$0e
+        //> beq CheckRightBounds     ;if found, branch, otherwise
+        if (A != 0x0E) {
+            //> cpx #$05                 ;check for end of buffer
+            //> bcc CheckRightBounds     ;if not at end of buffer, branch
+            if (!(X >= 0x05)) {
+                //  goto CheckRightBounds (internal forward branch)
+                //> CheckRightBounds:
+                //> lda ScreenRight_X_Pos    ;add 48 to pixel coordinate of right boundary
+                A = screenrightXPos
+                //> clc
+                //> adc #$30
+                temp0 = A + 0x30
+                A = temp0 and 0xFF
+                //> and #%11110000           ;store high nybble
+                A = A and 0xF0
+                //> sta $07
+                memory[0x7] = A.toUByte()
+                //> lda ScreenRight_PageLoc  ;add carry to page location of right boundary
+                A = screenrightPageloc
+                //> adc #$00
+                temp1 = A + if (temp0 > 0xFF) 1 else 0
+                A = temp1 and 0xFF
+                //> sta $06                  ;store page location + carry
+                memory[0x6] = A.toUByte()
+                //> ldy EnemyDataOffset
+                Y = enemyDataOffset
+                //> iny
+                Y = (Y + 1) and 0xFF
+                //> lda (EnemyData),y        ;if MSB of enemy object is clear, branch to check for row $0f
+                A = memory[readWord(EnemyData) + Y].toInt()
+                //> asl
+                val orig1: Int = A
+                A = (orig1 shl 1) and 0xFF
+                //> bcc CheckPageCtrlRow
+                if (!((orig1 and 0x80) != 0)) {
+                    //  goto CheckPageCtrlRow (internal forward branch)
+                    //> CheckPageCtrlRow:
+                    //> dey
+                    Y = (Y - 1) and 0xFF
+                    //> lda (EnemyData),y        ;reread first byte
+                    A = memory[readWord(EnemyData) + Y].toInt()
+                    //> and #$0f
+                    A = A and 0x0F
+                    //> cmp #$0f                 ;check for special row $0f
+                    //> bne PositionEnemyObj     ;if not found, branch to position enemy object
+                    if (!(A == 0x0F)) {
+                        //  goto PositionEnemyObj
+                        break@loop0
+                    }
+                    //> lda EnemyObjectPageSel   ;if page select set,
+                    A = enemyObjectPageSel
+                    //> bne PositionEnemyObj     ;branch without reading second byte
+                    if (!(A == 0)) {
+                        //  goto PositionEnemyObj
+                        break@loop0
+                    }
+                    //> iny
+                    Y = (Y + 1) and 0xFF
+                    //> lda (EnemyData),y        ;otherwise, get second byte, mask out 2 MSB
+                    A = memory[readWord(EnemyData) + Y].toInt()
+                    //> and #%00111111
+                    A = A and 0x3F
+                    //> sta EnemyObjectPageLoc   ;store as page control for enemy object data
+                    enemyObjectPageLoc = A
+                    //> inc EnemyDataOffset      ;increment enemy object data offset 2 bytes
+                    enemyDataOffset = (enemyDataOffset + 1) and 0xFF
+                    //> inc EnemyDataOffset
+                    enemyDataOffset = (enemyDataOffset + 1) and 0xFF
+                    //> inc EnemyObjectPageSel   ;set page select for enemy object data and
+                    enemyObjectPageSel = (enemyObjectPageSel + 1) and 0xFF
+                    //> jmp ProcLoopCommand      ;jump back to process loop commands again
+                    //> jmp ProcLoopCommand (not a known function)
+                    return X
+                }
+                //> lda EnemyObjectPageSel   ;if page select already set, do not set again
+                A = enemyObjectPageSel
+                //> bne CheckPageCtrlRow
+                if (!(A == 0)) {
+                    //  goto CheckPageCtrlRow (internal forward branch)
+                    //> CheckPageCtrlRow:
+                    //> dey
+                    Y = (Y - 1) and 0xFF
+                    //> lda (EnemyData),y        ;reread first byte
+                    A = memory[readWord(EnemyData) + Y].toInt()
+                    //> and #$0f
+                    A = A and 0x0F
+                    //> cmp #$0f                 ;check for special row $0f
+                    //> bne PositionEnemyObj     ;if not found, branch to position enemy object
+                    if (!(A == 0x0F)) {
+                        //  goto PositionEnemyObj
+                        break@loop0
+                    }
+                    return X
+                }
+                //> inc EnemyObjectPageSel   ;otherwise, if MSB is set, set page select
+                enemyObjectPageSel = (enemyObjectPageSel + 1) and 0xFF
+                //> inc EnemyObjectPageLoc   ;and increment page control
+                enemyObjectPageLoc = (enemyObjectPageLoc + 1) and 0xFF
+                return X
+            }
+            //> iny
+            Y = (Y + 1) and 0xFF
+            //> lda (EnemyData),y        ;check for specific value here
+            A = memory[readWord(EnemyData) + Y].toInt()
+            //> and #%00111111           ;not sure what this was intended for, exactly
+            A = A and 0x3F
+            //> cmp #$2e                 ;this part is quite possibly residual code
+            //> beq CheckRightBounds     ;but it has the effect of keeping enemies out of
+            if (A == 0x2E) {
+                //  goto CheckRightBounds (internal forward branch)
+                //> CheckRightBounds:
+                //> lda ScreenRight_X_Pos    ;add 48 to pixel coordinate of right boundary
+                A = screenrightXPos
+                //> clc
+                //> adc #$30
+                temp2 = A + 0x30
+                A = temp2 and 0xFF
+                //> and #%11110000           ;store high nybble
+                A = A and 0xF0
+                //> sta $07
+                memory[0x7] = A.toUByte()
+                //> lda ScreenRight_PageLoc  ;add carry to page location of right boundary
+                A = screenrightPageloc
+                //> adc #$00
+                temp3 = A + if (temp2 > 0xFF) 1 else 0
+                A = temp3 and 0xFF
+                //> sta $06                  ;store page location + carry
+                memory[0x6] = A.toUByte()
+                //> ldy EnemyDataOffset
+                Y = enemyDataOffset
+                //> iny
+                Y = (Y + 1) and 0xFF
+                //> lda (EnemyData),y        ;if MSB of enemy object is clear, branch to check for row $0f
+                A = memory[readWord(EnemyData) + Y].toInt()
+                //> asl
+                val orig2: Int = A
+                A = (orig2 shl 1) and 0xFF
+                //> bcc CheckPageCtrlRow
+                if (!((orig2 and 0x80) != 0)) {
+                    //  goto CheckPageCtrlRow (internal forward branch)
+                    //> CheckPageCtrlRow:
+                    //> dey
+                    Y = (Y - 1) and 0xFF
+                    //> lda (EnemyData),y        ;reread first byte
+                    A = memory[readWord(EnemyData) + Y].toInt()
+                    //> and #$0f
+                    A = A and 0x0F
+                    //> cmp #$0f                 ;check for special row $0f
+                    //> bne PositionEnemyObj     ;if not found, branch to position enemy object
+                    if (!(A == 0x0F)) {
+                        //  goto PositionEnemyObj
+                        break@loop0
+                    }
+                    return X
+                }
+                return X
+            }
             //> rts                      ;the sixth slot
             return X
         }
-        if (flagC) {
+        //> CheckRightBounds:
+        //> lda ScreenRight_X_Pos    ;add 48 to pixel coordinate of right boundary
+        A = screenrightXPos
+        //> clc
+        //> adc #$30
+        temp4 = A + 0x30
+        A = temp4 and 0xFF
+        //> and #%11110000           ;store high nybble
+        A = A and 0xF0
+        //> sta $07
+        memory[0x7] = A.toUByte()
+        //> lda ScreenRight_PageLoc  ;add carry to page location of right boundary
+        A = screenrightPageloc
+        //> adc #$00
+        temp5 = A + if (temp4 > 0xFF) 1 else 0
+        A = temp5 and 0xFF
+        //> sta $06                  ;store page location + carry
+        memory[0x6] = A.toUByte()
+        //> ldy EnemyDataOffset
+        Y = enemyDataOffset
+        //> iny
+        Y = (Y + 1) and 0xFF
+        //> lda (EnemyData),y        ;if MSB of enemy object is clear, branch to check for row $0f
+        A = memory[readWord(EnemyData) + Y].toInt()
+        //> asl
+        val orig3: Int = A
+        A = (orig3 shl 1) and 0xFF
+        //> bcc CheckPageCtrlRow
+        if ((orig3 and 0x80) != 0) {
+            //> lda EnemyObjectPageSel   ;if page select already set, do not set again
+            A = enemyObjectPageSel
+            //> bne CheckPageCtrlRow
+            if (!(A == 0)) {
+                //  goto CheckPageCtrlRow (internal forward branch)
+                //> CheckPageCtrlRow:
+                //> dey
+                Y = (Y - 1) and 0xFF
+                //> lda (EnemyData),y        ;reread first byte
+                A = memory[readWord(EnemyData) + Y].toInt()
+                //> and #$0f
+                A = A and 0x0F
+                //> cmp #$0f                 ;check for special row $0f
+                //> bne PositionEnemyObj     ;if not found, branch to position enemy object
+                if (!(A == 0x0F)) {
+                    //  goto PositionEnemyObj
+                    break@loop0
+                }
+                //> lda EnemyObjectPageSel   ;if page select set,
+                A = enemyObjectPageSel
+                //> bne PositionEnemyObj     ;branch without reading second byte
+                if (!(A == 0)) {
+                    //  goto PositionEnemyObj
+                    break@loop0
+                }
+                //> iny
+                Y = (Y + 1) and 0xFF
+                //> lda (EnemyData),y        ;otherwise, get second byte, mask out 2 MSB
+                A = memory[readWord(EnemyData) + Y].toInt()
+                //> and #%00111111
+                A = A and 0x3F
+                //> sta EnemyObjectPageLoc   ;store as page control for enemy object data
+                enemyObjectPageLoc = A
+                //> inc EnemyDataOffset      ;increment enemy object data offset 2 bytes
+                enemyDataOffset = (enemyDataOffset + 1) and 0xFF
+                //> inc EnemyDataOffset
+                enemyDataOffset = (enemyDataOffset + 1) and 0xFF
+                //> inc EnemyObjectPageSel   ;set page select for enemy object data and
+                enemyObjectPageSel = (enemyObjectPageSel + 1) and 0xFF
+                //> jmp ProcLoopCommand      ;jump back to process loop commands again
+                //> jmp ProcLoopCommand (not a known function)
+                return X
+            }
+            //> inc EnemyObjectPageSel   ;otherwise, if MSB is set, set page select
+            enemyObjectPageSel = (enemyObjectPageSel + 1) and 0xFF
+            //> inc EnemyObjectPageLoc   ;and increment page control
+            enemyObjectPageLoc = (enemyObjectPageLoc + 1) and 0xFF
         }
-    } while (true /* unknown branch JMP */)
+    }
     //> PositionEnemyObj:
     //> lda EnemyObjectPageLoc   ;store page control as page location
     A = enemyObjectPageLoc
@@ -17226,14 +17266,10 @@ fun lakituAndSpinyHandler(X: Int) {
         }
         //> ldx #$04                ;start with the last enemy slot again
         X = 0x04
-        loop1@ do {
+        loop1@ while (A != 0) {
             //> ChkNoEn:  lda Enemy_Flag,x        ;check enemy buffer flag for non-active enemy slot
             A = enemyFlag[X]
             //> beq CreateL             ;branch out of loop if found
-            if (A == 0) {
-                //  goto CreateL
-                break@loop1
-            }
             //> dex                     ;otherwise check next slot
             X = (X - 1) and 0xFF
             //> bpl ChkNoEn             ;branch until all slots are checked
@@ -17241,9 +17277,9 @@ fun lakituAndSpinyHandler(X: Int) {
                 //  continue loop (branch back to ChkNoEn)
                 continue@loop1
             }
-        } while (X != 0)
+        }
         //> bmi RetEOfs             ;if no empty slots were found, branch to leave
-        if ((X and 0x80) == 0) {
+        if ((A and 0x80) == 0) {
             //> CreateL:  lda #$00                ;initialize enemy state
             A = 0x00
             //> sta Enemy_State,x
@@ -17269,9 +17305,13 @@ fun lakituAndSpinyHandler(X: Int) {
     A = playerYPosition
     //> cmp #$2c
     //> bcc ExLSHand
+    if (!(A >= 0x2C)) {
+    }
     //> lda Enemy_State,y          ;if lakitu is not in normal state, branch to leave
     A = enemyState[Y]
     //> bne ExLSHand
+    if (A != 0) {
+    }
     //> lda Enemy_PageLoc,y        ;store horizontal coordinates (high and low) of lakitu
     A = enemyPageloc[Y]
     //> sta Enemy_PageLoc,x        ;into the coordinates of the spiny we're going to create
@@ -17499,9 +17539,9 @@ fun initFlyingCheepCheep(X: Int) {
     //> lda FrenzyEnemyTimer       ;if timer here not expired yet, branch to leave
     A = frenzyEnemyTimer
     //> bne ChpChpEx
-    if (!(A == 0)) {
-        //  goto ChpChpEx -> chpChpEx
-        chpChpEx()
+    X = X
+    if (A != 0) {
+        //> ChpChpEx: rts
         return
     } else {
         //> jsr SmallBBox              ;jump to set bounding box size $09 and init other values
@@ -17521,7 +17561,6 @@ fun initFlyingCheepCheep(X: Int) {
         //> lda SecondaryHardMode
         A = secondaryHardMode
         //> beq MaxCC                  ;if secondary hard mode flag not set, do not increment Y
-        X = X
         if (A != 0) {
             //> iny                        ;otherwise, increment Y to allow as many as four onscreen
             Y = (Y + 1) and 0xFF
@@ -17532,8 +17571,7 @@ fun initFlyingCheepCheep(X: Int) {
     //> cpx $00                    ;compare enemy object buffer offset with Y
     //> bcs ChpChpEx               ;if X => Y, branch to leave
     if (X >= memory[0x0].toInt()) {
-        //  goto ChpChpEx -> chpChpEx
-        chpChpEx()
+        //> ChpChpEx: rts
         return
     } else {
         //> lda PseudoRandomBitReg,x
@@ -17830,9 +17868,9 @@ fun initBowserFlame(X: Int): Int {
     //> lda FrenzyEnemyTimer        ;if timer not expired yet, branch to leave
     A = frenzyEnemyTimer
     //> bne FlmEx
-    if (!(A == 0)) {
-        //  goto FlmEx -> flmEx
-        flmEx()
+    X = X
+    if (A != 0) {
+        //> FlmEx:  rts                     ;and then leave
         return A
     } else {
         //> sta Enemy_Y_MoveForce,x     ;reset something here
@@ -17849,7 +17887,6 @@ fun initBowserFlame(X: Int): Int {
         A = enemyId[Y]
         //> cmp #Bowser
         //> beq SpawnFromMouth          ;branch if found
-        X = X
         if (A != Bowser) {
             //> jsr SetFlameTimer           ;get timer data based on flame counter
             temp0 = setFlameTimer()
@@ -20470,6 +20507,8 @@ fun xmovecntrPlatform(A: Int, X: Int) {
     xMovePrimaryCounter[X] = (xMovePrimaryCounter[X] + 1) and 0xFF
     //> rts
     return
+    if (xMovePrimaryCounter[X] == 0) {
+    }
 }
 
 // Decompiled from MoveWithXMCntrs
@@ -21384,20 +21423,18 @@ fun firebarCollision(Y: Int): Int {
         Y = A
         //> BigJp:   tya                      ;get vertical coordinate, altered or otherwise, from Y
         A = Y
-        loop0@ do {
+        loop0@ while ((temp2 and 0xFF and 0x80) != 0) {
             //> FBCLoop: sec                      ;subtract vertical position of firebar
             //> sbc $07                  ;from the vertical coordinate of the player
             temp2 = A - memory[0x7].toInt()
             A = temp2 and 0xFF
             //> bpl ChkVFBD              ;if player lower on the screen than firebar,
-            if ((temp2 and 0xFF and 0x80) != 0) {
-                //> eor #$ff                 ;skip two's compliment part
-                A = A xor 0xFF
-                //> clc                      ;otherwise get two's compliment
-                //> adc #$01
-                temp3 = A + 0x01
-                A = temp3 and 0xFF
-            }
+            //> eor #$ff                 ;skip two's compliment part
+            A = A xor 0xFF
+            //> clc                      ;otherwise get two's compliment
+            //> adc #$01
+            temp3 = A + 0x01
+            A = temp3 and 0xFF
             //> ChkVFBD: cmp #$08                 ;if difference => 8 pixels, skip ahead of this part
             //> bcs Chk2Ofs
             if (!(A >= 0x08)) {
@@ -21503,7 +21540,7 @@ fun firebarCollision(Y: Int): Int {
             memory[0x5] = ((memory[0x5].toInt() + 1) and 0xFF).toUByte()
             //> jmp FBCLoop
             //> jmp FBCLoop (not a known function)
-        } while (true /* unknown branch JMP */)
+        }
         //> ChgSDir: ldx #$01                 ;set movement direction by default
         X = 0x01
         //> lda $04                  ;if OAM X coordinate of player's sprite 1
@@ -22724,6 +22761,7 @@ fun exBGfxH() {
 fun processBowserHalf(X: Int, Y: Int): Int {
     var A: Int = 0
     var X: Int = X
+    var Y: Int = Y
     var temp0: Int = 0
     var temp1: Int = 0
     var temp2: Int = 0
@@ -22741,19 +22779,20 @@ fun processBowserHalf(X: Int, Y: Int): Int {
     //> lda Enemy_State,x
     A = enemyState[temp0]
     //> bne ExBGfxH               ;if either enemy object not in normal state, branch to leave
-    if (!(A == 0)) {
-        //  goto ExBGfxH -> exBGfxH
-        exBGfxH()
+    X = temp0
+    Y = temp1
+    if (A != 0) {
+        //> ExBGfxH:  rts                      ;leave!
         return X
     } else {
         //> lda #$0a
         A = 0x0A
         //> sta Enemy_BoundBoxCtrl,x  ;set bounding box size control
-        enemyBoundboxctrl[temp0] = A
+        enemyBoundboxctrl[X] = A
         //> jsr GetEnemyBoundBox      ;get bounding box coordinates
-        temp2 = getEnemyBoundBox(temp0)
+        temp2 = getEnemyBoundBox(X)
         //> jmp PlayerEnemyCollision  ;do player-to-enemy collision detection
-        return playerEnemyCollision(temp0, temp2)
+        return playerEnemyCollision(X, temp2)
     }
 }
 
@@ -22911,6 +22950,11 @@ fun procBowserFlame(X: Int): Int {
         enemyYPosition[X] = A
     }
     if (A != 0) {
+        //> ExFl: rts
+        return X
+    } else {
+        if (A != 0) {
+        }
     }
     loop0@ do {
         //> DrawFlameLoop:
@@ -23464,6 +23508,7 @@ fun delayToAreaEnd(X: Int) {
     var X: Int = X
     var temp0: Int = 0
     var eventMusicBuffer by MemoryByte(EventMusicBuffer)
+    var starFlagTaskControl by MemoryByte(StarFlagTaskControl)
     val enemyIntervalTimer by MemoryByteIndexed(EnemyIntervalTimer)
     //> DelayToAreaEnd:
     //> jsr DrawStarFlag          ;do sub to draw star flag
@@ -23478,8 +23523,10 @@ fun delayToAreaEnd(X: Int) {
         A = eventMusicBuffer
         //> beq IncrementSFTask2      ;branch to increment task
         if (A == 0) {
-            //  goto IncrementSFTask2 -> incrementSFTask2
-            incrementSFTask2()
+            //> IncrementSFTask2:
+            //> inc StarFlagTaskControl   ;move onto next task
+            starFlagTaskControl = (starFlagTaskControl + 1) and 0xFF
+            //> rts
             return
         }
     }
@@ -23700,6 +23747,9 @@ fun balancePlatform(X: Int): Pair<Int, Int> {
     var temp13: Int = 0
     var temp14: Int = 0
     var temp15: Int = 0
+    var temp16: Int = 0
+    var temp17: Int = 0
+    var temp18: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
@@ -23829,7 +23879,8 @@ fun balancePlatform(X: Int): Pair<Int, Int> {
                 if (!((temp3 and 0xFF) == 0)) {
                     //  goto PlatUp (internal forward branch)
                     //> PlatUp: jsr MovePlatformUp          ;do a sub to move upwards
-                    movePlatformUp()
+                    temp5 = movePlatformUp(X)
+                    X = temp5
                     //> jmp DoOtherPlatform         ;jump ahead to remaining code
                     //> jmp DoOtherPlatform (not a known function)
                     return Pair(A, X)
@@ -23850,7 +23901,8 @@ fun balancePlatform(X: Int): Pair<Int, Int> {
                 if (A >= 0x0B) {
                     //  goto PlatUp (internal forward branch)
                     //> PlatUp: jsr MovePlatformUp          ;do a sub to move upwards
-                    movePlatformUp()
+                    temp6 = movePlatformUp(X)
+                    X = temp6
                     //> jmp DoOtherPlatform         ;jump ahead to remaining code
                     //> jmp DoOtherPlatform (not a known function)
                     return Pair(A, X)
@@ -23860,17 +23912,18 @@ fun balancePlatform(X: Int): Pair<Int, Int> {
             //> beq PlatDn                  ;current enemy object offset, branch
             if (A != objectOffset) {
                 //> PlatUp: jsr MovePlatformUp          ;do a sub to move upwards
-                movePlatformUp()
+                temp7 = movePlatformUp(X)
+                X = temp7
                 //> jmp DoOtherPlatform         ;jump ahead to remaining code
                 //> jmp DoOtherPlatform (not a known function)
                 //> PlatSt: jsr StopPlatforms           ;do a sub to stop movement
-                stopPlatforms(A, X, Y)
+                stopPlatforms(A, temp7, Y)
                 //> jmp DoOtherPlatform         ;jump ahead to remaining code
                 //> jmp DoOtherPlatform (not a known function)
             } else {
                 //> PlatDn: jsr MovePlatformDown        ;do a sub to move downwards
-                temp5 = movePlatformDown(X)
-                X = temp5
+                temp8 = movePlatformDown(X)
+                X = temp8
             }
             //> DoOtherPlatform:
             //> ldy Enemy_State,x           ;get offset of other platform
@@ -23879,12 +23932,12 @@ fun balancePlatform(X: Int): Pair<Int, Int> {
             A = pull()
             //> sec
             //> sbc Enemy_Y_Position,x      ;get difference of old vs. new coordinate
-            temp6 = A - enemyYPosition[X]
-            A = temp6 and 0xFF
+            temp9 = A - enemyYPosition[X]
+            A = temp9 and 0xFF
             //> clc
             //> adc Enemy_Y_Position,y      ;add difference to vertical coordinate of other
-            temp7 = A + enemyYPosition[Y]
-            A = temp7 and 0xFF
+            temp10 = A + enemyYPosition[Y]
+            A = temp10 and 0xFF
             //> sta Enemy_Y_Position,y      ;platform to move it in the opposite direction
             enemyYPosition[Y] = A
             //> lda PlatformCollisionFlag,x ;if no collision, skip this part here
@@ -23894,7 +23947,7 @@ fun balancePlatform(X: Int): Pair<Int, Int> {
                 //> tax                         ;put offset which collision occurred here
                 X = A
                 //> jsr PositionPlayerOnVPlat   ;and use it to position player accordingly
-                positionPlayerOnVPlat()
+                positionPlayerOnVPlat(X)
             }
             //> DrawEraseRope:
             //> ldy ObjectOffset            ;get enemy object offset
@@ -23923,24 +23976,24 @@ fun balancePlatform(X: Int): Pair<Int, Int> {
                 //> pha
                 push(A)
                 //> jsr SetupPlatformRope       ;do a sub to figure out where to put new bg tiles
-                temp8 = setupPlatformRope(A, Y)
-                X = temp8
+                temp11 = setupPlatformRope(A, Y)
+                X = temp11
                 //> lda $01                     ;write name table address to vram buffer
                 A = memory[0x1].toInt()
                 //> sta VRAM_Buffer1,x          ;first the high byte, then the low
-                vramBuffer1[temp8] = A
+                vramBuffer1[temp11] = A
                 //> lda $00
                 A = memory[0x0].toInt()
                 //> sta VRAM_Buffer1+1,x
-                vramBuffer1[1 + temp8] = A
+                vramBuffer1[1 + temp11] = A
                 //> lda #$02                    ;set length for 2 bytes
                 A = 0x02
                 //> sta VRAM_Buffer1+2,x
-                vramBuffer1[2 + temp8] = A
+                vramBuffer1[2 + temp11] = A
                 //> lda Enemy_Y_Speed,y         ;if platform moving upwards, branch
                 A = enemyYSpeed[Y]
                 //> bmi EraseR1                 ;to do something else
-                X = temp8
+                X = temp11
                 if ((A and 0x80) == 0) {
                     //> lda #$a2
                     A = 0xA2
@@ -23970,24 +24023,24 @@ fun balancePlatform(X: Int): Pair<Int, Int> {
                 //> eor #$ff                    ;invert bits to reverse speed
                 A = A xor 0xFF
                 //> jsr SetupPlatformRope       ;do sub again to figure out where to put bg tiles
-                temp9 = setupPlatformRope(A, Y)
-                X = temp9
+                temp12 = setupPlatformRope(A, Y)
+                X = temp12
                 //> lda $01                     ;write name table address to vram buffer
                 A = memory[0x1].toInt()
                 //> sta VRAM_Buffer1+5,x        ;this time we're doing putting tiles for
-                vramBuffer1[5 + temp9] = A
+                vramBuffer1[5 + temp12] = A
                 //> lda $00                     ;the other platform
                 A = memory[0x0].toInt()
                 //> sta VRAM_Buffer1+6,x
-                vramBuffer1[6 + temp9] = A
+                vramBuffer1[6 + temp12] = A
                 //> lda #$02
                 A = 0x02
                 //> sta VRAM_Buffer1+7,x        ;set length again for 2 bytes
-                vramBuffer1[7 + temp9] = A
+                vramBuffer1[7 + temp12] = A
                 //> pla                         ;pull first copy of vertical speed from stack
                 A = pull()
                 //> bpl EraseR2                 ;if moving upwards (note inversion earlier), skip this
-                X = temp9
+                X = temp12
                 if ((A and 0x80) != 0) {
                     //> lda #$a2
                     A = 0xA2
@@ -24015,8 +24068,8 @@ fun balancePlatform(X: Int): Pair<Int, Int> {
                 A = vramBuffer1Offset
                 //> clc                         ;and store
                 //> adc #10
-                temp10 = A + 0x0A
-                A = temp10 and 0xFF
+                temp13 = A + 0x0A
+                A = temp13 and 0xFF
                 //> sta VRAM_Buffer1_Offset
                 vramBuffer1Offset = A
             }
@@ -24028,27 +24081,27 @@ fun balancePlatform(X: Int): Pair<Int, Int> {
         X = A
         //> jsr GetEnemyOffscreenBits  ;get offscreen bits
         val pair0 = getEnemyOffscreenBits(X)
-        temp11 = pair0.first
-        temp12 = pair0.second
-        X = temp11
+        temp14 = pair0.first
+        temp15 = pair0.second
+        X = temp14
         //> lda #$06
         A = 0x06
         //> jsr SetupFloateyNumber     ;award 1000 points to player
-        temp13 = setupFloateyNumber(A, temp11)
+        temp16 = setupFloateyNumber(A, temp14)
         //> lda Player_Rel_XPos
         A = playerRelXpos
         //> sta FloateyNum_X_Pos,x     ;put floatey number coordinates where player is
-        floateynumXPos[temp11] = A
+        floateynumXPos[temp14] = A
         //> lda Player_Y_Position
         A = playerYPosition
         //> sta FloateyNum_Y_Pos,x
-        floateynumYPos[temp11] = A
+        floateynumYPos[temp14] = A
         //> lda #$01                   ;set moving direction as flag for
         A = 0x01
         //> sta Enemy_MovingDir,x      ;falling platforms
-        enemyMovingdir[temp11] = A
+        enemyMovingdir[temp14] = A
         //  Fall-through tail call to stopPlatforms
-        stopPlatforms(A, temp11, temp12)
+        stopPlatforms(A, temp14, temp15)
         return Pair(A, X)
     }
     //> PlatformFall:
@@ -24057,15 +24110,15 @@ fun balancePlatform(X: Int): Pair<Int, Int> {
     //> pha
     push(A)
     //> jsr MoveFallingPlatform     ;make current platform fall
-    temp14 = moveFallingPlatform(X)
-    X = temp14
+    temp17 = moveFallingPlatform(X)
+    X = temp17
     //> pla
     A = pull()
     //> tax                         ;pull offset from stack and save to X
     X = A
     //> jsr MoveFallingPlatform     ;make other platform fall
-    temp15 = moveFallingPlatform(X)
-    X = temp15
+    temp18 = moveFallingPlatform(X)
+    X = temp18
     //> ldx ObjectOffset
     X = objectOffset
     //> lda PlatformCollisionFlag,x ;if player not standing on either platform,
@@ -24075,7 +24128,7 @@ fun balancePlatform(X: Int): Pair<Int, Int> {
         //> tax                         ;transfer collision flag offset as offset to X
         X = A
         //> jsr PositionPlayerOnVPlat   ;and position player appropriately
-        positionPlayerOnVPlat()
+        positionPlayerOnVPlat(X)
     }
     //> ExPF: ldx ObjectOffset            ;get enemy object buffer offset and leave
     X = objectOffset
@@ -24239,6 +24292,8 @@ fun yMovingPlatform(X: Int): Int {
     var X: Int = X
     var temp0: Int = 0
     var temp1: Int = 0
+    var temp2: Int = 0
+    var temp3: Int = 0
     var frameCounter by MemoryByte(FrameCounter)
     val enemyYmfDummy by MemoryByteIndexed(Enemy_YMF_Dummy)
     val enemyYMoveforce by MemoryByteIndexed(Enemy_Y_MoveForce)
@@ -24277,9 +24332,10 @@ fun yMovingPlatform(X: Int): Int {
                 return X
             }
             //> jsr MovePlatformUp           ;otherwise start slowing descent/moving upwards
-            movePlatformUp()
+            temp1 = movePlatformUp(X)
+            X = temp1
             //> jmp ChkYPCollision
-            chkYPCollision(X)
+            chkYPCollision(temp1)
             return X
         }
         //> lda FrameCounter
@@ -24302,17 +24358,18 @@ fun yMovingPlatform(X: Int): Int {
         //> bcc YMDown
         if (A >= yPlatformCenterYPos[X]) {
             //> jsr MovePlatformUp           ;otherwise start slowing descent/moving upwards
-            movePlatformUp()
+            temp2 = movePlatformUp(X)
+            X = temp2
             //> jmp ChkYPCollision
-            chkYPCollision(X)
+            chkYPCollision(temp2)
             return X
         }
     }
     //> YMDown: jsr MovePlatformDown         ;start slowing ascent/moving downwards
-    temp1 = movePlatformDown(X)
-    X = temp1
+    temp3 = movePlatformDown(X)
+    X = temp3
     //  Fall-through tail call to chkYPCollision
-    chkYPCollision(temp1)
+    chkYPCollision(temp3)
     return X
 }
 
@@ -24330,14 +24387,14 @@ fun chkYPCollision(X: Int) {
         return
     }
     //  Fall-through tail call to func_10925
-    func_10925()
+    func_10925(X)
     return
 }
 
 // Decompiled from @10925
-fun func_10925() {
+fun func_10925(X: Int) {
     //> jsr PositionPlayerOnVPlat    ;otherwise position player appropriately
-    positionPlayerOnVPlat()
+    positionPlayerOnVPlat(X)
     //  Fall-through tail call to exYPl
     exYPl()
     return
@@ -24372,14 +24429,15 @@ fun xMovingPlatform(X: Int): Int {
         return X
     } else {
         //  Fall-through tail call to positionPlayerOnHPlat
-        positionPlayerOnHPlat()
+        positionPlayerOnHPlat(temp0)
         return X
     }
 }
 
 // Decompiled from PositionPlayerOnHPlat
-fun positionPlayerOnHPlat() {
+fun positionPlayerOnHPlat(X: Int) {
     var A: Int = 0
+    var X: Int = X
     var Y: Int = 0
     var temp0: Int = 0
     var temp1: Int = 0
@@ -24401,6 +24459,7 @@ fun positionPlayerOnHPlat() {
     //> ldy $00                   ;check to see if saved value here is positive or negative
     Y = memory[0x0].toInt()
     //> bmi PPHSubt               ;if negative, branch to subtract
+    X = X
     if ((Y and 0x80) == 0) {
         //> adc #$00                  ;otherwise add carry to page location
         temp1 = A + if (temp0 > 0xFF) 1 else 0
@@ -24417,7 +24476,7 @@ fun positionPlayerOnHPlat() {
     //> sty Platform_X_Scroll     ;put saved value from second sub here to be used later
     platformXScroll = Y
     //> jsr PositionPlayerOnVPlat ;position player vertically and appropriately
-    positionPlayerOnVPlat()
+    positionPlayerOnVPlat(X)
     //  Fall-through tail call to exXMP
     exXMP()
     return
@@ -24444,7 +24503,7 @@ fun dropPlatform(X: Int) {
         //> jsr MoveDropPlatform         ;otherwise do a sub to move platform down very quickly
         temp0 = moveDropPlatform()
         //> jsr PositionPlayerOnVPlat    ;do a sub to position player appropriately
-        positionPlayerOnVPlat()
+        positionPlayerOnVPlat(X)
     }
     //> ExDPl: rts                          ;leave
     return
@@ -24477,7 +24536,7 @@ fun rightPlatform(A: Int, X: Int): Int {
         //> sta Enemy_X_Speed,x           ;otherwise set new speed (gets moving if motionless)
         enemyXSpeed[X] = A
         //> jsr PositionPlayerOnHPlat     ;use saved value from earlier sub to position player
-        positionPlayerOnHPlat()
+        positionPlayerOnHPlat(X)
     }
     //> ExRPl: rts                           ;then leave
     return X
@@ -25218,400 +25277,402 @@ fun playerEnemyCollision(X: Int, Y: Int): Int {
     val orig0: Int = A
     A = orig0 shr 1
     //> bcs NoPUp                   ;if set, branch to leave
-    //> HandlePowerUpCollision:
-    //> jsr EraseEnemyObject    ;erase the power-up object
-    temp0 = eraseEnemyObject(X)
-    //> lda #$06
-    A = 0x06
-    //> jsr SetupFloateyNumber  ;award 1000 points to player by default
-    temp1 = setupFloateyNumber(A, X)
-    //> lda #Sfx_PowerUpGrab
-    A = Sfx_PowerUpGrab
-    //> sta Square2SoundQueue   ;play the power-up sound
-    square2SoundQueue = A
-    //> lda PowerUpType         ;check power-up type
-    A = powerUpType
-    //> cmp #$02
-    //> bcc Shroom_Flower_PUp   ;if mushroom or fire flower, branch
     X = X
     Y = Y
-    if (A >= 0x02) {
-        //> cmp #$03
-        //> beq SetFor1Up           ;if 1-up mushroom, branch
-        if (A == 0x03) {
-            //  goto SetFor1Up (internal forward branch)
-            //> SetFor1Up:
-            //> lda #$0b                 ;change 1000 points into 1-up instead
-            A = 0x0B
-            //> sta FloateyNum_Control,x ;and then leave
-            floateynumControl[X] = A
-            //> rts
-            return X
-        }
-        //> lda #$23                ;otherwise set star mario invincibility
-        A = 0x23
-        //> sta StarInvincibleTimer ;timer, and load the star mario music
-        starInvincibleTimer = A
-        //> lda #StarPowerMusic     ;into the area music queue, then leave
-        A = StarPowerMusic
-        //> sta AreaMusicQueue
-        areaMusicQueue = A
-        //> rts
+    if ((orig0 and 0x01) != 0) {
+        //> NoPUp: rts
         return X
     } else {
-        //> Shroom_Flower_PUp:
-        //> lda PlayerStatus    ;if player status = small, branch
-        A = playerStatus
-        //> beq UpToSuper
-        if (A != 0) {
-            //> cmp #$01            ;if player status not super, leave
-            //> bne NoPUp
-            if (!(A == 0x01)) {
-                //  goto NoPUp (internal forward branch)
-                //> NoPUp: rts
+        //> jsr CheckPlayerVertical     ;if player object is completely offscreen or
+        val flag1: Boolean = checkPlayerVertical()
+        //> bcs NoPECol                 ;if down past 224th pixel row, branch to leave
+        if (!flag1) {
+            //> lda EnemyOffscrBitsMasked,x ;if current enemy is offscreen by any amount,
+            A = enemyOffscrBitsMasked[X]
+            //> bne NoPECol                 ;go ahead and branch to leave
+            if (!(A == 0)) {
+                //  goto NoPECol (internal forward branch)
+                //> NoPECol: rts
                 return X
             }
-            //> ldx ObjectOffset    ;get enemy offset, not necessary
+            //> lda GameEngineSubroutine
+            A = gameEngineSubroutine
+            //> cmp #$08                    ;if not set to run player control routine
+            //> bne NoPECol                 ;on next frame, branch to leave
+            if (!(A == 0x08)) {
+                //  goto NoPECol (internal forward branch)
+                //> NoPECol: rts
+                return X
+            }
+            //> lda Enemy_State,x
+            A = enemyState[X]
+            //> and #%00100000              ;if enemy state has d5 set, branch to leave
+            A = A and 0x20
+            //> bne NoPECol
+            if (!(A == 0)) {
+                //  goto NoPECol (internal forward branch)
+                //> NoPECol: rts
+                return X
+            }
+            //> jsr GetEnemyBoundBoxOfs     ;get bounding box offset for current enemy object
+            temp0 = getEnemyBoundBoxOfs()
+            //> jsr PlayerCollisionCore     ;do collision detection on player vs. enemy
+            val flag2: Boolean = playerCollisionCore(Y)
+            //> ldx ObjectOffset            ;get enemy object buffer offset
             X = objectOffset
-            //> lda #$02            ;set player status to fiery
-            A = 0x02
-            //> sta PlayerStatus
-            playerStatus = A
-            //> jsr GetPlayerColors ;run sub to change colors of player
-            getPlayerColors()
-            //> ldx ObjectOffset    ;get enemy offset again, and again not necessary
-            X = objectOffset
-            //> lda #$0c            ;set value to be used by subroutine tree (fiery)
-            A = 0x0C
-            //> jmp UpToFiery       ;jump to set values accordingly
-            //> jmp UpToFiery (not a known function)
-            //> SetFor1Up:
-            //> lda #$0b                 ;change 1000 points into 1-up instead
-            A = 0x0B
-            //> sta FloateyNum_Control,x ;and then leave
-            floateynumControl[X] = A
-            //> rts
-            return X
-        }
-    }
-    //> UpToSuper:
-    //> lda #$01         ;set player status to super
-    A = 0x01
-    //> sta PlayerStatus
-    playerStatus = A
-    //> lda #$09         ;set value to be used by subroutine tree (super)
-    A = 0x09
-    //> UpToFiery:
-    //> ldy #$00         ;set value to be used as new player state
-    Y = 0x00
-    //> jsr SetPRout     ;set values to stop certain things in motion
-    setPRout(A, Y)
-    //> NoPUp: rts
-    return X
-    //> jsr CheckPlayerVertical     ;if player object is completely offscreen or
-    val flag1: Boolean = checkPlayerVertical()
-    //> bcs NoPECol                 ;if down past 224th pixel row, branch to leave
-    if (!flag1) {
-        //> lda EnemyOffscrBitsMasked,x ;if current enemy is offscreen by any amount,
-        A = enemyOffscrBitsMasked[X]
-        //> bne NoPECol                 ;go ahead and branch to leave
-        if (!(A == 0)) {
-            //  goto NoPECol (internal forward branch)
-            //> NoPECol: rts
-            return X
-        }
-        //> lda GameEngineSubroutine
-        A = gameEngineSubroutine
-        //> cmp #$08                    ;if not set to run player control routine
-        //> bne NoPECol                 ;on next frame, branch to leave
-        if (!(A == 0x08)) {
-            //  goto NoPECol (internal forward branch)
-            //> NoPECol: rts
-            return X
-        }
-        //> lda Enemy_State,x
-        A = enemyState[X]
-        //> and #%00100000              ;if enemy state has d5 set, branch to leave
-        A = A and 0x20
-        //> bne NoPECol
-        if (!(A == 0)) {
-            //  goto NoPECol (internal forward branch)
-            //> NoPECol: rts
-            return X
-        }
-        //> jsr GetEnemyBoundBoxOfs     ;get bounding box offset for current enemy object
-        temp2 = getEnemyBoundBoxOfs()
-        //> jsr PlayerCollisionCore     ;do collision detection on player vs. enemy
-        val flag2: Boolean = playerCollisionCore(Y)
-        //> ldx ObjectOffset            ;get enemy object buffer offset
-        X = objectOffset
-        //> bcs CheckForPUpCollision    ;if collision, branch past this part here
-        if (flag2) {
-            //  goto CheckForPUpCollision (internal forward branch)
-            //> CheckForPUpCollision:
-            //> ldy Enemy_ID,x
-            Y = enemyId[X]
-            //> cpy #PowerUpObject            ;check for power-up object
-            //> bne EColl                     ;if not found, branch to next part
-            if (!(Y == PowerUpObject)) {
-                //  goto EColl (internal forward branch)
-                //> EColl: lda StarInvincibleTimer       ;if star mario invincibility timer expired,
-                A = starInvincibleTimer
-                //> beq HandlePECollisions        ;perform task here, otherwise kill enemy like
-                if (A == 0) {
-                    //  goto HandlePECollisions (internal forward branch)
-                    //> HandlePECollisions:
-                    //> lda Enemy_CollisionBits,x    ;check enemy collision bits for d0 set
-                    A = enemyCollisionbits[X]
-                    //> and #%00000001               ;or for being offscreen at all
-                    A = A and 0x01
-                    //> ora EnemyOffscrBitsMasked,x
-                    A = A or enemyOffscrBitsMasked[X]
-                    //> bne ExPEC                    ;branch to leave if either is true
-                    if (!(A == 0)) {
-                        //  goto ExPEC (internal forward branch)
-                        //> ExPEC: rts                          ;leave!!!
-                        return X
-                    }
-                    //> lda #$01
-                    A = 0x01
-                    //> ora Enemy_CollisionBits,x    ;otherwise set d0 now
-                    A = A or enemyCollisionbits[X]
-                    //> sta Enemy_CollisionBits,x
-                    enemyCollisionbits[X] = A
-                    //> cpy #Spiny                   ;branch if spiny
-                    //> beq ChkForPlayerInjury
-                    if (Y == Spiny) {
-                        //  goto ChkForPlayerInjury (internal forward branch)
-                        //> ChkForPlayerInjury:
-                        //> lda Player_Y_Speed     ;check player's vertical speed
-                        A = playerYSpeed
-                        //> bmi ChkInj             ;perform procedure below if player moving upwards
-                        if ((A and 0x80) != 0) {
-                            //  goto ChkInj (internal forward branch)
-                            //> ChkInj:   lda Enemy_ID,x         ;branch if enemy object < $07
-                            A = enemyId[X]
-                            //> cmp #Bloober
-                            //> bcc ChkETmrs
-                            if (!(A >= Bloober)) {
-                                //  goto ChkETmrs (internal forward branch)
-                                //> ChkETmrs: lda StompTimer         ;check stomp timer
-                                A = stompTimer
-                                //> bne EnemyStomped       ;branch if set
-                                if (!(A == 0)) {
+            //> bcs CheckForPUpCollision    ;if collision, branch past this part here
+            if (flag2) {
+                //  goto CheckForPUpCollision (internal forward branch)
+                //> CheckForPUpCollision:
+                //> ldy Enemy_ID,x
+                Y = enemyId[X]
+                //> cpy #PowerUpObject            ;check for power-up object
+                //> bne EColl                     ;if not found, branch to next part
+                if (!(Y == PowerUpObject)) {
+                    //  goto EColl (internal forward branch)
+                    //> EColl: lda StarInvincibleTimer       ;if star mario invincibility timer expired,
+                    A = starInvincibleTimer
+                    //> beq HandlePECollisions        ;perform task here, otherwise kill enemy like
+                    if (A == 0) {
+                        //  goto HandlePECollisions (internal forward branch)
+                        //> HandlePECollisions:
+                        //> lda Enemy_CollisionBits,x    ;check enemy collision bits for d0 set
+                        A = enemyCollisionbits[X]
+                        //> and #%00000001               ;or for being offscreen at all
+                        A = A and 0x01
+                        //> ora EnemyOffscrBitsMasked,x
+                        A = A or enemyOffscrBitsMasked[X]
+                        //> bne ExPEC                    ;branch to leave if either is true
+                        if (!(A == 0)) {
+                            //  goto ExPEC (internal forward branch)
+                            //> ExPEC: rts                          ;leave!!!
+                            return X
+                        }
+                        //> lda #$01
+                        A = 0x01
+                        //> ora Enemy_CollisionBits,x    ;otherwise set d0 now
+                        A = A or enemyCollisionbits[X]
+                        //> sta Enemy_CollisionBits,x
+                        enemyCollisionbits[X] = A
+                        //> cpy #Spiny                   ;branch if spiny
+                        //> beq ChkForPlayerInjury
+                        if (Y == Spiny) {
+                            //  goto ChkForPlayerInjury (internal forward branch)
+                            //> ChkForPlayerInjury:
+                            //> lda Player_Y_Speed     ;check player's vertical speed
+                            A = playerYSpeed
+                            //> bmi ChkInj             ;perform procedure below if player moving upwards
+                            if ((A and 0x80) != 0) {
+                                //  goto ChkInj (internal forward branch)
+                                //> ChkInj:   lda Enemy_ID,x         ;branch if enemy object < $07
+                                A = enemyId[X]
+                                //> cmp #Bloober
+                                //> bcc ChkETmrs
+                                if (!(A >= Bloober)) {
+                                    //  goto ChkETmrs (internal forward branch)
+                                    //> ChkETmrs: lda StompTimer         ;check stomp timer
+                                    A = stompTimer
+                                    //> bne EnemyStomped       ;branch if set
+                                    if (!(A == 0)) {
+                                        //  goto EnemyStomped -> enemyStomped
+                                        enemyStomped(X)
+                                        return X
+                                    }
+                                    //> lda InjuryTimer        ;check to see if injured invincibility timer still
+                                    A = injuryTimer
+                                    //> bne ExInjColRoutines   ;counting down, and branch elsewhere to leave if so
+                                    if (!(A == 0)) {
+                                        //  goto ExInjColRoutines -> exInjColRoutines
+                                        exInjColRoutines()
+                                        return X
+                                    }
+                                    //> lda Player_Rel_XPos
+                                    A = playerRelXpos
+                                    //> cmp Enemy_Rel_XPos     ;if player's relative position to the left of enemy's
+                                    //> bcc TInjE              ;relative position, branch here
+                                    if (!(A >= enemyRelXpos)) {
+                                        //  goto TInjE (internal forward branch)
+                                        //> TInjE:    lda Enemy_MovingDir,x  ;if enemy moving towards the left,
+                                        A = enemyMovingdir[X]
+                                        //> cmp #$01               ;branch, otherwise do a jump here
+                                        //> bne InjurePlayer       ;to turn the enemy around
+                                        if (!(A == 0x01)) {
+                                            //  goto InjurePlayer -> injurePlayer
+                                            injurePlayer()
+                                            return X
+                                        }
+                                        //> jmp LInj
+                                        lInj(X)
+                                        return X
+                                    }
+                                    //> jmp ChkEnemyFaceRight  ;otherwise do a jump here
+                                    //> jmp ChkEnemyFaceRight (not a known function)
+                                    return X
+                                }
+                                //> lda Player_Y_Position  ;add 12 pixels to player's vertical position
+                                A = playerYPosition
+                                //> clc
+                                //> adc #$0c
+                                temp1 = A + 0x0C
+                                A = temp1 and 0xFF
+                                //> cmp Enemy_Y_Position,x ;compare modified player's position to enemy's position
+                                //> bcc EnemyStomped       ;branch if this player's position above (less than) enemy's
+                                if (!(A >= enemyYPosition[X])) {
                                     //  goto EnemyStomped -> enemyStomped
                                     enemyStomped(X)
                                     return X
                                 }
-                                //> lda InjuryTimer        ;check to see if injured invincibility timer still
-                                A = injuryTimer
-                                //> bne ExInjColRoutines   ;counting down, and branch elsewhere to leave if so
-                                if (!(A == 0)) {
-                                    //  goto ExInjColRoutines -> exInjColRoutines
-                                    exInjColRoutines()
-                                    return X
-                                }
-                                //> lda Player_Rel_XPos
-                                A = playerRelXpos
-                                //> cmp Enemy_Rel_XPos     ;if player's relative position to the left of enemy's
-                                //> bcc TInjE              ;relative position, branch here
-                                if (!(A >= enemyRelXpos)) {
-                                    //  goto TInjE (internal forward branch)
-                                    //> TInjE:    lda Enemy_MovingDir,x  ;if enemy moving towards the left,
-                                    A = enemyMovingdir[X]
-                                    //> cmp #$01               ;branch, otherwise do a jump here
-                                    //> bne InjurePlayer       ;to turn the enemy around
-                                    if (!(A == 0x01)) {
-                                        //  goto InjurePlayer -> injurePlayer
-                                        injurePlayer()
-                                        return X
-                                    }
-                                    //> jmp LInj
-                                    lInj(X)
-                                    return X
-                                }
-                                //> jmp ChkEnemyFaceRight  ;otherwise do a jump here
-                                //> jmp ChkEnemyFaceRight (not a known function)
                                 return X
                             }
-                            //> lda Player_Y_Position  ;add 12 pixels to player's vertical position
-                            A = playerYPosition
-                            //> clc
-                            //> adc #$0c
-                            temp3 = A + 0x0C
-                            A = temp3 and 0xFF
-                            //> cmp Enemy_Y_Position,x ;compare modified player's position to enemy's position
-                            //> bcc EnemyStomped       ;branch if this player's position above (less than) enemy's
-                            if (!(A >= enemyYPosition[X])) {
+                            //> bne EnemyStomped       ;or not at all, and branch elsewhere if moving downwards
+                            if (!(A == 0)) {
                                 //  goto EnemyStomped -> enemyStomped
                                 enemyStomped(X)
                                 return X
                             }
                             return X
                         }
-                        //> bne EnemyStomped       ;or not at all, and branch elsewhere if moving downwards
-                        if (!(A == 0)) {
-                            //  goto EnemyStomped -> enemyStomped
-                            enemyStomped(X)
+                        //> cpy #PiranhaPlant            ;branch if piranha plant
+                        //> beq InjurePlayer
+                        if (Y == PiranhaPlant) {
+                            //  goto InjurePlayer -> injurePlayer
+                            injurePlayer()
                             return X
                         }
-                        return X
-                    }
-                    //> cpy #PiranhaPlant            ;branch if piranha plant
-                    //> beq InjurePlayer
-                    if (Y == PiranhaPlant) {
-                        //  goto InjurePlayer -> injurePlayer
-                        injurePlayer()
-                        return X
-                    }
-                    //> cpy #Podoboo                 ;branch if podoboo
-                    //> beq InjurePlayer
-                    if (Y == Podoboo) {
-                        //  goto InjurePlayer -> injurePlayer
-                        injurePlayer()
-                        return X
-                    }
-                    //> cpy #BulletBill_CannonVar    ;branch if bullet bill
-                    //> beq ChkForPlayerInjury
-                    if (Y == BulletBill_CannonVar) {
-                        //  goto ChkForPlayerInjury (internal forward branch)
-                        //> ChkForPlayerInjury:
-                        //> lda Player_Y_Speed     ;check player's vertical speed
-                        A = playerYSpeed
-                        //> bmi ChkInj             ;perform procedure below if player moving upwards
-                        if ((A and 0x80) != 0) {
-                            //  goto ChkInj (internal forward branch)
-                            //> ChkInj:   lda Enemy_ID,x         ;branch if enemy object < $07
-                            A = enemyId[X]
-                            //> cmp #Bloober
-                            //> bcc ChkETmrs
-                            if (!(A >= Bloober)) {
-                                //  goto ChkETmrs (internal forward branch)
-                                //> ChkETmrs: lda StompTimer         ;check stomp timer
-                                A = stompTimer
-                                //> bne EnemyStomped       ;branch if set
-                                if (!(A == 0)) {
-                                    //  goto EnemyStomped -> enemyStomped
-                                    enemyStomped(X)
+                        //> cpy #Podoboo                 ;branch if podoboo
+                        //> beq InjurePlayer
+                        if (Y == Podoboo) {
+                            //  goto InjurePlayer -> injurePlayer
+                            injurePlayer()
+                            return X
+                        }
+                        //> cpy #BulletBill_CannonVar    ;branch if bullet bill
+                        //> beq ChkForPlayerInjury
+                        if (Y == BulletBill_CannonVar) {
+                            //  goto ChkForPlayerInjury (internal forward branch)
+                            //> ChkForPlayerInjury:
+                            //> lda Player_Y_Speed     ;check player's vertical speed
+                            A = playerYSpeed
+                            //> bmi ChkInj             ;perform procedure below if player moving upwards
+                            if ((A and 0x80) != 0) {
+                                //  goto ChkInj (internal forward branch)
+                                //> ChkInj:   lda Enemy_ID,x         ;branch if enemy object < $07
+                                A = enemyId[X]
+                                //> cmp #Bloober
+                                //> bcc ChkETmrs
+                                if (!(A >= Bloober)) {
+                                    //  goto ChkETmrs (internal forward branch)
+                                    //> ChkETmrs: lda StompTimer         ;check stomp timer
+                                    A = stompTimer
+                                    //> bne EnemyStomped       ;branch if set
+                                    if (!(A == 0)) {
+                                        //  goto EnemyStomped -> enemyStomped
+                                        enemyStomped(X)
+                                        return X
+                                    }
                                     return X
                                 }
                                 return X
                             }
                             return X
                         }
-                        return X
-                    }
-                    //> cpy #$15                     ;branch if object => $15
-                    //> bcs InjurePlayer
-                    if (Y >= 0x15) {
-                        //  goto InjurePlayer -> injurePlayer
-                        injurePlayer()
-                        return X
-                    }
-                    //> lda AreaType                 ;branch if water type level
-                    A = areaType
-                    //> beq InjurePlayer
-                    if (A == 0) {
-                        //  goto InjurePlayer -> injurePlayer
-                        injurePlayer()
-                        return X
-                    }
-                    //> lda Enemy_State,x            ;branch if d7 of enemy state was set
-                    A = enemyState[X]
-                    //> asl
-                    val orig3: Int = A
-                    A = (orig3 shl 1) and 0xFF
-                    //> bcs ChkForPlayerInjury
-                    if ((orig3 and 0x80) != 0) {
-                        //  goto ChkForPlayerInjury (internal forward branch)
-                        //> ChkForPlayerInjury:
-                        //> lda Player_Y_Speed     ;check player's vertical speed
-                        A = playerYSpeed
-                        //> bmi ChkInj             ;perform procedure below if player moving upwards
-                        if ((A and 0x80) != 0) {
-                            //  goto ChkInj (internal forward branch)
-                            //> ChkInj:   lda Enemy_ID,x         ;branch if enemy object < $07
-                            A = enemyId[X]
-                            //> cmp #Bloober
-                            //> bcc ChkETmrs
-                            if (!(A >= Bloober)) {
-                                //  goto ChkETmrs (internal forward branch)
-                                //> ChkETmrs: lda StompTimer         ;check stomp timer
-                                A = stompTimer
-                                //> bne EnemyStomped       ;branch if set
-                                if (!(A == 0)) {
-                                    //  goto EnemyStomped -> enemyStomped
-                                    enemyStomped(X)
+                        //> cpy #$15                     ;branch if object => $15
+                        //> bcs InjurePlayer
+                        if (Y >= 0x15) {
+                            //  goto InjurePlayer -> injurePlayer
+                            injurePlayer()
+                            return X
+                        }
+                        //> lda AreaType                 ;branch if water type level
+                        A = areaType
+                        //> beq InjurePlayer
+                        if (A == 0) {
+                            //  goto InjurePlayer -> injurePlayer
+                            injurePlayer()
+                            return X
+                        }
+                        //> lda Enemy_State,x            ;branch if d7 of enemy state was set
+                        A = enemyState[X]
+                        //> asl
+                        val orig3: Int = A
+                        A = (orig3 shl 1) and 0xFF
+                        //> bcs ChkForPlayerInjury
+                        if ((orig3 and 0x80) != 0) {
+                            //  goto ChkForPlayerInjury (internal forward branch)
+                            //> ChkForPlayerInjury:
+                            //> lda Player_Y_Speed     ;check player's vertical speed
+                            A = playerYSpeed
+                            //> bmi ChkInj             ;perform procedure below if player moving upwards
+                            if ((A and 0x80) != 0) {
+                                //  goto ChkInj (internal forward branch)
+                                //> ChkInj:   lda Enemy_ID,x         ;branch if enemy object < $07
+                                A = enemyId[X]
+                                //> cmp #Bloober
+                                //> bcc ChkETmrs
+                                if (!(A >= Bloober)) {
+                                    //  goto ChkETmrs (internal forward branch)
+                                    //> ChkETmrs: lda StompTimer         ;check stomp timer
+                                    A = stompTimer
+                                    //> bne EnemyStomped       ;branch if set
+                                    if (!(A == 0)) {
+                                        //  goto EnemyStomped -> enemyStomped
+                                        enemyStomped(X)
+                                        return X
+                                    }
                                     return X
                                 }
                                 return X
                             }
                             return X
                         }
-                        return X
-                    }
-                    //> lda Enemy_State,x            ;mask out all but 3 LSB of enemy state
-                    A = enemyState[X]
-                    //> and #%00000111
-                    A = A and 0x07
-                    //> cmp #$02                     ;branch if enemy is in normal or falling state
-                    //> bcc ChkForPlayerInjury
-                    if (!(A >= 0x02)) {
-                        //  goto ChkForPlayerInjury (internal forward branch)
-                        //> ChkForPlayerInjury:
-                        //> lda Player_Y_Speed     ;check player's vertical speed
-                        A = playerYSpeed
-                        //> bmi ChkInj             ;perform procedure below if player moving upwards
-                        if ((A and 0x80) != 0) {
-                            //  goto ChkInj (internal forward branch)
-                            //> ChkInj:   lda Enemy_ID,x         ;branch if enemy object < $07
-                            A = enemyId[X]
-                            //> cmp #Bloober
-                            //> bcc ChkETmrs
-                            if (!(A >= Bloober)) {
-                                //  goto ChkETmrs (internal forward branch)
-                                //> ChkETmrs: lda StompTimer         ;check stomp timer
-                                A = stompTimer
-                                //> bne EnemyStomped       ;branch if set
-                                if (!(A == 0)) {
-                                    //  goto EnemyStomped -> enemyStomped
-                                    enemyStomped(X)
+                        //> lda Enemy_State,x            ;mask out all but 3 LSB of enemy state
+                        A = enemyState[X]
+                        //> and #%00000111
+                        A = A and 0x07
+                        //> cmp #$02                     ;branch if enemy is in normal or falling state
+                        //> bcc ChkForPlayerInjury
+                        if (!(A >= 0x02)) {
+                            //  goto ChkForPlayerInjury (internal forward branch)
+                            //> ChkForPlayerInjury:
+                            //> lda Player_Y_Speed     ;check player's vertical speed
+                            A = playerYSpeed
+                            //> bmi ChkInj             ;perform procedure below if player moving upwards
+                            if ((A and 0x80) != 0) {
+                                //  goto ChkInj (internal forward branch)
+                                //> ChkInj:   lda Enemy_ID,x         ;branch if enemy object < $07
+                                A = enemyId[X]
+                                //> cmp #Bloober
+                                //> bcc ChkETmrs
+                                if (!(A >= Bloober)) {
+                                    //  goto ChkETmrs (internal forward branch)
+                                    //> ChkETmrs: lda StompTimer         ;check stomp timer
+                                    A = stompTimer
+                                    //> bne EnemyStomped       ;branch if set
+                                    if (!(A == 0)) {
+                                        //  goto EnemyStomped -> enemyStomped
+                                        enemyStomped(X)
+                                        return X
+                                    }
                                     return X
                                 }
                                 return X
                             }
                             return X
                         }
+                        //> lda Enemy_ID,x               ;branch to leave if goomba in defeated state
+                        A = enemyId[X]
+                        //> cmp #Goomba
+                        //> beq ExPEC
+                        if (A == Goomba) {
+                            //  goto ExPEC (internal forward branch)
+                            //> ExPEC: rts                          ;leave!!!
+                            return X
+                        }
                         return X
                     }
-                    //> lda Enemy_ID,x               ;branch to leave if goomba in defeated state
-                    A = enemyId[X]
-                    //> cmp #Goomba
-                    //> beq ExPEC
-                    if (A == Goomba) {
-                        //  goto ExPEC (internal forward branch)
-                        //> ExPEC: rts                          ;leave!!!
-                        return X
-                    }
+                    //> jmp ShellOrBlockDefeat        ;hit with a shell, or from beneath
+                    shellOrBlockDefeat(X)
                     return X
                 }
-                //> jmp ShellOrBlockDefeat        ;hit with a shell, or from beneath
-                shellOrBlockDefeat(X)
+                //> jmp HandlePowerUpCollision    ;otherwise, unconditional jump backwards
+                //> jmp HandlePowerUpCollision (not a known function)
                 return X
             }
-            //> jmp HandlePowerUpCollision    ;otherwise, unconditional jump backwards
-            //> jmp HandlePowerUpCollision (not a known function)
-            return X
+            //> lda Enemy_CollisionBits,x
+            A = enemyCollisionbits[X]
+            //> and #%11111110              ;otherwise, clear d0 of current enemy object's
+            A = A and 0xFE
+            //> sta Enemy_CollisionBits,x   ;collision bit
+            enemyCollisionbits[X] = A
         }
-        //> lda Enemy_CollisionBits,x
-        A = enemyCollisionbits[X]
-        //> and #%11111110              ;otherwise, clear d0 of current enemy object's
-        A = A and 0xFE
-        //> sta Enemy_CollisionBits,x   ;collision bit
-        enemyCollisionbits[X] = A
     }
     if (Y == PowerUpObject) {
         loop0@ while (true) {
+            //> HandlePowerUpCollision:
+            //> jsr EraseEnemyObject    ;erase the power-up object
+            temp2 = eraseEnemyObject(X)
+            //> lda #$06
+            A = 0x06
+            //> jsr SetupFloateyNumber  ;award 1000 points to player by default
+            temp3 = setupFloateyNumber(A, X)
+            //> lda #Sfx_PowerUpGrab
+            A = Sfx_PowerUpGrab
+            //> sta Square2SoundQueue   ;play the power-up sound
+            square2SoundQueue = A
+            //> lda PowerUpType         ;check power-up type
+            A = powerUpType
+            //> cmp #$02
+            //> bcc Shroom_Flower_PUp   ;if mushroom or fire flower, branch
+            if (A >= 0x02) {
+                //> cmp #$03
+                //> beq SetFor1Up           ;if 1-up mushroom, branch
+                if (A == 0x03) {
+                    //  goto SetFor1Up (internal forward branch)
+                    //> SetFor1Up:
+                    //> lda #$0b                 ;change 1000 points into 1-up instead
+                    A = 0x0B
+                    //> sta FloateyNum_Control,x ;and then leave
+                    floateynumControl[X] = A
+                    //> rts
+                    return X
+                }
+                //> lda #$23                ;otherwise set star mario invincibility
+                A = 0x23
+                //> sta StarInvincibleTimer ;timer, and load the star mario music
+                starInvincibleTimer = A
+                //> lda #StarPowerMusic     ;into the area music queue, then leave
+                A = StarPowerMusic
+                //> sta AreaMusicQueue
+                areaMusicQueue = A
+                //> rts
+                return X
+            }
+            //> Shroom_Flower_PUp:
+            //> lda PlayerStatus    ;if player status = small, branch
+            A = playerStatus
+            //> beq UpToSuper
+            if (A != 0) {
+                //> cmp #$01            ;if player status not super, leave
+                //> bne NoPUp
+                if (!(A == 0x01)) {
+                    //  goto NoPUp (internal forward branch)
+                    //> NoPUp: rts
+                    return X
+                }
+                //> ldx ObjectOffset    ;get enemy offset, not necessary
+                X = objectOffset
+                //> lda #$02            ;set player status to fiery
+                A = 0x02
+                //> sta PlayerStatus
+                playerStatus = A
+                //> jsr GetPlayerColors ;run sub to change colors of player
+                getPlayerColors()
+                //> ldx ObjectOffset    ;get enemy offset again, and again not necessary
+                X = objectOffset
+                //> lda #$0c            ;set value to be used by subroutine tree (fiery)
+                A = 0x0C
+                //> jmp UpToFiery       ;jump to set values accordingly
+                //> jmp UpToFiery (not a known function)
+                //> SetFor1Up:
+                //> lda #$0b                 ;change 1000 points into 1-up instead
+                A = 0x0B
+                //> sta FloateyNum_Control,x ;and then leave
+                floateynumControl[X] = A
+                //> rts
+                return X
+            }
+            //> UpToSuper:
+            //> lda #$01         ;set player status to super
+            A = 0x01
+            //> sta PlayerStatus
+            playerStatus = A
+            //> lda #$09         ;set value to be used by subroutine tree (super)
+            A = 0x09
+            //> UpToFiery:
+            //> ldy #$00         ;set value to be used as new player state
+            Y = 0x00
+            //> jsr SetPRout     ;set values to stop certain things in motion
+            setPRout(A, Y)
         }
     }
     if (A != 0) {
@@ -26167,17 +26228,17 @@ fun enemiesCollision(X: Int, Y: Int): Int {
     val orig0: Int = A
     A = orig0 shr 1
     //> bcc ExSFN                   ;if d0 not set, leave
-    if (!((orig0 and 0x01) != 0)) {
-        //  goto ExSFN -> exSFN
-        exSFN()
+    X = X
+    Y = Y
+    if ((orig0 and 0x01) == 0) {
+        //> ExSFN: rts
         return X
     } else {
         //> lda AreaType
         A = areaType
         //> beq ExSFN                   ;if water area type, leave
         if (A == 0) {
-            //  goto ExSFN -> exSFN
-            exSFN()
+            //> ExSFN: rts
             return X
         }
     }
@@ -26185,8 +26246,6 @@ fun enemiesCollision(X: Int, Y: Int): Int {
     A = enemyId[X]
     //> cmp #$15                    ;if enemy object => $15, branch to leave
     //> bcs ExitECRoutine
-    X = X
-    Y = Y
     if (!(A >= 0x15)) {
         //> cmp #Lakitu                 ;if lakitu, branch to leave
         //> beq ExitECRoutine
@@ -26501,6 +26560,8 @@ fun procEnemyCollisions(X: Int, Y: Int) {
         A = enemyId[Y]
         //> cmp #HammerBro           ;if hammer bro found in alt state, branch to leave
         //> beq ExitProcessEColl
+        if (A == HammerBro) {
+        }
         //> jsr ShellOrBlockDefeat   ;otherwise, kill first enemy
         shellOrBlockDefeat(X)
         //> ldy $01
@@ -26825,7 +26886,7 @@ fun smallPlatformCollision(X: Int, Y: Int): Int {
                 //  continue loop (branch back to ChkSmallPlatLoop)
                 continue@loop0
             }
-        } while (memory[0x0].toInt() == 0)
+        } while (memory[0x0].toInt() != 0)
     }
     //> ProcSPlatCollisions:
     //> ldx ObjectOffset             ;return enemy object buffer offset to X, then continue
@@ -26963,17 +27024,8 @@ fun procLPlatCollisions(X: Int, Y: Int) {
 // Decompiled from PositionPlayerOnS_Plat
 fun positionplayeronsPlat(A: Int, X: Int) {
     var A: Int = A
-    var X: Int = X
     var Y: Int = 0
     var temp0: Int = 0
-    var temp1: Int = 0
-    var temp2: Int = 0
-    var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
-    var playerYHighpos by MemoryByte(Player_Y_HighPos)
-    var playerYMoveforce by MemoryByte(Player_Y_MoveForce)
-    var playerYPosition by MemoryByte(Player_Y_Position)
-    var playerYSpeed by MemoryByte(Player_Y_Speed)
-    val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
     val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
     val playerPosSPlatData by MemoryByteIndexed(PlayerPosSPlatData)
     //> PositionPlayerOnS_Plat:
@@ -26986,9 +27038,28 @@ fun positionplayeronsPlat(A: Int, X: Int) {
     temp0 = A + playerPosSPlatData[-1 + Y]
     A = temp0 and 0xFF
     //> .db $2c                    ;BIT instruction opcode
+    //  Fall-through tail call to positionPlayerOnVPlat
+    positionPlayerOnVPlat(X)
+    return
+}
+
+// Decompiled from PositionPlayerOnVPlat
+fun positionPlayerOnVPlat(X: Int) {
+    var A: Int = 0
+    var X: Int = X
+    var Y: Int = 0
+    var temp0: Int = 0
+    var temp1: Int = 0
+    var gameEngineSubroutine by MemoryByte(GameEngineSubroutine)
+    var playerYHighpos by MemoryByte(Player_Y_HighPos)
+    var playerYMoveforce by MemoryByte(Player_Y_MoveForce)
+    var playerYPosition by MemoryByte(Player_Y_Position)
+    var playerYSpeed by MemoryByte(Player_Y_Speed)
+    val enemyYHighpos by MemoryByteIndexed(Enemy_Y_HighPos)
+    val enemyYPosition by MemoryByteIndexed(Enemy_Y_Position)
     //> PositionPlayerOnVPlat:
     //> lda Enemy_Y_Position,x    ;get vertical coordinate
-    //  (skipped by BIT $2C)
+    A = enemyYPosition[X]
     //> ldy GameEngineSubroutine
     Y = gameEngineSubroutine
     //> cpy #$0b                  ;if certain routine being executed on this frame,
@@ -27005,15 +27076,15 @@ fun positionplayeronsPlat(A: Int, X: Int) {
         }
         //> sec                       ;subtract 32 pixels from vertical coordinate
         //> sbc #$20                  ;for the player object's height
-        temp1 = A - 0x20
-        A = temp1 and 0xFF
+        temp0 = A - 0x20
+        A = temp0 and 0xFF
         //> sta Player_Y_Position     ;save as player's new vertical coordinate
         playerYPosition = A
         //> tya
         A = Y
         //> sbc #$00                  ;subtract borrow and store as player's
-        temp2 = A - if (temp1 >= 0) 0 else 1
-        A = temp2 and 0xFF
+        temp1 = A - if (temp0 >= 0) 0 else 1
+        A = temp1 and 0xFF
         //> sta Player_Y_HighPos      ;new vertical high byte
         playerYHighpos = A
         //> lda #$00
@@ -27024,13 +27095,6 @@ fun positionplayeronsPlat(A: Int, X: Int) {
         playerYMoveforce = A
     }
     //> ExPlPos: rts
-    return
-}
-
-// Decompiled from PositionPlayerOnVPlat
-fun positionPlayerOnVPlat() {
-    // Fall-through tail call to positionplayeronsPlat
-    positionplayeronsPlat(0, 0)
     return
 }
 
@@ -29885,17 +29949,16 @@ fun enemyToBGCollisionDet(X: Int): Int {
     //> and #%00100000
     A = A and 0x20
     //> bne ExEBG                ;if set, branch to leave
-    if (!(A == 0)) {
-        //  goto ExEBG -> exEBG
-        exEBG()
+    X = X
+    if (A != 0) {
+        //> ExEBG: rts            ;leave
         return X
     } else {
         //> jsr SubtEnemyYPos        ;otherwise, do a subroutine here
         val flag0: Boolean = subtEnemyYPos(X)
         //> bcc ExEBG                ;if enemy vertical coord + 62 < 68, branch to leave
-        if (!(flag0)) {
-            //  goto ExEBG -> exEBG
-            exEBG()
+        if (!flag0) {
+            //> ExEBG: rts            ;leave
             return X
         }
     }
@@ -29903,15 +29966,13 @@ fun enemyToBGCollisionDet(X: Int): Int {
     Y = enemyId[X]
     //> cpy #Spiny               ;if enemy object is not spiny, branch elsewhere
     //> bne DoIDCheckBGColl
-    X = X
     if (Y == Spiny) {
         //> lda Enemy_Y_Position,x
         A = enemyYPosition[X]
         //> cmp #$25                 ;if enemy vertical coordinate < 36 branch to leave
         //> bcc ExEBG
         if (!(A >= 0x25)) {
-            //  goto ExEBG -> exEBG
-            exEBG()
+            //> ExEBG: rts            ;leave
             return X
         }
     }
@@ -32076,23 +32137,25 @@ fun blockbuffercolliFeet(Y: Int): Int {
 // Decompiled from BlockBufferColli_Head
 fun blockbuffercolliHead(Y: Int): Int {
     var A: Int = 0
-    var X: Int = 0
     //> BlockBufferColli_Head:
     //> lda #$00       ;set flag to return vertical coordinate
     A = 0x00
     //> .db $2c        ;BIT instruction opcode
-    //> BlockBufferColli_Side:
-    //> lda #$01       ;set flag to return horizontal coordinate
-    //  (skipped by BIT $2C)
-    //> ldx #$00       ;set offset for player object
-    X = 0x00
-    //  Fall-through tail call to blockBufferCollision
-    return blockBufferCollision(A, X, Y)
+    //  Fall-through tail call to blockbuffercolliSide
+    return blockbuffercolliSide(Y)
 }
 
 // Decompiled from BlockBufferColli_Side
 fun blockbuffercolliSide(Y: Int): Int {
-    return blockBufferCollision(0x01, 0x00, Y)
+    var A: Int = 0
+    var X: Int = 0
+    //> BlockBufferColli_Side:
+    //> lda #$01       ;set flag to return horizontal coordinate
+    A = 0x01
+    //> ldx #$00       ;set offset for player object
+    X = 0x00
+    //  Fall-through tail call to blockBufferCollision
+    return blockBufferCollision(A, X, Y)
 }
 
 // Decompiled from BlockBufferCollision
@@ -39275,6 +39338,7 @@ fun processPlayerAction(): Int {
     var temp0: Int = 0
     var temp1: Int = 0
     var temp10: Int = 0
+    var temp11: Int = 0
     var temp2: Int = 0
     var temp3: Int = 0
     var temp4: Int = 0
@@ -39466,15 +39530,28 @@ fun processPlayerAction(): Int {
         //> lda Player_Y_Speed     ;check player's vertical speed
         A = playerYSpeed
         //> beq NonAnimatedActs    ;if no speed, branch, use offset as-is
+        if (A == 0) {
+            //> NonAnimatedActs:
+            //> jsr GetGfxOffsetAdder      ;do a sub here to get offset adder for graphics table
+            temp7 = getGfxOffsetAdder(Y)
+            //> lda #$00
+            A = 0x00
+            //> sta PlayerAnimCtrl         ;initialize animation frame control
+            playerAnimCtrl = A
+            //> lda PlayerGfxTblOffsets,y  ;load offset to graphics table using size as offset
+            A = playerGfxTblOffsets[temp7]
+            //> rts
+            return A
+        }
         //> jsr GetGfxOffsetAdder  ;otherwise get offset for graphics table
-        temp7 = getGfxOffsetAdder(Y)
+        temp8 = getGfxOffsetAdder(Y)
         //> jmp ThreeFrameExtent   ;then skip ahead to more code
         //> jmp ThreeFrameExtent (not a known function)
         //> ActionSwimming:
         //> ldy #$01               ;load offset for swimming
         Y = 0x01
         //> jsr GetGfxOffsetAdder
-        temp8 = getGfxOffsetAdder(Y)
+        temp9 = getGfxOffsetAdder(Y)
         //> lda JumpSwimTimer      ;check jump/swim timer
         A = jumpSwimTimer
         //> ora PlayerAnimCtrl     ;and animation frame control
@@ -39505,7 +39582,7 @@ fun processPlayerAction(): Int {
             return A
         }
         //  Fall-through tail call to getCurrentAnimOffset
-        return getCurrentAnimOffset(temp8)
+        return getCurrentAnimOffset(temp9)
     }
     //> FourFrameExtent:
     //> lda #$03              ;load upper extent for frame control
@@ -39519,9 +39596,9 @@ fun processPlayerAction(): Int {
     //> sta $00                   ;store upper extent here
     memory[0x0] = A.toUByte()
     //> jsr GetCurrentAnimOffset  ;get proper offset to graphics table
-    temp9 = getCurrentAnimOffset(Y)
+    temp10 = getCurrentAnimOffset(Y)
     //> pha                       ;save offset to stack
-    push(temp9)
+    push(temp10)
     //> lda PlayerAnimTimer       ;load animation frame timer
     A = playerAnimTimer
     //> bne ExAnimC               ;branch if not expired
@@ -39534,8 +39611,8 @@ fun processPlayerAction(): Int {
         A = playerAnimCtrl
         //> clc                       ;add one to animation frame control
         //> adc #$01
-        temp10 = A + 0x01
-        A = temp10 and 0xFF
+        temp11 = A + 0x01
+        A = temp11 and 0xFF
         //> cmp $00                   ;compare to upper extent
         //> bcc SetAnimC              ;if frame control + 1 < upper extent, use as next
         if (A >= memory[0x0].toInt()) {
