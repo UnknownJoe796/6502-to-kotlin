@@ -230,41 +230,59 @@ private class StructuralAnalyzer(
         // Check if header's branch is internal (stays in loop) vs external (exits loop)
         val headerBranchInLoop = header.branchExit?.let { it in loop.body } ?: false
 
+        // by Claude - Check if header and back-edge branches check the SAME flag.
+        // This distinguishes between "early exit" patterns (same flag, inverted) vs
+        // "loop condition at header" patterns (different flags).
+        // Example: Loop: LDA $00,X; BEQ Done; DEX; BNE Loop - header (BEQ) and back-edge (BNE) both check Z
+        // Example: loop_header: LDA counter; BEQ exit; STA; DEC; BPL loop_header - header (BEQ=Z) vs back-edge (BPL=N)
+        fun getFlagCheckedByBranch(op: AssemblyOp?): Char? = when (op) {
+            AssemblyOp.BEQ, AssemblyOp.BNE -> 'Z'
+            AssemblyOp.BCS, AssemblyOp.BCC -> 'C'
+            AssemblyOp.BMI, AssemblyOp.BPL -> 'N'
+            AssemblyOp.BVS, AssemblyOp.BVC -> 'V'
+            else -> null
+        }
+        val headerBranchOp = header.lastInstructionLine()?.instruction?.op
+        val backEdgeBranchOp = backEdgeSource?.lastInstructionLine()?.instruction?.op
+        val headerFlag = getFlagCheckedByBranch(headerBranchOp)
+        val backEdgeFlag = getFlagCheckedByBranch(backEdgeBranchOp)
+        val sameFlag = headerFlag != null && backEdgeFlag != null && headerFlag == backEdgeFlag
+
         // by Claude - Check if header has body instructions that should execute before condition.
         // Key insight for patterns:
         // - Pattern: INX; CPX #$03; BEQ -> INX is body, CPX/BEQ is condition = PostTest
         // - Pattern: LDA #$00; BEQ -> LDA immediate is condition setup = PreTest
-        // - Pattern: LDA $addr; BEQ -> LDA memory is body (load has side effect) = PostTest
+        // - Pattern: LDA $addr; BEQ -> Just loading to test = PreTest (no side effects)
+        // - Pattern: LDA $addr; STA $other; BEQ -> STA is body code = PostTest
         //
-        // The distinction for LDA/LDX/LDY without compare:
-        // - Immediate mode (#$xx): loading a constant, this IS the condition (test if constant is zero)
-        // - Memory addressing: loading from memory, this is body code
+        // CRITICAL FIX: Loads (LDA/LDX/LDY) by themselves are NOT body code - they're condition setup.
+        // Only state-MODIFYING instructions (stores, increments, decrements, shifts, arithmetic that
+        // stores results) are body code. Loading a value to test it is part of the condition.
+        val stateModifyingOps = setOf(
+            AssemblyOp.INX, AssemblyOp.INY, AssemblyOp.DEX, AssemblyOp.DEY,
+            AssemblyOp.INC, AssemblyOp.DEC,
+            AssemblyOp.ASL, AssemblyOp.LSR, AssemblyOp.ROL, AssemblyOp.ROR,
+            AssemblyOp.STA, AssemblyOp.STX, AssemblyOp.STY,
+            // Note: ADC/SBC/AND/ORA/EOR modify A register but that's typically used in conditions
+            // Only count them as body if they occur BEFORE a compare/branch
+            AssemblyOp.TAX, AssemblyOp.TAY, AssemblyOp.TXA, AssemblyOp.TYA, // Transfers that preserve value
+            AssemblyOp.PHA, AssemblyOp.PHP, AssemblyOp.PLA, AssemblyOp.PLP  // Stack operations
+        )
+
         val hasCompareInstruction = header.lines.any { line ->
             line.instruction?.op in setOf(AssemblyOp.CMP, AssemblyOp.CPX, AssemblyOp.CPY, AssemblyOp.BIT)
         }
+
         val headerHasBodyInstructions = if (!hasCompareInstruction) {
-            // No compare instruction - check if loads are from memory (body) vs immediate (condition)
+            // No compare instruction - check for state-modifying instructions before the branch
+            // Loads (LDA/LDX/LDY) are condition setup, not body code
             header.lines.any { line ->
-                val instr = line.instruction ?: return@any false
-                val op = instr.op
-                // Load from memory (not immediate) is body code
-                if (op in setOf(AssemblyOp.LDA, AssemblyOp.LDX, AssemblyOp.LDY)) {
-                    // Check if it's memory addressing (not immediate/Value type)
-                    instr.address != null && instr.address !is AssemblyAddressing.Value
-                } else {
-                    // Other state-modifying instructions are body code
-                    op in setOf(
-                        AssemblyOp.INX, AssemblyOp.INY, AssemblyOp.DEX, AssemblyOp.DEY,
-                        AssemblyOp.INC, AssemblyOp.DEC,
-                        AssemblyOp.ASL, AssemblyOp.LSR, AssemblyOp.ROL, AssemblyOp.ROR,
-                        AssemblyOp.STA, AssemblyOp.STX, AssemblyOp.STY,
-                        AssemblyOp.ADC, AssemblyOp.SBC, AssemblyOp.AND, AssemblyOp.ORA, AssemblyOp.EOR,
-                        AssemblyOp.TAX, AssemblyOp.TAY, AssemblyOp.TXA, AssemblyOp.TYA
-                    )
-                }
+                val op = line.instruction?.op ?: return@any false
+                if (op.isBranch) return@any false // Don't count the branch itself
+                op in stateModifyingOps
             }
         } else {
-            // Has compare - check for state-modifying instructions before the compare
+            // Has compare - check for state-modifying instructions BEFORE the compare
             var foundCompare = false
             header.lines.any { line ->
                 val op = line.instruction?.op ?: return@any false
@@ -273,17 +291,28 @@ private class StructuralAnalyzer(
                     return@any false // Don't count compare as body
                 }
                 if (foundCompare) return@any false // After compare is condition, not body
-                // Before compare: check if it modifies state (not just loads)
-                // State-modifying: INC/DEC/INX/INY/DEX/DEY, ASL/LSR/ROL/ROR, STA/STX/STY, etc.
-                op in setOf(
-                    AssemblyOp.INX, AssemblyOp.INY, AssemblyOp.DEX, AssemblyOp.DEY,
-                    AssemblyOp.INC, AssemblyOp.DEC,
-                    AssemblyOp.ASL, AssemblyOp.LSR, AssemblyOp.ROL, AssemblyOp.ROR,
-                    AssemblyOp.STA, AssemblyOp.STX, AssemblyOp.STY,
-                    AssemblyOp.ADC, AssemblyOp.SBC, AssemblyOp.AND, AssemblyOp.ORA, AssemblyOp.EOR,
-                    AssemblyOp.TAX, AssemblyOp.TAY, AssemblyOp.TXA, AssemblyOp.TYA
-                )
+                // Before compare: only state-modifying instructions count as body
+                op in stateModifyingOps
             }
+        }
+
+        // by Claude - Debug
+        val debugLoop = header.label == "Loop"
+        val calculatedIsSingleBlock = loop.body.size == 1 && backEdgeSource == header
+        if (debugLoop) {
+            println("DEBUG Loop detection for ${header.label}:")
+            println("  headerIsConditional=$headerIsConditional")
+            println("  backEdgeIsConditional=$backEdgeIsConditional")
+            println("  headerBranchInLoop=$headerBranchInLoop")
+            println("  hasExits=${loop.exits.isNotEmpty()}, exits=${loop.exits.map { it.label }}")
+            println("  loop.body=${loop.body.map { it.label ?: "@${it.originalLineIndex}" }}")
+            println("  loop.backEdges=${loop.backEdges.map { (from, to) -> "${from.label ?: "@${from.originalLineIndex}"} -> ${to.label}" }}")
+            println("  backEdgeSource=${backEdgeSource?.label ?: backEdgeSource?.originalLineIndex}")
+            println("  isSingleBlock=$calculatedIsSingleBlock")
+            println("  headerHasBodyInstructions=$headerHasBodyInstructions")
+            println("  header.branchExit=${header.branchExit?.label}")
+            println("  header.fallThroughExit=${header.fallThroughExit?.label}")
+            println("  headerFlag=$headerFlag, backEdgeFlag=$backEdgeFlag, sameFlag=$sameFlag")
         }
 
         val loopKind = determineLoopKind(
@@ -291,9 +320,14 @@ private class StructuralAnalyzer(
             backEdgeIsConditional = backEdgeIsConditional,
             headerBranchInLoop = headerBranchInLoop,
             hasExits = loop.exits.isNotEmpty(),
-            isSingleBlock = loop.body.size == 1 && backEdgeSource == header,
-            headerHasBodyInstructions = headerHasBodyInstructions
+            isSingleBlock = calculatedIsSingleBlock,
+            headerHasBodyInstructions = headerHasBodyInstructions,
+            headerAndBackEdgeSameFlag = sameFlag
         )
+
+        if (debugLoop) {
+            println("  -> loopKind=$loopKind")
+        }
 
         // Mark as processing to prevent recursion
         processingLoopHeaders.add(header)
@@ -304,8 +338,10 @@ private class StructuralAnalyzer(
             // 1. Header has internal branch (original condition)
             // 2. Header has body instructions before condition
             // 3. Header is not conditional (all its instructions are body code)
+            // 4. Back-edge is from different block (header's branch is early exit, not loop condition)
+            val backEdgeFromDifferent = backEdgeSource != null && backEdgeSource != header
             val includeHeaderInBody = loopKind == LoopKind.PostTest &&
-                (headerBranchInLoop || headerHasBodyInstructions || !headerIsConditional)
+                (headerBranchInLoop || headerHasBodyInstructions || !headerIsConditional || backEdgeFromDifferent)
             val bodyStartIdx = if (includeHeaderInBody) {
                 headerIdx // Include header in body for PostTest
             } else {
@@ -389,19 +425,41 @@ private class StructuralAnalyzer(
         val ftIdx = indexOf[ft] ?: return null
         val brIdx = indexOf[br] ?: -1
 
+        // by Claude - CRITICAL FIX for Bug #4: Check for backward branches FIRST.
+        // When a conditional branches backward to an earlier block in MEMORY ORDER,
+        // the standard if-then detection fails. Handle backward branches to return blocks
+        // as early-return if-then patterns.
+        // NOTE: Check MEMORY order (originalLineIndex), not layout order (brIdx).
+        // Layout order has entry first, but memory order may have branch target first.
+        val isBackwardInMemory = br.originalLineIndex < block.originalLineIndex
+        if (isBackwardInMemory) {
+            // This is a backward branch (in memory order)
+            if (isReturnBlock(br)) {
+                // Build an if-then with the backward branch target as the then-body
+                return buildBackwardBranchIfThen(
+                    condBlock = block,
+                    branchTarget = br,
+                    fallThroughIdx = ftIdx,
+                    endIdx = endIdx
+                )
+            } else {
+                // Not a return block - mark as unstructured (loop continue or goto)
+                tracker.markUnstructured(block, br, "backward branch (loop continue or goto)")
+                // Continue to try standard if-then pattern for the forward fall-through
+            }
+        }
+
         // Fall-through should be next block (standard if-then pattern)
+        // Note: For backward branch cases that aren't early-return, we skip this check
+        // and let the fall-through be handled as a sequence
         if (ftIdx != blockIdx + 1) return null
 
         // Branch should be forward within range
         val effectiveBrIdx = if (brIdx in (blockIdx + 1) until endIdx) brIdx else -1
 
         if (effectiveBrIdx <= 0) {
-            // Branch is backward or out of range - could be loop or exit
-            // Check if it's a backward branch to a loop header
-            if (brIdx in 0..blockIdx) {
-                // This is a backward branch - mark as continue if inside a loop
-                tracker.markUnstructured(block, br, "backward branch (loop continue or goto)")
-            }
+            // Branch is backward or out of range - already handled above for backward branches
+            // This case is for branches that are forward but out of the current range
             return null
         }
 
@@ -517,6 +575,61 @@ private class StructuralAnalyzer(
     }
 
     /**
+     * by Claude - Build an if-then region for a backward branch to an early-return block.
+     * This handles the pattern where a conditional branches backward to code that ends with RTS.
+     *
+     * Pattern:
+     *   EntryPoint:
+     *     ldy counter
+     *     beq EarlyReturn    ; backward branch
+     *     ... main code ...
+     *   EarlyReturn:         ; earlier in memory
+     *     lda #$00
+     *     rts
+     *
+     * Generates:
+     *   if (Y == 0) {
+     *       A = 0x00
+     *       return
+     *   }
+     *   // main code
+     */
+    private fun buildBackwardBranchIfThen(
+        condBlock: AssemblyBlock,
+        branchTarget: AssemblyBlock,
+        fallThroughIdx: Int,
+        endIdx: Int
+    ): RegionBuildResult? {
+        val condLine = condBlock.lastInstructionLine() ?: return null
+
+        // Mark the backward target block as consumed
+        consumedBlocks.add(branchTarget)
+
+        // Build the then-body from the backward target block
+        // This is just the single block (which ends with return)
+        val thenRegion = BlockRegion(nextRegionId(), branchTarget)
+
+        // Consume edges
+        tracker.consumeEdge(condBlock, branchTarget) // branch edge
+        condBlock.fallThroughExit?.let { tracker.consumeEdge(condBlock, it) } // fall-through edge
+
+        // The join point is the fall-through (main code continues after the if)
+        val joinBlock = condBlock.fallThroughExit
+
+        val region = IfThenRegion(
+            id = nextRegionId(),
+            conditionBlock = condBlock,
+            conditionLine = condLine,
+            sense = true, // branch IS taken for then-path (inverted from normal if-then)
+            thenRegion = thenRegion,
+            joinBlock = joinBlock
+        )
+
+        // Continue processing from fall-through
+        return RegionBuildResult(region, fallThroughIdx)
+    }
+
+    /**
      * Try to build an infinite loop region.
      */
     private fun tryBuildInfiniteLoop(
@@ -572,12 +685,15 @@ private class StructuralAnalyzer(
         headerBranchInLoop: Boolean,
         hasExits: Boolean,
         isSingleBlock: Boolean,
-        headerHasBodyInstructions: Boolean = false  // by Claude - new parameter
+        headerHasBodyInstructions: Boolean = false,  // by Claude
+        headerAndBackEdgeSameFlag: Boolean = false   // by Claude - true if header and back-edge check same CPU flag
     ): LoopKind {
         return when {
             // Infinite loop: no exits and no conditional
             !hasExits && !headerIsConditional && !backEdgeIsConditional -> LoopKind.Infinite
-            // Single-block self-loop with conditional: PostTest
+            // Single-block self-loop with conditional: PostTest (do-while)
+            // This handles patterns like: Loop: LDA $00,X; BEQ exit; DEX; BNE Loop
+            // The body (LDA, DEX) always executes at least once before checking continue condition
             isSingleBlock && headerIsConditional -> LoopKind.PostTest
             // Header has internal branch only, back-edge is conditional: PostTest
             headerIsConditional && headerBranchInLoop && backEdgeIsConditional -> LoopKind.PostTest
@@ -587,8 +703,21 @@ private class StructuralAnalyzer(
             // This handles patterns like: Loop: INX; CPX #$03; BEQ Done; JMP Loop
             // The INX is loop body, CPX/BEQ is the condition, so body executes before condition
             headerIsConditional && headerHasBodyInstructions && hasExits -> LoopKind.PostTest
-            // Header is conditional with external exit and no body instructions: PreTest
-            headerIsConditional && !headerBranchInLoop && hasExits && !headerHasBodyInstructions -> LoopKind.PreTest
+            // by Claude - Multi-block loop with conditional back-edge and header exit, SAME FLAG: PostTest
+            // Pattern: Loop: LDA $00,X; BEQ Done; DEX; BNE Loop (blocks: [Loop, @5])
+            // Header (BEQ=Z) and back-edge (BNE=Z) check the SAME flag - this is "early exit" pattern.
+            // Header branch goes to exit (early exit), back-edge has the actual loop continuation condition.
+            // Body always executes before back-edge condition is checked -> PostTest
+            !isSingleBlock && backEdgeIsConditional && headerIsConditional && !headerBranchInLoop && hasExits && headerAndBackEdgeSameFlag -> LoopKind.PostTest
+            // by Claude - Multi-block loop with conditional back-edge and header exit, DIFFERENT FLAGS: PreTest
+            // Pattern: loop_header: LDA counter; BEQ exit; STA; DEC; BPL loop_header
+            // Header (BEQ=Z) and back-edge (BPL=N) check DIFFERENT flags - header has the primary condition.
+            // If header condition fails initially, body never executes -> PreTest
+            !isSingleBlock && backEdgeIsConditional && headerIsConditional && !headerBranchInLoop && hasExits && !headerAndBackEdgeSameFlag -> LoopKind.PreTest
+            // Header is conditional with external exit and UNCONDITIONAL back-edge: PreTest (while)
+            // This handles patterns like: loop_header: LDA counter; BEQ exit; loop_body: ...; JMP loop_header
+            // The condition is checked before the body executes
+            headerIsConditional && !headerBranchInLoop && hasExits && !headerHasBodyInstructions && !backEdgeIsConditional -> LoopKind.PreTest
             // Default to PreTest
             else -> LoopKind.PreTest
         }

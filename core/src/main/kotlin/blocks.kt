@@ -160,6 +160,11 @@ class AssemblyFunction(
 
     // by Claude - Flag indicating this is an empty function that needs fall-through resolution
     var isEmptyFunction: Boolean = false
+
+    // by Claude - Blocks that are reached via BIT skip pattern (.db $2c)
+    // These are other function entry points that this function "falls through" to via BIT skip.
+    // The target function's first instruction is skipped (eaten by BIT opcode).
+    val bitSkipTargets: MutableSet<AssemblyBlock> = mutableSetOf()
 }
 
 /**
@@ -671,26 +676,28 @@ fun List<AssemblyBlock>.functionify(
             if (current in visited) continue
             visited.add(current)
 
-            // Stop if we hit another function entry (unless it's the current function)
-            // Exception: If we arrived via a .db $2c BIT skip pattern, continue traversal
-            // because the BIT instruction "eats" the first instruction of the target function.
-            if (current in functionEntryBlocks && current != entryBlock) {
-                // Check if we got here via a BIT skip from a block already in this function
-                val arrivedViaBitSkip = functionBlocks.any { block ->
-                    blockEndsWith2c(block) && block.fallThroughExit == current
-                }
-                if (!arrivedViaBitSkip) {
-                    continue
-                }
-            }
-
             // by Claude - Check if we arrived via a BIT skip pattern from any block in this function
             // This applies to ALL blocks, not just function entries
-            // The skip is recorded per-function so that a block can have different behavior
-            // when decompiled as part of different functions
             val arrivedViaBitSkip = functionBlocks.any { block ->
                 blockEndsWith2c(block) && block.fallThroughExit == current
             }
+
+            // Stop if we hit another function entry (unless it's the current function)
+            // by Claude - CRITICAL FIX: Even if we arrived via BIT skip, we should NOT claim
+            // another function's entry block. The BIT skip creates an alternative path through
+            // the code, but each function entry point should have its own set of blocks.
+            // Example: MoveAllSpritesOffscreen uses BIT skip to reach MoveSpritesOffscreen's code,
+            // but MoveSpritesOffscreen should still be its own function with its own blocks.
+            if (current in functionEntryBlocks && current != entryBlock) {
+                // Record the BIT skip relationship for code generation, but don't claim the block
+                if (arrivedViaBitSkip) {
+                    current.skipFirstInstructionForFunctions.add(function)
+                    // Record that this function calls the target function via BIT skip
+                    function.bitSkipTargets.add(current)
+                }
+                continue
+            }
+
             if (arrivedViaBitSkip) {
                 // Mark this block to skip its first instruction for THIS function only
                 // because the BIT instruction "eats" the next 2 bytes (first instruction)

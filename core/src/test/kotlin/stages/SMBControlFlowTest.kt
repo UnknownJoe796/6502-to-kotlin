@@ -87,8 +87,49 @@ class SMBControlFlowTest {
     fun `MoveSpritesOffscreen has loop structure`() {
         val func = loadFunction("MoveSpritesOffscreen")
 
+        // by Claude - Debug output
+        println("=== MoveSpritesOffscreen Debug ===")
+        println("Starting block: ${func.startingBlock.label}")
+        println("Starting block owner: ${func.startingBlock.function?.startingBlock?.label}")
+        println("Is empty function: ${func.isEmptyFunction}")
+        println("Blocks in function: ${func.blocks?.map { it.label ?: "@${it.originalLineIndex}" }}")
+
+        // Check MoveAllSpritesOffscreen too
+        val allFunc = SMBTestFixtures.allFunctions.find { it.startingBlock.label == "MoveAllSpritesOffscreen" }
+        if (allFunc != null) {
+            println("\n=== MoveAllSpritesOffscreen Debug ===")
+            println("Blocks: ${allFunc.blocks?.map { it.label ?: "@${it.originalLineIndex}" }}")
+        }
+
+        // Check dominator info
+        println("\n=== Dominator Info ===")
+        func.blocks?.forEach { block ->
+            val label = block.label ?: "@${block.originalLineIndex}"
+            val idom = block.immediateDominator?.let { it.label ?: "@${it.originalLineIndex}" } ?: "null"
+            println("  $label -> idom = $idom")
+            println("    branchExit: ${block.branchExit?.label ?: block.branchExit?.originalLineIndex}")
+            println("    fallThroughExit: ${block.fallThroughExit?.label ?: block.fallThroughExit?.originalLineIndex}")
+        }
+
+        // Check natural loops
+        val naturalLoops = func.blocks?.toList()?.detectNaturalLoops() ?: emptyList()
+        println("\n=== Natural Loops Detected ===")
+        if (naturalLoops.isEmpty()) {
+            println("  NO LOOPS DETECTED!")
+        } else {
+            naturalLoops.forEach { loop ->
+                println("  Loop header: ${loop.header.label}")
+                println("  Body: ${loop.body.map { it.label ?: "@${it.originalLineIndex}" }}")
+                println("  Back-edges: ${loop.backEdges.map { (from, to) -> "${from.label ?: "@${from.originalLineIndex}"} -> ${to.label ?: "@${to.originalLineIndex}"}" }}")
+                println("  Exits: ${loop.exits.map { it.label ?: "@${it.originalLineIndex}" }}")
+            }
+        }
+
+        println("\n=== Control Nodes ===")
+
         assertNotNull(func.asControls, "Control flow should be analyzed")
         val controls = func.asControls!!
+        controls.forEach { println("  $it") }
 
         // Should have: entry block, loop node, exit block
         assertTrue(controls.size >= 2, "Should have at least 2 nodes")

@@ -32,8 +32,10 @@ class ControlFlowPatternsTest {
     /**
      * Extended Kotlin AST evaluator that handles control flow statements.
      */
-    // by Claude - Exception for break statements in loops
-    class BreakException : Exception()
+    // by Claude - Exceptions for control flow in loops and functions
+    class BreakException(val label: String? = null) : Exception()
+    class ContinueException(val label: String? = null) : Exception()
+    class ReturnException : Exception()  // by Claude - For early returns
 
     class ControlFlowEvaluator(private val state: EvaluatorState) {
         private val baseEvaluator = KotlinAstEvaluator(state)
@@ -49,7 +51,29 @@ class ControlFlowPatternsTest {
                             if (loopIterations++ > maxIterations) {
                                 throw RuntimeException("Infinite loop detected in KWhile")
                             }
-                            stmt.body.forEach { evaluate(it) }
+                            try {
+                                stmt.body.forEach { evaluate(it) }
+                            } catch (e: ContinueException) {
+                                // Continue to next iteration
+                            }
+                        }
+                    } catch (e: BreakException) {
+                        // Break exits the loop
+                    }
+                }
+                // by Claude - Handle KLabeledWhile (same as KWhile but with label support)
+                is KLabeledWhile -> {
+                    loopIterations = 0
+                    try {
+                        while (baseEvaluator.evaluateBoolExpr(stmt.condition)) {
+                            if (loopIterations++ > maxIterations) {
+                                throw RuntimeException("Infinite loop detected in KLabeledWhile")
+                            }
+                            try {
+                                stmt.body.forEach { evaluate(it) }
+                            } catch (e: ContinueException) {
+                                // Continue to next iteration
+                            }
                         }
                     } catch (e: BreakException) {
                         // Break exits the loop
@@ -62,7 +86,29 @@ class ControlFlowPatternsTest {
                             if (loopIterations++ > maxIterations) {
                                 throw RuntimeException("Infinite loop detected in KDoWhile")
                             }
-                            stmt.body.forEach { evaluate(it) }
+                            try {
+                                stmt.body.forEach { evaluate(it) }
+                            } catch (e: ContinueException) {
+                                // Continue to next iteration (check condition)
+                            }
+                        } while (baseEvaluator.evaluateBoolExpr(stmt.condition))
+                    } catch (e: BreakException) {
+                        // Break exits the loop
+                    }
+                }
+                // by Claude - Handle KLabeledDoWhile (same as KDoWhile but with label support)
+                is KLabeledDoWhile -> {
+                    loopIterations = 0
+                    try {
+                        do {
+                            if (loopIterations++ > maxIterations) {
+                                throw RuntimeException("Infinite loop detected in KLabeledDoWhile")
+                            }
+                            try {
+                                stmt.body.forEach { evaluate(it) }
+                            } catch (e: ContinueException) {
+                                // Continue to next iteration (check condition)
+                            }
                         } while (baseEvaluator.evaluateBoolExpr(stmt.condition))
                     } catch (e: BreakException) {
                         // Break exits the loop
@@ -76,7 +122,11 @@ class ControlFlowPatternsTest {
                             if (loopIterations++ > maxIterations) {
                                 throw RuntimeException("Infinite loop detected in KLoop")
                             }
-                            stmt.body.forEach { evaluate(it) }
+                            try {
+                                stmt.body.forEach { evaluate(it) }
+                            } catch (e: ContinueException) {
+                                // Continue to next iteration
+                            }
                         }
                     } catch (e: BreakException) {
                         // Break exits the loop
@@ -84,6 +134,13 @@ class ControlFlowPatternsTest {
                 }
                 is KBreak -> {
                     throw BreakException()
+                }
+                // by Claude - Handle labeled break/continue
+                is KLabeledBreak -> {
+                    throw BreakException(stmt.label)
+                }
+                is KLabeledContinue -> {
+                    throw ContinueException(stmt.label)
                 }
                 is KIf -> {
                     val cond = baseEvaluator.evaluateBoolExpr(stmt.condition)
@@ -93,13 +150,22 @@ class ControlFlowPatternsTest {
                         stmt.elseBranch.forEach { evaluate(it) }
                     }
                 }
+                // by Claude - Handle KReturn by throwing ReturnException to stop execution
+                is KReturn -> {
+                    throw ReturnException()
+                }
                 else -> baseEvaluator.evaluate(stmt)
             }
         }
 
         fun evaluateAll(stmts: List<KotlinStmt>) {
-            for (stmt in stmts) {
-                evaluate(stmt)
+            // by Claude - Catch ReturnException to handle early returns
+            try {
+                for (stmt in stmts) {
+                    evaluate(stmt)
+                }
+            } catch (e: ReturnException) {
+                // Function returned early - this is normal for early exit patterns
             }
         }
     }

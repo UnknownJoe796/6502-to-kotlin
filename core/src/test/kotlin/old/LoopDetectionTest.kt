@@ -33,11 +33,32 @@ class LoopDetectionTest {
 
         val controls = functions[0].analyzeControls()
 
+        // by Claude - Debug output
+        println("=== PreTest Loop Debug ===")
+        println("Blocks: ${blocks.map { it.label ?: "@${it.originalLineIndex}" }}")
+        blocks.forEach { block ->
+            println("  ${block.label ?: "@${block.originalLineIndex}"}:")
+            println("    idom: ${block.immediateDominator?.label}")
+            println("    branchExit: ${block.branchExit?.label}")
+            println("    fallThroughExit: ${block.fallThroughExit?.label}")
+            println("    lines: ${block.lines.mapNotNull { it.instruction?.op }}")
+        }
+        println("\nNatural loops:")
+        val naturalLoops = blocks.detectNaturalLoops()
+        naturalLoops.forEach { loop ->
+            println("  header=${loop.header.label}, body=${loop.body.map { it.label }}, exits=${loop.exits.map { it.label }}")
+            println("  back-edges: ${loop.backEdges.map { (from, to) -> "${from.label}->${to.label}" }}")
+        }
+        println("\nControl nodes:")
+        controls.forEach { println("  $it") }
+        println()
+
         // Should produce a LoopNode
         assertTrue(controls.isNotEmpty(), "Expected control nodes")
 
         val loopNode = controls.filterIsInstance<LoopNode>().firstOrNull()
         assertNotNull(loopNode, "Should detect a LoopNode")
+        println("Loop kind detected: ${loopNode?.kind}")
         assertEquals(LoopKind.PreTest, loopNode!!.kind, "Should be PreTest loop")
         assertNotNull(loopNode.condition, "PreTest loop should have a condition")
         assertEquals(blocks[0], loopNode.header, "Loop header should be first block")

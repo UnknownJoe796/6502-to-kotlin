@@ -256,6 +256,25 @@ class EdgeTracker(
     fun getEdgesTo(block: AssemblyBlock): List<CfgEdge> {
         return allEdges.filter { it.target == block }
     }
+
+    // by Claude - Shared join point detection for fixing code duplication
+    /**
+     * Get the count of incoming edges to a block.
+     * This is used to detect shared join points where multiple control flow paths converge.
+     */
+    fun getIncomingEdgeCount(block: AssemblyBlock): Int {
+        return getEdgesTo(block).size
+    }
+
+    /**
+     * Check if a block is a shared join point (has multiple incoming edges).
+     * When a block has multiple incoming edges, it should NOT be inlined into
+     * individual if-then regions - instead it should appear in sequence after
+     * all the conditionals so all paths converge at it naturally.
+     */
+    fun isSharedJoinPoint(block: AssemblyBlock): Boolean {
+        return getIncomingEdgeCount(block) > 1
+    }
 }
 
 /**

@@ -33,7 +33,10 @@ class AlgorithmDecompileTest {
     // TEST HARNESS: Reuse from ControlFlowPatternsTest
     // =====================================================================
 
+    // by Claude - Exceptions for control flow
     class BreakException : Exception()
+    class ContinueException : Exception()
+    class ReturnException : Exception()
 
     class AlgorithmEvaluator(private val state: EvaluatorState) {
         private val baseEvaluator = KotlinAstEvaluator(state)
@@ -49,7 +52,29 @@ class AlgorithmDecompileTest {
                             if (loopIterations++ > maxIterations) {
                                 throw RuntimeException("Infinite loop detected in KWhile")
                             }
-                            stmt.body.forEach { evaluate(it) }
+                            try {
+                                stmt.body.forEach { evaluate(it) }
+                            } catch (e: ContinueException) {
+                                // Continue to next iteration
+                            }
+                        }
+                    } catch (e: BreakException) {
+                        // Break exits the loop
+                    }
+                }
+                // by Claude - Handle KLabeledWhile (same as KWhile but with label support)
+                is KLabeledWhile -> {
+                    loopIterations = 0
+                    try {
+                        while (baseEvaluator.evaluateBoolExpr(stmt.condition)) {
+                            if (loopIterations++ > maxIterations) {
+                                throw RuntimeException("Infinite loop detected in KLabeledWhile")
+                            }
+                            try {
+                                stmt.body.forEach { evaluate(it) }
+                            } catch (e: ContinueException) {
+                                // Continue to next iteration
+                            }
                         }
                     } catch (e: BreakException) {
                         // Break exits the loop
@@ -62,7 +87,29 @@ class AlgorithmDecompileTest {
                             if (loopIterations++ > maxIterations) {
                                 throw RuntimeException("Infinite loop detected in KDoWhile")
                             }
-                            stmt.body.forEach { evaluate(it) }
+                            try {
+                                stmt.body.forEach { evaluate(it) }
+                            } catch (e: ContinueException) {
+                                // Continue to next iteration (check condition)
+                            }
+                        } while (baseEvaluator.evaluateBoolExpr(stmt.condition))
+                    } catch (e: BreakException) {
+                        // Break exits the loop
+                    }
+                }
+                // by Claude - Handle KLabeledDoWhile (same as KDoWhile but with label support)
+                is KLabeledDoWhile -> {
+                    loopIterations = 0
+                    try {
+                        do {
+                            if (loopIterations++ > maxIterations) {
+                                throw RuntimeException("Infinite loop detected in KLabeledDoWhile")
+                            }
+                            try {
+                                stmt.body.forEach { evaluate(it) }
+                            } catch (e: ContinueException) {
+                                // Continue to next iteration (check condition)
+                            }
                         } while (baseEvaluator.evaluateBoolExpr(stmt.condition))
                     } catch (e: BreakException) {
                         // Break exits the loop
@@ -75,7 +122,11 @@ class AlgorithmDecompileTest {
                             if (loopIterations++ > maxIterations) {
                                 throw RuntimeException("Infinite loop detected in KLoop")
                             }
-                            stmt.body.forEach { evaluate(it) }
+                            try {
+                                stmt.body.forEach { evaluate(it) }
+                            } catch (e: ContinueException) {
+                                // Continue to next iteration
+                            }
                         }
                     } catch (e: BreakException) {
                         // Break exits the loop
@@ -83,6 +134,16 @@ class AlgorithmDecompileTest {
                 }
                 is KBreak -> {
                     throw BreakException()
+                }
+                // by Claude - Handle labeled break/continue and returns
+                is KLabeledBreak -> {
+                    throw BreakException()
+                }
+                is KLabeledContinue -> {
+                    throw ContinueException()
+                }
+                is KReturn -> {
+                    throw ReturnException()
                 }
                 is KIf -> {
                     val cond = baseEvaluator.evaluateBoolExpr(stmt.condition)
@@ -97,8 +158,13 @@ class AlgorithmDecompileTest {
         }
 
         fun evaluateAll(stmts: List<KotlinStmt>) {
-            for (stmt in stmts) {
-                evaluate(stmt)
+            // by Claude - Catch ReturnException to handle early returns
+            try {
+                for (stmt in stmts) {
+                    evaluate(stmt)
+                }
+            } catch (e: ReturnException) {
+                // Function returned early - this is normal for early exit patterns
             }
         }
     }
